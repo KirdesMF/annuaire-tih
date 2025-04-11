@@ -1,6 +1,6 @@
 {
-  "id": "5780865e-3a59-46e9-89b3-43e2a18f23c5",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "f7bdef67-4fba-40f3-aeb7-b769e71cf153",
+  "prevId": "c86cd65d-a6f2-4b86-a273-8ad2709e6673",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -249,8 +249,7 @@
         },
         "role": {
           "name": "role",
-          "type": "role",
-          "typeSchema": "public",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true,
           "default": "'user'"
@@ -408,7 +407,7 @@
         },
         "name": {
           "name": "name",
-          "type": "text",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
@@ -444,8 +443,7 @@
         },
         "status": {
           "name": "status",
-          "type": "company_status",
-          "typeSchema": "public",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true,
           "default": "'pending'"
@@ -463,6 +461,43 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "siret": {
+          "name": "siret",
+          "type": "varchar(14)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "logo": {
+          "name": "logo",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rqth": {
+          "name": "rqth",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "social_media": {
+          "name": "social_media",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
         }
       },
       "indexes": {
@@ -489,6 +524,19 @@
           "tableTo": "user",
           "columnsFrom": [
             "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "companies_user_id_user_id_fk": {
+          "name": "companies_user_id_user_id_fk",
+          "tableFrom": "companies",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
           ],
           "columnsTo": [
             "id"

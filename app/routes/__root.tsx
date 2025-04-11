@@ -1,12 +1,35 @@
 // app/routes/__root.tsx
 import type { ReactNode } from "react";
-import type { QueryClient } from "@tanstack/react-query";
+import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import { Outlet, HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { Header } from "~/components/header";
 import appCSS from "~/styles/app.css?url";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { createServerFn } from "@tanstack/react-start";
+import { getWebRequest } from "@tanstack/react-start/server";
+import { auth } from "~/lib/auth";
+import { Toaster } from "sonner";
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+const getSession = createServerFn({ method: "GET" }).handler(async () => {
+	const request = getWebRequest();
+
+	if (!request) return null;
+
+	const session = await auth.api.getSession({ headers: request.headers });
+	return session;
+});
+
+const sessionQueryOptions = queryOptions({
+	queryKey: ["user", "session"],
+	queryFn: ({ signal }) => getSession({ signal }),
+});
+
+export type RootRouterContext = {
+	queryClient: QueryClient;
+	session: Awaited<ReturnType<typeof getSession>>;
+};
+
+export const Route = createRootRouteWithContext<RootRouterContext>()({
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
@@ -18,6 +41,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 		],
 		links: [{ rel: "stylesheet", href: appCSS }],
 	}),
+	beforeLoad: async ({ context }) => {
+		const session = await context.queryClient.fetchQuery(sessionQueryOptions);
+		return { session };
+	},
 	component: RootComponent,
 });
 
@@ -35,11 +62,12 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 			<head>
 				<HeadContent />
 			</head>
-			<body className="font-sans text-gray-700">
+			<body className="font-sans text-gray-700 isolate">
 				<Header />
 				{children}
+				<Toaster />
+				<ReactQueryDevtools buttonPosition="bottom-left" />
 				<Scripts />
-				<ReactQueryDevtools buttonPosition="bottom-left" />{" "}
 			</body>
 		</html>
 	);
