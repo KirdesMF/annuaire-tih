@@ -37,6 +37,7 @@ export const companiesTable = pgTable(
 			.references(() => user.id, { onDelete: "cascade" })
 			.notNull(),
 		email: varchar("email", { length: 255 }),
+		phone: varchar("phone", { length: 24 }),
 		logo: varchar("logo", { length: 255 }),
 		rqth: boolean("rqth").notNull().default(false),
 		social_media: jsonb("social_media").$type<CompanySocialMedia>().default({}).notNull(),
