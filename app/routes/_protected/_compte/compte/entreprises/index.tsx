@@ -1,8 +1,11 @@
-import { queryOptions } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
+import { queryOptions, useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
+import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
-import { eq } from "drizzle-orm";
+import { unknown } from "better-auth";
+import { eq, inArray } from "drizzle-orm";
+import { useState } from "react";
+import { toast } from "sonner";
 import { CopyIcon } from "~/components/icons/copy";
 import {
 	Dialog,
@@ -13,7 +16,9 @@ import {
 	DialogTrigger,
 } from "~/components/ui/dialog";
 import { db } from "~/db";
+import { categoriesTable } from "~/db/schema/categories";
 import { companiesTable } from "~/db/schema/companies";
+import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { auth } from "~/lib/auth";
 
 export const getUserCompanies = createServerFn({ method: "GET" }).handler(async () => {
@@ -23,12 +28,49 @@ export const getUserCompanies = createServerFn({ method: "GET" }).handler(async 
 	const session = await auth.api.getSession({ headers: request.headers });
 	if (!session) throw redirect({ to: "/login" });
 
-	const companies = await db
-		.select()
+	// Get companies
+	const companiesQuery = await db
+		.select({
+			id: companiesTable.id,
+			name: companiesTable.name,
+			description: companiesTable.description,
+			status: companiesTable.status,
+			siret: companiesTable.siret,
+		})
 		.from(companiesTable)
 		.where(eq(companiesTable.user_id, session.user.id));
-	return companies;
+
+	// Then get categories in a separate query
+	const categories = await db
+		.select({
+			company_id: companyCategoriesTable.company_id,
+			category_id: categoriesTable.id,
+			category_name: categoriesTable.name,
+		})
+		.from(companyCategoriesTable)
+		.leftJoin(categoriesTable, eq(categoriesTable.id, companyCategoriesTable.category_id))
+		.where(
+			inArray(
+				companyCategoriesTable.company_id,
+				companiesQuery.map((c) => c.id),
+			),
+		);
+
+	return companiesQuery.map((company) => ({
+		...company,
+		categories: categories.filter((c) => c.company_id === company.id),
+	}));
 });
+
+export const deleteCompany = createServerFn({ method: "POST" })
+	.validator((data: string) => data as string)
+	.handler(async ({ data }) => {
+		try {
+			await db.delete(companiesTable).where(eq(companiesTable.id, data));
+		} catch (error) {
+			console.error(error);
+		}
+	});
 
 const userCompaniesQueryOptions = queryOptions({
 	queryKey: ["user", "companies"],
@@ -44,9 +86,30 @@ export const Route = createFileRoute("/_protected/_compte/compte/entreprises/")(
 });
 
 function RouteComponent() {
-	const data = Route.useLoaderData();
+	const companiesQuery = useSuspenseQuery(userCompaniesQueryOptions);
+	const context = Route.useRouteContext();
+	const { mutate, isPending } = useMutation({ mutationFn: deleteCompany });
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-	if (!data?.length) {
+	function onDeleteCompany(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		const formData = new FormData(e.target as HTMLFormElement);
+		mutate(
+			{ data: formData.get("companyId") as string },
+			{
+				onSuccess: () => {
+					context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
+					setIsDialogOpen(false);
+					toast.success("Entreprise supprimée avec succès");
+				},
+				onError: () => {
+					toast.error("Une erreur est survenue lors de la suppression de l'entreprise");
+				},
+			},
+		);
+	}
+
+	if (!companiesQuery.data?.length) {
 		return (
 			<div className="container px-4 py-6">
 				<div className="flex flex-col items-center justify-center gap-4">
@@ -66,21 +129,34 @@ function RouteComponent() {
 			</header>
 
 			<ul className="flex flex-col gap-2">
-				{data?.map((company) => (
+				{companiesQuery.data?.map((company) => (
 					<li key={company.id}>
 						<article className="border border-gray-300 p-5 rounded-sm relative">
-							<header className="flex items-baseline mb-2 gap-2">
+							<header className="flex items-baseline mb-4 gap-2">
 								<h2 className="text-lg font-bold leading-1 ">{company.name}</h2>
 								<p className="text-xs text-orange-300">{company.status}</p>
 							</header>
 
 							<button
 								type="button"
-								className="text-sm text-gray-500 border px-2 py-1 rounded-sm inline-flex gap-2 items-center hover:cursor-pointer absolute top-3 end-4"
+								className="text-xs text-gray-500 border px-2 py-1 rounded-sm inline-flex gap-2 items-center hover:cursor-pointer absolute top-3 end-4"
 							>
 								{company.siret}
 								<CopyIcon className="size-4" />
 							</button>
+
+							<p className="text-xs text-gray-500 mb-4">{company.description}</p>
+
+							<ul className="flex flex-wrap gap-2 mb-4">
+								{company.categories.map((category) => (
+									<li
+										key={category.category_id}
+										className="bg-gray-100 px-2 py-1 rounded-sm text-xs flex items-center gap-2"
+									>
+										{category.category_name}
+									</li>
+								))}
+							</ul>
 
 							<footer className="flex gap-2">
 								<Link
@@ -91,7 +167,7 @@ function RouteComponent() {
 									Modifier
 								</Link>
 
-								<Dialog>
+								<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 									<DialogTrigger asChild>
 										<button
 											type="button"
@@ -127,12 +203,15 @@ function RouteComponent() {
 												</button>
 											</DialogClose>
 
-											<button
-												type="button"
-												className="text-xs px-2 py-1 rounded-sm border border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-colors"
-											>
-												Valider
-											</button>
+											<form onSubmit={onDeleteCompany}>
+												<input type="hidden" name="companyId" value={company.id} />
+												<button
+													type="submit"
+													className="text-xs px-2 py-1 rounded-sm border border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-colors"
+												>
+													{isPending ? "..." : "Valider"}
+												</button>
+											</form>
 										</div>
 									</DialogContent>
 								</Dialog>

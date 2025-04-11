@@ -16,7 +16,7 @@ const getCategories = createServerFn({
 	return categories;
 });
 
-const categoriesQueryOptions = queryOptions({
+export const categoriesQueryOptions = queryOptions({
 	queryKey: ["categories"],
 	queryFn: () => getCategories(),
 	staleTime: 1000 * 60 * 60 * 24,

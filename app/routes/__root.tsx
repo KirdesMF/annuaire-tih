@@ -26,7 +26,7 @@ const sessionQueryOptions = queryOptions({
 
 export type RootRouterContext = {
 	queryClient: QueryClient;
-	session: Awaited<ReturnType<typeof getSession>>;
+	// session: Awaited<ReturnType<typeof getSession>>;
 };
 
 export const Route = createRootRouteWithContext<RootRouterContext>()({
