@@ -13,6 +13,13 @@ export type CompanySocialMedia = {
 export const COMPANY_STATUSES = ["pending", "active", "rejected"] as const;
 export type CompanyStatus = (typeof COMPANY_STATUSES)[number];
 
+export type CompanyImage = {
+	publicId: string;
+	secureUrl: string;
+};
+
+export type CompanyGallery = [CompanyImage, CompanyImage];
+
 export const isValidCompanyStatus = (status: string): status is CompanyStatus => {
 	return COMPANY_STATUSES.includes(status as CompanyStatus);
 };
@@ -38,9 +45,10 @@ export const companiesTable = pgTable(
 			.notNull(),
 		email: varchar("email", { length: 255 }),
 		phone: varchar("phone", { length: 24 }),
-		logo: varchar("logo", { length: 255 }),
+		logo: jsonb("logo").$type<CompanyImage | null>(),
+		gallery: jsonb("gallery").$type<CompanyGallery | null>(),
 		rqth: boolean("rqth").notNull().default(false),
-		social_media: jsonb("social_media").$type<CompanySocialMedia>().default({}).notNull(),
+		social_media: jsonb("social_media").$type<CompanySocialMedia | null>(),
 	},
 	(table) => [
 		index("company_search_index").using(
