@@ -1,26 +1,9 @@
 // app/routes/index.tsx
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
 import banner from "~/assets/img/banner.png?url";
-import { Header } from "~/components/header";
 import { InputSearch } from "~/components/input-search";
-import { db } from "~/db";
-import { categoriesTable } from "~/db/schema/categories";
-
-const getCategories = createServerFn({
-	method: "GET",
-}).handler(async () => {
-	const categories = await db.select().from(categoriesTable);
-	console.log(categories);
-	return categories;
-});
-
-export const categoriesQueryOptions = queryOptions({
-	queryKey: ["categories"],
-	queryFn: () => getCategories(),
-	staleTime: 1000 * 60 * 60 * 24,
-});
+import { categoriesQueryOptions } from "~/lib/api/categories";
 
 export const Route = createFileRoute("/")({
 	component: Home,

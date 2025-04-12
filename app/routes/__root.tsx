@@ -7,7 +7,7 @@ import appCSS from "~/styles/app.css?url";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
-import { auth } from "~/lib/auth";
+import { auth } from "~/lib/auth/auth.server";
 import { Toaster } from "sonner";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {

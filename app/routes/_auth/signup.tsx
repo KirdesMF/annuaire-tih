@@ -5,9 +5,9 @@ import { getWebRequest } from "@tanstack/react-start/server";
 import { APIError } from "better-auth/api";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
-import { auth } from "~/lib/auth";
 import * as v from "valibot";
 import { Resend } from "resend";
+import { auth } from "~/lib/auth/auth.server";
 
 const SignupSchema = v.object({
 	email: v.pipe(

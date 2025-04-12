@@ -1,82 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
-import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
-import { db } from "~/db";
-import { companiesTable } from "~/db/schema/companies";
-import { auth } from "~/lib/auth";
-import * as v from "valibot";
-import { categoriesQueryOptions } from "~/routes";
 import { Command } from "cmdk";
 import { useState } from "react";
 import { CloseIcon } from "~/components/icons/close";
-import { companyCategoriesTable } from "~/db/schema/company-categories";
+import { categoriesQueryOptions } from "~/lib/api/categories";
+import { addCompany } from "~/lib/api/companies";
 import { toast } from "sonner";
-
-const AddCompanySchema = v.object({
-	name: v.pipe(
-		v.string(),
-		v.nonEmpty("Veuillez entrer le nom de l'entreprise"),
-		v.maxLength(255, "Le nom de l'entreprise doit contenir au plus 255 caractères"),
-	),
-	siret: v.pipe(
-		v.string(),
-		v.nonEmpty("Veuillez entrer le siret de l'entreprise"),
-		v.maxLength(14, "Le siret de l'entreprise doit contenir 14 caractères"),
-	),
-	description: v.pipe(
-		v.string(),
-		v.maxLength(1500, "La description de l'entreprise doit contenir au plus 1500 caractères"),
-	),
-	categories: v.pipe(
-		v.array(v.string()),
-		v.minLength(1, "Veuillez sélectionner au moins une catégorie"),
-		v.maxLength(3, "Veuillez sélectionner au plus 3 catégories"),
-	),
-});
-
-type AddCompanyData = v.InferOutput<typeof AddCompanySchema>;
-
-export const addCompany = createServerFn({ method: "POST" })
-	.validator((data: AddCompanyData) => v.parse(AddCompanySchema, data))
-	.handler(async ({ data }) => {
-		const request = getWebRequest();
-
-		if (!request) return;
-
-		const session = await auth.api.getSession({ headers: request.headers });
-
-		if (!session) {
-			throw redirect({ to: "/login" });
-		}
-		try {
-			const { name, siret, description, categories } = data;
-
-			await db.transaction(async (tx) => {
-				const [company] = await tx
-					.insert(companiesTable)
-					.values({
-						name,
-						siret,
-						user_id: session.user.id,
-						created_by: session.user.id,
-						description,
-					})
-					.returning();
-
-				await tx.insert(companyCategoriesTable).values(
-					categories.map((category) => ({
-						company_id: company.id,
-						category_id: category,
-					})),
-				);
-			});
-		} catch (error) {
-			console.error(error);
-		}
-	});
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add")({
 	component: RouteComponent,

@@ -1,6 +1,6 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { LinkedinIcon } from "./icons/linkedin";
-import { authClient } from "~/lib/auth-client";
+import { authClient } from "~/lib/auth/auth.client";
 import { Avatar, DropdownMenu } from "radix-ui";
 import { LogoutIcon } from "./icons/logout";
 import { SettingsAccountIcon } from "./icons/settings-account";

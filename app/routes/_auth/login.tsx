@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
-import { authClient } from "~/lib/auth-client";
+import { authClient } from "~/lib/auth/auth.client";
 
 export const Route = createFileRoute("/_auth/login")({
 	component: RouteComponent,
@@ -14,8 +14,8 @@ export const Route = createFileRoute("/_auth/login")({
 });
 
 function RouteComponent() {
-	const context = Route.useRouteContext();
 	const router = useRouter();
+
 	const { mutate, isPending } = useMutation({
 		mutationFn: async ({
 			email,
