@@ -24,6 +24,7 @@ export const getUserCompanies = createServerFn({ method: "GET" }).handler(async 
 			description: companiesTable.description,
 			status: companiesTable.status,
 			siret: companiesTable.siret,
+			logo: companiesTable.logo,
 		})
 		.from(companiesTable)
 		.where(eq(companiesTable.user_id, session.user.id));

@@ -22,9 +22,16 @@ export const AddCompanySchema = v.object({
 	),
 	logo: v.optional(
 		v.pipe(
-			v.file("Veuillez entrer un fichier valide"),
+			v.instance(File, "Veuillez entrer un fichier valide"),
 			v.mimeType(["image/png", "image/jpeg", "image/jpg"], "Veuillez entrer un fichier valide"),
 			v.maxSize(1024 * 1024 * 3, "La taille du fichier doit être inférieure à 3MB"),
+		),
+	),
+	images: v.optional(
+		v.pipe(
+			v.array(v.file("Veuillez entrer un fichier valide")),
+			v.minLength(1, "Veuillez entrer au moins une image"),
+			v.maxLength(3, "Veuillez entrer au plus 3 images"),
 		),
 	),
 });

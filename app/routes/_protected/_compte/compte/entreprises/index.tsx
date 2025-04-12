@@ -11,6 +11,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "~/components/ui/dialog";
+import type { Company } from "~/db/schema/companies";
 import { deleteCompany } from "~/lib/api/companies";
 import { userCompaniesQueryOptions } from "~/lib/api/user";
 
@@ -46,6 +47,17 @@ function RouteComponent() {
 		);
 	}
 
+	function Logo({ company }: { company: Partial<Company> }) {
+		if (!company.logo) return null;
+		return (
+			<img
+				src={company.logo.secureUrl}
+				alt={company.name}
+				className="size-20 aspect-square rounded-sm"
+			/>
+		);
+	}
+
 	if (!companiesQuery.data?.length) {
 		return (
 			<div className="container px-4 py-6">
@@ -73,6 +85,10 @@ function RouteComponent() {
 								<h2 className="text-lg font-bold leading-1 ">{company.name}</h2>
 								<p className="text-xs text-orange-300">{company.status}</p>
 							</header>
+
+							<div className="flex items-center gap-2">
+								<Logo company={company} />
+							</div>
 
 							<button
 								type="button"
