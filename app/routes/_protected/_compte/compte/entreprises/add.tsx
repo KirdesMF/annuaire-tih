@@ -11,7 +11,7 @@ import { addCompany } from "~/lib/api/companies";
 import { toast } from "sonner";
 import { Popover } from "radix-ui";
 import * as v from "valibot";
-import { AddCompanySchema } from "~/lib/schemas/company";
+import { AddCompanySchema } from "~/lib/validator/company.schema";
 import { ChevronDownIcon } from "~/components/icons/chevron-down";
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add")({

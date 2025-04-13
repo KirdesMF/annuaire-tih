@@ -1,9 +1,8 @@
-import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { db } from "~/db";
 import { companiesTable, type CompanyGallery } from "~/db/schema/companies";
-import { AddCompanySchema, type AddCompanyData } from "../schemas/company";
+import { AddCompanySchema, type AddCompanyData } from "../validator/company.schema";
 import { getWebRequest } from "@tanstack/react-start/server";
 import { auth } from "~/lib/auth/auth.server";
 import { redirect } from "@tanstack/react-router";
@@ -11,28 +10,10 @@ import * as v from "valibot";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { uploadImageToCloudinary } from "../cloudinary";
 
-export const getCompanies = createServerFn({
-	method: "GET",
-}).handler(async () => {
-	const companies = await db.select().from(companiesTable);
-	return companies;
-});
-
-export const companiesQueryOptions = queryOptions({
-	queryKey: ["companies"],
-	queryFn: () => getCompanies(),
-});
-
-export const deleteCompany = createServerFn({ method: "POST" })
-	.validator((companyId: string) => companyId as string)
-	.handler(async ({ data: companyId }) => {
-		try {
-			await db.delete(companiesTable).where(eq(companiesTable.id, companyId));
-		} catch (error) {
-			console.error(error);
-		}
-	});
-
+/**
+ * Add a company
+ * @param data - The data of the company to add
+ */
 export const addCompany = createServerFn({ method: "POST" })
 	.validator((data: FormData) => {
 		return v.parse(AddCompanySchema, {
@@ -113,6 +94,20 @@ export const addCompany = createServerFn({ method: "POST" })
 					})),
 				);
 			});
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+/**
+ * Delete a company
+ * @param companyId - The ID of the company to delete
+ */
+export const deleteCompany = createServerFn({ method: "POST" })
+	.validator((companyId: string) => companyId as string)
+	.handler(async ({ data: companyId }) => {
+		try {
+			await db.delete(companiesTable).where(eq(companiesTable.id, companyId));
 		} catch (error) {
 			console.error(error);
 		}
