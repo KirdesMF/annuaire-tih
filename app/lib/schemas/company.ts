@@ -27,11 +27,10 @@ export const AddCompanySchema = v.object({
 			v.maxSize(1024 * 1024 * 3, "La taille du fichier doit être inférieure à 3MB"),
 		),
 	),
-	images: v.optional(
+	gallery: v.optional(
 		v.pipe(
 			v.array(v.file("Veuillez entrer un fichier valide")),
-			v.minLength(1, "Veuillez entrer au moins une image"),
-			v.maxLength(3, "Veuillez entrer au plus 3 images"),
+			v.maxLength(2, "Veuillez entrer au plus 2 images"),
 		),
 	),
 });

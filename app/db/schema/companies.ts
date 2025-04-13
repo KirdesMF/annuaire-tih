@@ -18,7 +18,7 @@ export type CompanyImage = {
 	secureUrl: string;
 };
 
-export type CompanyGallery = [CompanyImage, CompanyImage];
+export type CompanyGallery = Array<CompanyImage>;
 
 export const isValidCompanyStatus = (status: string): status is CompanyStatus => {
 	return COMPANY_STATUSES.includes(status as CompanyStatus);

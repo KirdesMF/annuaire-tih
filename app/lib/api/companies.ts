@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { db } from "~/db";
-import { companiesTable } from "~/db/schema/companies";
+import { companiesTable, type CompanyGallery } from "~/db/schema/companies";
 import { AddCompanySchema, type AddCompanyData } from "../schemas/company";
 import { getWebRequest } from "@tanstack/react-start/server";
 import { auth } from "~/lib/auth/auth.server";
@@ -41,6 +41,7 @@ export const addCompany = createServerFn({ method: "POST" })
 			description: data.get("description"),
 			logo: data.get("logo"),
 			categories: data.getAll("categories"),
+			gallery: data.getAll("gallery"),
 		});
 	})
 	.handler(async ({ data }) => {
@@ -50,7 +51,7 @@ export const addCompany = createServerFn({ method: "POST" })
 		const session = await auth.api.getSession({ headers: request.headers });
 		if (!session) throw redirect({ to: "/login" });
 
-		const { name, siret, description, categories, logo, images } = data;
+		const { name, siret, description, categories, logo, gallery } = data;
 
 		try {
 			await db.transaction(async (tx) => {
@@ -65,6 +66,7 @@ export const addCompany = createServerFn({ method: "POST" })
 					})
 					.returning();
 
+				// Upload logo
 				if (logo) {
 					const { secure_url, public_id } = await uploadImageToCloudinary({
 						file: logo,
@@ -80,6 +82,30 @@ export const addCompany = createServerFn({ method: "POST" })
 						.where(eq(companiesTable.id, company.id));
 				}
 
+				// Upload gallery
+				if (gallery) {
+					const uploadedImages: CompanyGallery = [];
+					for (const image of gallery) {
+						if (uploadedImages.length >= 2) break;
+
+						const { secure_url, public_id } = await uploadImageToCloudinary({
+							file: image,
+							companyId: company.id,
+							type: "gallery",
+						});
+
+						uploadedImages.push({ secureUrl: secure_url, publicId: public_id });
+					}
+
+					await tx
+						.update(companiesTable)
+						.set({
+							gallery: uploadedImages,
+						})
+						.where(eq(companiesTable.id, company.id));
+				}
+
+				// Insert categories
 				await tx.insert(companyCategoriesTable).values(
 					categories.map((category) => ({
 						company_id: company.id,

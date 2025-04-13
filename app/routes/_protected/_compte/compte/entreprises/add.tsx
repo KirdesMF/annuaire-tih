@@ -60,6 +60,7 @@ function RouteComponent() {
 			description: formData.get("description"),
 			categories: formData.getAll("categories"),
 			logo: formData.get("logo"),
+			gallery: formData.getAll("gallery"),
 		});
 
 		if (!result.success) {
@@ -181,7 +182,7 @@ function RouteComponent() {
 							<span className="mb-1 block">Image 1</span>
 							<input
 								type="file"
-								name="image-1"
+								name="gallery"
 								id="image-1"
 								className="block w-full text-sm text-gray-900 border border-gray-300 rounded-sm cursor-pointer bg-gray-50 outline-none file:bg-gray-500 file:text-white file:border-0 file:me-4 file:py-2 file:px-4"
 							/>
@@ -191,7 +192,7 @@ function RouteComponent() {
 							<span className="mb-1 block">Image 2</span>
 							<input
 								type="file"
-								name="image-2"
+								name="gallery"
 								id="image-2"
 								className="block w-full text-sm text-gray-900 border border-gray-300 rounded-sm cursor-pointer bg-gray-50 outline-none file:bg-gray-500 file:text-white file:border-0 file:me-4 file:py-2 file:px-4"
 							/>
