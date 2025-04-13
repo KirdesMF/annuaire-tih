@@ -1,9 +1,8 @@
-import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { db } from "~/db";
-import { companiesTable } from "~/db/schema/companies";
-import { AddCompanySchema, type AddCompanyData } from "../schemas/company";
+import { companiesTable, type CompanyGallery } from "~/db/schema/companies";
+import { AddCompanySchema, type AddCompanyData } from "../validator/company.schema";
 import { getWebRequest } from "@tanstack/react-start/server";
 import { auth } from "~/lib/auth/auth.server";
 import { redirect } from "@tanstack/react-router";
@@ -11,28 +10,10 @@ import * as v from "valibot";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { uploadImageToCloudinary } from "../cloudinary";
 
-export const getCompanies = createServerFn({
-	method: "GET",
-}).handler(async () => {
-	const companies = await db.select().from(companiesTable);
-	return companies;
-});
-
-export const companiesQueryOptions = queryOptions({
-	queryKey: ["companies"],
-	queryFn: () => getCompanies(),
-});
-
-export const deleteCompany = createServerFn({ method: "POST" })
-	.validator((companyId: string) => companyId as string)
-	.handler(async ({ data: companyId }) => {
-		try {
-			await db.delete(companiesTable).where(eq(companiesTable.id, companyId));
-		} catch (error) {
-			console.error(error);
-		}
-	});
-
+/**
+ * Add a company
+ * @param data - The data of the company to add
+ */
 export const addCompany = createServerFn({ method: "POST" })
 	.validator((data: FormData) => {
 		return v.parse(AddCompanySchema, {
@@ -41,6 +22,7 @@ export const addCompany = createServerFn({ method: "POST" })
 			description: data.get("description"),
 			logo: data.get("logo"),
 			categories: data.getAll("categories"),
+			gallery: data.getAll("gallery"),
 		});
 	})
 	.handler(async ({ data }) => {
@@ -50,7 +32,7 @@ export const addCompany = createServerFn({ method: "POST" })
 		const session = await auth.api.getSession({ headers: request.headers });
 		if (!session) throw redirect({ to: "/login" });
 
-		const { name, siret, description, categories, logo, images } = data;
+		const { name, siret, description, categories, logo, gallery } = data;
 
 		try {
 			await db.transaction(async (tx) => {
@@ -65,6 +47,7 @@ export const addCompany = createServerFn({ method: "POST" })
 					})
 					.returning();
 
+				// Upload logo
 				if (logo) {
 					const { secure_url, public_id } = await uploadImageToCloudinary({
 						file: logo,
@@ -80,6 +63,30 @@ export const addCompany = createServerFn({ method: "POST" })
 						.where(eq(companiesTable.id, company.id));
 				}
 
+				// Upload gallery
+				if (gallery) {
+					const uploadedImages: CompanyGallery = [];
+					for (const image of gallery) {
+						if (uploadedImages.length >= 2) break;
+
+						const { secure_url, public_id } = await uploadImageToCloudinary({
+							file: image,
+							companyId: company.id,
+							type: "gallery",
+						});
+
+						uploadedImages.push({ secureUrl: secure_url, publicId: public_id });
+					}
+
+					await tx
+						.update(companiesTable)
+						.set({
+							gallery: uploadedImages,
+						})
+						.where(eq(companiesTable.id, company.id));
+				}
+
+				// Insert categories
 				await tx.insert(companyCategoriesTable).values(
 					categories.map((category) => ({
 						company_id: company.id,
@@ -87,6 +94,20 @@ export const addCompany = createServerFn({ method: "POST" })
 					})),
 				);
 			});
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+/**
+ * Delete a company
+ * @param companyId - The ID of the company to delete
+ */
+export const deleteCompany = createServerFn({ method: "POST" })
+	.validator((companyId: string) => companyId as string)
+	.handler(async ({ data: companyId }) => {
+		try {
+			await db.delete(companiesTable).where(eq(companiesTable.id, companyId));
 		} catch (error) {
 			console.error(error);
 		}

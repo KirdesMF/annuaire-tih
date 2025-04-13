@@ -111,6 +111,18 @@ function RouteComponent() {
 								))}
 							</ul>
 
+							<ul className="flex flex-wrap gap-2 mb-4">
+								{company.gallery?.map((image) => (
+									<li key={image.publicId}>
+										<img
+											src={image.secureUrl}
+											alt={company.name}
+											className="size-20 aspect-square rounded-sm"
+										/>
+									</li>
+								))}
+							</ul>
+
 							<footer className="flex gap-2">
 								<Link
 									to="/compte/entreprises/$entrepriseId/edit"

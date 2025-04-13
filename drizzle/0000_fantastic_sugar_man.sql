@@ -1,5 +1,11 @@
-CREATE TYPE "public"."company_status" AS ENUM('pending', 'approved', 'rejected');--> statement-breakpoint
-CREATE TYPE "public"."role" AS ENUM('admin', 'user', 'superadmin');--> statement-breakpoint
+DROP TABLE IF EXISTS "account" CASCADE;
+DROP TABLE IF EXISTS "session" CASCADE;
+DROP TABLE IF EXISTS "verification" CASCADE;
+DROP TABLE IF EXISTS "company_categories" CASCADE;
+DROP TABLE IF EXISTS "companies" CASCADE;
+DROP TABLE IF EXISTS "categories" CASCADE;
+DROP TABLE IF EXISTS "user" CASCADE;
+
 CREATE TABLE "account" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" text NOT NULL,
@@ -37,7 +43,7 @@ CREATE TABLE "user" (
 	"image" varchar(255),
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
-	"role" "role" DEFAULT 'user' NOT NULL,
+	"role" varchar(255) DEFAULT 'user' NOT NULL,
 	"banned" boolean,
 	"ban_reason" text,
 	"ban_expires" timestamp,
@@ -55,7 +61,7 @@ CREATE TABLE "verification" (
 --> statement-breakpoint
 CREATE TABLE "categories" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" text NOT NULL,
+	"name" varchar(255) NOT NULL,
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
@@ -64,27 +70,39 @@ CREATE TABLE "categories" (
 --> statement-breakpoint
 CREATE TABLE "companies" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" text NOT NULL,
+	"status" varchar DEFAULT 'pending' NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"created_by" uuid NOT NULL,
+	"user_id" uuid NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"siret" varchar(14) NOT NULL,
+	"business_owner" varchar(255),
 	"description" varchar(1500),
 	"website" varchar(255),
 	"location" varchar(255),
 	"subdomain" varchar(100),
-	"created_by" uuid,
-	"status" "company_status" DEFAULT 'pending' NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	"work_mode" varchar,
+	"email" varchar(255),
+	"phone" varchar(24),
+	"logo" jsonb,
+	"gallery" jsonb,
+	"rqth" boolean DEFAULT false NOT NULL,
+	"social_media" jsonb,
+	"service_area" varchar(255)
 );
 --> statement-breakpoint
 CREATE TABLE "company_categories" (
-	"company_id" uuid,
-	"category_id" uuid,
+	"company_id" uuid NOT NULL,
+	"category_id" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "company_categories_company_id_category_id_pk" PRIMARY KEY("company_id","category_id")
 );
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "companies" ADD CONSTRAINT "companies_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "companies" ADD CONSTRAINT "companies_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "companies" ADD CONSTRAINT "companies_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "company_categories" ADD CONSTRAINT "company_categories_company_id_companies_id_fk" FOREIGN KEY ("company_id") REFERENCES "public"."companies"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "company_categories" ADD CONSTRAINT "company_categories_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "company_search_index" ON "companies" USING gin (to_tsvector('french', "name" || ' ' || "subdomain" || ' ' || "description"));
