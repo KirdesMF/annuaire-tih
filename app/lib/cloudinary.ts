@@ -6,59 +6,75 @@ cloudinary.config({
 	api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export type UploadCompanyImageProps = {
-	companyId: string;
-	file: string;
-	type: "logo" | "gallery";
+type UploadApiResponse = {
+	secure_url: string;
+	public_id: string;
 };
 
-export async function uploadCompanyImage(props: UploadCompanyImageProps) {
-	const path =
-		props.type === "logo"
-			? `companies/${props.companyId}/logo`
-			: `companies/${props.companyId}/gallery`;
+export async function uploadImageToCloudinary({
+	type,
+	file,
+	companyId,
+}: { type: "logo" | "gallery"; file: File; companyId: string }) {
+	const path = type === "logo" ? `companies/${companyId}/logo` : `companies/${companyId}/gallery`;
 
 	try {
-		const res = await cloudinary.uploader.upload(props.file, {
-			folder: path,
-			resource_type: "auto",
-			public_id: `${props.companyId}-${props.type}`,
-			allowed_formats: ["jpg", "png", "jpeg"],
+		const buffer = await file.arrayBuffer();
+		const res = await new Promise<UploadApiResponse>((resolve, reject) => {
+			cloudinary.uploader
+				.upload_stream(
+					{
+						folder: path,
+						resource_type: "auto",
+						public_id: `${companyId}-${Date.now()}`,
+						allowed_formats: ["jpg", "png", "jpeg"],
+					},
+					(error, result) => {
+						if (error) reject(error);
+						if (result) resolve({ secure_url: result.secure_url, public_id: result.public_id });
+					},
+				)
+				.end(Buffer.from(buffer));
 		});
 
-		return {
-			secure_url: res.secure_url,
-			public_id: res.public_id,
-		};
+		return res;
 	} catch (error) {
 		console.error(error);
 		throw new Error("Failed to upload image to Cloudinary");
 	}
 }
 
-export async function updateCompanyImage(props: {
-	file: string;
-	publicId: string;
-}) {
+export async function updateImageInCloudinary({
+	file,
+	publicId,
+}: { file: File; publicId: string }) {
 	try {
-		const res = await cloudinary.uploader.upload(props.file, {
-			public_id: props.publicId,
-			overwrite: true,
-			invalidate: true,
-			allowed_formats: ["jpg", "png", "jpeg"],
+		const buffer = await file.arrayBuffer();
+		const res = await new Promise<UploadApiResponse>((resolve, reject) => {
+			cloudinary.uploader
+				.upload_stream(
+					{
+						public_id: publicId,
+						overwrite: true,
+						invalidate: true,
+						allowed_formats: ["jpg", "png", "jpeg"],
+					},
+					(error, result) => {
+						if (error) reject(error);
+						if (result) resolve({ secure_url: result.secure_url, public_id: result.public_id });
+					},
+				)
+				.end(Buffer.from(buffer));
 		});
 
-		return {
-			secure_url: res.secure_url,
-			public_id: res.public_id,
-		};
+		return res;
 	} catch (error) {
 		console.error(error);
-		throw new Error("Failed to update image in Cloudinary");
+		throw new Error("Failed to upload image to Cloudinary");
 	}
 }
 
-export async function deleteCompanyImage(publicId: string) {
+export async function deleteImageFromCloudinary(publicId: string) {
 	try {
 		await cloudinary.uploader.destroy(publicId);
 	} catch (error) {
@@ -67,7 +83,7 @@ export async function deleteCompanyImage(publicId: string) {
 	}
 }
 
-export async function deleteAllCompanyImages(companyId: string) {
+export async function deleteCompanyFromCloudinary(companyId: string) {
 	try {
 		// delete all images in the company folder
 		await cloudinary.api.delete_resources_by_prefix(`companies/${companyId}`);

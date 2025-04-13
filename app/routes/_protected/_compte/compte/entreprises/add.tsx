@@ -48,13 +48,19 @@ function RouteComponent() {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
 		for (const category of selectedCategories) {
-			formData.append("categories[]", category.id);
+			formData.append("categories", category.id);
 		}
 
-		const result = v.safeParse(AddCompanySchema, formData);
+		const result = v.safeParse(AddCompanySchema, {
+			name: formData.get("name"),
+			siret: formData.get("siret"),
+			description: formData.get("description"),
+			categories: formData.getAll("categories"),
+			logo: formData.get("logo"),
+		});
 
 		if (!result.success) {
-			toast.error(result.issues[0].message);
+			toast.error(result.issues.map((issue) => issue.message).join("\n"));
 			return;
 		}
 
