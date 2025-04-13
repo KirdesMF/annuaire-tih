@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Popover } from "radix-ui";
 import * as v from "valibot";
 import { AddCompanySchema } from "~/lib/schemas/company";
+import { ChevronDownIcon } from "~/components/icons/chevron-down";
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add")({
 	component: RouteComponent,
@@ -26,20 +27,22 @@ function RouteComponent() {
 	const data = Route.useLoaderData();
 	const router = useRouter();
 	const { mutate, isPending } = useMutation({ mutationFn: useServerFn(addCompany) });
-	const [selectedCategories, setSelectedCategories] = useState(new Set<(typeof data)[number]>());
+	const [selectedCategories, setSelectedCategories] = useState(new Set<string>());
 
-	function onSelectCategory(category: (typeof data)[number]) {
+	function onSelectCategory(categoryId: string) {
 		setSelectedCategories((prev) => {
-			const newSet = new Set(prev);
-			newSet.add(category);
-			return newSet;
+			if (prev.size >= 3) {
+				toast.error("Vous ne pouvez pas sélectionner plus de 3 catégories");
+				return prev;
+			}
+			return new Set(prev).add(categoryId);
 		});
 	}
 
-	function onRemoveCategory(category: (typeof data)[number]) {
+	function onRemoveCategory(categoryId: string) {
 		setSelectedCategories((prev) => {
 			const newSet = new Set(prev);
-			newSet.delete(category);
+			newSet.delete(categoryId);
 			return newSet;
 		});
 	}
@@ -48,7 +51,7 @@ function RouteComponent() {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
 		for (const category of selectedCategories) {
-			formData.append("categories", category.id);
+			formData.append("categories", category);
 		}
 
 		const result = v.safeParse(AddCompanySchema, {
@@ -60,7 +63,7 @@ function RouteComponent() {
 		});
 
 		if (!result.success) {
-			toast.error(result.issues.map((issue) => issue.message).join("\n"));
+			toast.error(result.issues.map((issue) => issue.message).join(","));
 			return;
 		}
 
@@ -79,6 +82,8 @@ function RouteComponent() {
 	return (
 		<div className="container px-4 py-6">
 			<div className="max-w-xl mx-auto">
+				<h1 className="text-2xl font-bold mb-4">Référencez votre entreprise</h1>
+
 				<form className="flex flex-col gap-3" onSubmit={onSubmit}>
 					<Label>
 						Nom de l'entreprise *
@@ -100,12 +105,13 @@ function RouteComponent() {
 					</Label>
 
 					<Label className="flex flex-col gap-1">
-						<span className="mb-1 block">Catégories (max. 3)</span>
+						<span className="mb-1 block">Catégories * (max. 3)</span>
 						<Popover.Root>
-							<Popover.Trigger className="border rounded-sm border-gray-300 px-2 py-1 text-xs flex items-center gap-2">
-								<span className="px-2 py-1 rounded-sm text-xs flex items-center gap-2">
+							<Popover.Trigger className="h-9 cursor-pointer border rounded-sm border-gray-300 px-2 py-1 text-xs flex items-center justify-between gap-2">
+								<span className="rounded-sm text-xs flex items-center gap-2">
 									Ajouter une catégorie
 								</span>
+								<ChevronDownIcon className="size-5 text-gray-500" />
 							</Popover.Trigger>
 							<Popover.Portal>
 								<Popover.Content
@@ -115,7 +121,7 @@ function RouteComponent() {
 									<Command className="border rounded-sm border-gray-300">
 										<Command.Input
 											placeholder="Rechercher une catégorie"
-											className="w-full h-10 px-2 outline-none"
+											className="w-full h-10 px-2 outline-none placeholder:text-sm placeholder:font-light"
 										/>
 										<Command.Separator className="h-px bg-gray-300" />
 										<Command.List className="max-h-60 overflow-y-auto">
@@ -123,8 +129,9 @@ function RouteComponent() {
 												<Command.Item
 													key={category.id}
 													value={category.name}
-													className="cursor-pointer py-1.5 px-2 aria-selected:bg-gray-100 text-sm font-light"
-													onSelect={() => onSelectCategory(category)}
+													disabled={selectedCategories.has(category.id)}
+													className="cursor-pointer py-1.5 px-2 aria-selected:bg-gray-100 text-sm font-light aria-disabled:opacity-20"
+													onSelect={() => onSelectCategory(category.id)}
 												>
 													{category.name}
 												</Command.Item>
@@ -137,21 +144,26 @@ function RouteComponent() {
 					</Label>
 
 					<ul className="flex flex-wrap gap-2">
-						{Array.from(selectedCategories).map((category) => (
-							<li
-								key={category.id}
-								className="bg-gray-100 px-2 py-1 rounded-sm text-xs flex items-center gap-2"
-							>
-								{category.name}
-								<button
-									type="button"
-									className="text-gray-500 inline-grid place-items-center cursor-pointer"
-									onClick={() => onRemoveCategory(category)}
+						{Array.from(selectedCategories).map((categoryId) => {
+							const category = data.find((c) => c.id === categoryId);
+							if (!category) return null;
+
+							return (
+								<li
+									key={category.id}
+									className="bg-gray-400 text-white px-2 py-1 rounded-sm text-xs flex items-center gap-2"
 								>
-									<CloseIcon className="w-3 h-3" />
-								</button>
-							</li>
-						))}
+									<span className="max-w-[30ch] truncate">{category.name}</span>
+									<button
+										type="button"
+										className="text-white inline-grid place-items-center cursor-pointer"
+										onClick={() => onRemoveCategory(category.id)}
+									>
+										<CloseIcon className="size-3 text-white" />
+									</button>
+								</li>
+							);
+						})}
 					</ul>
 
 					<Label>

@@ -9,7 +9,7 @@ export const AddCompanySchema = v.object({
 	siret: v.pipe(
 		v.string(),
 		v.nonEmpty("Veuillez entrer le siret de l'entreprise"),
-		v.maxLength(14, "Le siret de l'entreprise doit contenir 14 caractères"),
+		v.length(14, "Le siret de l'entreprise doit contenir 14 caractères"),
 	),
 	description: v.pipe(
 		v.string(),
