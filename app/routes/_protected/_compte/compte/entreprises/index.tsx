@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CopyIcon } from "~/components/icons/copy";
+import { StoreIcon } from "~/components/icons/store";
 import {
 	Dialog,
 	DialogClose,
@@ -169,7 +170,7 @@ function RouteComponent() {
 }
 
 function Logo({ company }: { company: Partial<Company> }) {
-	if (!company.logo) return null;
+	if (!company.logo) return <StoreIcon className="size-8" />;
 	return (
 		<img
 			src={company.logo.secureUrl}
