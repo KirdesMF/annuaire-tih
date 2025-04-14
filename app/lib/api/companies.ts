@@ -10,6 +10,9 @@ import * as v from "valibot";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { uploadImageToCloudinary } from "../cloudinary";
 import { decode } from "decode-formdata";
+import { queryOptions } from "@tanstack/react-query";
+import { categoriesTable } from "~/db/schema/categories";
+
 /**
  * Add a company
  * @param data - The data of the company to add
@@ -44,12 +47,17 @@ export const addCompany = createServerFn({ method: "POST" })
 					.returning();
 
 				// Upload logo
+				// @todo: handle errors
 				if (logo && logo.size > 0) {
-					const { secure_url, public_id } = await uploadImageToCloudinary({
+					const res = await uploadImageToCloudinary({
 						file: logo,
 						companyId: company.id,
+						companyName: company.name,
 						type: "logo",
 					});
+
+					if (res instanceof Error) throw res;
+					const { secure_url, public_id } = res;
 
 					await tx
 						.update(companiesTable)
@@ -60,16 +68,21 @@ export const addCompany = createServerFn({ method: "POST" })
 				}
 
 				// Upload gallery
+				// @todo: handle errors
 				if (gallery && gallery.length > 0) {
 					const uploadedImages: CompanyGallery = [];
 					for (const image of gallery) {
 						if (uploadedImages.length >= 2) break;
 
-						const { secure_url, public_id } = await uploadImageToCloudinary({
+						const res = await uploadImageToCloudinary({
 							file: image,
 							companyId: company.id,
+							companyName: company.name,
 							type: "gallery",
 						});
+
+						if (res instanceof Error) throw res;
+						const { secure_url, public_id } = res;
 
 						uploadedImages.push({ secureUrl: secure_url, publicId: public_id });
 					}
@@ -108,3 +121,41 @@ export const deleteCompany = createServerFn({ method: "POST" })
 			console.error(error);
 		}
 	});
+
+/**
+ * Get a company
+ * @param id - The ID of the company to get
+ */
+export const getCompany = createServerFn({ method: "GET" })
+	.validator((id: string) => id as string)
+	.handler(async ({ data: id }) => {
+		try {
+			const company = await db
+				.select()
+				.from(companiesTable)
+				.where(eq(companiesTable.id, id))
+				.limit(1)
+				.then((res) => res[0]);
+
+			const categories = await db
+				.select()
+				.from(companyCategoriesTable)
+				.leftJoin(categoriesTable, eq(categoriesTable.id, companyCategoriesTable.category_id))
+				.where(eq(companyCategoriesTable.company_id, company.id));
+
+			return {
+				...company,
+				categories: categories.map((c) => c.categories?.name),
+			};
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+export function setCompanyQueryOptions(id: string) {
+	return queryOptions({
+		queryKey: ["company", id],
+		queryFn: () => getCompany({ data: id }),
+		staleTime: 1000 * 60 * 60 * 24,
+	});
+}

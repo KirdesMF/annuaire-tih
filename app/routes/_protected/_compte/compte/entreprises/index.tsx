@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Separator } from "radix-ui";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CompanyLogo } from "~/components/company-logo";
 import { CopyIcon } from "~/components/icons/copy";
 import { PlusIcon } from "~/components/icons/plus";
 import { StoreIcon } from "~/components/icons/store";
@@ -26,7 +27,7 @@ const STATUSES = {
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/")({
 	loader: async ({ context }) => {
-		const companies = context.queryClient.ensureQueryData(userCompaniesQueryOptions);
+		const companies = await context.queryClient.ensureQueryData(userCompaniesQueryOptions);
 		return companies;
 	},
 	component: RouteComponent,
@@ -47,6 +48,8 @@ function RouteComponent() {
 			{
 				onSuccess: () => {
 					context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
+					context.queryClient.invalidateQueries({ queryKey: ["company", companyId] });
+
 					setIsDialogOpen(false);
 					toast.success("Entreprise supprimée avec succès");
 				},
@@ -83,7 +86,7 @@ function RouteComponent() {
 						<article className="border border-gray-300 p-5 rounded-sm grid gap-4 shadow-2xs">
 							<header className="flex items-baseline gap-2 justify-between">
 								<div className="flex items-center gap-2">
-									<Logo company={company} />
+									<CompanyLogo company={company} />
 									<h2 className="text-lg font-bold leading-1">{company.name}</h2>
 									<p className="text-xs text-orange-300">{STATUSES[company.status]}</p>
 								</div>
@@ -106,16 +109,17 @@ function RouteComponent() {
 								</ul>
 								<div className="flex gap-2">
 									<Link
-										to="/entreprises/$entrepriseId"
-										params={{ entrepriseId: company.id }}
+										to="/entreprises/$name"
+										params={{ name: company.name.toLowerCase().replace(/ /g, "-") }}
+										search={{ id: company.id }}
 										className="text-xs px-2 py-1 rounded-sm border border-blue-400 text-blue-400"
 									>
 										Consulter
 									</Link>
 
 									<Link
-										to="/compte/entreprises/$entrepriseId/edit"
-										params={{ entrepriseId: company.id }}
+										to="/compte/entreprises/$id/edit"
+										params={{ id: company.id }}
 										className="text-xs px-2 py-1 rounded-sm border border-blue-400 text-blue-400"
 									>
 										Modifier
@@ -134,6 +138,7 @@ function RouteComponent() {
 												Supprimer
 											</button>
 										</DialogTrigger>
+
 										<DialogContent className="grid gap-4">
 											<DialogTitle className="text-lg font-bold">
 												Supprimer une entreprise
@@ -185,23 +190,12 @@ function RouteComponent() {
 	);
 }
 
-function Logo({ company }: { company: Partial<Company> }) {
-	if (!company.logo) return <StoreIcon className="size-8" />;
-	return (
-		<img
-			src={company.logo.secureUrl}
-			alt={company.name}
-			className="size-8 aspect-square rounded-sm"
-		/>
-	);
-}
-
 function CardCreateCompany() {
 	return (
-		<article className="border border-gray-300 p-5 rounded-sm grid gap-4">
+		<article className="border border-gray-300 p-5 rounded-sm">
 			<Link
 				to="/compte/entreprises/add"
-				className="text-sm border px-2 py-1 rounded-sm flex items-center gap-2 max-w-fit"
+				className="text-sm border px-2 py-1 rounded-sm flex items-center gap-1.5 max-w-fit"
 			>
 				<PlusIcon className="size-4" />
 				Créer une entreprise

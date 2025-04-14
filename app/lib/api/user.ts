@@ -5,7 +5,7 @@ import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { auth } from "~/lib/auth/auth.server";
 import { getWebRequest } from "@tanstack/react-start/server";
-import { eq, inArray } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import { redirect } from "@tanstack/react-router";
 import { queryOptions } from "@tanstack/react-query";
 
@@ -36,7 +36,8 @@ export const getUserCompanies = createServerFn({ method: "GET" }).handler(async 
 			gallery: companiesTable.gallery,
 		})
 		.from(companiesTable)
-		.where(eq(companiesTable.user_id, session.user.id));
+		.where(eq(companiesTable.user_id, session.user.id))
+		.orderBy(desc(companiesTable.created_at));
 
 	// Then get categories in a separate query
 	const categories = await db
@@ -63,4 +64,5 @@ export const getUserCompanies = createServerFn({ method: "GET" }).handler(async 
 export const userCompaniesQueryOptions = queryOptions({
 	queryKey: ["user", "companies"],
 	queryFn: () => getUserCompanies(),
+	staleTime: 1000 * 60 * 60 * 24,
 });
