@@ -15,7 +15,7 @@ export const companiesTable = pgTable(
 		user_id: uuid("user_id")
 			.references(() => user.id, { onDelete: "cascade" })
 			.notNull(),
-		name: varchar("name", { length: 255 }).notNull(),
+		name: varchar("name", { length: 255 }).notNull().unique(),
 		siret: varchar("siret", { length: 14 }).notNull(),
 		business_owner: varchar("business_owner", { length: 255 }),
 		description: varchar("description", { length: 1500 }),
@@ -48,7 +48,7 @@ export const isValidCompanyStatus = (status: string): status is CompanyStatus =>
 	return COMPANY_STATUSES.includes(status as CompanyStatus);
 };
 
-export const COMPANY_WORK_MODES = ["remote", "hybrid", "onsite"] as const;
+export const COMPANY_WORK_MODES = ["remote", "hybrid", "onsite", "not_specified"] as const;
 export type CompanyWorkMode = (typeof COMPANY_WORK_MODES)[number];
 export const isValidCompanyWorkMode = (workMode: string): workMode is CompanyWorkMode => {
 	return COMPANY_WORK_MODES.includes(workMode as CompanyWorkMode);

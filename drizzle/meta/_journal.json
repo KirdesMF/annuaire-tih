@@ -8,6 +8,13 @@
       "when": 1744576129995,
       "tag": "0000_fantastic_sugar_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1744664938826,
+      "tag": "0001_mysterious_black_crow",
+      "breakpoints": true
     }
   ]
 }

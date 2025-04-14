@@ -9,29 +9,19 @@ import { redirect } from "@tanstack/react-router";
 import * as v from "valibot";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { uploadImageToCloudinary } from "../cloudinary";
-
+import { decode } from "decode-formdata";
 /**
  * Add a company
  * @param data - The data of the company to add
  */
 export const addCompany = createServerFn({ method: "POST" })
 	.validator((formData: FormData) => {
-		return v.parse(AddCompanySchema, {
-			name: formData.get("name"),
-			siret: formData.get("siret"),
-			categories: formData.getAll("categories"),
-			description: formData.get("description"),
-			business_owner: formData.get("business_owner"),
-			website: formData.get("website"),
-			service_area: formData.get("service_area"),
-			subdomain: formData.get("subdomain"),
-			email: formData.get("email"),
-			phone: formData.get("phone"),
-			work_mode: formData.get("work_mode"),
-			rqth: formData.get("rqth"),
-			logo: formData.get("logo"),
-			gallery: formData.getAll("gallery"),
+		const decodedFormData = decode(formData, {
+			files: ["logo", "gallery"],
+			arrays: ["categories", "gallery"],
+			booleans: ["rqth"],
 		});
+		return v.parse(AddCompanySchema, decodedFormData);
 	})
 	.handler(async ({ data }) => {
 		const request = getWebRequest();
@@ -48,14 +38,13 @@ export const addCompany = createServerFn({ method: "POST" })
 					.insert(companiesTable)
 					.values({
 						...rest,
-						rqth: rest.rqth === "true",
 						user_id: session.user.id,
 						created_by: session.user.id,
 					})
 					.returning();
 
 				// Upload logo
-				if (logo) {
+				if (logo && logo.size > 0) {
 					const { secure_url, public_id } = await uploadImageToCloudinary({
 						file: logo,
 						companyId: company.id,
@@ -71,7 +60,7 @@ export const addCompany = createServerFn({ method: "POST" })
 				}
 
 				// Upload gallery
-				if (gallery) {
+				if (gallery && gallery.length > 0) {
 					const uploadedImages: CompanyGallery = [];
 					for (const image of gallery) {
 						if (uploadedImages.length >= 2) break;

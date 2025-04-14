@@ -1,8 +1,10 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Separator } from "radix-ui";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CopyIcon } from "~/components/icons/copy";
+import { PlusIcon } from "~/components/icons/plus";
 import { StoreIcon } from "~/components/icons/store";
 import {
 	Dialog,
@@ -35,6 +37,7 @@ function RouteComponent() {
 	const companiesQuery = useSuspenseQuery(userCompaniesQueryOptions);
 	const { mutate, isPending } = useMutation({ mutationFn: deleteCompany });
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [companyId, setCompanyId] = useState<string | null>(null);
 
 	function onDeleteCompany(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -74,10 +77,10 @@ function RouteComponent() {
 				<p>Gérez vos entreprises et leurs informations.</p>
 			</header>
 
-			<ul className="flex flex-col gap-2">
+			<ul className="flex flex-col gap-2 ">
 				{companiesQuery.data?.map((company) => (
 					<li key={company.id}>
-						<article className="border border-gray-300 p-5 rounded-sm grid gap-4">
+						<article className="border border-gray-300 p-5 rounded-sm grid gap-4 shadow-2xs">
 							<header className="flex items-baseline gap-2 justify-between">
 								<div className="flex items-center gap-2">
 									<Logo company={company} />
@@ -109,6 +112,7 @@ function RouteComponent() {
 									>
 										Consulter
 									</Link>
+
 									<Link
 										to="/compte/entreprises/$entrepriseId/edit"
 										params={{ entrepriseId: company.id }}
@@ -116,11 +120,16 @@ function RouteComponent() {
 									>
 										Modifier
 									</Link>
-									<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+
+									<Dialog
+										open={isDialogOpen && companyId === company.id}
+										onOpenChange={setIsDialogOpen}
+									>
 										<DialogTrigger asChild>
 											<button
 												type="button"
 												className="text-xs px-2 py-1 rounded-sm border border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-colors"
+												onClick={() => setCompanyId(company.id)}
 											>
 												Supprimer
 											</button>
@@ -165,6 +174,13 @@ function RouteComponent() {
 					</li>
 				))}
 			</ul>
+
+			{companiesQuery.data.length < 3 && (
+				<>
+					<Separator.Root className="my-6 h-px bg-gray-300" />
+					<CardCreateCompany />
+				</>
+			)}
 		</div>
 	);
 }
@@ -177,5 +193,19 @@ function Logo({ company }: { company: Partial<Company> }) {
 			alt={company.name}
 			className="size-8 aspect-square rounded-sm"
 		/>
+	);
+}
+
+function CardCreateCompany() {
+	return (
+		<article className="border border-gray-300 p-5 rounded-sm grid gap-4">
+			<Link
+				to="/compte/entreprises/add"
+				className="text-sm border px-2 py-1 rounded-sm flex items-center gap-2 max-w-fit"
+			>
+				<PlusIcon className="size-4" />
+				Créer une entreprise
+			</Link>
+		</article>
 	);
 }

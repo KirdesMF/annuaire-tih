@@ -13,6 +13,7 @@ import { Popover, Separator } from "radix-ui";
 import * as v from "valibot";
 import { AddCompanySchema } from "~/lib/validator/company.schema";
 import { ChevronDownIcon } from "~/components/icons/chevron-down";
+import { decode } from "decode-formdata";
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add")({
 	component: RouteComponent,
@@ -54,25 +55,23 @@ function RouteComponent() {
 			formData.append("categories", category);
 		}
 
-		const result = v.safeParse(AddCompanySchema, {
-			name: formData.get("name"),
-			siret: formData.get("siret"),
-			categories: formData.getAll("categories"),
-			description: formData.get("description"),
-			business_owner: formData.get("business_owner"),
-			website: formData.get("website"),
-			service_area: formData.get("service_area"),
-			subdomain: formData.get("subdomain"),
-			email: formData.get("email"),
-			phone: formData.get("phone"),
-			work_mode: formData.get("work_mode"),
-			rqth: formData.get("rqth"),
-			logo: formData.get("logo"),
-			gallery: formData.getAll("gallery"),
+		const decodedFormData = decode(formData, {
+			files: ["logo", "gallery"],
+			arrays: ["categories", "gallery"],
+			booleans: ["rqth"],
 		});
 
+		const result = v.safeParse(AddCompanySchema, decodedFormData, { abortPipeEarly: true });
+
 		if (!result.success) {
-			toast.error(result.issues.map((issue) => issue.message).join(","));
+			toast.error(
+				<div>
+					{result.issues.map((issue, idx) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+						<p key={idx}>{issue.message}</p>
+					))}
+				</div>,
+			);
 			return;
 		}
 
@@ -254,7 +253,13 @@ function RouteComponent() {
 						<fieldset className="flex flex-col gap-2">
 							<legend className="text-xs font-medium mb-2">Mode de travail</legend>
 							<Label className="flex items-center gap-2">
-								<Input type="radio" name="work_mode" value="" className="size-5" />
+								<Input
+									type="radio"
+									name="work_mode"
+									value="not_specified"
+									defaultChecked
+									className="size-5"
+								/>
 								<span>Non spécifié</span>
 							</Label>
 							<Label className="flex items-center gap-2">
@@ -273,10 +278,6 @@ function RouteComponent() {
 
 						<fieldset className="flex flex-col gap-2">
 							<legend className="text-xs font-medium mb-2">RQTH</legend>
-							<Label className="flex items-center gap-2">
-								<Input type="radio" name="rqth" value="" className="size-5" />
-								<span>Non spécifié</span>
-							</Label>
 							<Label className="flex items-center gap-2">
 								<Input type="radio" name="rqth" value="true" className="size-5" />
 								<span>Oui</span>
