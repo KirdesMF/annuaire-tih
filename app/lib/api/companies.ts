@@ -15,14 +15,22 @@ import { uploadImageToCloudinary } from "../cloudinary";
  * @param data - The data of the company to add
  */
 export const addCompany = createServerFn({ method: "POST" })
-	.validator((data: FormData) => {
+	.validator((formData: FormData) => {
 		return v.parse(AddCompanySchema, {
-			name: data.get("name"),
-			siret: data.get("siret"),
-			description: data.get("description"),
-			logo: data.get("logo"),
-			categories: data.getAll("categories"),
-			gallery: data.getAll("gallery"),
+			name: formData.get("name"),
+			siret: formData.get("siret"),
+			categories: formData.getAll("categories"),
+			description: formData.get("description"),
+			business_owner: formData.get("business_owner"),
+			website: formData.get("website"),
+			service_area: formData.get("service_area"),
+			subdomain: formData.get("subdomain"),
+			email: formData.get("email"),
+			phone: formData.get("phone"),
+			work_mode: formData.get("work_mode"),
+			rqth: formData.get("rqth"),
+			logo: formData.get("logo"),
+			gallery: formData.getAll("gallery"),
 		});
 	})
 	.handler(async ({ data }) => {
@@ -32,18 +40,17 @@ export const addCompany = createServerFn({ method: "POST" })
 		const session = await auth.api.getSession({ headers: request.headers });
 		if (!session) throw redirect({ to: "/login" });
 
-		const { name, siret, description, categories, logo, gallery } = data;
+		const { logo, gallery, categories, ...rest } = data;
 
 		try {
 			await db.transaction(async (tx) => {
 				const [company] = await tx
 					.insert(companiesTable)
 					.values({
-						name,
-						siret,
+						...rest,
+						rqth: rest.rqth === "true",
 						user_id: session.user.id,
 						created_by: session.user.id,
-						description,
 					})
 					.returning();
 
