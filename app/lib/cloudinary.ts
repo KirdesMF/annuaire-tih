@@ -15,8 +15,10 @@ export async function uploadImageToCloudinary({
 	type,
 	file,
 	companyId,
-}: { type: "logo" | "gallery"; file: File; companyId: string }) {
-	const path = type === "logo" ? `companies/${companyId}/logo` : `companies/${companyId}/gallery`;
+	companyName,
+}: { type: "logo" | "gallery"; file: File; companyId: string; companyName: string }) {
+	const path =
+		type === "logo" ? `companies/${companyName}/logo` : `companies/${companyName}/gallery`;
 
 	try {
 		const buffer = await file.arrayBuffer();
@@ -27,7 +29,7 @@ export async function uploadImageToCloudinary({
 						folder: path,
 						resource_type: "auto",
 						public_id: `${companyId}-${Date.now()}`,
-						allowed_formats: ["jpg", "png", "jpeg"],
+						allowed_formats: ["jpg", "png", "jpeg", "webp"],
 					},
 					(error, result) => {
 						if (error) reject(error);
@@ -57,7 +59,7 @@ export async function updateImageInCloudinary({
 						public_id: publicId,
 						overwrite: true,
 						invalidate: true,
-						allowed_formats: ["jpg", "png", "jpeg"],
+						allowed_formats: ["jpg", "png", "jpeg", "webp"],
 					},
 					(error, result) => {
 						if (error) reject(error);

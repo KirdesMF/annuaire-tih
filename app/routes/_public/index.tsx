@@ -5,7 +5,7 @@ import banner from "~/assets/img/banner.png?url";
 import { InputSearch } from "~/components/input-search";
 import { categoriesQueryOptions } from "~/lib/api/categories";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_public/")({
 	component: Home,
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(categoriesQueryOptions);

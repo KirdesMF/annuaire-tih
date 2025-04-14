@@ -1,13 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/categories/")({
+export const Route = createFileRoute("/_public/entrepreneurs/")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	return (
-		<div>
-			<h1>Categories</h1>
-		</div>
-	);
+	return <div>Hello "/entrepreneurs/"!</div>;
 }

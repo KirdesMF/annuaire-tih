@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/categories/$categoryId")({
+export const Route = createFileRoute("/_public/categories/$id")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const categoryId = Route.useParams().categoryId;
+	const categoryId = Route.useParams().id;
 
 	return (
 		<div>
