@@ -21,6 +21,7 @@ import { Route as AdminRouteImport } from './routes/_admin/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as EntrepreneursIndexImport } from './routes/entrepreneurs/index'
 import { Route as CategoriesIndexImport } from './routes/categories/index'
+import { Route as EntreprisesEntrepriseIdImport } from './routes/entreprises/$entrepriseId'
 import { Route as CategoriesCategoryIdImport } from './routes/categories/$categoryId'
 import { Route as ProtectedReferenceImport } from './routes/_protected/reference'
 import { Route as AuthSignupImport } from './routes/_auth/signup'
@@ -91,6 +92,12 @@ const EntrepreneursIndexRoute = EntrepreneursIndexImport.update({
 const CategoriesIndexRoute = CategoriesIndexImport.update({
   id: '/categories/',
   path: '/categories/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const EntreprisesEntrepriseIdRoute = EntreprisesEntrepriseIdImport.update({
+  id: '/entreprises/$entrepriseId',
+  path: '/entreprises/$entrepriseId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -278,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesCategoryIdImport
       parentRoute: typeof rootRoute
     }
+    '/entreprises/$entrepriseId': {
+      id: '/entreprises/$entrepriseId'
+      path: '/entreprises/$entrepriseId'
+      fullPath: '/entreprises/$entrepriseId'
+      preLoaderRoute: typeof EntreprisesEntrepriseIdImport
+      parentRoute: typeof rootRoute
+    }
     '/categories/': {
       id: '/categories/'
       path: '/categories'
@@ -392,6 +406,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof AuthSignupRoute
   '/reference': typeof ProtectedReferenceRoute
   '/categories/$categoryId': typeof CategoriesCategoryIdRoute
+  '/entreprises/$entrepriseId': typeof EntreprisesEntrepriseIdRoute
   '/categories': typeof CategoriesIndexRoute
   '/entrepreneurs': typeof EntrepreneursIndexRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
@@ -415,6 +430,7 @@ export interface FileRoutesByTo {
   '/signup': typeof AuthSignupRoute
   '/reference': typeof ProtectedReferenceRoute
   '/categories/$categoryId': typeof CategoriesCategoryIdRoute
+  '/entreprises/$entrepriseId': typeof EntreprisesEntrepriseIdRoute
   '/categories': typeof CategoriesIndexRoute
   '/entrepreneurs': typeof EntrepreneursIndexRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
@@ -441,6 +457,7 @@ export interface FileRoutesById {
   '/_auth/signup': typeof AuthSignupRoute
   '/_protected/reference': typeof ProtectedReferenceRoute
   '/categories/$categoryId': typeof CategoriesCategoryIdRoute
+  '/entreprises/$entrepriseId': typeof EntreprisesEntrepriseIdRoute
   '/categories/': typeof CategoriesIndexRoute
   '/entrepreneurs/': typeof EntrepreneursIndexRoute
   '/_admin/admin/dashboard': typeof AdminAdminDashboardRoute
@@ -466,6 +483,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/reference'
     | '/categories/$categoryId'
+    | '/entreprises/$entrepriseId'
     | '/categories'
     | '/entrepreneurs'
     | '/admin/dashboard'
@@ -488,6 +506,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/reference'
     | '/categories/$categoryId'
+    | '/entreprises/$entrepriseId'
     | '/categories'
     | '/entrepreneurs'
     | '/admin/dashboard'
@@ -512,6 +531,7 @@ export interface FileRouteTypes {
     | '/_auth/signup'
     | '/_protected/reference'
     | '/categories/$categoryId'
+    | '/entreprises/$entrepriseId'
     | '/categories/'
     | '/entrepreneurs/'
     | '/_admin/admin/dashboard'
@@ -536,6 +556,7 @@ export interface RootRouteChildren {
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignupRoute: typeof AuthSignupRoute
   CategoriesCategoryIdRoute: typeof CategoriesCategoryIdRoute
+  EntreprisesEntrepriseIdRoute: typeof EntreprisesEntrepriseIdRoute
   CategoriesIndexRoute: typeof CategoriesIndexRoute
   EntrepreneursIndexRoute: typeof EntrepreneursIndexRoute
 }
@@ -554,6 +575,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignupRoute: AuthSignupRoute,
   CategoriesCategoryIdRoute: CategoriesCategoryIdRoute,
+  EntreprisesEntrepriseIdRoute: EntreprisesEntrepriseIdRoute,
   CategoriesIndexRoute: CategoriesIndexRoute,
   EntrepreneursIndexRoute: EntrepreneursIndexRoute,
 }
@@ -581,6 +603,7 @@ export const routeTree = rootRoute
         "/_auth/reset-password",
         "/_auth/signup",
         "/categories/$categoryId",
+        "/entreprises/$entrepriseId",
         "/categories/",
         "/entrepreneurs/"
       ]
@@ -644,6 +667,9 @@ export const routeTree = rootRoute
     },
     "/categories/$categoryId": {
       "filePath": "categories/$categoryId.tsx"
+    },
+    "/entreprises/$entrepriseId": {
+      "filePath": "entreprises/$entrepriseId.tsx"
     },
     "/categories/": {
       "filePath": "categories/index.tsx"

@@ -46,7 +46,7 @@ export const AddCompanySchema = v.object({
 			v.maxLength(24, "Le numéro de téléphone doit contenir au plus 24 caractères"),
 		),
 	),
-	rqth: v.optional(v.boolean()),
+	rqth: v.optional(v.picklist(["true", "false"])),
 	logo: v.optional(
 		v.pipe(
 			v.instance(File, "Veuillez entrer un fichier valide"),

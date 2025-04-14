@@ -11,9 +11,15 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "~/components/ui/dialog";
-import type { Company } from "~/db/schema/companies";
+import type { Company, CompanyStatus } from "~/db/schema/companies";
 import { deleteCompany } from "~/lib/api/companies";
 import { userCompaniesQueryOptions } from "~/lib/api/user";
+
+const STATUSES = {
+	pending: "En attente de validation",
+	active: "Approuvée",
+	rejected: "Rejetée",
+} as const;
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/")({
 	loader: async ({ context }) => {
@@ -24,8 +30,8 @@ export const Route = createFileRoute("/_protected/_compte/compte/entreprises/")(
 });
 
 function RouteComponent() {
-	const companiesQuery = useSuspenseQuery(userCompaniesQueryOptions);
 	const context = Route.useRouteContext();
+	const companiesQuery = useSuspenseQuery(userCompaniesQueryOptions);
 	const { mutate, isPending } = useMutation({ mutationFn: deleteCompany });
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -47,17 +53,6 @@ function RouteComponent() {
 		);
 	}
 
-	function Logo({ company }: { company: Partial<Company> }) {
-		if (!company.logo) return null;
-		return (
-			<img
-				src={company.logo.secureUrl}
-				alt={company.name}
-				className="size-20 aspect-square rounded-sm"
-			/>
-		);
-	}
-
 	if (!companiesQuery.data?.length) {
 		return (
 			<div className="container px-4 py-6">
@@ -70,6 +65,7 @@ function RouteComponent() {
 			</div>
 		);
 	}
+
 	return (
 		<div className="container px-4 py-6">
 			<header className="mb-6">
@@ -80,111 +76,105 @@ function RouteComponent() {
 			<ul className="flex flex-col gap-2">
 				{companiesQuery.data?.map((company) => (
 					<li key={company.id}>
-						<article className="border border-gray-300 p-5 rounded-sm relative">
-							<header className="flex items-baseline mb-4 gap-2">
-								<h2 className="text-lg font-bold leading-1 ">{company.name}</h2>
-								<p className="text-xs text-orange-300">{company.status}</p>
+						<article className="border border-gray-300 p-5 rounded-sm grid gap-4">
+							<header className="flex items-baseline gap-2 justify-between">
+								<div className="flex items-center gap-2">
+									<Logo company={company} />
+									<h2 className="text-lg font-bold leading-1">{company.name}</h2>
+									<p className="text-xs text-orange-300">{STATUSES[company.status]}</p>
+								</div>
+
+								<p className="text-xs text-gray-500 border px-2 py-1 rounded-sm inline-flex gap-2 items-center hover:cursor-pointer ">
+									{company.siret}
+								</p>
 							</header>
 
-							<div className="flex items-center gap-2">
-								<Logo company={company} />
-							</div>
-
-							<button
-								type="button"
-								className="text-xs text-gray-500 border px-2 py-1 rounded-sm inline-flex gap-2 items-center hover:cursor-pointer absolute top-3 end-4"
-							>
-								{company.siret}
-								<CopyIcon className="size-4" />
-							</button>
-
-							<p className="text-xs text-gray-500 mb-4">{company.description}</p>
-
-							<ul className="flex flex-wrap gap-2 mb-4">
-								{company.categories.map((category) => (
-									<li
-										key={category.category_id}
-										className="bg-gray-100 px-2 py-1 rounded-sm text-xs flex items-center gap-2"
-									>
-										{category.category_name}
-									</li>
-								))}
-							</ul>
-
-							<ul className="flex flex-wrap gap-2 mb-4">
-								{company.gallery?.map((image) => (
-									<li key={image.publicId}>
-										<img
-											src={image.secureUrl}
-											alt={company.name}
-											className="size-20 aspect-square rounded-sm"
-										/>
-									</li>
-								))}
-							</ul>
-
-							<footer className="flex gap-2">
-								<Link
-									to="/compte/entreprises/$entrepriseId/edit"
-									params={{ entrepriseId: company.id }}
-									className="text-xs px-2 py-1 rounded-sm border border-blue-400 text-blue-400"
-								>
-									Modifier
-								</Link>
-
-								<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-									<DialogTrigger asChild>
-										<button
-											type="button"
-											className="text-xs px-2 py-1 rounded-sm border border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-colors"
+							<footer className="flex items-center gap-2 justify-between">
+								<ul className="flex flex-wrap gap-2">
+									{company.categories.map((category) => (
+										<li
+											key={category.category_id}
+											className="bg-gray-100 px-2 py-1 rounded-sm text-xs flex items-center gap-2"
 										>
-											Supprimer
-										</button>
-									</DialogTrigger>
-
-									<DialogContent className="grid gap-4">
-										<DialogTitle className="text-lg font-bold">
-											Supprimer une entreprise
-										</DialogTitle>
-
-										<div className="space-y-2">
-											<DialogDescription className="text-sm text-gray-500">
-												Valider la suppression de l'entreprise <strong>{company.name}</strong> ?
-											</DialogDescription>
-
-											<p className="text-sm text-gray-500">
-												Cette action est irréversible. Toutes les données liées à cette entreprise
-												seront perdues.
-											</p>
-										</div>
-
-										<div className="grid grid-flow-col gap-2 place-content-end">
-											<DialogClose asChild>
-												<button
-													type="button"
-													className="text-xs px-2 py-1 rounded-sm border border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white transition-colors"
-												>
-													Annuler
-												</button>
-											</DialogClose>
-
-											<form onSubmit={onDeleteCompany}>
-												<input type="hidden" name="companyId" value={company.id} />
-												<button
-													type="submit"
-													className="text-xs px-2 py-1 rounded-sm border border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-colors"
-												>
-													{isPending ? "..." : "Valider"}
-												</button>
-											</form>
-										</div>
-									</DialogContent>
-								</Dialog>
+											{category.category_name}
+										</li>
+									))}
+								</ul>
+								<div className="flex gap-2">
+									<Link
+										to="/entreprises/$entrepriseId"
+										params={{ entrepriseId: company.id }}
+										className="text-xs px-2 py-1 rounded-sm border border-blue-400 text-blue-400"
+									>
+										Consulter
+									</Link>
+									<Link
+										to="/compte/entreprises/$entrepriseId/edit"
+										params={{ entrepriseId: company.id }}
+										className="text-xs px-2 py-1 rounded-sm border border-blue-400 text-blue-400"
+									>
+										Modifier
+									</Link>
+									<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+										<DialogTrigger asChild>
+											<button
+												type="button"
+												className="text-xs px-2 py-1 rounded-sm border border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-colors"
+											>
+												Supprimer
+											</button>
+										</DialogTrigger>
+										<DialogContent className="grid gap-4">
+											<DialogTitle className="text-lg font-bold">
+												Supprimer une entreprise
+											</DialogTitle>
+											<div className="space-y-2">
+												<DialogDescription className="text-sm text-gray-500">
+													Valider la suppression de l'entreprise <strong>{company.name}</strong> ?
+												</DialogDescription>
+												<p className="text-sm text-gray-500">
+													Cette action est irréversible. Toutes les données liées à cette entreprise
+													seront perdues.
+												</p>
+											</div>
+											<div className="grid grid-flow-col gap-2 place-content-end">
+												<DialogClose asChild>
+													<button
+														type="button"
+														className="text-xs px-2 py-1 rounded-sm border border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white transition-colors"
+													>
+														Annuler
+													</button>
+												</DialogClose>
+												<form onSubmit={onDeleteCompany}>
+													<input type="hidden" name="companyId" value={company.id} />
+													<button
+														type="submit"
+														className="text-xs px-2 py-1 rounded-sm border border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-colors"
+													>
+														{isPending ? "..." : "Valider"}
+													</button>
+												</form>
+											</div>
+										</DialogContent>
+									</Dialog>
+								</div>
 							</footer>
 						</article>
 					</li>
 				))}
 			</ul>
 		</div>
+	);
+}
+
+function Logo({ company }: { company: Partial<Company> }) {
+	if (!company.logo) return null;
+	return (
+		<img
+			src={company.logo.secureUrl}
+			alt={company.name}
+			className="size-8 aspect-square rounded-sm"
+		/>
 	);
 }
