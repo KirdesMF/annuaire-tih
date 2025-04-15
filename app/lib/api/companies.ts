@@ -33,7 +33,7 @@ export const addCompany = createServerFn({ method: "POST" })
 		const session = await auth.api.getSession({ headers: request.headers });
 		if (!session) throw redirect({ to: "/login" });
 
-		const { logo, gallery, categories, ...rest } = data;
+		const { logo, gallery, categories, facebook, instagram, linkedin, calendly, ...rest } = data;
 
 		try {
 			await db.transaction(async (tx) => {
@@ -41,6 +41,7 @@ export const addCompany = createServerFn({ method: "POST" })
 					.insert(companiesTable)
 					.values({
 						...rest,
+						social_media: { facebook, instagram, linkedin, calendly },
 						user_id: session.user.id,
 						created_by: session.user.id,
 					})

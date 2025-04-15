@@ -84,6 +84,16 @@ function RouteComponent() {
 			</ul>
 
 			<ul>
+				{Object.entries(data.social_media ?? {}).map(([key, value]) => (
+					<li key={key}>
+						<a href={value} target="_blank" rel="noopener noreferrer">
+							{key}
+						</a>
+					</li>
+				))}
+			</ul>
+
+			<ul>
 				{data.gallery?.map((image) => (
 					<li key={image.publicId}>
 						<img
