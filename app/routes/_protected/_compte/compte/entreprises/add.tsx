@@ -14,6 +14,10 @@ import * as v from "valibot";
 import { AddCompanySchema } from "~/lib/validator/company.schema";
 import { ChevronDownIcon } from "~/components/icons/chevron-down";
 import { decode } from "decode-formdata";
+import { LinkedinIcon } from "~/components/icons/linkedin";
+import { InstagramIcon } from "~/components/icons/instagram";
+import { CalendlyIcon } from "~/components/icons/calendly";
+import { FacebookIcon } from "~/components/icons/facecook";
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add")({
 	component: RouteComponent,
@@ -246,6 +250,60 @@ function RouteComponent() {
 							className="placeholder:text-xs"
 						/>
 					</Label>
+
+					<Separator.Root className="h-px bg-gray-300 my-4" />
+
+					<fieldset className="flex flex-col gap-4">
+						<legend className="text-xs font-medium mb-2">Réseaux sociaux</legend>
+						<Label>
+							<span className="sr-only">Linkedin</span>
+							<div className="flex items-center gap-2">
+								<LinkedinIcon className="size-6" />
+								<Input
+									type="text"
+									name="linkedin"
+									placeholder="Ex: https://www.linkedin.com/company/monentreprise"
+									className="placeholder:text-xs"
+								/>
+							</div>
+						</Label>
+						<Label>
+							<span className="sr-only">Instagram</span>
+							<div className="flex items-center gap-2">
+								<InstagramIcon className="size-6" />
+								<Input
+									type="text"
+									name="instagram"
+									placeholder="Ex: https://www.instagram.com/monentreprise"
+									className="placeholder:text-xs"
+								/>
+							</div>
+						</Label>
+						<Label>
+							<span className="sr-only">Calendly</span>
+							<div className="flex items-center gap-2">
+								<CalendlyIcon className="size-6" />
+								<Input
+									type="text"
+									name="calendly"
+									placeholder="Ex: https://calendly.com/monentreprise"
+									className="placeholder:text-xs"
+								/>
+							</div>
+						</Label>
+						<Label>
+							<span className="sr-only">Facebook</span>
+							<div className="flex items-center gap-2">
+								<FacebookIcon className="size-6" />
+								<Input
+									type="text"
+									name="facebook"
+									placeholder="Ex: https://www.facebook.com/monentreprise"
+									className="placeholder:text-xs"
+								/>
+							</div>
+						</Label>
+					</fieldset>
 
 					<Separator.Root className="h-px bg-gray-300 my-4" />
 

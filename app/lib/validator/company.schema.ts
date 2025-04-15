@@ -88,14 +88,38 @@ export const AddCompanySchema = v.object({
 			v.maxLength(2, "Veuillez entrer au plus 2 images"),
 		),
 	),
-	social_media: v.optional(
-		v.object({
-			facebook: v.optional(v.pipe(v.string(), v.url("Veuillez entrer une url valide"))),
-			instagram: v.optional(v.pipe(v.string(), v.url("Veuillez entrer une url valide"))),
-			linkedin: v.optional(v.pipe(v.string(), v.url("Veuillez entrer une url valide"))),
-			calendly: v.optional(v.pipe(v.string(), v.url("Veuillez entrer une url valide"))),
-		}),
-	),
+	facebook: v.union([
+		v.literal(""),
+		v.pipe(
+			v.string(),
+			v.url("Veuillez entrer une url valide"),
+			v.startsWith("https://www.facebook.com/", "Veuillez entrer une url facebook valide"),
+		),
+	]),
+	instagram: v.union([
+		v.literal(""),
+		v.pipe(
+			v.string(),
+			v.url("Veuillez entrer une url valide"),
+			v.startsWith("https://www.instagram.com/", "Veuillez entrer une url instagram valide"),
+		),
+	]),
+	linkedin: v.union([
+		v.literal(""),
+		v.pipe(
+			v.string(),
+			v.url("Veuillez entrer une url valide"),
+			v.startsWith("https://www.linkedin.com/company/", "Veuillez entrer une url linkedin valide"),
+		),
+	]),
+	calendly: v.union([
+		v.literal(""),
+		v.pipe(
+			v.string(),
+			v.url("Veuillez entrer une url valide"),
+			v.startsWith("https://calendly.com/", "Veuillez entrer une url calendly valide"),
+		),
+	]),
 });
 
 export type AddCompanyData = v.InferOutput<typeof AddCompanySchema>;
