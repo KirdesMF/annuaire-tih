@@ -29,7 +29,12 @@ export const companiesTable = pgTable(
 		rqth: boolean("rqth").notNull().default(false),
 		logo: jsonb("logo").$type<CompanyImage | null>(),
 		gallery: jsonb("gallery").$type<CompanyGallery | null>(),
-		social_media: jsonb("social_media").$type<CompanySocialMedia | null>(),
+		social_media: jsonb("social_media").$type<CompanySocialMedia>().notNull().default({
+			facebook: "",
+			calendly: "",
+			linkedin: "",
+			instagram: "",
+		}),
 	},
 	(table) => [
 		index("company_search_index").using(
@@ -61,8 +66,8 @@ export type CompanyImage = {
 export type CompanyGallery = Array<CompanyImage>;
 
 export type CompanySocialMedia = {
-	facebook?: string;
-	calendly?: string;
-	linkedin?: string;
-	instagram?: string;
+	facebook: string;
+	calendly: string;
+	linkedin: string;
+	instagram: string;
 };

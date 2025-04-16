@@ -17,7 +17,7 @@ import { decode } from "decode-formdata";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import { InstagramIcon } from "~/components/icons/instagram";
 import { CalendlyIcon } from "~/components/icons/calendly";
-import { FacebookIcon } from "~/components/icons/facecook";
+import { FacebookIcon } from "~/components/icons/facebook";
 import { userCompaniesQueryOptions } from "~/lib/api/user";
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add")({
