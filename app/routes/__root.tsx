@@ -26,7 +26,6 @@ const sessionQueryOptions = queryOptions({
 
 export type RootRouterContext = {
 	queryClient: QueryClient;
-	// session: Awaited<ReturnType<typeof getSession>>;
 };
 
 export const Route = createRootRouteWithContext<RootRouterContext>()({
@@ -57,13 +56,15 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+	const { session, queryClient } = Route.useRouteContext();
+
 	return (
 		<html lang="fr">
 			<head>
 				<HeadContent />
 			</head>
 			<body className="font-sans text-gray-700 isolate">
-				<Header />
+				<Header session={session} queryClient={queryClient} />
 				{children}
 				<Toaster />
 				<ReactQueryDevtools buttonPosition="bottom-left" />
