@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
@@ -18,9 +18,17 @@ import { LinkedinIcon } from "~/components/icons/linkedin";
 import { InstagramIcon } from "~/components/icons/instagram";
 import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facecook";
+import { userCompaniesQueryOptions } from "~/lib/api/user";
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add")({
 	component: RouteComponent,
+	beforeLoad: async ({ context }) => {
+		const userCompanies = await context.queryClient.ensureQueryData(userCompaniesQueryOptions);
+		if (userCompanies && userCompanies?.length >= 3) {
+			toast.error("Vous ne pouvez pas créer plus de 3 entreprises");
+			throw redirect({ to: "/compte/entreprises" });
+		}
+	},
 	loader: ({ context }) => {
 		const categories = context.queryClient.ensureQueryData(categoriesQueryOptions);
 		return categories;
