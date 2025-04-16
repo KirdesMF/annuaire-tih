@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { db } from "~/db";
-import { companiesTable, type CompanyGallery } from "~/db/schema/companies";
+import { companiesTable, type CompanyStatus, type CompanyGallery } from "~/db/schema/companies";
 import { AddCompanySchema, type AddCompanyData } from "../validator/company.schema";
 import { getWebRequest } from "@tanstack/react-start/server";
 import { auth } from "~/lib/auth/auth.server";
@@ -160,3 +160,30 @@ export function setCompanyQueryOptions(id: string) {
 		staleTime: 1000 * 60 * 60 * 24,
 	});
 }
+
+/**
+ * Get all companies
+ */
+export const getAllCompanies = createServerFn({ method: "GET" }).handler(async () => {
+	try {
+		const companies = await db.select().from(companiesTable);
+		return companies;
+	} catch (error) {
+		console.error(error);
+	}
+});
+
+export const allCompaniesQueryOptions = queryOptions({
+	queryKey: ["companies"],
+	queryFn: () => getAllCompanies(),
+});
+
+export const updateCompanyStatus = createServerFn({ method: "POST" })
+	.validator((data: unknown) => data as { companyId: string; status: CompanyStatus })
+	.handler(async ({ data: { companyId, status } }) => {
+		try {
+			await db.update(companiesTable).set({ status }).where(eq(companiesTable.id, companyId));
+		} catch (error) {
+			console.error(error);
+		}
+	});
