@@ -1,6 +1,6 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { LinkedinIcon } from "./icons/linkedin";
-import { authClient } from "~/lib/auth-client";
+import { authClient } from "~/lib/auth/auth.client";
 import { Avatar, DropdownMenu } from "radix-ui";
 import { LogoutIcon } from "./icons/logout";
 import { SettingsAccountIcon } from "./icons/settings-account";
@@ -9,8 +9,9 @@ import { AddIcon } from "./icons/add";
 import { useState } from "react";
 import { DashboardIcon } from "./icons/dashboard";
 import { useAdminRole } from "~/hooks/use-admin-role";
-import { useQueryClient } from "@tanstack/react-query";
+import { type QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import type { AuthSession } from "~/lib/auth/auth.server";
 
 const LINKS = [
 	{ label: "Qui sommes-nous ?", to: "/about" },
@@ -19,7 +20,10 @@ const LINKS = [
 	{ label: "Contact", to: "/contact" },
 ] as const;
 
-export function Header() {
+export function Header({
+	session,
+	queryClient,
+}: { session: AuthSession | null; queryClient: QueryClient }) {
 	return (
 		<header className="px-16 py-1.5 border-b border-gray-200 backdrop-blur-sm">
 			<nav className="flex items-center justify-between">
@@ -53,18 +57,16 @@ export function Header() {
 						<LinkedinIcon className="size-5" />
 					</a>
 
-					<RegisterLink />
-					<LoginButton />
-					<LoggedUserMenu />
+					<RegisterLink session={session} />
+					<LoginButton session={session} />
+					<LoggedUserMenu session={session} queryClient={queryClient} />
 				</div>
 			</nav>
 		</header>
 	);
 }
 
-function RegisterLink() {
-	const { data: session } = authClient.useSession();
-
+function RegisterLink({ session }: { session: AuthSession | null }) {
 	if (session) return null;
 
 	return (
@@ -74,9 +76,7 @@ function RegisterLink() {
 	);
 }
 
-function LoginButton() {
-	const { data: session } = authClient.useSession();
-
+function LoginButton({ session }: { session: AuthSession | null }) {
 	if (session) return null;
 
 	return (
@@ -89,31 +89,32 @@ function LoginButton() {
 	);
 }
 
-function LoggedUserMenu() {
+function LoggedUserMenu({
+	session,
+	queryClient,
+}: { session: AuthSession | null; queryClient: QueryClient }) {
 	const router = useRouter();
 	const [theme, setTheme] = useState("light");
-	const queryClient = useQueryClient();
-	const { data: session } = authClient.useSession();
 	const { isAdmin } = useAdminRole();
+	const { mutate: logout } = useMutation({
+		mutationFn: () => authClient.signOut(),
+		onSuccess: () => {
+			queryClient.clear();
+			toast.success("Vous êtes déconnecté");
+			router.navigate({ to: "/" });
+		},
+	});
 
 	if (!session) return null;
 
 	async function onLogout() {
-		await authClient.signOut({
-			fetchOptions: {
-				onSuccess: () => {
-					queryClient.clear();
-					toast.success("Vous êtes déconnecté");
-					router.navigate({ to: "/" });
-				},
-			},
-		});
+		logout();
 	}
 
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger className="rounded-full cursor-pointer">
-				<AvatarUser />
+				<AvatarUser session={session} />
 			</DropdownMenu.Trigger>
 
 			<DropdownMenu.Portal>
@@ -228,9 +229,7 @@ function LoggedUserMenu() {
 	);
 }
 
-function AvatarUser() {
-	const { data: session } = authClient.useSession();
-
+function AvatarUser({ session }: { session: AuthSession | null }) {
 	if (!session) return null;
 
 	const initials = session.user.name

@@ -7,7 +7,7 @@ import appCSS from "~/styles/app.css?url";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
-import { auth } from "~/lib/auth";
+import { auth } from "~/lib/auth/auth.server";
 import { Toaster } from "sonner";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
@@ -26,7 +26,6 @@ const sessionQueryOptions = queryOptions({
 
 export type RootRouterContext = {
 	queryClient: QueryClient;
-	// session: Awaited<ReturnType<typeof getSession>>;
 };
 
 export const Route = createRootRouteWithContext<RootRouterContext>()({
@@ -57,13 +56,15 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+	const { session, queryClient } = Route.useRouteContext();
+
 	return (
 		<html lang="fr">
 			<head>
 				<HeadContent />
 			</head>
 			<body className="font-sans text-gray-700 isolate">
-				<Header />
+				<Header session={session} queryClient={queryClient} />
 				{children}
 				<Toaster />
 				<ReactQueryDevtools buttonPosition="bottom-left" />

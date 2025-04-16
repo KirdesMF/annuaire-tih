@@ -5,43 +5,22 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1744071604707,
-      "tag": "0000_calm_terror",
+      "when": 1744576129995,
+      "tag": "0000_fantastic_sugar_man",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1744249505939,
-      "tag": "0001_lovely_gideon",
+      "when": 1744664938826,
+      "tag": "0001_mysterious_black_crow",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1744249933055,
-      "tag": "0002_tan_the_captain",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1744376328325,
-      "tag": "0003_lyrical_bulldozer",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1744387640055,
-      "tag": "0004_optimal_jetstream",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1744410984519,
-      "tag": "0005_complex_exodus",
+      "when": 1744822088861,
+      "tag": "0002_square_vanisher",
       "breakpoints": true
     }
   ]
