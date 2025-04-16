@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { Command } from "cmdk";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CloseIcon } from "~/components/icons/close";
 import { categoriesQueryOptions } from "~/lib/api/categories";
 import { addCompany } from "~/lib/api/companies";
@@ -49,6 +49,9 @@ function RouteComponent() {
 		logo?: string;
 		gallery: string[];
 	}>({ gallery: [] });
+	const [descriptionLength, setDescriptionLength] = useState(0);
+
+	const formRef = useRef<HTMLFormElement>(null);
 
 	function onSelectCategory(categoryId: string) {
 		setSelectedCategories((prev) => {
@@ -66,6 +69,10 @@ function RouteComponent() {
 			newSet.delete(categoryId);
 			return newSet;
 		});
+	}
+
+	function onDescriptionChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+		setDescriptionLength(e.target.value.length);
 	}
 
 	function onImageChange(
@@ -92,6 +99,23 @@ function RouteComponent() {
 			}
 		};
 		reader.readAsDataURL(file);
+	}
+
+	function onPreview() {
+		const formData = new FormData(formRef.current as HTMLFormElement);
+		for (const category of selectedCategories) {
+			formData.append("categories", category);
+		}
+
+		const decodedFormData = decode(formData, {
+			files: ["logo", "gallery"],
+			arrays: ["categories", "gallery"],
+			booleans: ["rqth"],
+		});
+
+		const result = v.safeParse(AddCompanySchema, decodedFormData, { abortPipeEarly: true });
+
+		console.log(result);
 	}
 
 	function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -138,7 +162,7 @@ function RouteComponent() {
 			<div className="max-w-xl mx-auto">
 				<h1 className="text-2xl font-bold mb-4">Référencez votre entreprise</h1>
 
-				<form className="flex flex-col gap-3" onSubmit={onSubmit}>
+				<form className="flex flex-col gap-3" ref={formRef} onSubmit={onSubmit}>
 					<Label className="flex flex-col gap-1">
 						<span className="text-xs font-medium">Nom de l'entreprise *</span>
 						<Input
@@ -223,15 +247,19 @@ function RouteComponent() {
 
 					<Separator.Root className="h-px bg-gray-300 my-4" />
 
-					<Label className="flex flex-col gap-1">
-						<span className="text-xs font-medium">Description</span>
-						<textarea
-							name="description"
-							className="border rounded-sm p-2 border-gray-300 resize-none placeholder:text-xs"
-							rows={4}
-							placeholder="Entrer une description de mon entreprise..."
-						/>
-					</Label>
+					<div className="grid gap-1">
+						<Label className="flex flex-col gap-1">
+							<span className="text-xs font-medium">Description</span>
+							<textarea
+								name="description"
+								className="border rounded-sm p-2 border-gray-300 resize-none placeholder:text-xs"
+								rows={4}
+								placeholder="Entrer une description de mon entreprise..."
+								onChange={onDescriptionChange}
+							/>
+						</Label>
+						<span className="text-xs text-gray-500 justify-self-end">{descriptionLength}/1500</span>
+					</div>
 
 					<Label className="flex flex-col gap-1">
 						<span className="text-xs font-medium">Entrepreneur</span>
@@ -490,6 +518,14 @@ function RouteComponent() {
 					<Separator.Root className="h-px bg-gray-300 my-4" />
 
 					<div className="flex gap-2 justify-end">
+						<Link
+							to="/compte/entreprises/preview"
+							className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs"
+							onClick={onPreview}
+						>
+							Prévisualiser
+						</Link>
+
 						<button
 							type="submit"
 							className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs"
