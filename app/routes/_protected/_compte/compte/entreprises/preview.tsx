@@ -5,5 +5,9 @@ export const Route = createFileRoute("/_protected/_compte/compte/entreprises/pre
 });
 
 function RouteComponent() {
-	return <div>Hello "/_protected/_compte/compte/entreprises/preview"!</div>;
+	return (
+		<div className="container px-4 py-6">
+			<h1 className="text-2xl font-bold mb-4">Prévisualisation</h1>
+		</div>
+	);
 }
