@@ -20,6 +20,12 @@ export default defineConfig({
 					}
 					warn(warning);
 				},
+				onLog(level, log, handler) {
+					if (log.code === "MODULE_LEVEL_DIRECTIVE") {
+						return;
+					}
+					handler(level, log);
+				},
 			},
 		},
 	},
