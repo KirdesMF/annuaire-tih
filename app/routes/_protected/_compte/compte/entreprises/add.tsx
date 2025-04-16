@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
@@ -19,6 +19,10 @@ import { InstagramIcon } from "~/components/icons/instagram";
 import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facebook";
 import { userCompaniesQueryOptions } from "~/lib/api/user";
+import { PlusIcon } from "~/components/icons/plus";
+import { PhoneIcon } from "~/components/icons/phone";
+import { GlobeIcon } from "~/components/icons/globe";
+import { EmailIcon } from "~/components/icons/email";
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add")({
 	component: RouteComponent,
@@ -41,6 +45,10 @@ function RouteComponent() {
 	const router = useRouter();
 	const { mutate, isPending } = useMutation({ mutationFn: useServerFn(addCompany) });
 	const [selectedCategories, setSelectedCategories] = useState(new Set<string>());
+	const [imagePreviews, setImagePreviews] = useState<{
+		logo?: string;
+		gallery: string[];
+	}>({ gallery: [] });
 
 	function onSelectCategory(categoryId: string) {
 		setSelectedCategories((prev) => {
@@ -58,6 +66,32 @@ function RouteComponent() {
 			newSet.delete(categoryId);
 			return newSet;
 		});
+	}
+
+	function onImageChange(
+		e: React.ChangeEvent<HTMLInputElement>,
+		type: "logo" | "gallery",
+		index?: number,
+	) {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		const reader = new FileReader();
+		reader.onload = () => {
+			const result = reader.result as string;
+			if (type === "logo") {
+				setImagePreviews((prev) => ({ ...prev, logo: result }));
+			}
+
+			if (type === "gallery" && index) {
+				setImagePreviews((prev) => {
+					const newGallery = [...prev.gallery];
+					newGallery[index] = result;
+					return { ...prev, gallery: newGallery };
+				});
+			}
+		};
+		reader.readAsDataURL(file);
 	}
 
 	function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -210,16 +244,6 @@ function RouteComponent() {
 					</Label>
 
 					<Label className="flex flex-col gap-1">
-						<span className="text-xs font-medium">Site web</span>
-						<Input
-							type="text"
-							name="website"
-							placeholder="Ex: https://www.monentreprise.com"
-							className="placeholder:text-xs"
-						/>
-					</Label>
-
-					<Label className="flex flex-col gap-1">
 						<span className="text-xs font-medium">Perimètre d'intervention</span>
 						<Input
 							type="text"
@@ -241,22 +265,41 @@ function RouteComponent() {
 
 					<Label className="flex flex-col gap-1">
 						<span className="text-xs font-medium">Email</span>
-						<Input
-							type="email"
-							name="email"
-							placeholder="Ex: contact@monentreprise.com"
-							className="placeholder:text-xs"
-						/>
+						<div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
+							<EmailIcon className="size-5 text-gray-500" />
+							<input
+								type="email"
+								name="email"
+								placeholder="Ex: contact@monentreprise.com"
+								className="placeholder:text-xs outline-none w-full"
+							/>
+						</div>
 					</Label>
 
 					<Label className="flex flex-col gap-1">
 						<span className="text-xs font-medium">Numéro de téléphone</span>
-						<Input
-							type="tel"
-							name="phone"
-							placeholder="Ex: 06 06 06 06 06"
-							className="placeholder:text-xs"
-						/>
+						<div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
+							<PhoneIcon className="size-5 text-gray-500" />
+							<input
+								type="tel"
+								name="phone"
+								placeholder="Ex: 06 06 06 06 06"
+								className="placeholder:text-xs outline-none w-full"
+							/>
+						</div>
+					</Label>
+
+					<Label className="flex flex-col gap-1">
+						<span className="text-xs font-medium">Site web</span>
+						<div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
+							<GlobeIcon className="size-5 text-gray-500" />
+							<input
+								type="text"
+								name="website"
+								placeholder="Ex: https://www.monentreprise.com"
+								className="placeholder:text-xs outline-none w-full"
+							/>
+						</div>
 					</Label>
 
 					<Separator.Root className="h-px bg-gray-300 my-4" />
@@ -265,49 +308,49 @@ function RouteComponent() {
 						<legend className="text-xs font-medium mb-2">Réseaux sociaux</legend>
 						<Label>
 							<span className="sr-only">Linkedin</span>
-							<div className="flex items-center gap-2">
-								<LinkedinIcon className="size-6" />
-								<Input
+							<div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
+								<LinkedinIcon className="size-5 text-gray-500" />
+								<input
 									type="text"
 									name="linkedin"
 									placeholder="Ex: https://www.linkedin.com/company/monentreprise"
-									className="placeholder:text-xs"
-								/>
-							</div>
-						</Label>
-						<Label>
-							<span className="sr-only">Instagram</span>
-							<div className="flex items-center gap-2">
-								<InstagramIcon className="size-6" />
-								<Input
-									type="text"
-									name="instagram"
-									placeholder="Ex: https://www.instagram.com/monentreprise"
-									className="placeholder:text-xs"
-								/>
-							</div>
-						</Label>
-						<Label>
-							<span className="sr-only">Calendly</span>
-							<div className="flex items-center gap-2">
-								<CalendlyIcon className="size-6" />
-								<Input
-									type="text"
-									name="calendly"
-									placeholder="Ex: https://calendly.com/monentreprise"
-									className="placeholder:text-xs"
+									className="placeholder:text-xs outline-none w-full"
 								/>
 							</div>
 						</Label>
 						<Label>
 							<span className="sr-only">Facebook</span>
-							<div className="flex items-center gap-2">
-								<FacebookIcon className="size-6" />
-								<Input
+							<div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
+								<FacebookIcon className="size-5 text-gray-500" />
+								<input
 									type="text"
 									name="facebook"
 									placeholder="Ex: https://www.facebook.com/monentreprise"
-									className="placeholder:text-xs"
+									className="placeholder:text-xs outline-none w-full"
+								/>
+							</div>
+						</Label>
+						<Label>
+							<span className="sr-only">Instagram</span>
+							<div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
+								<InstagramIcon className="size-5 text-gray-500" />
+								<input
+									type="text"
+									name="instagram"
+									placeholder="Ex: https://www.instagram.com/monentreprise"
+									className="placeholder:text-xs outline-none w-full"
+								/>
+							</div>
+						</Label>
+						<Label>
+							<span className="sr-only">Calendly</span>
+							<div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
+								<CalendlyIcon className="size-5 text-gray-500" />
+								<input
+									type="text"
+									name="calendly"
+									placeholder="Ex: https://calendly.com/monentreprise"
+									className="placeholder:text-xs outline-none w-full"
 								/>
 							</div>
 						</Label>
@@ -315,89 +358,146 @@ function RouteComponent() {
 
 					<Separator.Root className="h-px bg-gray-300 my-4" />
 
-					<div className="flex flex-wrap gap-8">
-						<fieldset className="flex flex-col gap-2">
+					<div className="grid gap-8">
+						<fieldset className="flex gap-4">
 							<legend className="text-xs font-medium mb-2">Mode de travail</legend>
-							<Label className="flex items-center gap-2">
+							<Label className="flex items-center gap-1">
 								<Input
 									type="radio"
 									name="work_mode"
 									value="not_specified"
 									defaultChecked
-									className="size-5"
+									className="size-4 accent-gray-600"
 								/>
-								<span>Non spécifié</span>
+								<span className="text-xs">Non spécifié</span>
 							</Label>
-							<Label className="flex items-center gap-2">
-								<Input type="radio" name="work_mode" value="remote" className="size-5" />
-								<span>À distance</span>
+							<Label className="flex items-center gap-1">
+								<Input
+									type="radio"
+									name="work_mode"
+									value="remote"
+									className="size-4 accent-gray-600"
+								/>
+								<span className="text-xs">À distance</span>
 							</Label>
-							<Label className="flex items-center gap-2">
-								<Input type="radio" name="work_mode" value="hybrid" className="size-5" />
-								<span>Hybride</span>
+							<Label className="flex items-center gap-1">
+								<Input
+									type="radio"
+									name="work_mode"
+									value="onsite"
+									className="size-4 accent-gray-600"
+								/>
+								<span className="text-xs">Sur site</span>
 							</Label>
-							<Label className="flex items-center gap-2">
-								<Input type="radio" name="work_mode" value="onsite" className="size-5" />
-								<span>Sur site</span>
+							<Label className="flex items-center gap-1">
+								<Input
+									type="radio"
+									name="work_mode"
+									value="hybrid"
+									className="size-4 accent-gray-600"
+								/>
+								<span className="text-xs">Hybride</span>
 							</Label>
 						</fieldset>
 
-						<fieldset className="flex flex-col gap-2">
+						<fieldset className="flex gap-2">
 							<legend className="text-xs font-medium mb-2">RQTH</legend>
-							<Label className="flex items-center gap-2">
-								<Input type="radio" name="rqth" value="true" className="size-5" />
-								<span>Oui</span>
+							<Label className="flex items-center gap-1">
+								<Input type="radio" name="rqth" value="true" className="size-4 accent-gray-600" />
+								<span className="text-xs">Oui</span>
 							</Label>
-							<Label className="flex items-center gap-2">
-								<Input type="radio" name="rqth" value="false" className="size-5" />
-								<span>Non</span>
+							<Label className="flex items-center gap-1">
+								<Input type="radio" name="rqth" value="false" className="size-4 accent-gray-600" />
+								<span className="text-xs">Non</span>
 							</Label>
 						</fieldset>
 					</div>
 
 					<Separator.Root className="h-px bg-gray-300 my-4" />
 
-					<Label className="flex flex-col gap-1">
-						<span className="text-xs font-medium">Logo (max. 3MB)</span>
-						<input
-							type="file"
-							name="logo"
-							className="block w-full text-sm text-gray-900 border border-gray-300 rounded-sm cursor-pointer bg-gray-50 outline-none file:bg-gray-500 file:text-white file:border-0 file:me-4 file:py-2 file:px-4"
-						/>
-					</Label>
+					<fieldset className="border rounded-sm border-gray-300 p-4">
+						<legend className="text-xs font-medium  bg-white px-2">Images</legend>
 
-					<fieldset className="flex flex-col gap-2">
-						<legend className="sr-only">Images</legend>
-						<Label className="flex flex-col gap-1">
-							<span className="text-xs font-medium">Image 1 (max. 2MB)</span>
-							<input
-								type="file"
-								name="gallery"
-								id="image-1"
-								className="block w-full text-sm text-gray-900 border border-gray-300 rounded-sm cursor-pointer bg-gray-50 outline-none file:bg-gray-500 file:text-white file:border-0 file:me-4 file:py-2 file:px-4"
-							/>
-						</Label>
+						<div className="flex gap-2 justify-center">
+							<Label className="relative flex flex-col gap-1 outline-none group">
+								<span className="text-xs font-medium">Logo (max. 3MB)</span>
+								<div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
+									{imagePreviews.logo ? (
+										<img
+											src={imagePreviews.logo}
+											alt="Logo"
+											className="w-full h-full object-cover"
+										/>
+									) : (
+										<PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
+									)}
+									<input
+										type="file"
+										className="absolute inset-0 opacity-0"
+										name="logo"
+										onChange={(e) => onImageChange(e, "logo")}
+										accept="image/*"
+									/>
+								</div>
+							</Label>
 
-						<Label className="flex flex-col gap-1">
-							<span className="text-xs font-medium">Image 2 (max. 2MB)</span>
-							<input
-								type="file"
-								name="gallery"
-								id="image-2"
-								className="block w-full text-sm text-gray-900 border border-gray-300 rounded-sm cursor-pointer bg-gray-50 outline-none file:bg-gray-500 file:text-white file:border-0 file:me-4 file:py-2 file:px-4"
-							/>
-						</Label>
+							<Label className="relative flex flex-col gap-1 outline-none group">
+								<span className="text-xs font-medium">Image 1 (max. 2MB)</span>
+								<div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
+									{imagePreviews.gallery[0] ? (
+										<img
+											src={imagePreviews.gallery[0]}
+											alt="gallery 1"
+											className="w-full h-full object-cover"
+										/>
+									) : (
+										<PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
+									)}
+									<input
+										type="file"
+										className="absolute inset-0 opacity-0"
+										name="gallery"
+										onChange={(e) => onImageChange(e, "gallery", 0)}
+										accept="image/*"
+									/>
+								</div>
+							</Label>
+
+							<Label className="relative flex flex-col gap-1 outline-none group">
+								<span className="text-xs font-medium">Image 2 (max. 2MB)</span>
+								<div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
+									{imagePreviews.gallery[1] ? (
+										<img
+											src={imagePreviews.gallery[1]}
+											alt="gallery 2"
+											className="w-full h-full object-cover"
+										/>
+									) : (
+										<PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
+									)}
+									<input
+										type="file"
+										className="absolute inset-0 opacity-0"
+										name="gallery"
+										onChange={(e) => onImageChange(e, "gallery", 1)}
+										accept="image/*"
+									/>
+								</div>
+							</Label>
+						</div>
 					</fieldset>
 
 					<Separator.Root className="h-px bg-gray-300 my-4" />
 
-					<button
-						type="submit"
-						className="bg-gray-800 text-white p-3 rounded-sm font-light text-sm"
-						disabled={isPending}
-					>
-						{isPending ? "Création en cours..." : "Créer un compte"}
-					</button>
+					<div className="flex gap-2 justify-end">
+						<button
+							type="submit"
+							className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs"
+							disabled={isPending}
+						>
+							{isPending ? "Création en cours..." : "Créer un compte"}
+						</button>
+					</div>
 				</form>
 			</div>
 		</div>
