@@ -1,1 +1,0 @@
-import{j as n}from"./client-CB7jT4PR.js";const e=function(){return n.jsx("div",{className:"container px-4 py-6",children:n.jsx("h1",{className:"text-2xl font-bold mb-4",children:"Prévisualisation"})})};export{e as component};

@@ -1,1 +1,0 @@
-import{pgTable as e,timestamp as a,boolean as t,varchar as l,uuid as o}from"drizzle-orm/pg-core";const d=e("categories",{id:o("id").primaryKey().defaultRandom(),name:l("name",{length:255}).notNull().unique(),is_active:t("is_active").notNull().default(!0),created_at:a("created_at").notNull().defaultNow(),updated_at:a("updated_at").notNull().defaultNow()});export{d as c};

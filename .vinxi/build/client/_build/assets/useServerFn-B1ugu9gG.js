@@ -1,1 +1,0 @@
-import{a as n,az as t}from"./client-CB7jT4PR.js";function i(o){const e=n();return async(...a)=>{try{const r=await o(...a);if(t(r))throw r;return r}catch(r){if(t(r)){const s=e.resolveRedirect({...r,_fromLocation:e.state.location});return e.navigate(s)}throw r}}}export{i as u};

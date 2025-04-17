@@ -1,1 +1,0 @@
-import{aB as t,j as o}from"./client-CB7jT4PR.js";const r=function(){const{entrepriseId:e}=t.useParams();return o.jsxs("div",{children:['Hello "/_protected/compte/entreprises/',e,'/edit"!']})};export{r as component};
