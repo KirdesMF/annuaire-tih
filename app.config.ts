@@ -14,7 +14,7 @@ export default defineConfig({
 		],
 	},
 	server: {
-		preset: "netlify",
-		// unenv: cloudflare,
+		preset: "cloudflare-pages",
+		unenv: cloudflare,
 	},
 });
