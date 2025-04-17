@@ -1,5 +1,5 @@
 {
-  "id": "22159c2d-b5fc-4bd3-81bd-74900d331756",
+  "id": "5b08de5e-cea8-44a5-b5e8-06f0306ebbee",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,10 +10,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "account_id": {
           "name": "account_id",
@@ -29,7 +28,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -116,10 +115,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "expires_at": {
           "name": "expires_at",
@@ -159,7 +157,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -206,10 +204,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "first_name": {
           "name": "first_name",
@@ -295,10 +292,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "identifier": {
           "name": "identifier",
@@ -428,13 +424,13 @@
         },
         "created_by": {
           "name": "created_by",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "user_id": {
           "name": "user_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -474,6 +470,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "service_area": {
+          "name": "service_area",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "subdomain": {
           "name": "subdomain",
           "type": "varchar(100)",
@@ -498,6 +500,13 @@
           "primaryKey": false,
           "notNull": false
         },
+        "rqth": {
+          "name": "rqth",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
         "logo": {
           "name": "logo",
           "type": "jsonb",
@@ -510,24 +519,12 @@
           "primaryKey": false,
           "notNull": false
         },
-        "rqth": {
-          "name": "rqth",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
         "social_media": {
           "name": "social_media",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
-        },
-        "service_area": {
-          "name": "service_area",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'{\"facebook\":\"\",\"calendly\":\"\",\"linkedin\":\"\",\"instagram\":\"\"}'::jsonb"
         }
       },
       "indexes": {
@@ -576,7 +573,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "companies_name_unique": {
+          "name": "companies_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
