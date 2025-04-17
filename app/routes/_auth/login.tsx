@@ -3,6 +3,27 @@ import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { authClient } from "~/lib/auth/auth.client";
+import * as v from "valibot";
+import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { auth } from "~/lib/auth/auth.server";
+
+const LoginSchema = v.object({
+	email: v.pipe(v.string(), v.email()),
+	password: v.pipe(v.string(), v.minLength(8)),
+});
+
+type LoginData = v.InferOutput<typeof LoginSchema>;
+
+export const loginFn = createServerFn({ method: "POST" })
+	.validator((data: unknown) => v.parse(LoginSchema, data))
+	.handler(async ({ data }) => {
+		await auth.api.signInEmail({
+			body: {
+				email: data.email,
+				password: data.password,
+			},
+		});
+	});
 
 export const Route = createFileRoute("/_auth/login")({
 	component: RouteComponent,
@@ -15,19 +36,8 @@ export const Route = createFileRoute("/_auth/login")({
 
 function RouteComponent() {
 	const router = useRouter();
-
 	const { mutate, isPending } = useMutation({
-		mutationFn: async ({
-			email,
-			password,
-		}: {
-			email: string;
-			password: string;
-		}) =>
-			await authClient.signIn.email({
-				email,
-				password,
-			}),
+		mutationFn: useServerFn(loginFn),
 	});
 
 	async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -36,8 +46,10 @@ function RouteComponent() {
 
 		mutate(
 			{
-				email: formData.get("email") as string,
-				password: formData.get("password") as string,
+				data: {
+					email: formData.get("email") as string,
+					password: formData.get("password") as string,
+				},
 			},
 			{
 				onSuccess: async () => {
