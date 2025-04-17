@@ -30,7 +30,7 @@ export default defineConfig({
 		},
 	},
 	server: {
-		preset: "cloudflare-pages",
-		unenv: cloudflare,
+		preset: "netlify",
+		// unenv: cloudflare,
 	},
 });
