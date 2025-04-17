@@ -1,0 +1,144 @@
+{
+  "/Users/kirdes/Dev/@annuaire-tih/app/styles/app.css": {
+    "file": "assets/app-BvlQHg4K.css",
+    "src": "/Users/kirdes/Dev/@annuaire-tih/app/styles/app.css"
+  },
+  "_auth.server-CEln8Kin.js": {
+    "file": "assets/auth.server-CEln8Kin.js",
+    "name": "auth.server",
+    "imports": [
+      "_index-8Htcofqc.js"
+    ]
+  },
+  "_categories-BGVwlHfX.js": {
+    "file": "assets/categories-BGVwlHfX.js",
+    "name": "categories"
+  },
+  "_company-categories-Dsd3WCXy.js": {
+    "file": "assets/company-categories-Dsd3WCXy.js",
+    "name": "company-categories",
+    "imports": [
+      "_auth.server-CEln8Kin.js",
+      "_categories-BGVwlHfX.js"
+    ]
+  },
+  "_index-8Htcofqc.js": {
+    "file": "assets/index-8Htcofqc.js",
+    "name": "index"
+  },
+  "_label-BcVNeqdH.js": {
+    "file": "assets/label-BcVNeqdH.js",
+    "name": "label"
+  },
+  "app/lib/api/categories.ts?tsr-directive-use-server=": {
+    "file": "assets/categories-4UjoYAyj.js",
+    "name": "categories",
+    "src": "app/lib/api/categories.ts?tsr-directive-use-server=",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-8Htcofqc.js",
+      "_categories-BGVwlHfX.js"
+    ]
+  },
+  "app/lib/api/companies.ts?tsr-directive-use-server=": {
+    "file": "assets/companies-Co9WOiyO.js",
+    "name": "companies",
+    "src": "app/lib/api/companies.ts?tsr-directive-use-server=",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-8Htcofqc.js",
+      "_company-categories-Dsd3WCXy.js",
+      "_auth.server-CEln8Kin.js",
+      "_categories-BGVwlHfX.js"
+    ]
+  },
+  "app/lib/api/user.ts?tsr-directive-use-server=": {
+    "file": "assets/user-DodAozgJ.js",
+    "name": "user",
+    "src": "app/lib/api/user.ts?tsr-directive-use-server=",
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-8Htcofqc.js",
+      "_categories-BGVwlHfX.js",
+      "_company-categories-Dsd3WCXy.js",
+      "_auth.server-CEln8Kin.js"
+    ]
+  },
+  "app/routes/__root.tsx?tsr-directive-use-server=": {
+    "file": "assets/__root-314AODrE.js",
+    "name": "__root",
+    "src": "app/routes/__root.tsx?tsr-directive-use-server=",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth.server-CEln8Kin.js",
+      "_index-8Htcofqc.js"
+    ],
+    "assets": [
+      "assets/app-BvlQHg4K.css"
+    ]
+  },
+  "app/routes/_auth/login.tsx?tsr-directive-use-server=": {
+    "file": "assets/login-BhSqD-hQ.js",
+    "name": "login",
+    "src": "app/routes/_auth/login.tsx?tsr-directive-use-server=",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth.server-CEln8Kin.js",
+      "_index-8Htcofqc.js"
+    ],
+    "dynamicImports": [
+      "app/routes/_auth/login.tsx?tsr-split=component"
+    ]
+  },
+  "app/routes/_auth/login.tsx?tsr-split=component": {
+    "file": "assets/login-02gR8xUb.js",
+    "name": "login",
+    "src": "app/routes/_auth/login.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "_label-BcVNeqdH.js",
+      "_auth.server-CEln8Kin.js",
+      "_index-8Htcofqc.js"
+    ]
+  },
+  "app/routes/_auth/signup.tsx?tsr-directive-use-server=": {
+    "file": "assets/signup-DcEYNaAi.js",
+    "name": "signup",
+    "src": "app/routes/_auth/signup.tsx?tsr-directive-use-server=",
+    "isDynamicEntry": true,
+    "imports": [
+      "_auth.server-CEln8Kin.js",
+      "_index-8Htcofqc.js"
+    ],
+    "dynamicImports": [
+      "app/routes/_auth/signup.tsx?tsr-split=component"
+    ]
+  },
+  "app/routes/_auth/signup.tsx?tsr-split=component": {
+    "file": "assets/signup-C_1YHVpu.js",
+    "name": "signup",
+    "src": "app/routes/_auth/signup.tsx?tsr-split=component",
+    "isDynamicEntry": true,
+    "imports": [
+      "_label-BcVNeqdH.js",
+      "_auth.server-CEln8Kin.js",
+      "_index-8Htcofqc.js"
+    ]
+  },
+  "virtual:$vinxi/handler/server": {
+    "file": "server.js",
+    "name": "server",
+    "src": "virtual:$vinxi/handler/server",
+    "isEntry": true,
+    "dynamicImports": [
+      "app/routes/__root.tsx?tsr-directive-use-server=",
+      "app/routes/_auth/signup.tsx?tsr-directive-use-server=",
+      "app/routes/_auth/login.tsx?tsr-directive-use-server=",
+      "app/lib/api/categories.ts?tsr-directive-use-server=",
+      "app/lib/api/companies.ts?tsr-directive-use-server=",
+      "app/lib/api/companies.ts?tsr-directive-use-server=",
+      "app/lib/api/companies.ts?tsr-directive-use-server=",
+      "app/lib/api/user.ts?tsr-directive-use-server="
+    ]
+  }
+}

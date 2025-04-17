@@ -1,0 +1,1 @@
+import{jsx as e}from"react/jsx-runtime";import{c as a}from"./cn-bhneXptQ.js";function l({className:r,...t}){return e("input",{...t,className:a("border border-gray-300 rounded-sm p-2 h-9 w-full",r)})}function m({className:r,children:t,...n}){return e("label",{...n,className:a("text-sm font-light text-gray-700",r),children:t})}export{l as I,m as L};

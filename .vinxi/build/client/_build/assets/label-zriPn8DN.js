@@ -1,0 +1,1 @@
+import{j as s}from"./client-CB7jT4PR.js";import{c as e}from"./cn-B3Z9kGEY.js";function m({className:r,...t}){return s.jsx("input",{...t,className:e("border border-gray-300 rounded-sm p-2 h-9 w-full",r)})}function u({className:r,children:t,...a}){return s.jsx("label",{...a,className:e("text-sm font-light text-gray-700",r),children:t})}export{m as I,u as L};

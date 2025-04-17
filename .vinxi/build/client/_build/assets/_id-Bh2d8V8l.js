@@ -1,0 +1,1 @@
+import{f as e,j as o,L as s}from"./client-CB7jT4PR.js";const i=function(){const t=e.useParams().id;return o.jsxs("div",{children:[o.jsxs("h1",{children:["Hello ",t,"!"]}),o.jsx(s,{to:"/categories",children:"Back to categories"})]})};export{i as component};

@@ -1,0 +1,46 @@
+import { betterAuth } from 'better-auth';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { admin } from 'better-auth/plugins';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import i from 'postgres';
+import { config } from 'dotenv';
+import { pgTable, timestamp, text, boolean, varchar } from 'drizzle-orm/pg-core';
+import { reactStartCookies } from 'better-auth/react-start';
+import { k } from '../nitro/nitro.mjs';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import 'node:async_hooks';
+import 'vinxi/lib/invariant';
+import 'vinxi/lib/path';
+import 'node:url';
+import '@tanstack/router-core';
+import 'tiny-invariant';
+import '@tanstack/start-server-core';
+import '@tanstack/start-client-core';
+import '@tanstack/react-router';
+import 'react/jsx-runtime';
+import '@tanstack/react-query';
+import 'better-auth/react';
+import 'better-auth/client/plugins';
+import 'radix-ui';
+import 'react';
+import 'sonner';
+import '@tanstack/react-query-devtools';
+import 'valibot';
+import 'drizzle-orm';
+import 'decode-formdata';
+import '@tanstack/react-router-with-query';
+import 'node:stream';
+import 'isbot';
+import 'react-dom/server';
+
+config({ path: ".env" });
+const A = i(process.env.DATABASE_URL, { prepare: false }), N = drizzle({ client: A }), n = pgTable("user", { id: text("id").primaryKey(), name: varchar("first_name", { length: 255 }).notNull(), email: varchar("email", { length: 255 }).notNull().unique(), emailVerified: boolean("email_verified").notNull(), image: varchar("image", { length: 255 }), createdAt: timestamp("created_at").notNull(), updatedAt: timestamp("updated_at").notNull(), role: varchar("role", { length: 255 }).$type().default("user").notNull(), banned: boolean("banned"), banReason: text("ban_reason"), banExpires: timestamp("ban_expires") }), h = pgTable("session", { id: text("id").primaryKey(), expiresAt: timestamp("expires_at").notNull(), token: text("token").notNull().unique(), createdAt: timestamp("created_at").notNull(), updatedAt: timestamp("updated_at").notNull(), ipAddress: text("ip_address"), userAgent: text("user_agent"), userId: text("user_id").notNull().references(() => n.id, { onDelete: "cascade" }), impersonatedBy: text("impersonated_by") }), g = pgTable("account", { id: text("id").primaryKey(), accountId: text("account_id").notNull(), providerId: text("provider_id").notNull(), userId: text("user_id").notNull().references(() => n.id, { onDelete: "cascade" }), accessToken: text("access_token"), refreshToken: text("refresh_token"), idToken: text("id_token"), accessTokenExpiresAt: timestamp("access_token_expires_at"), refreshTokenExpiresAt: timestamp("refresh_token_expires_at"), scope: text("scope"), password: text("password"), createdAt: timestamp("created_at").notNull(), updatedAt: timestamp("updated_at").notNull() }), b = pgTable("verification", { id: text("id").primaryKey(), identifier: text("identifier").notNull(), value: text("value").notNull(), expiresAt: timestamp("expires_at").notNull(), createdAt: timestamp("created_at"), updatedAt: timestamp("updated_at") }), s = betterAuth({ database: drizzleAdapter(N, { provider: "pg", schema: { user: n, session: h, account: g, verification: b } }), session: { cookieCache: { enabled: true, maxAge: 5 * 60 } }, plugins: [admin({ adminRoles: ["admin", "superadmin"] }), reactStartCookies()], advanced: { generateId: false }, emailAndPassword: { enabled: true } }), P = k("/api/auth/$")({ GET: ({ request: o }) => s.handler(o), POST: ({ request: o }) => s.handler(o) });
+
+export { P as APIRoute };
+//# sourceMappingURL=_.mjs.map

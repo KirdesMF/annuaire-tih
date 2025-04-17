@@ -37,8 +37,8 @@ function Home() {
 				{categoriesQuery.data.map((category) => (
 					<li key={category.id}>
 						<Link
-							to="/categories/$categoryId"
-							params={{ categoryId: category.id.toString() }}
+							to="/categories/$id"
+							params={{ id: category.id.toString() }}
 							className="text-sm px-4 py-2 border border-gray-400 rounded-md flex"
 						>
 							{category.name}
