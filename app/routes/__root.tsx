@@ -3,12 +3,12 @@ import type { ReactNode } from "react";
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import { Outlet, HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { Header } from "~/components/header";
-import appCSS from "~/styles/app.css?url";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import { auth } from "~/lib/auth/auth.server";
 import { Toaster } from "sonner";
+import appCSS from "~/styles/app.css?url";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
 	const request = getWebRequest();
@@ -44,6 +44,7 @@ export const Route = createRootRouteWithContext<RootRouterContext>()({
 		const session = await context.queryClient.fetchQuery(sessionQueryOptions);
 		return { session };
 	},
+	notFoundComponent: () => <div>Not found</div>,
 	component: RootComponent,
 });
 
