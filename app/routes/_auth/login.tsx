@@ -17,6 +17,7 @@ type LoginData = v.InferOutput<typeof LoginSchema>;
 export const loginFn = createServerFn({ method: "POST" })
 	.validator((data: unknown) => v.parse(LoginSchema, data))
 	.handler(async ({ data }) => {
+		console.log(data);
 		await auth.api.signInEmail({
 			body: {
 				email: data.email,

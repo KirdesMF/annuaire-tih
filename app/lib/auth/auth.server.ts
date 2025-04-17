@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin } from "better-auth/plugins";
 import { db } from "~/db";
 import { user, session, account, verification } from "~/db/schema/auth";
-import { reactStartCookies } from "better-auth/react-start";
+import { tanstackStartCookies } from "./react-start-cookies";
 
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
@@ -16,7 +16,7 @@ export const auth = betterAuth({
 			maxAge: 5 * 60,
 		},
 	},
-	plugins: [admin({ adminRoles: ["admin", "superadmin"] }), reactStartCookies()],
+	plugins: [admin({ adminRoles: ["admin", "superadmin"] }), tanstackStartCookies()],
 	advanced: {
 		generateId: false,
 	},
