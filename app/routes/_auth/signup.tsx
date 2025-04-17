@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
 import { APIError } from "better-auth/api";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
@@ -37,8 +36,6 @@ type SignupData = v.InferOutput<typeof SignupSchema>;
 export const signupFn = createServerFn()
 	.validator((data: unknown) => v.parse(SignupSchema, data))
 	.handler(async ({ data }) => {
-		const request = getWebRequest();
-
 		try {
 			await auth.api.signUpEmail({
 				body: {
@@ -46,7 +43,6 @@ export const signupFn = createServerFn()
 					password: data.password,
 					name: `${data.firstName} ${data.lastName}`,
 				},
-				headers: request?.headers,
 			});
 		} catch (error) {
 			if (error instanceof APIError) {

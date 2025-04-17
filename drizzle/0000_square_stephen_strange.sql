@@ -1,16 +1,8 @@
-DROP TABLE IF EXISTS "account" CASCADE;
-DROP TABLE IF EXISTS "session" CASCADE;
-DROP TABLE IF EXISTS "verification" CASCADE;
-DROP TABLE IF EXISTS "company_categories" CASCADE;
-DROP TABLE IF EXISTS "companies" CASCADE;
-DROP TABLE IF EXISTS "categories" CASCADE;
-DROP TABLE IF EXISTS "user" CASCADE;
-
 CREATE TABLE "account" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"account_id" text NOT NULL,
 	"provider_id" text NOT NULL,
-	"user_id" uuid NOT NULL,
+	"user_id" text NOT NULL,
 	"access_token" text,
 	"refresh_token" text,
 	"id_token" text,
@@ -23,20 +15,20 @@ CREATE TABLE "account" (
 );
 --> statement-breakpoint
 CREATE TABLE "session" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"expires_at" timestamp NOT NULL,
 	"token" text NOT NULL,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
 	"ip_address" text,
 	"user_agent" text,
-	"user_id" uuid NOT NULL,
+	"user_id" text NOT NULL,
 	"impersonated_by" text,
 	CONSTRAINT "session_token_unique" UNIQUE("token")
 );
 --> statement-breakpoint
 CREATE TABLE "user" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"first_name" varchar(255) NOT NULL,
 	"email" varchar(255) NOT NULL,
 	"email_verified" boolean NOT NULL,
@@ -51,7 +43,7 @@ CREATE TABLE "user" (
 );
 --> statement-breakpoint
 CREATE TABLE "verification" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"identifier" text NOT NULL,
 	"value" text NOT NULL,
 	"expires_at" timestamp NOT NULL,
@@ -73,23 +65,24 @@ CREATE TABLE "companies" (
 	"status" varchar DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	"created_by" uuid NOT NULL,
-	"user_id" uuid NOT NULL,
+	"created_by" text NOT NULL,
+	"user_id" text NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"siret" varchar(14) NOT NULL,
 	"business_owner" varchar(255),
 	"description" varchar(1500),
 	"website" varchar(255),
 	"location" varchar(255),
+	"service_area" varchar(255),
 	"subdomain" varchar(100),
 	"work_mode" varchar,
 	"email" varchar(255),
 	"phone" varchar(24),
+	"rqth" boolean DEFAULT false NOT NULL,
 	"logo" jsonb,
 	"gallery" jsonb,
-	"rqth" boolean DEFAULT false NOT NULL,
-	"social_media" jsonb,
-	"service_area" varchar(255)
+	"social_media" jsonb DEFAULT '{"facebook":"","calendly":"","linkedin":"","instagram":""}'::jsonb NOT NULL,
+	CONSTRAINT "companies_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE "company_categories" (
