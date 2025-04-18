@@ -8,7 +8,11 @@ import { getWebRequest } from "@tanstack/react-start/server";
 import { desc, eq, inArray } from "drizzle-orm";
 import { redirect } from "@tanstack/react-router";
 import { queryOptions } from "@tanstack/react-query";
+import { user } from "~/db/schema/auth";
 
+/**
+ * Get companies of the current user
+ */
 export const getUserCompanies = createServerFn({ method: "GET" }).handler(async () => {
 	const request = getWebRequest();
 	if (!request) return;
@@ -65,4 +69,17 @@ export const userCompaniesQueryOptions = queryOptions({
 	queryKey: ["user", "companies"],
 	queryFn: () => getUserCompanies(),
 	staleTime: 1000 * 60 * 60 * 24,
+});
+
+/**
+ * Get all users
+ */
+export const getAllUsers = createServerFn({ method: "GET" }).handler(async () => {
+	const users = await db.select().from(user);
+	return users;
+});
+
+export const allUsersQueryOptions = queryOptions({
+	queryKey: ["users"],
+	queryFn: () => getAllUsers(),
 });
