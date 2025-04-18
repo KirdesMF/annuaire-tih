@@ -4,6 +4,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import banner from "~/assets/img/banner.png?url";
 import { InputSearch } from "~/components/input-search";
 import { categoriesQueryOptions } from "~/lib/api/categories";
+import { slugify } from "~/utils/slug";
 
 export const Route = createFileRoute("/_public/")({
 	component: Home,
@@ -37,8 +38,9 @@ function Home() {
 				{categoriesQuery.data.map((category) => (
 					<li key={category.id}>
 						<Link
-							to="/categories/$id"
-							params={{ id: category.id.toString() }}
+							to="/categories/$slug"
+							params={{ slug: slugify(category.name) }}
+							search={{ id: category.id }}
 							className="text-sm px-4 py-2 border border-gray-400 rounded-md flex"
 						>
 							{category.name}
