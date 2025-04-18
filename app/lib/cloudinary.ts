@@ -79,19 +79,21 @@ export async function updateImageInCloudinary({
 export async function deleteImageFromCloudinary(publicId: string) {
 	try {
 		await cloudinary.uploader.destroy(publicId);
+		// remove folder and images from Cloudinary
 	} catch (error) {
 		console.error(error);
 		throw new Error("Failed to delete image from Cloudinary");
 	}
 }
 
-export async function deleteCompanyFromCloudinary(companyId: string) {
+export async function deleteCompanyFromCloudinary(slug: string) {
 	try {
+		const path = `companies/${slug}`;
 		// delete all images in the company folder
-		await cloudinary.api.delete_resources_by_prefix(`companies/${companyId}`);
+		await cloudinary.api.delete_resources_by_prefix(path);
 
 		// delete the company folder
-		await cloudinary.api.delete_folder(`companies/${companyId}`);
+		await cloudinary.api.delete_folder(path);
 	} catch (error) {
 		console.error(error);
 		throw new Error("Failed to delete images from Cloudinary");
