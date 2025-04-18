@@ -1,9 +1,12 @@
 // app/routes/index.tsx
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import banner from "~/assets/img/banner.png?url";
 import { InputSearch } from "~/components/input-search";
+import { useDebounce } from "~/hooks/use-debounce";
 import { categoriesQueryOptions } from "~/lib/api/categories";
+import { setSearchCompaniesByTermQueryOptions } from "~/lib/api/search";
 import { slugify } from "~/utils/slug";
 
 export const Route = createFileRoute("/_public/")({
@@ -15,6 +18,9 @@ export const Route = createFileRoute("/_public/")({
 
 function Home() {
 	const categoriesQuery = useSuspenseQuery(categoriesQueryOptions);
+	const [searchTerm, setSearchTerm] = useState("");
+	const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+	const { data: companies } = useQuery(setSearchCompaniesByTermQueryOptions(debouncedSearchTerm));
 
 	return (
 		<main className="px-4 py-6 max-w-4xl mx-auto">
@@ -28,8 +34,25 @@ function Home() {
 				/>
 			</div>
 
-			<div className="mt-12 flex justify-center">
-				<InputSearch />
+			<div className="mt-12 mx-auto flex flex-col gap-4 items-center w-[min(100%,500px)]">
+				<InputSearch value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+				{companies?.length && searchTerm ? (
+					<ul className="flex flex-col gap-4 w-full border border-gray-400 rounded-sm">
+						{companies?.map((company) => (
+							<li key={company.id} className="w-full">
+								<Link
+									to="/entreprises/$slug"
+									params={{ slug: company.slug }}
+									className="px-4 py-2 w-full inline-flex hover:bg-gray-100"
+								>
+									{company.name}
+								</Link>
+							</li>
+						))}
+					</ul>
+				) : (
+					searchTerm && <p className="text-sm font-light">Aucune entreprise trouvée</p>
+				)}
 			</div>
 
 			<div role="separator" tabIndex={-1} className="h-px w-1/3 bg-gray-400 my-12 mx-auto" />
