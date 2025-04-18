@@ -8,7 +8,7 @@ import { auth } from "~/lib/auth/auth.server";
 import { redirect } from "@tanstack/react-router";
 import * as v from "valibot";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
-import { uploadImageToCloudinary } from "../cloudinary";
+import { uploadImageToCloudinary, deleteCompanyFromCloudinary } from "../cloudinary";
 import { decode } from "decode-formdata";
 import { queryOptions } from "@tanstack/react-query";
 import { categoriesTable } from "~/db/schema/categories";
@@ -117,10 +117,13 @@ export const addCompany = createServerFn({ method: "POST" })
  * @param companyId - The ID of the company to delete
  */
 export const deleteCompany = createServerFn({ method: "POST" })
-	.validator((companyId: string) => companyId as string)
-	.handler(async ({ data: companyId }) => {
+	.validator((data: { companyId: string; companySlug: string }) => data)
+	.handler(async ({ data: { companyId, companySlug } }) => {
 		try {
 			await db.delete(companiesTable).where(eq(companiesTable.id, companyId));
+
+			// Delete all images from Cloudinary
+			await deleteCompanyFromCloudinary(companySlug);
 		} catch (error) {
 			console.error(error);
 		}

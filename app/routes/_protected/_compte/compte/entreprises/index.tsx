@@ -36,7 +36,12 @@ function RouteComponent() {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
 		mutate(
-			{ data: formData.get("companyId") as string },
+			{
+				data: {
+					companyId: formData.get("companyId") as string,
+					companySlug: formData.get("companySlug") as string,
+				},
+			},
 			{
 				onSuccess: () => {
 					context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
@@ -154,6 +159,7 @@ function RouteComponent() {
 												</DialogClose>
 												<form onSubmit={onDeleteCompany}>
 													<input type="hidden" name="companyId" value={company.id} />
+													<input type="hidden" name="companySlug" value={company.slug} />
 													<button
 														type="submit"
 														className="text-xs px-2 py-1 rounded-sm border border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-colors"
