@@ -10,11 +10,13 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { user } from "./auth";
-
+import { nanoid } from "nanoid";
 export const companiesTable = pgTable(
 	"companies",
 	{
-		id: uuid("id").primaryKey().defaultRandom(),
+		id: text("id")
+			.primaryKey()
+			.$defaultFn(() => nanoid(32)),
 		status: varchar("status").$type<CompanyStatus>().notNull().default("pending"),
 		created_at: timestamp("created_at").notNull().defaultNow(),
 		updated_at: timestamp("updated_at").notNull().defaultNow(),
@@ -24,7 +26,8 @@ export const companiesTable = pgTable(
 		user_id: text("user_id")
 			.references(() => user.id, { onDelete: "cascade" })
 			.notNull(),
-		name: varchar("name", { length: 255 }).notNull().unique(),
+		name: varchar("name", { length: 255 }).notNull(),
+		slug: varchar("slug", { length: 100 }).notNull().unique(),
 		siret: varchar("siret", { length: 14 }).notNull(),
 		business_owner: varchar("business_owner", { length: 255 }),
 		description: varchar("description", { length: 1500 }),

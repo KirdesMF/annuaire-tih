@@ -12,10 +12,12 @@ import { uploadImageToCloudinary } from "../cloudinary";
 import { decode } from "decode-formdata";
 import { queryOptions } from "@tanstack/react-query";
 import { categoriesTable } from "~/db/schema/categories";
+import { generateUniqueSlug } from "~/utils/slug";
 
 /**
  * Add a company
  * @param data - The data of the company to add
+ * @todo: attempt to generate a unique slug
  */
 export const addCompany = createServerFn({ method: "POST" })
 	.validator((formData: FormData) => {
@@ -44,6 +46,7 @@ export const addCompany = createServerFn({ method: "POST" })
 						social_media: { facebook, instagram, linkedin, calendly },
 						user_id: session.user.id,
 						created_by: session.user.id,
+						slug: generateUniqueSlug(rest.name),
 					})
 					.returning();
 
@@ -53,7 +56,7 @@ export const addCompany = createServerFn({ method: "POST" })
 					const res = await uploadImageToCloudinary({
 						file: logo,
 						companyId: company.id,
-						companyName: company.name,
+						companySlug: company.slug,
 						type: "logo",
 					});
 
@@ -78,7 +81,7 @@ export const addCompany = createServerFn({ method: "POST" })
 						const res = await uploadImageToCloudinary({
 							file: image,
 							companyId: company.id,
-							companyName: company.name,
+							companySlug: company.slug,
 							type: "gallery",
 						});
 
@@ -128,13 +131,13 @@ export const deleteCompany = createServerFn({ method: "POST" })
  * @param id - The ID of the company to get
  */
 export const getCompany = createServerFn({ method: "GET" })
-	.validator((id: string) => id as string)
-	.handler(async ({ data: id }) => {
+	.validator((slug: string) => slug as string)
+	.handler(async ({ data: slug }) => {
 		try {
 			const company = await db
 				.select()
 				.from(companiesTable)
-				.where(eq(companiesTable.id, id))
+				.where(eq(companiesTable.slug, slug))
 				.limit(1)
 				.then((res) => res[0]);
 
@@ -153,10 +156,10 @@ export const getCompany = createServerFn({ method: "GET" })
 		}
 	});
 
-export function setCompanyQueryOptions(id: string) {
+export function setCompanyQueryOptions(slug: string) {
 	return queryOptions({
-		queryKey: ["company", id],
-		queryFn: () => getCompany({ data: id }),
+		queryKey: ["company", slug],
+		queryFn: () => getCompany({ data: slug }),
 		staleTime: 1000 * 60 * 60 * 24,
 	});
 }

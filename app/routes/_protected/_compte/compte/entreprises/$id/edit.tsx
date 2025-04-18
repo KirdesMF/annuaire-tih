@@ -1,12 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute(
-  "/_protected/_compte/compte/entreprises/$id/edit",
-)({
-  component: RouteComponent,
+export const Route = createFileRoute("/_protected/_compte/compte/entreprises/$id/edit")({
+	component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { entrepriseId } = Route.useParams();
-  return <div>Hello "/_protected/compte/entreprises/{entrepriseId}/edit"!</div>;
+	const { id } = Route.useParams();
+	return <div>Hello "/_protected/compte/entreprises/{id}/edit"!</div>;
 }

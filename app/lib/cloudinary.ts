@@ -15,10 +15,10 @@ export async function uploadImageToCloudinary({
 	type,
 	file,
 	companyId,
-	companyName,
-}: { type: "logo" | "gallery"; file: File; companyId: string; companyName: string }) {
+	companySlug,
+}: { type: "logo" | "gallery"; file: File; companyId: string; companySlug: string }) {
 	const path =
-		type === "logo" ? `companies/${companyName}/logo` : `companies/${companyName}/gallery`;
+		type === "logo" ? `companies/${companySlug}/logo` : `companies/${companySlug}/gallery`;
 
 	try {
 		const buffer = await file.arrayBuffer();

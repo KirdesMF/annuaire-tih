@@ -1,5 +1,5 @@
 {
-  "id": "5b08de5e-cea8-44a5-b5e8-06f0306ebbee",
+  "id": "898dc307-b37c-4192-964a-cc4112512bc4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -341,10 +341,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "name": {
           "name": "name",
@@ -396,10 +395,9 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "notNull": true
         },
         "status": {
           "name": "status",
@@ -437,6 +435,12 @@
         "name": {
           "name": "name",
           "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
         },
@@ -574,11 +578,11 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "companies_name_unique": {
-          "name": "companies_name_unique",
+        "companies_slug_unique": {
+          "name": "companies_slug_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "name"
+            "slug"
           ]
         }
       },
@@ -592,13 +596,13 @@
       "columns": {
         "company_id": {
           "name": "company_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
         "category_id": {
           "name": "category_id",
-          "type": "uuid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
