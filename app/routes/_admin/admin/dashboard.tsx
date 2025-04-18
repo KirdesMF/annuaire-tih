@@ -1,6 +1,9 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { allCompaniesQueryOptions } from "~/lib/api/companies";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import type { CompanyStatus } from "~/db/schema/companies";
+import { allCompaniesQueryOptions, updateCompanyStatus } from "~/lib/api/companies";
 import { allUsersQueryOptions } from "~/lib/api/user";
 
 export const Route = createFileRoute("/_admin/admin/dashboard")({
@@ -17,8 +20,23 @@ export const Route = createFileRoute("/_admin/admin/dashboard")({
 });
 
 function RouteComponent() {
+	const context = Route.useRouteContext();
 	const { data: companies } = useSuspenseQuery(allCompaniesQueryOptions);
 	const { data: users } = useSuspenseQuery(allUsersQueryOptions);
+	const { mutate } = useMutation({ mutationFn: useServerFn(updateCompanyStatus) });
+
+	function onAction(companyId: string, action: CompanyStatus) {
+		mutate(
+			{ data: { companyId, status: action } },
+			{
+				onSuccess: () => {
+					toast.success("Company status updated");
+					context.queryClient.invalidateQueries({ queryKey: ["companies"] });
+				},
+			},
+		);
+	}
+
 	return (
 		<main>
 			<div className="container px-4 py-6 grid gap-6">
@@ -34,6 +52,38 @@ function RouteComponent() {
 							>
 								<h2 className="text-lg font-bold">{company.name}</h2>
 								<p>{company.status}</p>
+
+								<div className="flex gap-2">
+									<button
+										name="action"
+										value="accept"
+										type="submit"
+										className="bg-green-500 text-white px-4 py-2 rounded-md text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+										disabled={company.status === "active"}
+										onClick={() => onAction(company.id, "active")}
+									>
+										Accepter
+									</button>
+									<button
+										name="action"
+										value="reject"
+										type="submit"
+										className="bg-red-500 text-white px-4 py-2 rounded-md text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+										disabled={company.status === "rejected"}
+										onClick={() => onAction(company.id, "rejected")}
+									>
+										Rejeter
+									</button>
+
+									<button
+										type="button"
+										className="bg-blue-500 text-white px-4 py-2 rounded-md text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+										disabled={company.status === "pending"}
+										onClick={() => onAction(company.id, "pending")}
+									>
+										En attente
+									</button>
+								</div>
 							</div>
 						))}
 					</div>

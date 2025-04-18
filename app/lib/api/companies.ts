@@ -178,8 +178,13 @@ export const allCompaniesQueryOptions = queryOptions({
 	queryFn: () => getAllCompanies(),
 });
 
+type UpdateCompanyStatusData = {
+	companyId: string;
+	status: CompanyStatus;
+};
+
 export const updateCompanyStatus = createServerFn({ method: "POST" })
-	.validator((data: unknown) => data as { companyId: string; status: CompanyStatus })
+	.validator((data: UpdateCompanyStatusData) => data)
 	.handler(async ({ data: { companyId, status } }) => {
 		try {
 			await db.update(companiesTable).set({ status }).where(eq(companiesTable.id, companyId));
