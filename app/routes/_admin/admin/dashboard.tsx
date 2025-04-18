@@ -2,9 +2,11 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { TrashIcon } from "~/components/icons/trash";
 import type { CompanyStatus } from "~/db/schema/companies";
-import { allCompaniesQueryOptions, updateCompanyStatus } from "~/lib/api/companies";
+import { allCompaniesQueryOptions, deleteCompany, updateCompanyStatus } from "~/lib/api/companies";
 import { allUsersQueryOptions } from "~/lib/api/user";
+import { COMPANY_STATUSES } from "~/utils/constantes";
 
 export const Route = createFileRoute("/_admin/admin/dashboard")({
 	component: RouteComponent,
@@ -23,14 +25,29 @@ function RouteComponent() {
 	const context = Route.useRouteContext();
 	const { data: companies } = useSuspenseQuery(allCompaniesQueryOptions);
 	const { data: users } = useSuspenseQuery(allUsersQueryOptions);
-	const { mutate } = useMutation({ mutationFn: useServerFn(updateCompanyStatus) });
+	const { mutate: update } = useMutation({ mutationFn: useServerFn(updateCompanyStatus) });
+	const { mutate: remove } = useMutation({ mutationFn: useServerFn(deleteCompany) });
 
+	// TODO: Add confirmation dialog
 	function onAction(companyId: string, action: CompanyStatus) {
-		mutate(
+		update(
 			{ data: { companyId, status: action } },
 			{
 				onSuccess: () => {
 					toast.success("Company status updated");
+					context.queryClient.invalidateQueries({ queryKey: ["companies"] });
+				},
+			},
+		);
+	}
+
+	// TODO: Add confirmation dialog
+	function onDeleteCompany(companyId: string) {
+		remove(
+			{ data: companyId },
+			{
+				onSuccess: () => {
+					toast.success("Company deleted");
 					context.queryClient.invalidateQueries({ queryKey: ["companies"] });
 				},
 			},
@@ -51,23 +68,24 @@ function RouteComponent() {
 								className="bg-white shadow-md rounded-lg p-4 border border-gray-200"
 							>
 								<h2 className="text-lg font-bold">{company.name}</h2>
-								<p>{company.status}</p>
+								<p className="text-sm text-gray-500">{COMPANY_STATUSES[company.status]}</p>
 
 								<div className="flex gap-2">
 									<button
 										name="action"
 										value="accept"
-										type="submit"
+										type="button"
 										className="bg-green-500 text-white px-4 py-2 rounded-md text-xs disabled:opacity-50 disabled:cursor-not-allowed"
 										disabled={company.status === "active"}
 										onClick={() => onAction(company.id, "active")}
 									>
 										Accepter
 									</button>
+
 									<button
 										name="action"
 										value="reject"
-										type="submit"
+										type="button"
 										className="bg-red-500 text-white px-4 py-2 rounded-md text-xs disabled:opacity-50 disabled:cursor-not-allowed"
 										disabled={company.status === "rejected"}
 										onClick={() => onAction(company.id, "rejected")}
@@ -84,6 +102,14 @@ function RouteComponent() {
 										En attente
 									</button>
 								</div>
+
+								<button
+									type="button"
+									className="text-xs text-gray-500 border px-2 py-1 rounded-sm hover:bg-gray-100 transition-colors"
+									onClick={() => onDeleteCompany(company.id)}
+								>
+									<TrashIcon />
+								</button>
 							</div>
 						))}
 					</div>
