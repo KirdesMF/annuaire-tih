@@ -17,9 +17,11 @@ export const auth = betterAuth({
 		},
 	},
 	plugins: [admin({ adminRoles: ["admin", "superadmin"] }), reactStartCookies()],
-	advanced: {
-		generateId: false,
-	},
+	// advanced: {
+	// 	database: {
+	// 		generateId: false,
+	// 	}
+	// },
 	emailAndPassword: {
 		enabled: true,
 	},

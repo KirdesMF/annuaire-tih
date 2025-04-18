@@ -15,18 +15,12 @@ import { PhoneIcon } from "~/components/icons/phone";
 import { GlobeIcon } from "~/components/icons/globe";
 import { LinkChainIcon } from "~/components/icons/link-chain";
 
-const SearchSchema = v.object({
-	id: v.string(),
-});
-
-export const Route = createFileRoute("/_public/entreprises/$name")({
+export const Route = createFileRoute("/_public/entreprises/$slug")({
 	component: RouteComponent,
 	pendingComponent: () => <div>Loading...</div>,
 	errorComponent: () => <div>Error</div>,
-	validateSearch: SearchSchema,
-	loaderDeps: ({ search: { id } }) => ({ id }),
-	loader: async ({ context, deps: { id } }) => {
-		const company = await context.queryClient.ensureQueryData(setCompanyQueryOptions(id));
+	loader: async ({ context, params }) => {
+		const company = await context.queryClient.ensureQueryData(setCompanyQueryOptions(params.slug));
 		const session = context.session;
 
 		return {
@@ -51,8 +45,8 @@ const SOCIAL_MEDIA_ICONS = {
 } as const;
 
 function RouteComponent() {
-	const search = Route.useSearch();
-	const { data } = useSuspenseQuery(setCompanyQueryOptions(search.id));
+	const params = Route.useParams();
+	const { data } = useSuspenseQuery(setCompanyQueryOptions(params.slug));
 	const { session } = Route.useLoaderData();
 
 	if (!data) return <div>Company not found</div>;

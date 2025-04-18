@@ -27,7 +27,7 @@ import { Route as AuthForgotPasswordImport } from './routes/_auth/forgot-passwor
 import { Route as ProtectedCompteRouteImport } from './routes/_protected/_compte/route'
 import { Route as PublicEntrepreneursIndexImport } from './routes/_public/entrepreneurs/index'
 import { Route as PublicCategoriesIndexImport } from './routes/_public/categories/index'
-import { Route as PublicEntreprisesNameImport } from './routes/_public/entreprises/$name'
+import { Route as PublicEntreprisesSlugImport } from './routes/_public/entreprises/$slug'
 import { Route as PublicCategoriesIdImport } from './routes/_public/categories/$id'
 import { Route as AdminAdminDashboardImport } from './routes/_admin/admin/dashboard'
 import { Route as ProtectedCompteComptePreferencesImport } from './routes/_protected/_compte/compte/preferences'
@@ -131,9 +131,9 @@ const PublicCategoriesIndexRoute = PublicCategoriesIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const PublicEntreprisesNameRoute = PublicEntreprisesNameImport.update({
-  id: '/_public/entreprises/$name',
-  path: '/entreprises/$name',
+const PublicEntreprisesSlugRoute = PublicEntreprisesSlugImport.update({
+  id: '/_public/entreprises/$slug',
+  path: '/entreprises/$slug',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -300,11 +300,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicCategoriesIdImport
       parentRoute: typeof rootRoute
     }
-    '/_public/entreprises/$name': {
-      id: '/_public/entreprises/$name'
-      path: '/entreprises/$name'
-      fullPath: '/entreprises/$name'
-      preLoaderRoute: typeof PublicEntreprisesNameImport
+    '/_public/entreprises/$slug': {
+      id: '/_public/entreprises/$slug'
+      path: '/entreprises/$slug'
+      fullPath: '/entreprises/$slug'
+      preLoaderRoute: typeof PublicEntreprisesSlugImport
       parentRoute: typeof rootRoute
     }
     '/_public/categories/': {
@@ -425,7 +425,7 @@ export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/categories/$id': typeof PublicCategoriesIdRoute
-  '/entreprises/$name': typeof PublicEntreprisesNameRoute
+  '/entreprises/$slug': typeof PublicEntreprisesSlugRoute
   '/categories': typeof PublicCategoriesIndexRoute
   '/entrepreneurs': typeof PublicEntrepreneursIndexRoute
   '/compte/preferences': typeof ProtectedCompteComptePreferencesRoute
@@ -450,7 +450,7 @@ export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/categories/$id': typeof PublicCategoriesIdRoute
-  '/entreprises/$name': typeof PublicEntreprisesNameRoute
+  '/entreprises/$slug': typeof PublicEntreprisesSlugRoute
   '/categories': typeof PublicCategoriesIndexRoute
   '/entrepreneurs': typeof PublicEntrepreneursIndexRoute
   '/compte/preferences': typeof ProtectedCompteComptePreferencesRoute
@@ -478,7 +478,7 @@ export interface FileRoutesById {
   '/_public/': typeof PublicIndexRoute
   '/_admin/admin/dashboard': typeof AdminAdminDashboardRoute
   '/_public/categories/$id': typeof PublicCategoriesIdRoute
-  '/_public/entreprises/$name': typeof PublicEntreprisesNameRoute
+  '/_public/entreprises/$slug': typeof PublicEntreprisesSlugRoute
   '/_public/categories/': typeof PublicCategoriesIndexRoute
   '/_public/entrepreneurs/': typeof PublicEntrepreneursIndexRoute
   '/_protected/_compte/compte/preferences': typeof ProtectedCompteComptePreferencesRoute
@@ -505,7 +505,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/dashboard'
     | '/categories/$id'
-    | '/entreprises/$name'
+    | '/entreprises/$slug'
     | '/categories'
     | '/entrepreneurs'
     | '/compte/preferences'
@@ -529,7 +529,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/dashboard'
     | '/categories/$id'
-    | '/entreprises/$name'
+    | '/entreprises/$slug'
     | '/categories'
     | '/entrepreneurs'
     | '/compte/preferences'
@@ -555,7 +555,7 @@ export interface FileRouteTypes {
     | '/_public/'
     | '/_admin/admin/dashboard'
     | '/_public/categories/$id'
-    | '/_public/entreprises/$name'
+    | '/_public/entreprises/$slug'
     | '/_public/categories/'
     | '/_public/entrepreneurs/'
     | '/_protected/_compte/compte/preferences'
@@ -580,7 +580,7 @@ export interface RootRouteChildren {
   PublicSourcesRoute: typeof PublicSourcesRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicCategoriesIdRoute: typeof PublicCategoriesIdRoute
-  PublicEntreprisesNameRoute: typeof PublicEntreprisesNameRoute
+  PublicEntreprisesSlugRoute: typeof PublicEntreprisesSlugRoute
   PublicCategoriesIndexRoute: typeof PublicCategoriesIndexRoute
   PublicEntrepreneursIndexRoute: typeof PublicEntrepreneursIndexRoute
 }
@@ -599,7 +599,7 @@ const rootRouteChildren: RootRouteChildren = {
   PublicSourcesRoute: PublicSourcesRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicCategoriesIdRoute: PublicCategoriesIdRoute,
-  PublicEntreprisesNameRoute: PublicEntreprisesNameRoute,
+  PublicEntreprisesSlugRoute: PublicEntreprisesSlugRoute,
   PublicCategoriesIndexRoute: PublicCategoriesIndexRoute,
   PublicEntrepreneursIndexRoute: PublicEntrepreneursIndexRoute,
 }
@@ -627,7 +627,7 @@ export const routeTree = rootRoute
         "/_public/sources",
         "/_public/",
         "/_public/categories/$id",
-        "/_public/entreprises/$name",
+        "/_public/entreprises/$slug",
         "/_public/categories/",
         "/_public/entrepreneurs/"
       ]
@@ -697,8 +697,8 @@ export const routeTree = rootRoute
     "/_public/categories/$id": {
       "filePath": "_public/categories/$id.tsx"
     },
-    "/_public/entreprises/$name": {
-      "filePath": "_public/entreprises/$name.tsx"
+    "/_public/entreprises/$slug": {
+      "filePath": "_public/entreprises/$slug.tsx"
     },
     "/_public/categories/": {
       "filePath": "_public/categories/index.tsx"

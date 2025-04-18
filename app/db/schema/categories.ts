@@ -1,7 +1,10 @@
-import { pgTable, varchar, timestamp, uuid, boolean } from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, uuid, boolean, text } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
 
 export const categoriesTable = pgTable("categories", {
-	id: uuid("id").primaryKey().defaultRandom(),
+	id: text("id")
+		.primaryKey()
+		.$defaultFn(() => nanoid(32)),
 	name: varchar("name", { length: 255 }).notNull().unique(),
 	is_active: boolean("is_active").notNull().default(true),
 	created_at: timestamp("created_at").notNull().defaultNow(),

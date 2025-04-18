@@ -52,7 +52,7 @@ CREATE TABLE "verification" (
 );
 --> statement-breakpoint
 CREATE TABLE "categories" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -61,13 +61,14 @@ CREATE TABLE "categories" (
 );
 --> statement-breakpoint
 CREATE TABLE "companies" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"status" varchar DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"created_by" text NOT NULL,
 	"user_id" text NOT NULL,
 	"name" varchar(255) NOT NULL,
+	"slug" varchar(100) NOT NULL,
 	"siret" varchar(14) NOT NULL,
 	"business_owner" varchar(255),
 	"description" varchar(1500),
@@ -82,12 +83,12 @@ CREATE TABLE "companies" (
 	"logo" jsonb,
 	"gallery" jsonb,
 	"social_media" jsonb DEFAULT '{"facebook":"","calendly":"","linkedin":"","instagram":""}'::jsonb NOT NULL,
-	CONSTRAINT "companies_name_unique" UNIQUE("name")
+	CONSTRAINT "companies_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 CREATE TABLE "company_categories" (
-	"company_id" uuid NOT NULL,
-	"category_id" uuid NOT NULL,
+	"company_id" text NOT NULL,
+	"category_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "company_categories_company_id_category_id_pk" PRIMARY KEY("company_id","category_id")
 );

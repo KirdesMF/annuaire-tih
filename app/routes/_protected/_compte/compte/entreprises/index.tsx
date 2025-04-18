@@ -4,9 +4,7 @@ import { Separator } from "radix-ui";
 import { useState } from "react";
 import { toast } from "sonner";
 import { CompanyLogo } from "~/components/company-logo";
-import { CopyIcon } from "~/components/icons/copy";
 import { PlusIcon } from "~/components/icons/plus";
-import { StoreIcon } from "~/components/icons/store";
 import {
 	Dialog,
 	DialogClose,
@@ -15,7 +13,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "~/components/ui/dialog";
-import type { Company, CompanyStatus } from "~/db/schema/companies";
 import { deleteCompany } from "~/lib/api/companies";
 import { userCompaniesQueryOptions } from "~/lib/api/user";
 import { COMPANY_STATUSES } from "~/utils/constantes";
@@ -104,9 +101,8 @@ function RouteComponent() {
 								</ul>
 								<div className="flex gap-2">
 									<Link
-										to="/entreprises/$name"
-										params={{ name: company.name.toLowerCase().replace(/ /g, "-") }}
-										search={{ id: company.id }}
+										to="/entreprises/$slug"
+										params={{ slug: company.slug }}
 										className="text-xs px-2 py-1 rounded-sm border border-blue-400 text-blue-400"
 									>
 										Consulter
