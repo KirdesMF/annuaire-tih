@@ -11,7 +11,9 @@ import { DashboardIcon } from "./icons/dashboard";
 import { useAdminRole } from "~/hooks/use-admin-role";
 import { type QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { AuthSession } from "~/lib/auth/auth.server";
+import { auth, type AuthSession } from "~/lib/auth/auth.server";
+import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { getWebRequest } from "@tanstack/react-start/server";
 
 const LINKS = [
 	{ label: "Qui sommes-nous ?", to: "/about" },
@@ -19,6 +21,14 @@ const LINKS = [
 	{ label: "Sources", to: "/sources" },
 	{ label: "Contact", to: "/contact" },
 ] as const;
+
+const signOutFn = createServerFn({ method: "POST" }).handler(async () => {
+	const request = getWebRequest();
+
+	if (!request) return;
+
+	await auth.api.signOut({ headers: request.headers });
+});
 
 export function Header({
 	session,
@@ -96,19 +106,20 @@ function LoggedUserMenu({
 	const router = useRouter();
 	const [theme, setTheme] = useState("light");
 	const { isAdmin } = useAdminRole();
-	const { mutate: logout } = useMutation({
-		mutationFn: () => authClient.signOut(),
-		onSuccess: () => {
-			queryClient.clear();
-			toast.success("Vous êtes déconnecté");
-			router.navigate({ to: "/" });
-		},
+	const { mutate: signOut } = useMutation({
+		mutationFn: useServerFn(signOutFn),
 	});
 
 	if (!session) return null;
 
 	async function onLogout() {
-		logout();
+		signOut(undefined, {
+			onSuccess: () => {
+				queryClient.clear();
+				toast.success("Vous êtes déconnecté");
+				router.navigate({ to: "/" });
+			},
+		});
 	}
 
 	return (
