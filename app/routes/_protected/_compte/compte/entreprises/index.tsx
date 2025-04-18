@@ -81,7 +81,7 @@ function RouteComponent() {
 						<article className="border border-gray-300 p-5 rounded-sm grid gap-4 shadow-2xs">
 							<header className="flex items-baseline gap-2 justify-between">
 								<div className="flex items-center gap-2">
-									<CompanyLogo company={company} />
+									<CompanyLogo name={company.name} url={company.logo?.secureUrl} />
 									<h2 className="text-lg font-bold leading-1">{company.name}</h2>
 									<p className="text-xs text-orange-300">{COMPANY_STATUSES[company.status]}</p>
 								</div>

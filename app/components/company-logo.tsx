@@ -9,16 +9,11 @@ const SIZES = {
 };
 
 export function CompanyLogo({
-	company,
+	url,
+	name,
 	size = "sm",
-}: { company: Partial<Company>; size?: keyof typeof SIZES }) {
-	if (!company.logo) return <StoreIcon className={cn(SIZES[size])} />;
+}: { url?: string; name: string; size?: keyof typeof SIZES }) {
+	if (!url) return <StoreIcon className={cn(SIZES[size])} />;
 
-	return (
-		<img
-			src={company.logo.secureUrl}
-			alt={company.name}
-			className={cn(SIZES[size], "aspect-square rounded-sm")}
-		/>
-	);
+	return <img src={url} alt={name} className={cn(SIZES[size], "aspect-square rounded-sm")} />;
 }

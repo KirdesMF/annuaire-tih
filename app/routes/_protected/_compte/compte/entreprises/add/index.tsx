@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { Command } from "cmdk";
@@ -23,35 +23,42 @@ import { PlusIcon } from "~/components/icons/plus";
 import { PhoneIcon } from "~/components/icons/phone";
 import { GlobeIcon } from "~/components/icons/globe";
 import { EmailIcon } from "~/components/icons/email";
+import { usePreviewStore } from "~/lib/store/preview.store";
 
-export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add")({
+export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add/")({
 	component: RouteComponent,
 	beforeLoad: async ({ context }) => {
 		const userCompanies = await context.queryClient.ensureQueryData(userCompaniesQueryOptions);
+
 		if (userCompanies && userCompanies?.length >= 3) {
 			toast.error("Vous ne pouvez pas créer plus de 3 entreprises");
 			throw redirect({ to: "/compte/entreprises" });
 		}
 	},
-	loader: ({ context }) => {
-		const categories = context.queryClient.ensureQueryData(categoriesQueryOptions);
-		return categories;
+	loader: async ({ context }) => {
+		const categories = await context.queryClient.ensureQueryData(categoriesQueryOptions);
+		return { categories };
 	},
 });
 
 function RouteComponent() {
 	const context = Route.useRouteContext();
-	const data = Route.useLoaderData();
-	const router = useRouter();
+	const { categories } = Route.useLoaderData();
+	const navigate = Route.useNavigate();
 	const { mutate, isPending } = useMutation({ mutationFn: useServerFn(addCompany) });
-	const [selectedCategories, setSelectedCategories] = useState(new Set<string>());
+
+	const formRef = useRef<HTMLFormElement>(null);
+	const preview = usePreviewStore((state) => state.preview);
+	const setPreview = usePreviewStore((state) => state.setPreview);
+
+	const [selectedCategories, setSelectedCategories] = useState(
+		new Set<string>(preview?.categories),
+	);
+	const [descriptionLength, setDescriptionLength] = useState(0);
 	const [imagePreviews, setImagePreviews] = useState<{
 		logo?: string;
 		gallery: string[];
 	}>({ gallery: [] });
-	const [descriptionLength, setDescriptionLength] = useState(0);
-
-	const formRef = useRef<HTMLFormElement>(null);
 
 	function onSelectCategory(categoryId: string) {
 		setSelectedCategories((prev) => {
@@ -90,7 +97,7 @@ function RouteComponent() {
 				setImagePreviews((prev) => ({ ...prev, logo: result }));
 			}
 
-			if (type === "gallery" && index) {
+			if (type === "gallery" && typeof index === "number") {
 				setImagePreviews((prev) => {
 					const newGallery = [...prev.gallery];
 					newGallery[index] = result;
@@ -103,8 +110,8 @@ function RouteComponent() {
 
 	function onPreview() {
 		const formData = new FormData(formRef.current as HTMLFormElement);
-		for (const category of selectedCategories) {
-			formData.append("categories", category);
+		for (const categoryId of selectedCategories) {
+			formData.append("categories", categoryId);
 		}
 
 		const decodedFormData = decode(formData, {
@@ -115,14 +122,27 @@ function RouteComponent() {
 
 		const result = v.safeParse(AddCompanySchema, decodedFormData, { abortPipeEarly: true });
 
-		console.log(result);
+		if (!result.success) {
+			toast.error(
+				<div>
+					{result.issues.map((issue, idx) => (
+						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+						<p key={idx}>{issue.message}</p>
+					))}
+				</div>,
+			);
+			return;
+		}
+
+		setPreview(result.output);
+		navigate({ to: "/compte/entreprises/add/preview" });
 	}
 
 	function onSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
-		for (const category of selectedCategories) {
-			formData.append("categories", category);
+		for (const categoryId of selectedCategories) {
+			formData.append("categories", categoryId);
 		}
 
 		const decodedFormData = decode(formData, {
@@ -151,7 +171,7 @@ function RouteComponent() {
 				onSuccess: () => {
 					context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
 					toast.success("Entreprise créée avec succès");
-					router.navigate({ to: "/compte/entreprises" });
+					navigate({ to: "/compte/entreprises" });
 				},
 			},
 		);
@@ -170,6 +190,7 @@ function RouteComponent() {
 							name="name"
 							placeholder="Ex: mon entreprise"
 							className="placeholder:text-xs"
+							defaultValue={preview?.name}
 						/>
 					</Label>
 
@@ -180,6 +201,7 @@ function RouteComponent() {
 							name="siret"
 							placeholder="Ex: 12345678901234"
 							className="placeholder:text-xs"
+							defaultValue={preview?.siret}
 						/>
 					</Label>
 
@@ -204,7 +226,7 @@ function RouteComponent() {
 										/>
 										<Command.Separator className="h-px bg-gray-300" />
 										<Command.List className="max-h-60 overflow-y-auto">
-											{data.map((category) => (
+											{categories.map((category) => (
 												<Command.Item
 													key={category.id}
 													value={category.name}
@@ -222,28 +244,30 @@ function RouteComponent() {
 						</Popover.Root>
 					</Label>
 
-					<ul className="flex flex-wrap gap-2">
-						{Array.from(selectedCategories).map((categoryId) => {
-							const category = data.find((c) => c.id === categoryId);
-							if (!category) return null;
+					{selectedCategories.size ? (
+						<ul className="flex flex-wrap gap-2">
+							{Array.from(selectedCategories.values()).map((categoryId) => {
+								const category = categories.find((category) => category.id === categoryId);
+								if (!category) return null;
 
-							return (
-								<li
-									key={category.id}
-									className="bg-gray-400 text-white px-2 py-1 rounded-sm text-xs flex items-center gap-2"
-								>
-									<span className="max-w-[30ch] truncate">{category.name}</span>
-									<button
-										type="button"
-										className="text-white inline-grid place-items-center cursor-pointer"
-										onClick={() => onRemoveCategory(category.id)}
+								return (
+									<li
+										key={category.id}
+										className="bg-gray-400 text-white px-2 py-1 rounded-sm text-xs flex items-center gap-2"
 									>
-										<CloseIcon className="size-3 text-white" />
-									</button>
-								</li>
-							);
-						})}
-					</ul>
+										<span className="max-w-[30ch] truncate">{category.name}</span>
+										<button
+											type="button"
+											className="text-white inline-grid place-items-center cursor-pointer"
+											onClick={() => onRemoveCategory(category.id)}
+										>
+											<CloseIcon className="size-3 text-white" />
+										</button>
+									</li>
+								);
+							})}
+						</ul>
+					) : null}
 
 					<Separator.Root className="h-px bg-gray-300 my-4" />
 
@@ -518,13 +542,13 @@ function RouteComponent() {
 					<Separator.Root className="h-px bg-gray-300 my-4" />
 
 					<div className="flex gap-2 justify-end">
-						<Link
-							to="/compte/entreprises/preview"
-							className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs"
+						<button
+							type="button"
+							className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50"
 							onClick={onPreview}
 						>
 							Prévisualiser
-						</Link>
+						</button>
 
 						<button
 							type="submit"
