@@ -18,12 +18,7 @@ import {
 import type { Company, CompanyStatus } from "~/db/schema/companies";
 import { deleteCompany } from "~/lib/api/companies";
 import { userCompaniesQueryOptions } from "~/lib/api/user";
-
-const STATUSES = {
-	pending: "En attente de validation",
-	active: "Approuvée",
-	rejected: "Rejetée",
-} as const;
+import { COMPANY_STATUSES } from "~/utils/constantes";
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/")({
 	loader: async ({ context }) => {
@@ -88,7 +83,7 @@ function RouteComponent() {
 								<div className="flex items-center gap-2">
 									<CompanyLogo company={company} />
 									<h2 className="text-lg font-bold leading-1">{company.name}</h2>
-									<p className="text-xs text-orange-300">{STATUSES[company.status]}</p>
+									<p className="text-xs text-orange-300">{COMPANY_STATUSES[company.status]}</p>
 								</div>
 
 								<p className="text-xs text-gray-500 border px-2 py-1 rounded-sm inline-flex gap-2 items-center hover:cursor-pointer ">
