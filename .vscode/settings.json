@@ -3,5 +3,6 @@
 	"editor.defaultFormatter": "biomejs.biome",
 	"files.associations": {
 		"*.css": "tailwindcss"
-	}
+	},
+	"tailwindCSS.classFunctions": ["cva", "cx", "clsx", "twMerge"]
 }

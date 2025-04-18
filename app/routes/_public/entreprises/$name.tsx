@@ -15,13 +15,6 @@ import { PhoneIcon } from "~/components/icons/phone";
 import { GlobeIcon } from "~/components/icons/globe";
 import { LinkChainIcon } from "~/components/icons/link-chain";
 
-const WORK_MODES = {
-	remote: "À distance",
-	hybrid: "Hybride",
-	onsite: "Sur site",
-	not_specified: "Non spécifié",
-} as const;
-
 const SearchSchema = v.object({
 	id: v.string(),
 });
@@ -43,6 +36,13 @@ export const Route = createFileRoute("/_public/entreprises/$name")({
 	},
 });
 
+const WORK_MODES = {
+	remote: "À distance",
+	hybrid: "Hybride",
+	onsite: "Sur site",
+	not_specified: "Non spécifié",
+} as const;
+
 const SOCIAL_MEDIA_ICONS = {
 	facebook: <FacebookIcon className="size-5" />,
 	instagram: <InstagramIcon className="size-5" />,
@@ -63,7 +63,7 @@ function RouteComponent() {
 		<main className="px-4 py-8 grid gap-4">
 			<div className="container flex justify-between gap-4 border border-gray-300 p-6 rounded-sm">
 				<div className="flex flex-col gap-2">
-					<CompanyLogo company={data} size="lg" />
+					<CompanyLogo url={data.logo?.secureUrl} name={data.name} size="lg" />
 					<div className="flex items-center gap-2">
 						<h1 className="text-2xl font-bold">{data.name}</h1>
 						<CopyButton>{data.siret}</CopyButton>
@@ -96,33 +96,26 @@ function RouteComponent() {
 			<div className="container flex gap-2">
 				<div className="flex-1 flex flex-col justify-center gap-4 border border-gray-300 p-6 rounded-sm">
 					<div className="flex flex-col gap-2">
-						{data.email ? (
-							<div className="flex items-center gap-2">
-								<EmailIcon className="size-5" />
-								<p className="text-xs text-gray-500">{data.email}</p>
-							</div>
-						) : null}
+						<div className="flex items-center gap-2">
+							<EmailIcon className="size-5" />
+							<p className="text-xs text-gray-500">{data.email || "Non renseigné"}</p>
+						</div>
 
-						{data.phone ? (
-							<div className="flex items-center gap-2">
-								<PhoneIcon className="size-5" />
-								<p className="text-xs text-gray-500">{data.phone}</p>
-							</div>
-						) : null}
+						<div className="flex items-center gap-2">
+							<PhoneIcon className="size-5" />
+							<p className="text-xs text-gray-500">{data.phone || "Non renseigné"}</p>
+						</div>
 
-						{data.website ? (
-							<div className="flex items-center gap-2">
-								<GlobeIcon className="size-5" />
-								<a
-									href={data.website}
-									target="_blank"
-									rel="noopener noreferrer"
-									className="text-xs text-gray-500"
-								>
+						<div className="flex items-center gap-2">
+							<GlobeIcon className="size-5" />
+							{data.website ? (
+								<a href={data.website} target="_blank" rel="noopener noreferrer">
 									{data.website}
 								</a>
-							</div>
-						) : null}
+							) : (
+								<span className="text-xs text-gray-500">Non renseigné</span>
+							)}
+						</div>
 					</div>
 
 					{!isSocialMediaEmpty ? (
@@ -142,10 +135,12 @@ function RouteComponent() {
 
 				<div className="flex-1 border border-gray-300 p-6 rounded-sm flex flex-col gap-2">
 					<p className="text-sm text-gray-500">
-						<span className="font-bold">Entrepreneur:</span> {data.business_owner}
+						<span className="font-bold">Entrepreneur:</span>{" "}
+						{data.business_owner || "Non renseigné"}
 					</p>
 					<p className="text-sm text-gray-500">
-						<span className="font-bold">Zone géographique:</span> {data.service_area}
+						<span className="font-bold">Zone géographique:</span>{" "}
+						{data.service_area || "Non renseigné"}
 					</p>
 					<p className="text-sm text-gray-500">
 						<span className="font-bold">Mode de travail:</span>{" "}
@@ -155,7 +150,7 @@ function RouteComponent() {
 						<span className="font-bold">RQTH:</span> {data.rqth ? "Oui" : "Non"}
 					</p>
 					<p className="text-sm text-gray-500">
-						<span className="font-bold">Sous domaine:</span> {data.subdomain}
+						<span className="font-bold">Sous domaine:</span> {data.subdomain || "Non renseigné"}
 					</p>
 				</div>
 			</div>
@@ -163,22 +158,26 @@ function RouteComponent() {
 			<div className="container border border-gray-300 p-6 rounded-sm grid gap-4">
 				<div className="flex flex-col gap-2">
 					<h2 className="text-lg font-bold">Description</h2>
-					<p className="text-sm text-gray-500 text-pretty">{data.description}</p>
+					<p className="text-sm text-gray-500 text-pretty">{data.description || "Non renseigné"}</p>
 				</div>
 
-				<Separator.Root className="h-px bg-gray-300 my-4" />
+				{data.gallery?.length ? (
+					<>
+						<Separator.Root className="h-px bg-gray-300 my-4" />
 
-				<ul className="flex flex-wrap gap-2">
-					{data.gallery?.map((image) => (
-						<li key={image.publicId}>
-							<img
-								src={image.secureUrl}
-								alt={data.name}
-								className="size-16 aspect-square rounded-sm"
-							/>
-						</li>
-					))}
-				</ul>
+						<ul className="flex flex-wrap gap-2">
+							{data.gallery?.map((image) => (
+								<li key={image.publicId}>
+									<img
+										src={image.secureUrl}
+										alt={data.name}
+										className="size-16 aspect-square rounded-sm"
+									/>
+								</li>
+							))}
+						</ul>
+					</>
+				) : null}
 			</div>
 		</main>
 	);
