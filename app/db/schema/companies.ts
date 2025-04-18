@@ -1,4 +1,13 @@
-import { pgTable, uuid, timestamp, index, varchar, boolean, jsonb } from "drizzle-orm/pg-core";
+import {
+	pgTable,
+	uuid,
+	timestamp,
+	index,
+	varchar,
+	boolean,
+	jsonb,
+	text,
+} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { user } from "./auth";
 
@@ -9,10 +18,10 @@ export const companiesTable = pgTable(
 		status: varchar("status").$type<CompanyStatus>().notNull().default("pending"),
 		created_at: timestamp("created_at").notNull().defaultNow(),
 		updated_at: timestamp("updated_at").notNull().defaultNow(),
-		created_by: uuid("created_by")
+		created_by: text("created_by")
 			.references(() => user.id, { onDelete: "cascade" })
 			.notNull(),
-		user_id: uuid("user_id")
+		user_id: text("user_id")
 			.references(() => user.id, { onDelete: "cascade" })
 			.notNull(),
 		name: varchar("name", { length: 255 }).notNull().unique(),

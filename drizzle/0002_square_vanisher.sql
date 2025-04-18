@@ -1,2 +1,0 @@
-ALTER TABLE "companies" ALTER COLUMN "social_media" SET DEFAULT '{"facebook":"","calendly":"","linkedin":"","instagram":""}'::jsonb;--> statement-breakpoint
-ALTER TABLE "companies" ALTER COLUMN "social_media" SET NOT NULL;

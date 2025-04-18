@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, varchar, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, varchar } from "drizzle-orm/pg-core";
 
 export const USER_ROLES = ["admin", "user", "superadmin"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
@@ -9,7 +9,7 @@ export const isValidRole = (role?: string | null): role is UserRole => {
 };
 
 export const user = pgTable("user", {
-	id: uuid("id").primaryKey().defaultRandom(),
+	id: text("id").primaryKey(),
 	name: varchar("first_name", { length: 255 }).notNull(),
 	email: varchar("email", { length: 255 }).notNull().unique(),
 	emailVerified: boolean("email_verified").notNull(),
@@ -23,24 +23,24 @@ export const user = pgTable("user", {
 });
 
 export const session = pgTable("session", {
-	id: uuid("id").primaryKey().defaultRandom(),
+	id: text("id").primaryKey(),
 	expiresAt: timestamp("expires_at").notNull(),
 	token: text("token").notNull().unique(),
 	createdAt: timestamp("created_at").notNull(),
 	updatedAt: timestamp("updated_at").notNull(),
 	ipAddress: text("ip_address"),
 	userAgent: text("user_agent"),
-	userId: uuid("user_id")
+	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	impersonatedBy: text("impersonated_by"),
 });
 
 export const account = pgTable("account", {
-	id: uuid("id").primaryKey().defaultRandom(),
+	id: text("id").primaryKey(),
 	accountId: text("account_id").notNull(),
 	providerId: text("provider_id").notNull(),
-	userId: uuid("user_id")
+	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),
 	accessToken: text("access_token"),
@@ -55,7 +55,7 @@ export const account = pgTable("account", {
 });
 
 export const verification = pgTable("verification", {
-	id: uuid("id").primaryKey().defaultRandom(),
+	id: text("id").primaryKey(),
 	identifier: text("identifier").notNull(),
 	value: text("value").notNull(),
 	expiresAt: timestamp("expires_at").notNull(),
