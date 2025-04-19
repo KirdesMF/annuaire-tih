@@ -73,7 +73,7 @@ export const signupFn = createServerFn()
 		throw redirect({ to: "/compte/entreprises" });
 	});
 
-export const Route = createFileRoute("/_auth/signup")({
+export const Route = createFileRoute("/(auth)/signup")({
 	component: RouteComponent,
 	beforeLoad: async ({ context }) => {
 		const user = context.session?.user;

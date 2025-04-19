@@ -122,4 +122,10 @@ export const AddCompanySchema = v.object({
 	]),
 });
 
+export const UpdateCompanySchema = v.object({
+	companyId: v.string(),
+	...v.partial(AddCompanySchema).entries,
+});
+
 export type AddCompanyData = v.InferOutput<typeof AddCompanySchema>;
+export type UpdateCompanyData = v.InferOutput<typeof UpdateCompanySchema>;

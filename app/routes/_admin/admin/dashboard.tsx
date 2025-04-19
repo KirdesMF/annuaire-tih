@@ -12,12 +12,10 @@ export const Route = createFileRoute("/_admin/admin/dashboard")({
 	component: RouteComponent,
 	pendingComponent: () => <div>Loading...</div>,
 	loader: async ({ context }) => {
-		const [companies, users] = await Promise.all([
+		await Promise.all([
 			context.queryClient.prefetchQuery(allCompaniesQueryOptions),
 			context.queryClient.prefetchQuery(allUsersQueryOptions),
 		]);
-
-		return { companies, users };
 	},
 });
 
@@ -42,9 +40,9 @@ function RouteComponent() {
 	}
 
 	// TODO: Add confirmation dialog
-	function onDeleteCompany(companyId: string) {
+	function onDeleteCompany(companyId: string, companySlug: string) {
 		remove(
-			{ data: companyId },
+			{ data: { companyId, companySlug } },
 			{
 				onSuccess: () => {
 					toast.success("Company deleted");
@@ -106,7 +104,7 @@ function RouteComponent() {
 								<button
 									type="button"
 									className="text-xs text-gray-500 border px-2 py-1 rounded-sm hover:bg-gray-100 transition-colors"
-									onClick={() => onDeleteCompany(company.id)}
+									onClick={() => onDeleteCompany(company.id, company.slug)}
 								>
 									<TrashIcon />
 								</button>

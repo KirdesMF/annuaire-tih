@@ -7,8 +7,7 @@ import { userCompaniesQueryOptions } from "~/lib/api/user";
 export const Route = createFileRoute("/_protected/_compte")({
 	component: RouteComponent,
 	loader: async ({ context }) => {
-		const companies = context.queryClient.ensureQueryData(userCompaniesQueryOptions);
-		return companies || [];
+		await context.queryClient.ensureQueryData(userCompaniesQueryOptions);
 	},
 });
 

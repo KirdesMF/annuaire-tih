@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { setCompanyQueryOptions } from "~/lib/api/companies";
+import { companyBySlugQueryOptions } from "~/lib/api/companies";
 import * as v from "valibot";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CopyButton } from "~/components/copy-button";
@@ -15,12 +15,14 @@ import { PhoneIcon } from "~/components/icons/phone";
 import { GlobeIcon } from "~/components/icons/globe";
 import { LinkChainIcon } from "~/components/icons/link-chain";
 
-export const Route = createFileRoute("/_public/entreprises/$slug")({
+export const Route = createFileRoute("/(public)/entreprises/$slug")({
 	component: RouteComponent,
 	pendingComponent: () => <div>Loading...</div>,
 	errorComponent: () => <div>Error</div>,
 	loader: async ({ context, params }) => {
-		const company = await context.queryClient.ensureQueryData(setCompanyQueryOptions(params.slug));
+		const company = await context.queryClient.ensureQueryData(
+			companyBySlugQueryOptions(params.slug),
+		);
 		const session = context.session;
 
 		return {
@@ -46,7 +48,7 @@ const SOCIAL_MEDIA_ICONS = {
 
 function RouteComponent() {
 	const params = Route.useParams();
-	const { data } = useSuspenseQuery(setCompanyQueryOptions(params.slug));
+	const { data } = useSuspenseQuery(companyBySlugQueryOptions(params.slug));
 	const { session } = Route.useLoaderData();
 
 	if (!data) return <div>Company not found</div>;
@@ -63,8 +65,8 @@ function RouteComponent() {
 						<CopyButton>{data.siret}</CopyButton>
 						{session?.user?.id === data.user_id && (
 							<Link
-								to={"/compte/entreprises/edit"}
-								search={{ id: data.id }}
+								to={"/compte/entreprises/$slug/edit"}
+								params={{ slug: params.slug }}
 								className="border border-gray-300 px-2 py-1 rounded-sm text-xs h-min"
 							>
 								Edit
@@ -73,8 +75,8 @@ function RouteComponent() {
 					</div>
 					<ul className="flex flex-wrap gap-2">
 						{data.categories?.map((category) => (
-							<li key={category} className="bg-gray-100 px-2 py-1 rounded-sm text-xs">
-								{category}
+							<li key={category?.id} className="bg-gray-100 px-2 py-1 rounded-sm text-xs">
+								{category?.name}
 							</li>
 						))}
 					</ul>
