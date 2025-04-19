@@ -63,8 +63,8 @@ function RouteComponent() {
 						<CopyButton>{data.siret}</CopyButton>
 						{session?.user?.id === data.user_id && (
 							<Link
-								to={"/compte/entreprises/$id/edit"}
-								params={{ id: data.id }}
+								to={"/compte/entreprises/edit"}
+								search={{ id: data.id }}
 								className="border border-gray-300 px-2 py-1 rounded-sm text-xs h-min"
 							>
 								Edit

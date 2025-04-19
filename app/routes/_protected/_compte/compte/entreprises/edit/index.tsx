@@ -6,7 +6,6 @@ import { Label } from "~/components/label";
 import { Command } from "cmdk";
 import { useRef, useState } from "react";
 import { CloseIcon } from "~/components/icons/close";
-import { categoriesQueryOptions } from "~/lib/api/categories";
 import { addCompany } from "~/lib/api/companies";
 import { toast } from "sonner";
 import { Popover, Separator } from "radix-ui";
@@ -18,28 +17,25 @@ import { LinkedinIcon } from "~/components/icons/linkedin";
 import { InstagramIcon } from "~/components/icons/instagram";
 import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facebook";
-import { userCompaniesQueryOptions } from "~/lib/api/user";
 import { PlusIcon } from "~/components/icons/plus";
 import { PhoneIcon } from "~/components/icons/phone";
 import { GlobeIcon } from "~/components/icons/globe";
 import { EmailIcon } from "~/components/icons/email";
 import { usePreviewStore } from "~/lib/store/preview.store";
 import { useImagePreview } from "~/hooks/use-image-preview";
+import { categoriesQueryOptions } from "~/lib/api/categories";
 
-export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add/")({
-	component: RouteComponent,
-	beforeLoad: async ({ context }) => {
-		const userCompanies = await context.queryClient.ensureQueryData(userCompaniesQueryOptions);
+const EditCompanySchema = v.object({
+	id: v.string(),
+});
 
-		if (userCompanies && userCompanies?.length >= 3) {
-			toast.error("Vous ne pouvez pas créer plus de 3 entreprises");
-			throw redirect({ to: "/compte/entreprises" });
-		}
-	},
+export const Route = createFileRoute("/_protected/_compte/compte/entreprises/edit/")({
+	validateSearch: (search) => v.parse(EditCompanySchema, search),
 	loader: async ({ context }) => {
 		const categories = await context.queryClient.ensureQueryData(categoriesQueryOptions);
 		return { categories };
 	},
+	component: RouteComponent,
 });
 
 function RouteComponent() {

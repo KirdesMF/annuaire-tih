@@ -31,9 +31,10 @@ import { Route as PublicCategoriesSlugImport } from './routes/_public/categories
 import { Route as AdminAdminDashboardImport } from './routes/_admin/admin/dashboard'
 import { Route as ProtectedCompteComptePreferencesImport } from './routes/_protected/_compte/compte/preferences'
 import { Route as ProtectedCompteCompteEntreprisesIndexImport } from './routes/_protected/_compte/compte/entreprises/index'
+import { Route as ProtectedCompteCompteEntreprisesEditIndexImport } from './routes/_protected/_compte/compte/entreprises/edit/index'
 import { Route as ProtectedCompteCompteEntreprisesAddIndexImport } from './routes/_protected/_compte/compte/entreprises/add/index'
+import { Route as ProtectedCompteCompteEntreprisesEditPreviewImport } from './routes/_protected/_compte/compte/entreprises/edit/preview'
 import { Route as ProtectedCompteCompteEntreprisesAddPreviewImport } from './routes/_protected/_compte/compte/entreprises/add/preview'
-import { Route as ProtectedCompteCompteEntreprisesIdEditImport } from './routes/_protected/_compte/compte/entreprises/$id/edit'
 
 // Create/Update Routes
 
@@ -156,6 +157,13 @@ const ProtectedCompteCompteEntreprisesIndexRoute =
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
 
+const ProtectedCompteCompteEntreprisesEditIndexRoute =
+  ProtectedCompteCompteEntreprisesEditIndexImport.update({
+    id: '/compte/entreprises/edit/',
+    path: '/compte/entreprises/edit/',
+    getParentRoute: () => ProtectedCompteRouteRoute,
+  } as any)
+
 const ProtectedCompteCompteEntreprisesAddIndexRoute =
   ProtectedCompteCompteEntreprisesAddIndexImport.update({
     id: '/compte/entreprises/add/',
@@ -163,17 +171,17 @@ const ProtectedCompteCompteEntreprisesAddIndexRoute =
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
 
+const ProtectedCompteCompteEntreprisesEditPreviewRoute =
+  ProtectedCompteCompteEntreprisesEditPreviewImport.update({
+    id: '/compte/entreprises/edit/preview',
+    path: '/compte/entreprises/edit/preview',
+    getParentRoute: () => ProtectedCompteRouteRoute,
+  } as any)
+
 const ProtectedCompteCompteEntreprisesAddPreviewRoute =
   ProtectedCompteCompteEntreprisesAddPreviewImport.update({
     id: '/compte/entreprises/add/preview',
     path: '/compte/entreprises/add/preview',
-    getParentRoute: () => ProtectedCompteRouteRoute,
-  } as any)
-
-const ProtectedCompteCompteEntreprisesIdEditRoute =
-  ProtectedCompteCompteEntreprisesIdEditImport.update({
-    id: '/compte/entreprises/$id/edit',
-    path: '/compte/entreprises/$id/edit',
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
 
@@ -321,13 +329,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedCompteCompteEntreprisesIndexImport
       parentRoute: typeof ProtectedCompteRouteImport
     }
-    '/_protected/_compte/compte/entreprises/$id/edit': {
-      id: '/_protected/_compte/compte/entreprises/$id/edit'
-      path: '/compte/entreprises/$id/edit'
-      fullPath: '/compte/entreprises/$id/edit'
-      preLoaderRoute: typeof ProtectedCompteCompteEntreprisesIdEditImport
-      parentRoute: typeof ProtectedCompteRouteImport
-    }
     '/_protected/_compte/compte/entreprises/add/preview': {
       id: '/_protected/_compte/compte/entreprises/add/preview'
       path: '/compte/entreprises/add/preview'
@@ -335,11 +336,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedCompteCompteEntreprisesAddPreviewImport
       parentRoute: typeof ProtectedCompteRouteImport
     }
+    '/_protected/_compte/compte/entreprises/edit/preview': {
+      id: '/_protected/_compte/compte/entreprises/edit/preview'
+      path: '/compte/entreprises/edit/preview'
+      fullPath: '/compte/entreprises/edit/preview'
+      preLoaderRoute: typeof ProtectedCompteCompteEntreprisesEditPreviewImport
+      parentRoute: typeof ProtectedCompteRouteImport
+    }
     '/_protected/_compte/compte/entreprises/add/': {
       id: '/_protected/_compte/compte/entreprises/add/'
       path: '/compte/entreprises/add'
       fullPath: '/compte/entreprises/add'
       preLoaderRoute: typeof ProtectedCompteCompteEntreprisesAddIndexImport
+      parentRoute: typeof ProtectedCompteRouteImport
+    }
+    '/_protected/_compte/compte/entreprises/edit/': {
+      id: '/_protected/_compte/compte/entreprises/edit/'
+      path: '/compte/entreprises/edit'
+      fullPath: '/compte/entreprises/edit'
+      preLoaderRoute: typeof ProtectedCompteCompteEntreprisesEditIndexImport
       parentRoute: typeof ProtectedCompteRouteImport
     }
   }
@@ -362,21 +377,24 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
 interface ProtectedCompteRouteRouteChildren {
   ProtectedCompteComptePreferencesRoute: typeof ProtectedCompteComptePreferencesRoute
   ProtectedCompteCompteEntreprisesIndexRoute: typeof ProtectedCompteCompteEntreprisesIndexRoute
-  ProtectedCompteCompteEntreprisesIdEditRoute: typeof ProtectedCompteCompteEntreprisesIdEditRoute
   ProtectedCompteCompteEntreprisesAddPreviewRoute: typeof ProtectedCompteCompteEntreprisesAddPreviewRoute
+  ProtectedCompteCompteEntreprisesEditPreviewRoute: typeof ProtectedCompteCompteEntreprisesEditPreviewRoute
   ProtectedCompteCompteEntreprisesAddIndexRoute: typeof ProtectedCompteCompteEntreprisesAddIndexRoute
+  ProtectedCompteCompteEntreprisesEditIndexRoute: typeof ProtectedCompteCompteEntreprisesEditIndexRoute
 }
 
 const ProtectedCompteRouteRouteChildren: ProtectedCompteRouteRouteChildren = {
   ProtectedCompteComptePreferencesRoute: ProtectedCompteComptePreferencesRoute,
   ProtectedCompteCompteEntreprisesIndexRoute:
     ProtectedCompteCompteEntreprisesIndexRoute,
-  ProtectedCompteCompteEntreprisesIdEditRoute:
-    ProtectedCompteCompteEntreprisesIdEditRoute,
   ProtectedCompteCompteEntreprisesAddPreviewRoute:
     ProtectedCompteCompteEntreprisesAddPreviewRoute,
+  ProtectedCompteCompteEntreprisesEditPreviewRoute:
+    ProtectedCompteCompteEntreprisesEditPreviewRoute,
   ProtectedCompteCompteEntreprisesAddIndexRoute:
     ProtectedCompteCompteEntreprisesAddIndexRoute,
+  ProtectedCompteCompteEntreprisesEditIndexRoute:
+    ProtectedCompteCompteEntreprisesEditIndexRoute,
 }
 
 const ProtectedCompteRouteRouteWithChildren =
@@ -415,9 +433,10 @@ export interface FileRoutesByFullPath {
   '/entrepreneurs': typeof PublicEntrepreneursIndexRoute
   '/compte/preferences': typeof ProtectedCompteComptePreferencesRoute
   '/compte/entreprises': typeof ProtectedCompteCompteEntreprisesIndexRoute
-  '/compte/entreprises/$id/edit': typeof ProtectedCompteCompteEntreprisesIdEditRoute
   '/compte/entreprises/add/preview': typeof ProtectedCompteCompteEntreprisesAddPreviewRoute
+  '/compte/entreprises/edit/preview': typeof ProtectedCompteCompteEntreprisesEditPreviewRoute
   '/compte/entreprises/add': typeof ProtectedCompteCompteEntreprisesAddIndexRoute
+  '/compte/entreprises/edit': typeof ProtectedCompteCompteEntreprisesEditIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -439,9 +458,10 @@ export interface FileRoutesByTo {
   '/entrepreneurs': typeof PublicEntrepreneursIndexRoute
   '/compte/preferences': typeof ProtectedCompteComptePreferencesRoute
   '/compte/entreprises': typeof ProtectedCompteCompteEntreprisesIndexRoute
-  '/compte/entreprises/$id/edit': typeof ProtectedCompteCompteEntreprisesIdEditRoute
   '/compte/entreprises/add/preview': typeof ProtectedCompteCompteEntreprisesAddPreviewRoute
+  '/compte/entreprises/edit/preview': typeof ProtectedCompteCompteEntreprisesEditPreviewRoute
   '/compte/entreprises/add': typeof ProtectedCompteCompteEntreprisesAddIndexRoute
+  '/compte/entreprises/edit': typeof ProtectedCompteCompteEntreprisesEditIndexRoute
 }
 
 export interface FileRoutesById {
@@ -466,9 +486,10 @@ export interface FileRoutesById {
   '/_public/entrepreneurs/': typeof PublicEntrepreneursIndexRoute
   '/_protected/_compte/compte/preferences': typeof ProtectedCompteComptePreferencesRoute
   '/_protected/_compte/compte/entreprises/': typeof ProtectedCompteCompteEntreprisesIndexRoute
-  '/_protected/_compte/compte/entreprises/$id/edit': typeof ProtectedCompteCompteEntreprisesIdEditRoute
   '/_protected/_compte/compte/entreprises/add/preview': typeof ProtectedCompteCompteEntreprisesAddPreviewRoute
+  '/_protected/_compte/compte/entreprises/edit/preview': typeof ProtectedCompteCompteEntreprisesEditPreviewRoute
   '/_protected/_compte/compte/entreprises/add/': typeof ProtectedCompteCompteEntreprisesAddIndexRoute
+  '/_protected/_compte/compte/entreprises/edit/': typeof ProtectedCompteCompteEntreprisesEditIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -492,9 +513,10 @@ export interface FileRouteTypes {
     | '/entrepreneurs'
     | '/compte/preferences'
     | '/compte/entreprises'
-    | '/compte/entreprises/$id/edit'
     | '/compte/entreprises/add/preview'
+    | '/compte/entreprises/edit/preview'
     | '/compte/entreprises/add'
+    | '/compte/entreprises/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -515,9 +537,10 @@ export interface FileRouteTypes {
     | '/entrepreneurs'
     | '/compte/preferences'
     | '/compte/entreprises'
-    | '/compte/entreprises/$id/edit'
     | '/compte/entreprises/add/preview'
+    | '/compte/entreprises/edit/preview'
     | '/compte/entreprises/add'
+    | '/compte/entreprises/edit'
   id:
     | '__root__'
     | '/'
@@ -540,9 +563,10 @@ export interface FileRouteTypes {
     | '/_public/entrepreneurs/'
     | '/_protected/_compte/compte/preferences'
     | '/_protected/_compte/compte/entreprises/'
-    | '/_protected/_compte/compte/entreprises/$id/edit'
     | '/_protected/_compte/compte/entreprises/add/preview'
+    | '/_protected/_compte/compte/entreprises/edit/preview'
     | '/_protected/_compte/compte/entreprises/add/'
+    | '/_protected/_compte/compte/entreprises/edit/'
   fileRoutesById: FileRoutesById
 }
 
@@ -631,9 +655,10 @@ export const routeTree = rootRoute
       "children": [
         "/_protected/_compte/compte/preferences",
         "/_protected/_compte/compte/entreprises/",
-        "/_protected/_compte/compte/entreprises/$id/edit",
         "/_protected/_compte/compte/entreprises/add/preview",
-        "/_protected/_compte/compte/entreprises/add/"
+        "/_protected/_compte/compte/entreprises/edit/preview",
+        "/_protected/_compte/compte/entreprises/add/",
+        "/_protected/_compte/compte/entreprises/edit/"
       ]
     },
     "/_auth/forgot-password": {
@@ -688,16 +713,20 @@ export const routeTree = rootRoute
       "filePath": "_protected/_compte/compte/entreprises/index.tsx",
       "parent": "/_protected/_compte"
     },
-    "/_protected/_compte/compte/entreprises/$id/edit": {
-      "filePath": "_protected/_compte/compte/entreprises/$id/edit.tsx",
-      "parent": "/_protected/_compte"
-    },
     "/_protected/_compte/compte/entreprises/add/preview": {
       "filePath": "_protected/_compte/compte/entreprises/add/preview.tsx",
       "parent": "/_protected/_compte"
     },
+    "/_protected/_compte/compte/entreprises/edit/preview": {
+      "filePath": "_protected/_compte/compte/entreprises/edit/preview.tsx",
+      "parent": "/_protected/_compte"
+    },
     "/_protected/_compte/compte/entreprises/add/": {
       "filePath": "_protected/_compte/compte/entreprises/add/index.tsx",
+      "parent": "/_protected/_compte"
+    },
+    "/_protected/_compte/compte/entreprises/edit/": {
+      "filePath": "_protected/_compte/compte/entreprises/edit/index.tsx",
       "parent": "/_protected/_compte"
     }
   }
