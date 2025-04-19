@@ -59,12 +59,12 @@ function RouteComponent() {
 
 	useEffect(() => {
 		if (preview.logo) {
-			readImage("logo", preview.logo, 0);
+			readImage({ type: "logo", file: preview.logo });
 		}
 
 		if (preview.gallery) {
 			preview.gallery.forEach((image, index) => {
-				readImage("gallery", image, index);
+				readImage({ type: "gallery", file: image, index });
 			});
 		}
 	}, [preview.logo, preview.gallery, readImage]);
