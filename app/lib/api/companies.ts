@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "~/db";
 import { companiesTable, type CompanyStatus, type CompanyGallery } from "~/db/schema/companies";
 import { AddCompanySchema, type AddCompanyData } from "../validator/company.schema";
@@ -16,7 +16,6 @@ import { generateUniqueSlug } from "~/utils/slug";
 
 /**
  * Add a company
- * @param data - The data of the company to add
  * @todo: attempt to generate a unique slug
  */
 export const addCompany = createServerFn({ method: "POST" })
@@ -130,11 +129,10 @@ export const deleteCompany = createServerFn({ method: "POST" })
 	});
 
 /**
- * Get a company
- * @param id - The ID of the company to get
+ * Get a company by slug
  */
-export const getCompany = createServerFn({ method: "GET" })
-	.validator((slug: string) => slug as string)
+export const getCompanyBySlug = createServerFn({ method: "GET" })
+	.validator((slug: string) => slug)
 	.handler(async ({ data: slug }) => {
 		try {
 			const company = await db
@@ -162,7 +160,7 @@ export const getCompany = createServerFn({ method: "GET" })
 export function setCompanyQueryOptions(slug: string) {
 	return queryOptions({
 		queryKey: ["company", slug],
-		queryFn: () => getCompany({ data: slug }),
+		queryFn: () => getCompanyBySlug({ data: slug }),
 		staleTime: 1000 * 60 * 60 * 24,
 	});
 }
@@ -184,11 +182,47 @@ export const allCompaniesQueryOptions = queryOptions({
 	queryFn: () => getAllCompanies(),
 });
 
+/**
+ * Get all companies by category
+ */
+export const getAllActiveCompaniesByCategory = createServerFn({ method: "GET" })
+	.validator((categoryId: string) => categoryId)
+	.handler(async ({ data: categoryId }) => {
+		try {
+			const companies = await db
+				.select()
+				.from(companiesTable)
+				.innerJoin(companyCategoriesTable, eq(companyCategoriesTable.company_id, companiesTable.id))
+				.where(
+					and(
+						eq(companyCategoriesTable.category_id, categoryId),
+						eq(companiesTable.status, "active"),
+					),
+				);
+
+			return {
+				companies: companies.map((company) => company.companies),
+				categories: companies.map((company) => company.company_categories),
+			};
+		} catch (error) {
+			console.error(error);
+		}
+	});
+
+export function setAllActiveCompaniesByCategoryQueryOptions(categoryId: string) {
+	return queryOptions({
+		queryKey: ["companies", "category", categoryId, "active"],
+		queryFn: () => getAllActiveCompaniesByCategory({ data: categoryId }),
+	});
+}
+
+/**
+ * Update the status of a company
+ */
 type UpdateCompanyStatusData = {
 	companyId: string;
 	status: CompanyStatus;
 };
-
 export const updateCompanyStatus = createServerFn({ method: "POST" })
 	.validator((data: UpdateCompanyStatusData) => data)
 	.handler(async ({ data: { companyId, status } }) => {
