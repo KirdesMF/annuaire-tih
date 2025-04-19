@@ -13,7 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as ProtectedRouteImport } from './routes/_protected/route'
 import { Route as AdminRouteImport } from './routes/_admin/route'
-import { Route as PublicIndexImport } from './routes/_public/index'
+import { Route as IndexImport } from './routes/index'
 import { Route as PublicSourcesImport } from './routes/_public/sources'
 import { Route as PublicPartnerImport } from './routes/_public/partner'
 import { Route as PublicFaqImport } from './routes/_public/faq'
@@ -47,8 +47,8 @@ const AdminRouteRoute = AdminRouteImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const PublicIndexRoute = PublicIndexImport.update({
-  id: '/_public/',
+const IndexRoute = IndexImport.update({
+  id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
@@ -181,6 +181,13 @@ const ProtectedCompteCompteEntreprisesIdEditRoute =
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
     '/_admin': {
       id: '/_admin'
       path: ''
@@ -270,13 +277,6 @@ declare module '@tanstack/react-router' {
       path: '/sources'
       fullPath: '/sources'
       preLoaderRoute: typeof PublicSourcesImport
-      parentRoute: typeof rootRoute
-    }
-    '/_public/': {
-      id: '/_public/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof PublicIndexImport
       parentRoute: typeof rootRoute
     }
     '/_admin/admin/dashboard': {
@@ -397,6 +397,7 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 )
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '': typeof ProtectedCompteRouteRouteWithChildren
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
@@ -408,7 +409,6 @@ export interface FileRoutesByFullPath {
   '/faq': typeof PublicFaqRoute
   '/partner': typeof PublicPartnerRoute
   '/sources': typeof PublicSourcesRoute
-  '/': typeof PublicIndexRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/categories/$slug': typeof PublicCategoriesSlugRoute
   '/entreprises/$slug': typeof PublicEntreprisesSlugRoute
@@ -421,6 +421,7 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '': typeof ProtectedCompteRouteRouteWithChildren
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
@@ -432,7 +433,6 @@ export interface FileRoutesByTo {
   '/faq': typeof PublicFaqRoute
   '/partner': typeof PublicPartnerRoute
   '/sources': typeof PublicSourcesRoute
-  '/': typeof PublicIndexRoute
   '/admin/dashboard': typeof AdminAdminDashboardRoute
   '/categories/$slug': typeof PublicCategoriesSlugRoute
   '/entreprises/$slug': typeof PublicEntreprisesSlugRoute
@@ -446,6 +446,7 @@ export interface FileRoutesByTo {
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/': typeof IndexRoute
   '/_admin': typeof AdminRouteRouteWithChildren
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/_protected/_compte': typeof ProtectedCompteRouteRouteWithChildren
@@ -459,7 +460,6 @@ export interface FileRoutesById {
   '/_public/faq': typeof PublicFaqRoute
   '/_public/partner': typeof PublicPartnerRoute
   '/_public/sources': typeof PublicSourcesRoute
-  '/_public/': typeof PublicIndexRoute
   '/_admin/admin/dashboard': typeof AdminAdminDashboardRoute
   '/_public/categories/$slug': typeof PublicCategoriesSlugRoute
   '/_public/entreprises/$slug': typeof PublicEntreprisesSlugRoute
@@ -474,6 +474,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | ''
     | '/forgot-password'
     | '/login'
@@ -485,7 +486,6 @@ export interface FileRouteTypes {
     | '/faq'
     | '/partner'
     | '/sources'
-    | '/'
     | '/admin/dashboard'
     | '/categories/$slug'
     | '/entreprises/$slug'
@@ -497,6 +497,7 @@ export interface FileRouteTypes {
     | '/compte/entreprises/add'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | ''
     | '/forgot-password'
     | '/login'
@@ -508,7 +509,6 @@ export interface FileRouteTypes {
     | '/faq'
     | '/partner'
     | '/sources'
-    | '/'
     | '/admin/dashboard'
     | '/categories/$slug'
     | '/entreprises/$slug'
@@ -520,6 +520,7 @@ export interface FileRouteTypes {
     | '/compte/entreprises/add'
   id:
     | '__root__'
+    | '/'
     | '/_admin'
     | '/_protected'
     | '/_protected/_compte'
@@ -533,7 +534,6 @@ export interface FileRouteTypes {
     | '/_public/faq'
     | '/_public/partner'
     | '/_public/sources'
-    | '/_public/'
     | '/_admin/admin/dashboard'
     | '/_public/categories/$slug'
     | '/_public/entreprises/$slug'
@@ -547,6 +547,7 @@ export interface FileRouteTypes {
 }
 
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -558,13 +559,13 @@ export interface RootRouteChildren {
   PublicFaqRoute: typeof PublicFaqRoute
   PublicPartnerRoute: typeof PublicPartnerRoute
   PublicSourcesRoute: typeof PublicSourcesRoute
-  PublicIndexRoute: typeof PublicIndexRoute
   PublicCategoriesSlugRoute: typeof PublicCategoriesSlugRoute
   PublicEntreprisesSlugRoute: typeof PublicEntreprisesSlugRoute
   PublicEntrepreneursIndexRoute: typeof PublicEntrepreneursIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
@@ -576,7 +577,6 @@ const rootRouteChildren: RootRouteChildren = {
   PublicFaqRoute: PublicFaqRoute,
   PublicPartnerRoute: PublicPartnerRoute,
   PublicSourcesRoute: PublicSourcesRoute,
-  PublicIndexRoute: PublicIndexRoute,
   PublicCategoriesSlugRoute: PublicCategoriesSlugRoute,
   PublicEntreprisesSlugRoute: PublicEntreprisesSlugRoute,
   PublicEntrepreneursIndexRoute: PublicEntrepreneursIndexRoute,
@@ -592,6 +592,7 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
+        "/",
         "/_admin",
         "/_protected",
         "/_auth/forgot-password",
@@ -603,11 +604,13 @@ export const routeTree = rootRoute
         "/_public/faq",
         "/_public/partner",
         "/_public/sources",
-        "/_public/",
         "/_public/categories/$slug",
         "/_public/entreprises/$slug",
         "/_public/entrepreneurs/"
       ]
+    },
+    "/": {
+      "filePath": "index.tsx"
     },
     "/_admin": {
       "filePath": "_admin/route.tsx",
@@ -663,9 +666,6 @@ export const routeTree = rootRoute
     },
     "/_public/sources": {
       "filePath": "_public/sources.tsx"
-    },
-    "/_public/": {
-      "filePath": "_public/index.tsx"
     },
     "/_admin/admin/dashboard": {
       "filePath": "_admin/admin/dashboard.tsx",
