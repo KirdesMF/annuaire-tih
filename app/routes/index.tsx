@@ -3,13 +3,22 @@ import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import banner from "~/assets/img/banner.png?url";
-import { InputSearch } from "~/components/input-search";
+import {
+	Command,
+	CommandEmpty,
+	CommandInput,
+	CommandItem,
+	CommandList,
+	CommandLoading,
+	CommandSeparator,
+} from "~/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { useDebounce } from "~/hooks/use-debounce";
 import { categoriesQueryOptions } from "~/lib/api/categories";
 import { setSearchCompaniesByTermQueryOptions } from "~/lib/api/search";
 import { slugify } from "~/utils/slug";
 
-export const Route = createFileRoute("/_public/")({
+export const Route = createFileRoute("/")({
 	component: Home,
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(categoriesQueryOptions);
@@ -18,9 +27,16 @@ export const Route = createFileRoute("/_public/")({
 
 function Home() {
 	const categoriesQuery = useSuspenseQuery(categoriesQueryOptions);
+	const navigate = Route.useNavigate();
 	const [searchTerm, setSearchTerm] = useState("");
 	const debouncedSearchTerm = useDebounce(searchTerm, 1000);
-	const { data: companies } = useQuery(setSearchCompaniesByTermQueryOptions(debouncedSearchTerm));
+	const { data: companies, isFetching } = useQuery(
+		setSearchCompaniesByTermQueryOptions(debouncedSearchTerm),
+	);
+
+	function onSelect(slug: string) {
+		navigate({ to: "/entreprises/$slug", params: { slug } });
+	}
 
 	return (
 		<main className="px-4 py-6 max-w-4xl mx-auto">
@@ -35,24 +51,42 @@ function Home() {
 			</div>
 
 			<div className="mt-12 mx-auto flex flex-col gap-4 items-center w-[min(100%,500px)]">
-				<InputSearch value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-				{companies?.length && searchTerm ? (
-					<ul className="flex flex-col gap-4 w-full border border-gray-400 rounded-sm">
-						{companies?.map((company) => (
-							<li key={company.id} className="w-full">
-								<Link
-									to="/entreprises/$slug"
-									params={{ slug: company.slug }}
-									className="px-4 py-2 w-full inline-flex hover:bg-gray-100"
-								>
-									{company.name}
-								</Link>
-							</li>
-						))}
-					</ul>
-				) : (
-					searchTerm && <p className="text-sm font-light">Aucune entreprise trouvée</p>
-				)}
+				<Popover>
+					<PopoverTrigger asChild>
+						<button
+							type="button"
+							className="text-start text-sm font-light px-4 border border-gray-400 rounded-md shadow-sm bg-white w-full h-12 focus-within:outline focus-within:outline-blue-500"
+						>
+							Rechercher un nom ou une activité...
+						</button>
+					</PopoverTrigger>
+
+					<PopoverContent>
+						<Command shouldFilter={false} className="py-2">
+							<CommandInput
+								value={searchTerm}
+								onValueChange={(value) => setSearchTerm(value)}
+								placeholder="Entrez un nom ou une activité..."
+							/>
+
+							<CommandSeparator alwaysRender />
+
+							<CommandList>
+								{!searchTerm && <CommandEmpty>Entrez au moins 3 caractères...</CommandEmpty>}
+								{searchTerm && isFetching && <CommandLoading>Loading...</CommandLoading>}
+								{searchTerm.length >= 3 && !isFetching && (
+									<CommandEmpty>Aucune entreprise trouvée</CommandEmpty>
+								)}
+
+								{companies?.map((company) => (
+									<CommandItem key={company.id} onSelect={() => onSelect(company.slug)}>
+										{company.name}
+									</CommandItem>
+								))}
+							</CommandList>
+						</Command>
+					</PopoverContent>
+				</Popover>
 			</div>
 
 			<div role="separator" tabIndex={-1} className="h-px w-1/3 bg-gray-400 my-12 mx-auto" />
