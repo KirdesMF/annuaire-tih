@@ -114,8 +114,8 @@ function RouteComponent() {
 									</Link>
 
 									<Link
-										to="/compte/entreprises/edit"
-										search={{ id: company.id }}
+										to="/compte/entreprises/$slug/edit"
+										params={{ slug: company.slug }}
 										className="text-xs px-2 py-1 rounded-sm border border-blue-400 text-blue-400"
 									>
 										Modifier

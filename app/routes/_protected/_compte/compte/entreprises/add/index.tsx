@@ -23,7 +23,7 @@ import { PlusIcon } from "~/components/icons/plus";
 import { PhoneIcon } from "~/components/icons/phone";
 import { GlobeIcon } from "~/components/icons/globe";
 import { EmailIcon } from "~/components/icons/email";
-import { usePreviewStore } from "~/lib/store/preview.store";
+import { useAddPreviewStore } from "~/lib/store/preview.store";
 import { useImagePreview } from "~/hooks/use-image-preview";
 
 export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add/")({
@@ -49,8 +49,8 @@ function RouteComponent() {
 	const { mutate, isPending } = useMutation({ mutationFn: useServerFn(addCompany) });
 
 	const formRef = useRef<HTMLFormElement>(null);
-	const preview = usePreviewStore((state) => state.preview);
-	const setPreview = usePreviewStore((state) => state.setPreview);
+	const preview = useAddPreviewStore((state) => state.preview);
+	const setPreview = useAddPreviewStore((state) => state.setPreview);
 
 	const [selectedCategories, setSelectedCategories] = useState(
 		new Set<string>(preview?.categories),
@@ -92,10 +92,13 @@ function RouteComponent() {
 
 	function onPreview() {
 		const formData = new FormData(formRef.current as HTMLFormElement);
+
+		// append the selected categories to the form data
 		for (const categoryId of selectedCategories) {
 			formData.append("categories", categoryId);
 		}
 
+		// decode the form data
 		const decodedFormData = decode(formData, {
 			files: ["logo", "gallery"],
 			arrays: ["categories", "gallery"],
@@ -127,26 +130,6 @@ function RouteComponent() {
 			formData.append("categories", categoryId);
 		}
 
-		const decodedFormData = decode(formData, {
-			files: ["logo", "gallery"],
-			arrays: ["categories", "gallery"],
-			booleans: ["rqth"],
-		});
-
-		const result = v.safeParse(AddCompanySchema, decodedFormData, { abortPipeEarly: true });
-
-		if (!result.success) {
-			toast.error(
-				<div>
-					{result.issues.map((issue, idx) => (
-						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-						<p key={idx}>{issue.message}</p>
-					))}
-				</div>,
-			);
-			return;
-		}
-
 		mutate(
 			{ data: formData },
 			{
@@ -154,6 +137,10 @@ function RouteComponent() {
 					context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
 					toast.success("Entreprise créée avec succès");
 					navigate({ to: "/compte/entreprises" });
+				},
+				onError: (error) => {
+					console.error(error);
+					toast.error(error.message);
 				},
 			},
 		);
@@ -262,6 +249,7 @@ function RouteComponent() {
 								rows={4}
 								placeholder="Entrer une description de mon entreprise..."
 								onChange={onDescriptionChange}
+								defaultValue={preview?.description}
 							/>
 						</Label>
 						<span className="text-xs text-gray-500 justify-self-end">{descriptionLength}/1500</span>
@@ -274,6 +262,7 @@ function RouteComponent() {
 							name="business_owner"
 							placeholder="Ex: Nom Prénom"
 							className="placeholder:text-xs"
+							defaultValue={preview?.business_owner}
 						/>
 					</Label>
 
@@ -284,6 +273,7 @@ function RouteComponent() {
 							name="service_area"
 							placeholder="Ex: Paris, Lyon, Marseille"
 							className="placeholder:text-xs"
+							defaultValue={preview?.service_area}
 						/>
 					</Label>
 
@@ -294,6 +284,7 @@ function RouteComponent() {
 							name="subdomain"
 							placeholder="Ex: monentreprise"
 							className="placeholder:text-xs"
+							defaultValue={preview?.subdomain}
 						/>
 					</Label>
 
@@ -306,6 +297,7 @@ function RouteComponent() {
 								name="email"
 								placeholder="Ex: contact@monentreprise.com"
 								className="placeholder:text-xs outline-none w-full"
+								defaultValue={preview?.email}
 							/>
 						</div>
 					</Label>
@@ -319,6 +311,7 @@ function RouteComponent() {
 								name="phone"
 								placeholder="Ex: 06 06 06 06 06"
 								className="placeholder:text-xs outline-none w-full"
+								defaultValue={preview?.phone}
 							/>
 						</div>
 					</Label>
@@ -332,6 +325,7 @@ function RouteComponent() {
 								name="website"
 								placeholder="Ex: https://www.monentreprise.com"
 								className="placeholder:text-xs outline-none w-full"
+								defaultValue={preview?.website}
 							/>
 						</div>
 					</Label>
@@ -349,6 +343,7 @@ function RouteComponent() {
 									name="linkedin"
 									placeholder="Ex: https://www.linkedin.com/company/monentreprise"
 									className="placeholder:text-xs outline-none w-full"
+									defaultValue={preview?.linkedin}
 								/>
 							</div>
 						</Label>
@@ -361,6 +356,7 @@ function RouteComponent() {
 									name="facebook"
 									placeholder="Ex: https://www.facebook.com/monentreprise"
 									className="placeholder:text-xs outline-none w-full"
+									defaultValue={preview?.facebook}
 								/>
 							</div>
 						</Label>
@@ -373,6 +369,7 @@ function RouteComponent() {
 									name="instagram"
 									placeholder="Ex: https://www.instagram.com/monentreprise"
 									className="placeholder:text-xs outline-none w-full"
+									defaultValue={preview?.instagram}
 								/>
 							</div>
 						</Label>
@@ -385,6 +382,7 @@ function RouteComponent() {
 									name="calendly"
 									placeholder="Ex: https://calendly.com/monentreprise"
 									className="placeholder:text-xs outline-none w-full"
+									defaultValue={preview?.calendly}
 								/>
 							</div>
 						</Label>
@@ -400,7 +398,7 @@ function RouteComponent() {
 									type="radio"
 									name="work_mode"
 									value="not_specified"
-									defaultChecked
+									defaultChecked={preview?.work_mode === "not_specified"}
 									className="size-4 accent-gray-600"
 								/>
 								<span className="text-xs">Non spécifié</span>
@@ -410,6 +408,7 @@ function RouteComponent() {
 									type="radio"
 									name="work_mode"
 									value="remote"
+									defaultChecked={preview?.work_mode === "remote"}
 									className="size-4 accent-gray-600"
 								/>
 								<span className="text-xs">À distance</span>
@@ -419,6 +418,7 @@ function RouteComponent() {
 									type="radio"
 									name="work_mode"
 									value="onsite"
+									defaultChecked={preview?.work_mode === "onsite"}
 									className="size-4 accent-gray-600"
 								/>
 								<span className="text-xs">Sur site</span>
@@ -428,6 +428,7 @@ function RouteComponent() {
 									type="radio"
 									name="work_mode"
 									value="hybrid"
+									defaultChecked={preview?.work_mode === "hybrid"}
 									className="size-4 accent-gray-600"
 								/>
 								<span className="text-xs">Hybride</span>
@@ -437,11 +438,23 @@ function RouteComponent() {
 						<fieldset className="flex gap-2">
 							<legend className="text-xs font-medium mb-2">RQTH</legend>
 							<Label className="flex items-center gap-1">
-								<Input type="radio" name="rqth" value="true" className="size-4 accent-gray-600" />
+								<Input
+									type="radio"
+									name="rqth"
+									value="true"
+									defaultChecked={preview?.rqth}
+									className="size-4 accent-gray-600"
+								/>
 								<span className="text-xs">Oui</span>
 							</Label>
 							<Label className="flex items-center gap-1">
-								<Input type="radio" name="rqth" value="false" className="size-4 accent-gray-600" />
+								<Input
+									type="radio"
+									name="rqth"
+									value="false"
+									defaultChecked={!preview?.rqth}
+									className="size-4 accent-gray-600"
+								/>
 								<span className="text-xs">Non</span>
 							</Label>
 						</fieldset>

@@ -10,17 +10,15 @@ const SearchSchema = v.object({
 	id: v.string(),
 });
 
-export const Route = createFileRoute("/_public/categories/$slug")({
+export const Route = createFileRoute("/(public)/categories/$slug")({
 	validateSearch: (search) => v.parse(SearchSchema, search),
 	loaderDeps: ({ search }) => ({
 		categoryId: search.id,
 	}),
 	loader: async ({ context, deps: { categoryId } }) => {
-		const companies = await context.queryClient.ensureQueryData(
+		await context.queryClient.ensureQueryData(
 			setAllActiveCompaniesByCategoryQueryOptions(categoryId),
 		);
-
-		return companies;
 	},
 	component: RouteComponent,
 });

@@ -16,14 +16,14 @@ import { LinkedinIcon } from "~/components/icons/linkedin";
 import { PhoneIcon } from "~/components/icons/phone";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import { categoriesQueryOptions } from "~/lib/api/categories";
-import { addCompany } from "~/lib/api/companies";
-import { useAddPreviewStore } from "~/lib/store/preview.store";
+import { updateCompany } from "~/lib/api/companies";
+import { useUpdatePreviewStore } from "~/lib/store/preview.store";
 import type { Entries } from "~/utils/types";
 
-export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add/preview")({
+export const Route = createFileRoute("/_protected/_compte/compte/entreprises/$slug/preview")({
 	component: RouteComponent,
 	beforeLoad: () => {
-		const preview = useAddPreviewStore.getState().preview;
+		const preview = useUpdatePreviewStore.getState().preview;
 		if (!preview) {
 			throw redirect({ to: "/compte/entreprises/add" });
 		}
@@ -52,10 +52,11 @@ const SOCIAL_MEDIA_ICONS = {
 function RouteComponent() {
 	const { preview, queryClient } = Route.useRouteContext();
 	const { categories } = Route.useLoaderData();
+	const params = Route.useParams();
 	const navigate = Route.useNavigate();
 	const { imagePreviews, readImage } = useImagePreview();
 
-	const { mutate, isPending } = useMutation({ mutationFn: useServerFn(addCompany) });
+	const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompany) });
 
 	useEffect(() => {
 		if (preview.logo) {
@@ -86,7 +87,7 @@ function RouteComponent() {
 			}
 		}
 
-		for (const categoryId of preview.categories) {
+		for (const categoryId of preview?.categories ?? []) {
 			formData.append("categories", categoryId);
 		}
 
@@ -106,8 +107,9 @@ function RouteComponent() {
 			{ data: formData },
 			{
 				onSuccess: () => {
-					toast.success("Entreprise créée avec succès");
+					toast.success("Entreprise mise à jour avec succès");
 					queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
+					queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
 					navigate({ to: "/compte/entreprises" });
 				},
 			},
@@ -121,13 +123,13 @@ function RouteComponent() {
 			</Link>
 			<div className="container flex justify-between gap-4 border border-gray-300 p-6 rounded-sm">
 				<div className="flex flex-col gap-2">
-					<CompanyLogo url={imagePreviews.logo} name={preview.name} size="lg" />
+					<CompanyLogo url={imagePreviews.logo} name={preview.name ?? ""} size="lg" />
 					<div className="flex items-center gap-2">
 						<h1 className="text-2xl font-bold">{preview.name}</h1>
 						<CopyButton>{preview.siret}</CopyButton>
 					</div>
 
-					{preview.categories.length ? (
+					{preview.categories?.length ? (
 						<ul className="flex flex-wrap gap-2">
 							{preview.categories?.map((categoryId) => {
 								const category = categories.find((category) => category.id === categoryId);
@@ -246,7 +248,8 @@ function RouteComponent() {
 
 			<div className="container flex justify-end gap-2">
 				<Link
-					to="/compte/entreprises/add"
+					to="/compte/entreprises/$slug/edit"
+					params={{ slug: params.slug }}
 					className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs"
 				>
 					Retour
