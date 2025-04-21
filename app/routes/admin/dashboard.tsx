@@ -4,25 +4,27 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { TrashIcon } from "~/components/icons/trash";
 import type { CompanyStatus } from "~/db/schema/companies";
-import { allCompaniesQueryOptions, deleteCompany, updateCompanyStatus } from "~/lib/api/companies";
-import { allUsersQueryOptions } from "~/lib/api/user";
+import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
+import { updateCompanyStatus } from "~/lib/api/companies/mutations/update-company";
+import { companiesQuery } from "~/lib/api/companies/queries/get-companies";
+import { usersQuery } from "~/lib/api/users/queries/get-users";
 import { COMPANY_STATUSES } from "~/utils/constantes";
 
-export const Route = createFileRoute("/_admin/admin/dashboard")({
+export const Route = createFileRoute("/admin/dashboard")({
 	component: RouteComponent,
 	pendingComponent: () => <div>Loading...</div>,
 	loader: async ({ context }) => {
 		await Promise.all([
-			context.queryClient.prefetchQuery(allCompaniesQueryOptions),
-			context.queryClient.prefetchQuery(allUsersQueryOptions),
+			context.queryClient.prefetchQuery(companiesQuery()),
+			context.queryClient.prefetchQuery(usersQuery),
 		]);
 	},
 });
 
 function RouteComponent() {
 	const context = Route.useRouteContext();
-	const { data: companies } = useSuspenseQuery(allCompaniesQueryOptions);
-	const { data: users } = useSuspenseQuery(allUsersQueryOptions);
+	const { data: companies } = useSuspenseQuery(companiesQuery());
+	const { data: users } = useSuspenseQuery(usersQuery);
 	const { mutate: update } = useMutation({ mutationFn: useServerFn(updateCompanyStatus) });
 	const { mutate: remove } = useMutation({ mutationFn: useServerFn(deleteCompany) });
 

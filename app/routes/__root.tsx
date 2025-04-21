@@ -1,7 +1,13 @@
 // app/routes/__root.tsx
 import type { ReactNode } from "react";
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
-import { Outlet, HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
+import {
+	Outlet,
+	HeadContent,
+	Scripts,
+	createRootRouteWithContext,
+	redirect,
+} from "@tanstack/react-router";
 import { Header } from "~/components/header";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createServerFn } from "@tanstack/react-start";
@@ -12,11 +18,9 @@ import appCSS from "~/styles/app.css?url";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
 	const request = getWebRequest();
-
 	if (!request) return null;
 
-	const session = await auth.api.getSession({ headers: request.headers });
-	return session;
+	return await auth.api.getSession({ headers: request.headers });
 });
 
 const sessionQueryOptions = queryOptions({
@@ -42,7 +46,7 @@ export const Route = createRootRouteWithContext<RootRouterContext>()({
 	}),
 	beforeLoad: async ({ context }) => {
 		const session = await context.queryClient.fetchQuery(sessionQueryOptions);
-		return { session };
+		return { user: session?.user };
 	},
 	notFoundComponent: () => <div>Not found</div>,
 	component: RootComponent,
@@ -57,7 +61,7 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
-	const { session, queryClient } = Route.useRouteContext();
+	const { user, queryClient } = Route.useRouteContext();
 
 	return (
 		<html lang="fr">
@@ -65,7 +69,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
 				<HeadContent />
 			</head>
 			<body className="font-sans text-gray-700 isolate">
-				<Header session={session} queryClient={queryClient} />
+				<Header user={user} queryClient={queryClient} />
 				{children}
 				<Toaster />
 				<ReactQueryDevtools buttonPosition="bottom-left" />

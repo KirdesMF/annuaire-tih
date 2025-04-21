@@ -40,7 +40,7 @@ export const companiesTable = pgTable(
 		phone: varchar("phone", { length: 24 }),
 		rqth: boolean("rqth").notNull().default(false),
 		logo: jsonb("logo").$type<CompanyImage | null>(),
-		gallery: jsonb("gallery").$type<CompanyGallery | null>(),
+		gallery: jsonb("gallery").$type<CompanyGallery>().notNull().default([]),
 		social_media: jsonb("social_media").$type<CompanySocialMedia>().notNull().default({
 			facebook: "",
 			calendly: "",

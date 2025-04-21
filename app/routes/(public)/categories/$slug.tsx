@@ -4,7 +4,7 @@ import * as v from "valibot";
 import { SearchIcon } from "~/components/icons/search";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
-import { setAllActiveCompaniesByCategoryQueryOptions } from "~/lib/api/companies";
+import { companiesByCategoryQuery } from "~/lib/api/companies/queries/get-companies-by-category";
 
 const SearchSchema = v.object({
 	id: v.string(),
@@ -17,7 +17,7 @@ export const Route = createFileRoute("/(public)/categories/$slug")({
 	}),
 	loader: async ({ context, deps: { categoryId } }) => {
 		await context.queryClient.ensureQueryData(
-			setAllActiveCompaniesByCategoryQueryOptions(categoryId),
+			companiesByCategoryQuery({ categoryId, status: "active" }),
 		);
 	},
 	component: RouteComponent,
@@ -26,7 +26,9 @@ export const Route = createFileRoute("/(public)/categories/$slug")({
 function RouteComponent() {
 	const slug = Route.useParams().slug;
 	const { id } = Route.useSearch();
-	const { data } = useSuspenseQuery(setAllActiveCompaniesByCategoryQueryOptions(id));
+	const { data: companies } = useSuspenseQuery(
+		companiesByCategoryQuery({ categoryId: id, status: "active" }),
+	);
 
 	return (
 		<main>
@@ -53,11 +55,11 @@ function RouteComponent() {
 					</Label>
 				</div>
 
-				{data?.companies.length === 0 ? (
+				{companies.length === 0 ? (
 					<div>No companies found</div>
 				) : (
 					<ul>
-						{data?.companies.map((company) => (
+						{companies.map((company) => (
 							<li
 								key={company.id}
 								className="flex flex-col gap-2 border border-gray-200 rounded-md p-4"

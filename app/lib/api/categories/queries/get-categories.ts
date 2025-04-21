@@ -6,8 +6,13 @@ import { queryOptions } from "@tanstack/react-query";
 export const getCategories = createServerFn({
 	method: "GET",
 }).handler(async () => {
-	const categories = await db.select().from(categoriesTable);
-	return categories;
+	try {
+		const categories = await db.select().from(categoriesTable);
+		return categories;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
 });
 
 export const categoriesQueryOptions = queryOptions({

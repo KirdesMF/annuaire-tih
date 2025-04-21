@@ -13,21 +13,20 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "~/components/ui/dialog";
-import { deleteCompany } from "~/lib/api/companies";
-import { userCompaniesQueryOptions } from "~/lib/api/user";
+import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
+import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 import { COMPANY_STATUSES } from "~/utils/constantes";
 
-export const Route = createFileRoute("/_protected/_compte/compte/entreprises/")({
+export const Route = createFileRoute("/_protected/compte/entreprises/")({
 	loader: async ({ context }) => {
-		const companies = await context.queryClient.ensureQueryData(userCompaniesQueryOptions);
-		return companies;
+		await context.queryClient.ensureQueryData(userCompaniesQuery(context.user.id));
 	},
 	component: RouteComponent,
 });
 
 function RouteComponent() {
 	const context = Route.useRouteContext();
-	const companiesQuery = useSuspenseQuery(userCompaniesQueryOptions);
+	const companiesQuery = useSuspenseQuery(userCompaniesQuery(context.user.id));
 	const { mutate, isPending } = useMutation({ mutationFn: deleteCompany });
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [companyId, setCompanyId] = useState<string | null>(null);
@@ -62,7 +61,7 @@ function RouteComponent() {
 			<div className="container px-4 py-6">
 				<div className="flex flex-col items-center justify-center gap-4">
 					<h1 className="text-2xl font-bold">Vous n'avez encore d'entreprise référencée</h1>
-					<Link to="/compte/entreprises/add" className="text-sm border px-2 py-1 rounded-sm">
+					<Link to="/compte/entreprises/create" className="text-sm border px-2 py-1 rounded-sm">
 						Créer une entreprise
 					</Link>
 				</div>
@@ -114,7 +113,7 @@ function RouteComponent() {
 									</Link>
 
 									<Link
-										to="/compte/entreprises/$slug/edit"
+										to="/compte/entreprises/$slug/edit/infos"
 										params={{ slug: company.slug }}
 										className="text-xs px-2 py-1 rounded-sm border border-blue-400 text-blue-400"
 									>
@@ -191,7 +190,7 @@ function CardCreateCompany() {
 	return (
 		<article className="border border-gray-300 p-5 rounded-sm">
 			<Link
-				to="/compte/entreprises/add"
+				to="/compte/entreprises/create"
 				className="text-sm border px-2 py-1 rounded-sm flex items-center gap-1.5 max-w-fit"
 			>
 				<PlusIcon className="size-4" />

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { companyBySlugQueryOptions } from "~/lib/api/companies";
+import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import * as v from "valibot";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { CopyButton } from "~/components/copy-button";
@@ -20,15 +20,7 @@ export const Route = createFileRoute("/(public)/entreprises/$slug")({
 	pendingComponent: () => <div>Loading...</div>,
 	errorComponent: () => <div>Error</div>,
 	loader: async ({ context, params }) => {
-		const company = await context.queryClient.ensureQueryData(
-			companyBySlugQueryOptions(params.slug),
-		);
-		const session = context.session;
-
-		return {
-			company,
-			session,
-		};
+		await context.queryClient.ensureQueryData(companyBySlugQuery(params.slug));
 	},
 });
 
@@ -48,8 +40,8 @@ const SOCIAL_MEDIA_ICONS = {
 
 function RouteComponent() {
 	const params = Route.useParams();
-	const { data } = useSuspenseQuery(companyBySlugQueryOptions(params.slug));
-	const { session } = Route.useLoaderData();
+	const context = Route.useRouteContext();
+	const { data } = useSuspenseQuery(companyBySlugQuery(params.slug));
 
 	if (!data) return <div>Company not found</div>;
 
@@ -63,9 +55,9 @@ function RouteComponent() {
 					<div className="flex items-center gap-2">
 						<h1 className="text-2xl font-bold">{data.name}</h1>
 						<CopyButton>{data.siret}</CopyButton>
-						{session?.user?.id === data.user_id && (
+						{context.user?.id === data.user_id && (
 							<Link
-								to={"/compte/entreprises/$slug/edit"}
+								to={"/compte/entreprises/$slug/edit/infos"}
 								params={{ slug: params.slug }}
 								className="border border-gray-300 px-2 py-1 rounded-sm text-xs h-min"
 							>

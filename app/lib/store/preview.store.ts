@@ -1,22 +1,26 @@
 import { create } from "zustand";
-import type { AddCompanyData, UpdateCompanyData } from "../validator/company.schema";
+import type {
+	CreateCompanyData,
+	UpdateCompanyInfosData,
+	UpdateCompanyMediaData,
+} from "../validator/company.schema";
 
 type AddPreviewStore = {
-	preview: AddCompanyData | null;
-	setPreview: (preview: AddCompanyData) => void;
+	preview: CreateCompanyData | null;
+	setPreview: (preview: CreateCompanyData) => void;
 };
 
 export const useAddPreviewStore = create<AddPreviewStore>((set) => ({
 	preview: null,
-	setPreview: (preview: AddCompanyData) => set({ preview }),
+	setPreview: (preview: CreateCompanyData) => set({ preview }),
 }));
 
 type UpdatePreviewStore = {
-	preview: UpdateCompanyData | null;
-	setPreview: (preview: UpdateCompanyData) => void;
+	preview: (UpdateCompanyInfosData & UpdateCompanyMediaData) | null;
+	setPreview: (preview: UpdateCompanyInfosData & UpdateCompanyMediaData) => void;
 };
 
 export const useUpdatePreviewStore = create<UpdatePreviewStore>((set) => ({
 	preview: null,
-	setPreview: (preview: UpdateCompanyData) => set({ preview }),
+	setPreview: (preview: UpdateCompanyInfosData & UpdateCompanyMediaData) => set({ preview }),
 }));

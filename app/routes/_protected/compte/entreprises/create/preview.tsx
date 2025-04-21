@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Separator } from "radix-ui";
@@ -15,23 +15,22 @@ import { LinkChainIcon } from "~/components/icons/link-chain";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import { PhoneIcon } from "~/components/icons/phone";
 import { useImagePreview } from "~/hooks/use-image-preview";
-import { categoriesQueryOptions } from "~/lib/api/categories";
-import { updateCompany } from "~/lib/api/companies";
-import { useUpdatePreviewStore } from "~/lib/store/preview.store";
+import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
+import { createCompany } from "~/lib/api/companies/mutations/create-company";
+import { useAddPreviewStore } from "~/lib/store/preview.store";
 import type { Entries } from "~/utils/types";
 
-export const Route = createFileRoute("/_protected/_compte/compte/entreprises/$slug/preview")({
+export const Route = createFileRoute("/_protected/compte/entreprises/create/preview")({
 	component: RouteComponent,
 	beforeLoad: () => {
-		const preview = useUpdatePreviewStore.getState().preview;
+		const preview = useAddPreviewStore.getState().preview;
 		if (!preview) {
-			throw redirect({ to: "/compte/entreprises/add" });
+			throw redirect({ to: "/compte/entreprises/create" });
 		}
 		return { preview };
 	},
 	loader: async ({ context }) => {
-		const categories = await context.queryClient.ensureQueryData(categoriesQueryOptions);
-		return { categories };
+		await context.queryClient.ensureQueryData(categoriesQueryOptions);
 	},
 });
 
@@ -51,12 +50,11 @@ const SOCIAL_MEDIA_ICONS = {
 
 function RouteComponent() {
 	const { preview, queryClient } = Route.useRouteContext();
-	const { categories } = Route.useLoaderData();
-	const params = Route.useParams();
+	const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
 	const navigate = Route.useNavigate();
 	const { imagePreviews, readImage } = useImagePreview();
 
-	const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompany) });
+	const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
 
 	useEffect(() => {
 		if (preview.logo) {
@@ -71,10 +69,10 @@ function RouteComponent() {
 	}, [preview.logo, preview.gallery, readImage]);
 
 	const socialMedia = {
-		facebook: preview.facebook,
-		instagram: preview.instagram,
-		linkedin: preview.linkedin,
-		calendly: preview.calendly,
+		facebook: preview.social_media.facebook,
+		instagram: preview.social_media.instagram,
+		linkedin: preview.social_media.linkedin,
+		calendly: preview.social_media.calendly,
 	};
 
 	const isSocialMediaEmpty = Object.values(socialMedia).every((value) => value === "");
@@ -87,7 +85,7 @@ function RouteComponent() {
 			}
 		}
 
-		for (const categoryId of preview?.categories ?? []) {
+		for (const categoryId of preview.categories) {
 			formData.append("categories", categoryId);
 		}
 
@@ -107,9 +105,8 @@ function RouteComponent() {
 			{ data: formData },
 			{
 				onSuccess: () => {
-					toast.success("Entreprise mise à jour avec succès");
+					toast.success("Entreprise créée avec succès");
 					queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
-					queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
 					navigate({ to: "/compte/entreprises" });
 				},
 			},
@@ -118,18 +115,18 @@ function RouteComponent() {
 
 	return (
 		<main className="px-4 py-8 grid gap-4">
-			<Link to="/compte/entreprises/add" className="text-sm text-gray-500">
+			<Link to="/compte/entreprises/create" className="text-sm text-gray-500">
 				Retour
 			</Link>
 			<div className="container flex justify-between gap-4 border border-gray-300 p-6 rounded-sm">
 				<div className="flex flex-col gap-2">
-					<CompanyLogo url={imagePreviews.logo} name={preview.name ?? ""} size="lg" />
+					<CompanyLogo url={imagePreviews.logo} name={preview.name} size="lg" />
 					<div className="flex items-center gap-2">
 						<h1 className="text-2xl font-bold">{preview.name}</h1>
 						<CopyButton>{preview.siret}</CopyButton>
 					</div>
 
-					{preview.categories?.length ? (
+					{preview.categories.length ? (
 						<ul className="flex flex-wrap gap-2">
 							{preview.categories?.map((categoryId) => {
 								const category = categories.find((category) => category.id === categoryId);
@@ -248,8 +245,7 @@ function RouteComponent() {
 
 			<div className="container flex justify-end gap-2">
 				<Link
-					to="/compte/entreprises/$slug/edit"
-					params={{ slug: params.slug }}
+					to="/compte/entreprises/create"
 					className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs"
 				>
 					Retour

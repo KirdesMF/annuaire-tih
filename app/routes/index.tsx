@@ -14,8 +14,8 @@ import {
 } from "~/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { useDebounce } from "~/hooks/use-debounce";
-import { categoriesQueryOptions } from "~/lib/api/categories";
-import { setSearchCompaniesByTermQueryOptions } from "~/lib/api/search";
+import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
+import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
 import { slugify } from "~/utils/slug";
 
 export const Route = createFileRoute("/")({
@@ -26,13 +26,11 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-	const categoriesQuery = useSuspenseQuery(categoriesQueryOptions);
 	const navigate = Route.useNavigate();
+	const categoriesQuery = useSuspenseQuery(categoriesQueryOptions);
 	const [searchTerm, setSearchTerm] = useState("");
 	const debouncedSearchTerm = useDebounce(searchTerm, 1000);
-	const { data: companies, isFetching } = useQuery(
-		setSearchCompaniesByTermQueryOptions(debouncedSearchTerm),
-	);
+	const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
 
 	function onSelect(slug: string) {
 		navigate({ to: "/entreprises/$slug", params: { slug } });
