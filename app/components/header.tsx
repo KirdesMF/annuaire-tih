@@ -1,6 +1,5 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { LinkedinIcon } from "./icons/linkedin";
-import { authClient } from "~/lib/auth/auth.client";
 import { Avatar, DropdownMenu } from "radix-ui";
 import { LogoutIcon } from "./icons/logout";
 import { SettingsAccountIcon } from "./icons/settings-account";
@@ -14,6 +13,7 @@ import { toast } from "sonner";
 import { auth, type AuthSession } from "~/lib/auth/auth.server";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
+import type { User } from "better-auth";
 
 const LINKS = [
 	{ label: "Qui sommes-nous ?", to: "/about" },
@@ -31,9 +31,9 @@ const signOutFn = createServerFn({ method: "POST" }).handler(async () => {
 });
 
 export function Header({
-	session,
+	user,
 	queryClient,
-}: { session: AuthSession | null; queryClient: QueryClient }) {
+}: { user: User | undefined; queryClient: QueryClient }) {
 	return (
 		<header className="px-16 py-1.5 border-b border-gray-200 backdrop-blur-sm">
 			<nav className="flex items-center justify-between">
@@ -67,17 +67,17 @@ export function Header({
 						<LinkedinIcon className="size-5" />
 					</a>
 
-					<RegisterLink session={session} />
-					<LoginButton session={session} />
-					<LoggedUserMenu session={session} queryClient={queryClient} />
+					<RegisterLink user={user} />
+					<LoginButton user={user} />
+					<LoggedUserMenu user={user} queryClient={queryClient} />
 				</div>
 			</nav>
 		</header>
 	);
 }
 
-function RegisterLink({ session }: { session: AuthSession | null }) {
-	if (session) return null;
+function RegisterLink({ user }: { user: User | undefined }) {
+	if (user) return null;
 
 	return (
 		<Link to="/signup" className="text-xs px-2 py-1 rounded-sm border border-gray-400">
@@ -86,8 +86,8 @@ function RegisterLink({ session }: { session: AuthSession | null }) {
 	);
 }
 
-function LoginButton({ session }: { session: AuthSession | null }) {
-	if (session) return null;
+function LoginButton({ user }: { user: User | undefined }) {
+	if (user) return null;
 
 	return (
 		<Link
@@ -100,9 +100,9 @@ function LoginButton({ session }: { session: AuthSession | null }) {
 }
 
 function LoggedUserMenu({
-	session,
+	user,
 	queryClient,
-}: { session: AuthSession | null; queryClient: QueryClient }) {
+}: { user: User | undefined; queryClient: QueryClient }) {
 	const router = useRouter();
 	const [theme, setTheme] = useState("light");
 	const { isAdmin } = useAdminRole();
@@ -110,7 +110,7 @@ function LoggedUserMenu({
 		mutationFn: useServerFn(signOutFn),
 	});
 
-	if (!session) return null;
+	if (!user) return null;
 
 	async function onLogout() {
 		signOut(undefined, {
@@ -125,7 +125,7 @@ function LoggedUserMenu({
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger className="rounded-full cursor-pointer">
-				<AvatarUser session={session} />
+				<AvatarUser user={user} />
 			</DropdownMenu.Trigger>
 
 			<DropdownMenu.Portal>
@@ -135,8 +135,8 @@ function LoggedUserMenu({
 					className="bg-white border rounded-sm border-gray-200 min-w-64 overflow-hidden p-1 shadow-xs"
 				>
 					<div className="flex flex-col p-2">
-						<span className="text-sm">{session.user.name}</span>
-						<span className="truncate text-xs">{session.user.email}</span>
+						<span className="text-sm">{user.name}</span>
+						<span className="truncate text-xs">{user.email}</span>
 					</div>
 
 					<DropdownMenu.Separator className="h-px bg-gray-200 my-1 -mx-1" />
@@ -144,7 +144,7 @@ function LoggedUserMenu({
 					<DropdownMenu.Group>
 						<DropdownMenu.Item asChild>
 							<Link
-								to="/compte/entreprises/add"
+								to="/compte/entreprises/create"
 								className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none"
 							>
 								<AddIcon className="size-4" />
@@ -240,22 +240,18 @@ function LoggedUserMenu({
 	);
 }
 
-function AvatarUser({ session }: { session: AuthSession | null }) {
-	if (!session) return null;
+function AvatarUser({ user }: { user: User }) {
+	if (!user) return null;
 
-	const initials = session.user.name
+	const initials = user.name
 		?.split(" ")
 		.map((name) => name[0])
 		.join("");
 
-	if (session.user.image) {
+	if (user.image) {
 		return (
 			<Avatar.Root className="size-6 rounded-full">
-				<Avatar.Image
-					src={session.user.image}
-					alt={session.user.name}
-					className="size-full rounded-full"
-				/>
+				<Avatar.Image src={user.image} alt={user.name} className="size-full rounded-full" />
 				<Avatar.Fallback className="size-full leading-1">{initials}</Avatar.Fallback>
 			</Avatar.Root>
 		);

@@ -1,7 +1,20 @@
 import * as v from "valibot";
 import { COMPANY_WORK_MODES } from "~/db/schema/companies";
 
-export const AddCompanySchema = v.object({
+export const CompanyMediaSchema = v.object({
+	logo: v.optional(
+		v.pipe(
+			v.instance(File),
+			v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
+			v.maxSize(1024 * 1024 * 3, "La taille du fichier doit être inférieure à 3MB"),
+		),
+	),
+	gallery: v.optional(
+		v.pipe(v.array(v.instance(File)), v.maxLength(2, "Veuillez entrer au plus 2 images")),
+	),
+});
+
+export const CompanyInfosSchema = v.object({
 	name: v.pipe(
 		v.string(),
 		v.nonEmpty("Veuillez entrer le nom de l'entreprise"),
@@ -63,69 +76,60 @@ export const AddCompanySchema = v.object({
 	]),
 	work_mode: v.nullable(v.picklist(COMPANY_WORK_MODES)),
 	rqth: v.optional(v.boolean()),
-	logo: v.optional(
-		v.pipe(
-			v.instance(File),
-			v.mimeType(
-				["image/png", "image/jpeg", "image/jpg", "image/webp"],
-				"Veuillez entrer un fichier valide pour le logo",
+	social_media: v.object({
+		facebook: v.union([
+			v.literal(""),
+			v.pipe(
+				v.string(),
+				v.url("Veuillez entrer une url valide"),
+				v.startsWith("https://www.facebook.com/", "Veuillez entrer une url facebook valide"),
 			),
-			v.maxSize(1024 * 1024 * 3, "La taille du fichier doit être inférieure à 3MB"),
-		),
-	),
-	gallery: v.optional(
-		v.pipe(
-			v.array(
-				v.pipe(
-					v.instance(File),
-					v.mimeType(
-						["image/png", "image/jpeg", "image/jpg", "image/webp"],
-						"Veuillez entrer un fichier valide pour la galerie",
-					),
-					v.maxSize(1024 * 1024 * 2, "La taille du fichier doit être inférieure à 2MB"),
+		]),
+		instagram: v.union([
+			v.literal(""),
+			v.pipe(
+				v.string(),
+				v.url("Veuillez entrer une url valide"),
+				v.startsWith("https://www.instagram.com/", "Veuillez entrer une url instagram valide"),
+			),
+		]),
+		linkedin: v.union([
+			v.literal(""),
+			v.pipe(
+				v.string(),
+				v.url("Veuillez entrer une url valide"),
+				v.startsWith(
+					"https://www.linkedin.com/company/",
+					"Veuillez entrer une url linkedin valide",
 				),
 			),
-			v.maxLength(2, "Veuillez entrer au plus 2 images"),
-		),
-	),
-	facebook: v.union([
-		v.literal(""),
-		v.pipe(
-			v.string(),
-			v.url("Veuillez entrer une url valide"),
-			v.startsWith("https://www.facebook.com/", "Veuillez entrer une url facebook valide"),
-		),
-	]),
-	instagram: v.union([
-		v.literal(""),
-		v.pipe(
-			v.string(),
-			v.url("Veuillez entrer une url valide"),
-			v.startsWith("https://www.instagram.com/", "Veuillez entrer une url instagram valide"),
-		),
-	]),
-	linkedin: v.union([
-		v.literal(""),
-		v.pipe(
-			v.string(),
-			v.url("Veuillez entrer une url valide"),
-			v.startsWith("https://www.linkedin.com/company/", "Veuillez entrer une url linkedin valide"),
-		),
-	]),
-	calendly: v.union([
-		v.literal(""),
-		v.pipe(
-			v.string(),
-			v.url("Veuillez entrer une url valide"),
-			v.startsWith("https://calendly.com/", "Veuillez entrer une url calendly valide"),
-		),
-	]),
+		]),
+		calendly: v.union([
+			v.literal(""),
+			v.pipe(
+				v.string(),
+				v.url("Veuillez entrer une url valide"),
+				v.startsWith("https://calendly.com/", "Veuillez entrer une url calendly valide"),
+			),
+		]),
+	}),
 });
 
-export const UpdateCompanySchema = v.object({
+export const CreateCompanySchema = v.object({
+	...CompanyInfosSchema.entries,
+	...CompanyMediaSchema.entries,
+});
+
+export const UpdateCompanyInfosSchema = v.object({
 	companyId: v.string(),
-	...v.partial(AddCompanySchema).entries,
+	...CompanyInfosSchema.entries,
 });
 
-export type AddCompanyData = v.InferOutput<typeof AddCompanySchema>;
-export type UpdateCompanyData = v.InferOutput<typeof UpdateCompanySchema>;
+export const UpdateCompanyMediaSchema = v.object({
+	companyId: v.string(),
+	...CompanyMediaSchema.entries,
+});
+
+export type CreateCompanyData = v.InferOutput<typeof CreateCompanySchema>;
+export type UpdateCompanyInfosData = v.InferOutput<typeof UpdateCompanyInfosSchema>;
+export type UpdateCompanyMediaData = v.InferOutput<typeof UpdateCompanyMediaSchema>;

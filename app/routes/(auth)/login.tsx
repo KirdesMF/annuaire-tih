@@ -29,7 +29,7 @@ export const loginFn = createServerFn({ method: "POST" })
 export const Route = createFileRoute("/(auth)/login")({
 	component: RouteComponent,
 	beforeLoad: async ({ context }) => {
-		if (context.session?.user) {
+		if (context.user) {
 			throw redirect({ to: "/compte/entreprises" });
 		}
 	},

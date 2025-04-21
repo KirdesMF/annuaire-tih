@@ -4,7 +4,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { db } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 
-export const searchCompaniesByTerm = createServerFn({ method: "GET" })
+export const getCompaniesByTerm = createServerFn({ method: "GET" })
 	.validator((term: string) => term)
 	.handler(async ({ data: term }) => {
 		const searchWords = term
@@ -26,10 +26,10 @@ export const searchCompaniesByTerm = createServerFn({ method: "GET" })
 			);
 	});
 
-export function setSearchCompaniesByTermQueryOptions(term: string) {
+export function companiesByTermQuery(term: string) {
 	return queryOptions({
-		queryKey: ["search", "companies", term],
-		queryFn: ({ signal }) => searchCompaniesByTerm({ data: term, signal }),
+		queryKey: ["companies", term],
+		queryFn: ({ signal }) => getCompaniesByTerm({ data: term, signal }),
 		enabled: term.length >= 3,
 	});
 }

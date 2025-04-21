@@ -1,62 +1,62 @@
-import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { Command } from "cmdk";
 import { useRef, useState } from "react";
 import { CloseIcon } from "~/components/icons/close";
-import { categoriesQueryOptions } from "~/lib/api/categories";
-import { addCompany } from "~/lib/api/companies";
+import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import { toast } from "sonner";
 import { Popover, Separator } from "radix-ui";
-import * as v from "valibot";
-import { AddCompanySchema } from "~/lib/validator/company.schema";
 import { ChevronDownIcon } from "~/components/icons/chevron-down";
 import { decode } from "decode-formdata";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import { InstagramIcon } from "~/components/icons/instagram";
 import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facebook";
-import { userCompaniesQueryOptions } from "~/lib/api/user";
-import { PlusIcon } from "~/components/icons/plus";
 import { PhoneIcon } from "~/components/icons/phone";
 import { GlobeIcon } from "~/components/icons/globe";
 import { EmailIcon } from "~/components/icons/email";
-import { useAddPreviewStore } from "~/lib/store/preview.store";
-import { useImagePreview } from "~/hooks/use-image-preview";
+import { useUpdatePreviewStore } from "~/lib/store/preview.store";
+import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
+import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company";
 
-export const Route = createFileRoute("/_protected/_compte/compte/entreprises/add/")({
+export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/infos")({
+	loader: async ({ context, params }) => {
+		// seed the cache
+		await Promise.all([
+			context.queryClient.ensureQueryData(companyBySlugQuery(params.slug)),
+			context.queryClient.ensureQueryData(categoriesQueryOptions),
+		]);
+	},
 	component: RouteComponent,
-	beforeLoad: async ({ context }) => {
-		const userCompanies = await context.queryClient.ensureQueryData(userCompaniesQueryOptions);
-
-		if (userCompanies && userCompanies?.length >= 3) {
-			toast.error("Vous ne pouvez pas créer plus de 3 entreprises");
-			throw redirect({ to: "/compte/entreprises" });
-		}
-	},
-	loader: async ({ context }) => {
-		const categories = await context.queryClient.ensureQueryData(categoriesQueryOptions);
-		return { categories };
-	},
+	errorComponent: () => <div className="container px-4 py-6">Company not found</div>,
 });
 
 function RouteComponent() {
+	// Route
 	const context = Route.useRouteContext();
-	const { categories } = Route.useLoaderData();
+	const params = Route.useParams();
 	const navigate = Route.useNavigate();
-	const { mutate, isPending } = useMutation({ mutationFn: useServerFn(addCompany) });
 
 	const formRef = useRef<HTMLFormElement>(null);
-	const preview = useAddPreviewStore((state) => state.preview);
-	const setPreview = useAddPreviewStore((state) => state.setPreview);
+	const [categories, company] = useSuspenseQueries({
+		queries: [categoriesQueryOptions, companyBySlugQuery(params.slug)],
+	});
 
+	const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompanyInfos) });
+
+	// states
 	const [selectedCategories, setSelectedCategories] = useState(
-		new Set<string>(preview?.categories),
+		new Set<string>(company.data?.categories.map((c) => c?.id ?? "")),
 	);
-	const [descriptionLength, setDescriptionLength] = useState(0);
-	const { imagePreviews, readImage } = useImagePreview();
+	const [descriptionLength, setDescriptionLength] = useState(
+		company.data?.description?.length ?? 0,
+	);
+
+	// hooks and stores
+	const setPreview = useUpdatePreviewStore((state) => state.setPreview);
 
 	function onSelectCategory(categoryId: string) {
 		setSelectedCategories((prev) => {
@@ -80,70 +80,52 @@ function RouteComponent() {
 		setDescriptionLength(e.target.value.length);
 	}
 
-	function onImageChange(
-		e: React.ChangeEvent<HTMLInputElement>,
-		type: "logo" | "gallery",
-		index?: number,
-	) {
-		const file = e.target.files?.[0];
-		if (!file) return;
-		readImage({ type, file, index });
-	}
-
-	function onPreview() {
-		const formData = new FormData(formRef.current as HTMLFormElement);
-
-		// append the selected categories to the form data
-		for (const categoryId of selectedCategories) {
-			formData.append("categories", categoryId);
-		}
-
-		// decode the form data
-		const decodedFormData = decode(formData, {
-			files: ["logo", "gallery"],
-			arrays: ["categories", "gallery"],
-			booleans: ["rqth"],
-		});
-
-		const result = v.safeParse(AddCompanySchema, decodedFormData, { abortPipeEarly: true });
-
-		if (!result.success) {
-			toast.error(
-				<div>
-					{result.issues.map((issue, idx) => (
-						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-						<p key={idx}>{issue.message}</p>
-					))}
-				</div>,
-			);
-			return;
-		}
-
-		setPreview(result.output);
-		navigate({ to: "/compte/entreprises/add/preview" });
-	}
-
 	function onSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		const formData = new FormData(e.target as HTMLFormElement);
-		for (const categoryId of selectedCategories) {
-			formData.append("categories", categoryId);
-		}
+		const differentialFormData = getDifferentialFormData(formData);
 
 		mutate(
-			{ data: formData },
+			{ data: differentialFormData },
 			{
 				onSuccess: () => {
 					context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
-					toast.success("Entreprise créée avec succès");
+					context.queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
+
+					toast.success("Entreprise mise à jour avec succès");
 					navigate({ to: "/compte/entreprises" });
 				},
 				onError: (error) => {
-					console.error(error);
 					toast.error(error.message);
 				},
 			},
 		);
+	}
+
+	function getDifferentialFormData(formData: FormData) {
+		const differentialFormData = new FormData();
+		const formObject = Object.fromEntries(formData.entries());
+
+		for (const [key, value] of Object.entries(formObject)) {
+			const initialValue = company.data?.[key as keyof typeof company.data];
+			if (initialValue !== value) differentialFormData.append(key, value);
+		}
+
+		// categories
+		const initialCategories = new Set(company.data?.categories.map((c) => c?.id ?? ""));
+		const currentCategories = new Set(selectedCategories);
+		const hasDifferentCategoriesSize = initialCategories.size !== currentCategories.size;
+		const hasDifferentCategoriesId = Array.from(initialCategories).some(
+			(id) => !currentCategories.has(id),
+		);
+
+		if (hasDifferentCategoriesSize || hasDifferentCategoriesId) {
+			for (const [categoryId, index] of currentCategories) {
+				differentialFormData.append(`categories[${index}]`, categoryId);
+			}
+		}
+
+		return differentialFormData;
 	}
 
 	return (
@@ -152,6 +134,7 @@ function RouteComponent() {
 				<h1 className="text-2xl font-bold mb-4">Référencez votre entreprise</h1>
 
 				<form className="flex flex-col gap-3" ref={formRef} onSubmit={onSubmit}>
+					<input type="hidden" name="companyId" value={company.data?.id} />
 					<Label className="flex flex-col gap-1">
 						<span className="text-xs font-medium">Nom de l'entreprise *</span>
 						<Input
@@ -159,7 +142,7 @@ function RouteComponent() {
 							name="name"
 							placeholder="Ex: mon entreprise"
 							className="placeholder:text-xs"
-							defaultValue={preview?.name}
+							defaultValue={company.data?.name}
 						/>
 					</Label>
 
@@ -170,7 +153,7 @@ function RouteComponent() {
 							name="siret"
 							placeholder="Ex: 12345678901234"
 							className="placeholder:text-xs"
-							defaultValue={preview?.siret}
+							defaultValue={company.data?.siret}
 						/>
 					</Label>
 
@@ -195,7 +178,7 @@ function RouteComponent() {
 										/>
 										<Command.Separator className="h-px bg-gray-300" />
 										<Command.List className="max-h-60 overflow-y-auto">
-											{categories.map((category) => (
+											{categories.data?.map((category) => (
 												<Command.Item
 													key={category.id}
 													value={category.name}
@@ -215,8 +198,8 @@ function RouteComponent() {
 
 					{selectedCategories.size ? (
 						<ul className="flex flex-wrap gap-2">
-							{Array.from(selectedCategories.values()).map((categoryId) => {
-								const category = categories.find((category) => category.id === categoryId);
+							{Array.from(selectedCategories.values()).map((categoryId, idx) => {
+								const category = categories.data?.find((category) => category.id === categoryId);
 								if (!category) return null;
 
 								return (
@@ -224,6 +207,7 @@ function RouteComponent() {
 										key={category.id}
 										className="bg-gray-400 text-white px-2 py-1 rounded-sm text-xs flex items-center gap-2"
 									>
+										<input type="hidden" name={`categories[${idx}]`} value={category.id} />
 										<span className="max-w-[30ch] truncate">{category.name}</span>
 										<button
 											type="button"
@@ -249,7 +233,7 @@ function RouteComponent() {
 								rows={4}
 								placeholder="Entrer une description de mon entreprise..."
 								onChange={onDescriptionChange}
-								defaultValue={preview?.description}
+								defaultValue={company.data?.description ?? ""}
 							/>
 						</Label>
 						<span className="text-xs text-gray-500 justify-self-end">{descriptionLength}/1500</span>
@@ -262,7 +246,7 @@ function RouteComponent() {
 							name="business_owner"
 							placeholder="Ex: Nom Prénom"
 							className="placeholder:text-xs"
-							defaultValue={preview?.business_owner}
+							defaultValue={company.data?.business_owner ?? ""}
 						/>
 					</Label>
 
@@ -273,7 +257,7 @@ function RouteComponent() {
 							name="service_area"
 							placeholder="Ex: Paris, Lyon, Marseille"
 							className="placeholder:text-xs"
-							defaultValue={preview?.service_area}
+							defaultValue={company.data?.service_area ?? ""}
 						/>
 					</Label>
 
@@ -284,7 +268,7 @@ function RouteComponent() {
 							name="subdomain"
 							placeholder="Ex: monentreprise"
 							className="placeholder:text-xs"
-							defaultValue={preview?.subdomain}
+							defaultValue={company.data?.subdomain ?? ""}
 						/>
 					</Label>
 
@@ -297,7 +281,7 @@ function RouteComponent() {
 								name="email"
 								placeholder="Ex: contact@monentreprise.com"
 								className="placeholder:text-xs outline-none w-full"
-								defaultValue={preview?.email}
+								defaultValue={company.data?.email ?? ""}
 							/>
 						</div>
 					</Label>
@@ -311,7 +295,7 @@ function RouteComponent() {
 								name="phone"
 								placeholder="Ex: 06 06 06 06 06"
 								className="placeholder:text-xs outline-none w-full"
-								defaultValue={preview?.phone}
+								defaultValue={company.data?.phone ?? ""}
 							/>
 						</div>
 					</Label>
@@ -325,7 +309,7 @@ function RouteComponent() {
 								name="website"
 								placeholder="Ex: https://www.monentreprise.com"
 								className="placeholder:text-xs outline-none w-full"
-								defaultValue={preview?.website}
+								defaultValue={company.data?.website ?? ""}
 							/>
 						</div>
 					</Label>
@@ -340,10 +324,10 @@ function RouteComponent() {
 								<LinkedinIcon className="size-5 text-gray-500" />
 								<input
 									type="text"
-									name="linkedin"
+									name="social_media.linkedin"
 									placeholder="Ex: https://www.linkedin.com/company/monentreprise"
 									className="placeholder:text-xs outline-none w-full"
-									defaultValue={preview?.linkedin}
+									defaultValue={company.data?.social_media.linkedin ?? ""}
 								/>
 							</div>
 						</Label>
@@ -353,10 +337,10 @@ function RouteComponent() {
 								<FacebookIcon className="size-5 text-gray-500" />
 								<input
 									type="text"
-									name="facebook"
+									name="social_media.facebook"
 									placeholder="Ex: https://www.facebook.com/monentreprise"
 									className="placeholder:text-xs outline-none w-full"
-									defaultValue={preview?.facebook}
+									defaultValue={company.data?.social_media.facebook ?? ""}
 								/>
 							</div>
 						</Label>
@@ -366,10 +350,10 @@ function RouteComponent() {
 								<InstagramIcon className="size-5 text-gray-500" />
 								<input
 									type="text"
-									name="instagram"
+									name="social_media.instagram"
 									placeholder="Ex: https://www.instagram.com/monentreprise"
 									className="placeholder:text-xs outline-none w-full"
-									defaultValue={preview?.instagram}
+									defaultValue={company.data?.social_media.instagram ?? ""}
 								/>
 							</div>
 						</Label>
@@ -379,10 +363,10 @@ function RouteComponent() {
 								<CalendlyIcon className="size-5 text-gray-500" />
 								<input
 									type="text"
-									name="calendly"
+									name="social_media.calendly"
 									placeholder="Ex: https://calendly.com/monentreprise"
 									className="placeholder:text-xs outline-none w-full"
-									defaultValue={preview?.calendly}
+									defaultValue={company.data?.social_media.calendly ?? ""}
 								/>
 							</div>
 						</Label>
@@ -398,7 +382,7 @@ function RouteComponent() {
 									type="radio"
 									name="work_mode"
 									value="not_specified"
-									defaultChecked={preview?.work_mode === "not_specified"}
+									defaultChecked={company.data?.work_mode === "not_specified"}
 									className="size-4 accent-gray-600"
 								/>
 								<span className="text-xs">Non spécifié</span>
@@ -408,7 +392,7 @@ function RouteComponent() {
 									type="radio"
 									name="work_mode"
 									value="remote"
-									defaultChecked={preview?.work_mode === "remote"}
+									defaultChecked={company.data?.work_mode === "remote"}
 									className="size-4 accent-gray-600"
 								/>
 								<span className="text-xs">À distance</span>
@@ -418,7 +402,7 @@ function RouteComponent() {
 									type="radio"
 									name="work_mode"
 									value="onsite"
-									defaultChecked={preview?.work_mode === "onsite"}
+									defaultChecked={company.data?.work_mode === "onsite"}
 									className="size-4 accent-gray-600"
 								/>
 								<span className="text-xs">Sur site</span>
@@ -428,7 +412,7 @@ function RouteComponent() {
 									type="radio"
 									name="work_mode"
 									value="hybrid"
-									defaultChecked={preview?.work_mode === "hybrid"}
+									defaultChecked={company.data?.work_mode === "hybrid"}
 									className="size-4 accent-gray-600"
 								/>
 								<span className="text-xs">Hybride</span>
@@ -442,7 +426,7 @@ function RouteComponent() {
 									type="radio"
 									name="rqth"
 									value="true"
-									defaultChecked={preview?.rqth}
+									defaultChecked={company.data?.rqth}
 									className="size-4 accent-gray-600"
 								/>
 								<span className="text-xs">Oui</span>
@@ -452,7 +436,7 @@ function RouteComponent() {
 									type="radio"
 									name="rqth"
 									value="false"
-									defaultChecked={!preview?.rqth}
+									defaultChecked={!company.data?.rqth}
 									className="size-4 accent-gray-600"
 								/>
 								<span className="text-xs">Non</span>
@@ -462,95 +446,13 @@ function RouteComponent() {
 
 					<Separator.Root className="h-px bg-gray-300 my-4" />
 
-					<fieldset className="border rounded-sm border-gray-300 p-4">
-						<legend className="text-xs font-medium  bg-white px-2">Images</legend>
-
-						<div className="flex gap-2 justify-center">
-							<Label className="relative flex flex-col gap-1 outline-none group">
-								<span className="text-xs font-medium">Logo (max. 3MB)</span>
-								<div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-									{imagePreviews.logo ? (
-										<img
-											src={imagePreviews.logo}
-											alt="Logo"
-											className="w-full h-full object-cover"
-										/>
-									) : (
-										<PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
-									)}
-									<input
-										type="file"
-										className="absolute inset-0 opacity-0"
-										name="logo"
-										onChange={(e) => onImageChange(e, "logo")}
-										accept="image/*"
-									/>
-								</div>
-							</Label>
-
-							<Label className="relative flex flex-col gap-1 outline-none group">
-								<span className="text-xs font-medium">Image 1 (max. 2MB)</span>
-								<div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-									{imagePreviews.gallery[0] ? (
-										<img
-											src={imagePreviews.gallery[0]}
-											alt="gallery 1"
-											className="w-full h-full object-cover"
-										/>
-									) : (
-										<PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
-									)}
-									<input
-										type="file"
-										className="absolute inset-0 opacity-0"
-										name="gallery"
-										onChange={(e) => onImageChange(e, "gallery", 0)}
-										accept="image/*"
-									/>
-								</div>
-							</Label>
-
-							<Label className="relative flex flex-col gap-1 outline-none group">
-								<span className="text-xs font-medium">Image 2 (max. 2MB)</span>
-								<div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-									{imagePreviews.gallery[1] ? (
-										<img
-											src={imagePreviews.gallery[1]}
-											alt="gallery 2"
-											className="w-full h-full object-cover"
-										/>
-									) : (
-										<PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
-									)}
-									<input
-										type="file"
-										className="absolute inset-0 opacity-0"
-										name="gallery"
-										onChange={(e) => onImageChange(e, "gallery", 1)}
-										accept="image/*"
-									/>
-								</div>
-							</Label>
-						</div>
-					</fieldset>
-
-					<Separator.Root className="h-px bg-gray-300 my-4" />
-
 					<div className="flex gap-2 justify-end">
-						<button
-							type="button"
-							className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50"
-							onClick={onPreview}
-						>
-							Prévisualiser
-						</button>
-
 						<button
 							type="submit"
 							className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs"
 							disabled={isPending}
 						>
-							{isPending ? "Création en cours..." : "Créer un compte"}
+							{isPending ? "Mise à jour en cours..." : "Mettre à jour"}
 						</button>
 					</div>
 				</form>

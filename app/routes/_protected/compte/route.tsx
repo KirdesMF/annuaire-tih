@@ -1,18 +1,19 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
 import { Separator } from "radix-ui";
 import { PlusIcon } from "~/components/icons/plus";
-import { userCompaniesQueryOptions } from "~/lib/api/user";
+import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 
-export const Route = createFileRoute("/_protected/_compte")({
+export const Route = createFileRoute("/_protected/compte")({
 	component: RouteComponent,
 	loader: async ({ context }) => {
-		await context.queryClient.ensureQueryData(userCompaniesQueryOptions);
+		await context.queryClient.ensureQueryData(userCompaniesQuery(context.user.id));
 	},
 });
 
 function RouteComponent() {
-	const companies = useSuspenseQuery(userCompaniesQueryOptions);
+	const context = Route.useRouteContext();
+	const companies = useSuspenseQuery(userCompaniesQuery(context.user.id));
 
 	return (
 		<div className="flex min-h-[calc(100svh-45px)]">
@@ -30,7 +31,7 @@ function RouteComponent() {
 							<ul className="ms-4">
 								<li>
 									<Link
-										to="/compte/entreprises/add"
+										to="/compte/entreprises/create"
 										className="text-xs font-light flex items-center gap-1 px-4 py-1.5 text-gray-500 hover:text-gray-900 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed"
 										disabled={companies.data && companies.data.length >= 3}
 									>
