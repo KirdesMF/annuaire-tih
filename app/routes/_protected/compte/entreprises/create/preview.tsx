@@ -17,7 +17,7 @@ import { PhoneIcon } from "~/components/icons/phone";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
-import { useAddPreviewStore } from "~/lib/store/preview.store";
+import { useAddPreviewStore } from "~/stores/preview.store";
 import type { Entries } from "~/utils/types";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/create/preview")({

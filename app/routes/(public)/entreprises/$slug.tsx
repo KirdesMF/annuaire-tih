@@ -146,7 +146,9 @@ function RouteComponent() {
 			<div className="container border border-gray-300 p-6 rounded-sm grid gap-4">
 				<div className="flex flex-col gap-2">
 					<h2 className="text-lg font-bold">Description</h2>
-					<p className="text-sm text-gray-500 text-pretty">{data.description || "Non renseigné"}</p>
+					<p className="text-sm text-gray-500 text-pretty whitespace-pre-line">
+						{data.description || "Non renseigné"}
+					</p>
 				</div>
 
 				{data.gallery?.length ? (

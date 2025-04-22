@@ -14,13 +14,14 @@ import { auth, type AuthSession } from "~/lib/auth/auth.server";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import type { User } from "better-auth";
+import { linkOptions } from "@tanstack/react-router";
 
-const LINKS = [
+const LINKS = linkOptions([
 	{ label: "Qui sommes-nous ?", to: "/about" },
 	{ label: "FAQ", to: "/faq" },
 	{ label: "Sources", to: "/sources" },
 	{ label: "Contact", to: "/contact" },
-] as const;
+]);
 
 const signOutFn = createServerFn({ method: "POST" }).handler(async () => {
 	const request = getWebRequest();
