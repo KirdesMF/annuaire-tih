@@ -3,7 +3,7 @@ import type {
 	CreateCompanyData,
 	UpdateCompanyInfosData,
 	UpdateCompanyMediaData,
-} from "../validator/company.schema";
+} from "~/lib/validator/company.schema";
 
 type AddPreviewStore = {
 	preview: CreateCompanyData | null;

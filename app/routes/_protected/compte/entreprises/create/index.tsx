@@ -21,7 +21,7 @@ import { PlusIcon } from "~/components/icons/plus";
 import { PhoneIcon } from "~/components/icons/phone";
 import { GlobeIcon } from "~/components/icons/globe";
 import { EmailIcon } from "~/components/icons/email";
-import { useAddPreviewStore } from "~/lib/store/preview.store";
+import { useAddPreviewStore } from "~/stores/preview.store";
 import { useImagePreview } from "~/hooks/use-image-preview";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";

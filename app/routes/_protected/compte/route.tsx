@@ -24,6 +24,7 @@ function RouteComponent() {
 							<Link
 								to="/compte/entreprises"
 								className="text-sm font-light flex ps-4 pe-8 py-1.5 select-none text-gray-500 hover:text-gray-900 transition-colors"
+								activeProps={{ className: "data-[status=active]:text-blue-700" }}
 							>
 								Mes entreprises
 							</Link>
@@ -34,6 +35,10 @@ function RouteComponent() {
 										to="/compte/entreprises/create"
 										className="text-xs font-light flex items-center gap-1 px-4 py-1.5 text-gray-500 hover:text-gray-900 aria-disabled:opacity-50 aria-disabled:cursor-not-allowed"
 										disabled={companies.data && companies.data.length >= 3}
+										activeProps={{
+											className:
+												"data-[status=active]:text-blue-700 data-[status=active]:font-medium",
+										}}
 									>
 										<PlusIcon className="size-3" />
 										Référencer
@@ -51,7 +56,8 @@ function RouteComponent() {
 						<li>
 							<Link
 								to="/compte/preferences"
-								className="text-sm font-light flex ps-4 pe-8 py-1.5 select-none text-gray-500 hover:text-gray-900"
+								className="text-sm font-light flex ps-4 pe-8 py-1.5 select-none text-gray-500 hover:text-gray-900 transition-colors"
+								activeProps={{ className: "data-[status=active]:text-blue-700" }}
 							>
 								Preférences
 							</Link>
@@ -66,9 +72,9 @@ function RouteComponent() {
 				</nav>
 			</aside>
 
-			<main className="flex-1">
+			<div className="flex-1">
 				<Outlet />
-			</main>
+			</div>
 		</div>
 	);
 }
