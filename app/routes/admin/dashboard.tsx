@@ -1,6 +1,7 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useRef } from "react";
 import { toast } from "sonner";
 import { TrashIcon } from "~/components/icons/trash";
 import type { UserRole } from "~/db/schema/auth";
@@ -32,8 +33,14 @@ function RouteComponent() {
   const { mutate: updateUserRole, isPending: isUpdatingUserRole } = useMutation({
     mutationFn: useServerFn(updateUserRoleFn),
   });
+
+  // keep track of the current user being updated
+  const currentUser = useRef("");
+  const currentCompany = useRef("");
+
   // TODO: Add confirmation dialog
   function onAction(companyId: string, action: CompanyStatus) {
+    currentCompany.current = companyId;
     update(
       { data: { companyId, status: action } },
       {
@@ -59,6 +66,7 @@ function RouteComponent() {
   }
 
   function onUpdateUserRole(userId: string, role: UserRole) {
+    currentUser.current = userId;
     updateUserRole(
       { data: { userId, role } },
       {
@@ -149,7 +157,9 @@ function RouteComponent() {
                     className="text-xs text-gray-500 border px-2 py-1 rounded-sm hover:bg-gray-100 transition-colors"
                     onClick={() => onUpdateUserRole(user.id, "admin")}
                   >
-                    {isUpdatingUserRole ? "Updating..." : "Set as admin"}
+                    {isUpdatingUserRole && currentUser.current === user.id && user.role === "user"
+                      ? "Updating..."
+                      : "Set as admin"}
                   </button>
 
                   <button
@@ -157,7 +167,9 @@ function RouteComponent() {
                     className="text-xs text-gray-500 border px-2 py-1 rounded-sm hover:bg-gray-100 transition-colors"
                     onClick={() => onUpdateUserRole(user.id, "user")}
                   >
-                    {isUpdatingUserRole ? "Updating..." : "Set as user"}
+                    {isUpdatingUserRole && currentUser.current === user.id && user.role === "admin"
+                      ? "Updating..."
+                      : "Set as user"}
                   </button>
                 </div>
               </div>

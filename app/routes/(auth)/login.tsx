@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { authClient } from "~/lib/auth/auth.client";
@@ -84,6 +84,10 @@ function RouteComponent() {
             {isPending ? "Connexion en cours..." : "Connexion"}
           </button>
         </form>
+
+        <Link className="text-sm text-gray-500" to="/forgot-password">
+          Mot de passe oublié ?
+        </Link>
       </div>
     </main>
   );

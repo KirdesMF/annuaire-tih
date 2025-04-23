@@ -4,6 +4,8 @@ import { admin } from "better-auth/plugins";
 import { db } from "~/db";
 import { user, session, account, verification } from "~/db/schema/auth";
 import { reactStartCookies } from "better-auth/react-start";
+import { Resend } from "resend";
+import { toast } from "sonner";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -24,6 +26,22 @@ export const auth = betterAuth({
   // },
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ user, url, token }) => {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+
+      const { data, error } = await resend.emails.send({
+        from: "Acme <onboarding@resend.dev>",
+        to: user.email,
+        subject: "Reset your password",
+        text: `Click ${url} to reset your password`,
+      });
+
+      if (error) {
+        console.error(error);
+      }
+
+      console.log(data);
+    },
   },
   user: {
     deleteUser: {
