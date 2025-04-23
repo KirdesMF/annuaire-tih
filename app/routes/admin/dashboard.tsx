@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { TrashIcon } from "~/components/icons/trash";
+import { UserRole } from "~/db/schema/auth";
 import type { CompanyStatus } from "~/db/schema/companies";
+import { updateUserRoleFn } from "~/lib/api/admin/mutations/update-user-role";
 import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
 import { updateCompanyStatus } from "~/lib/api/companies/mutations/update-company-status";
 import { companiesQuery } from "~/lib/api/companies/queries/get-companies";
@@ -27,7 +29,9 @@ function RouteComponent() {
   const { data: users } = useSuspenseQuery(usersQuery);
   const { mutate: update } = useMutation({ mutationFn: useServerFn(updateCompanyStatus) });
   const { mutate: remove } = useMutation({ mutationFn: useServerFn(deleteCompany) });
-
+  const { mutate: updateUserRole, isPending: isUpdatingUserRole } = useMutation({
+    mutationFn: useServerFn(updateUserRoleFn),
+  });
   // TODO: Add confirmation dialog
   function onAction(companyId: string, action: CompanyStatus) {
     update(
@@ -49,6 +53,18 @@ function RouteComponent() {
         onSuccess: () => {
           toast.success("Company deleted");
           context.queryClient.invalidateQueries({ queryKey: ["companies"] });
+        },
+      },
+    );
+  }
+
+  function onUpdateUserRole(userId: string, role: UserRole) {
+    updateUserRole(
+      { data: { userId, role } },
+      {
+        onSuccess: () => {
+          toast.success("User role updated");
+          context.queryClient.invalidateQueries({ queryKey: ["users"] });
         },
       },
     );
@@ -125,6 +141,25 @@ function RouteComponent() {
               >
                 <p>{user.name}</p>
                 <p>{user.email}</p>
+                <p>{user.role}</p>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="text-xs text-gray-500 border px-2 py-1 rounded-sm hover:bg-gray-100 transition-colors"
+                    onClick={() => onUpdateUserRole(user.id, "admin")}
+                  >
+                    {isUpdatingUserRole ? "Updating..." : "Set as admin"}
+                  </button>
+
+                  <button
+                    type="button"
+                    className="text-xs text-gray-500 border px-2 py-1 rounded-sm hover:bg-gray-100 transition-colors"
+                    onClick={() => onUpdateUserRole(user.id, "user")}
+                  >
+                    {isUpdatingUserRole ? "Updating..." : "Set as user"}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
