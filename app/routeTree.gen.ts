@@ -11,39 +11,44 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AdminRouteImport } from './routes/admin/route'
 import { Route as ProtectedRouteImport } from './routes/_protected/route'
-import { Route as AdminRouteImport } from './routes/_admin/route'
 import { Route as IndexImport } from './routes/index'
-import { Route as PublicSourcesImport } from './routes/_public/sources'
-import { Route as PublicPartnerImport } from './routes/_public/partner'
-import { Route as PublicFaqImport } from './routes/_public/faq'
-import { Route as PublicContactImport } from './routes/_public/contact'
-import { Route as PublicAboutImport } from './routes/_public/about'
-import { Route as ProtectedReferenceImport } from './routes/_protected/reference'
-import { Route as AuthSignupImport } from './routes/_auth/signup'
-import { Route as AuthResetPasswordImport } from './routes/_auth/reset-password'
-import { Route as AuthLoginImport } from './routes/_auth/login'
-import { Route as AuthForgotPasswordImport } from './routes/_auth/forgot-password'
-import { Route as ProtectedCompteRouteImport } from './routes/_protected/_compte/route'
-import { Route as PublicEntrepreneursIndexImport } from './routes/_public/entrepreneurs/index'
-import { Route as PublicEntreprisesSlugImport } from './routes/_public/entreprises/$slug'
-import { Route as PublicCategoriesSlugImport } from './routes/_public/categories/$slug'
-import { Route as AdminAdminDashboardImport } from './routes/_admin/admin/dashboard'
-import { Route as ProtectedCompteComptePreferencesImport } from './routes/_protected/_compte/compte/preferences'
-import { Route as ProtectedCompteCompteEntreprisesIndexImport } from './routes/_protected/_compte/compte/entreprises/index'
-import { Route as ProtectedCompteCompteEntreprisesAddIndexImport } from './routes/_protected/_compte/compte/entreprises/add/index'
-import { Route as ProtectedCompteCompteEntreprisesAddPreviewImport } from './routes/_protected/_compte/compte/entreprises/add/preview'
-import { Route as ProtectedCompteCompteEntreprisesIdEditImport } from './routes/_protected/_compte/compte/entreprises/$id/edit'
+import { Route as AdminIndexImport } from './routes/admin/index'
+import { Route as AdminDashboardImport } from './routes/admin/dashboard'
+import { Route as publicSourcesImport } from './routes/(public)/sources'
+import { Route as publicPartnerImport } from './routes/(public)/partner'
+import { Route as publicFaqImport } from './routes/(public)/faq'
+import { Route as publicContactImport } from './routes/(public)/contact'
+import { Route as publicAboutImport } from './routes/(public)/about'
+import { Route as authSignupImport } from './routes/(auth)/signup'
+import { Route as authResetPasswordImport } from './routes/(auth)/reset-password'
+import { Route as authLoginImport } from './routes/(auth)/login'
+import { Route as authForgotPasswordImport } from './routes/(auth)/forgot-password'
+import { Route as ProtectedCompteRouteImport } from './routes/_protected/compte/route'
+import { Route as ProtectedCompteIndexImport } from './routes/_protected/compte/index'
+import { Route as ProtectedComptePreferencesImport } from './routes/_protected/compte/preferences'
+import { Route as publicEntreprisesSlugImport } from './routes/(public)/entreprises/$slug'
+import { Route as publicCategoriesSlugImport } from './routes/(public)/categories/$slug'
+import { Route as ProtectedCompteEntreprisesIndexImport } from './routes/_protected/compte/entreprises/index'
+import { Route as ProtectedCompteEntreprisesCreateIndexImport } from './routes/_protected/compte/entreprises/create/index'
+import { Route as ProtectedCompteEntreprisesCreatePreviewImport } from './routes/_protected/compte/entreprises/create/preview'
+import { Route as ProtectedCompteEntreprisesSlugEditRouteImport } from './routes/_protected/compte/entreprises/$slug/edit/route'
+import { Route as ProtectedCompteEntreprisesSlugEditIndexImport } from './routes/_protected/compte/entreprises/$slug/edit/index'
+import { Route as ProtectedCompteEntreprisesSlugEditPreviewImport } from './routes/_protected/compte/entreprises/$slug/edit/preview'
+import { Route as ProtectedCompteEntreprisesSlugEditMediasImport } from './routes/_protected/compte/entreprises/$slug/edit/medias'
+import { Route as ProtectedCompteEntreprisesSlugEditInfosImport } from './routes/_protected/compte/entreprises/$slug/edit/infos'
 
 // Create/Update Routes
 
-const ProtectedRouteRoute = ProtectedRouteImport.update({
-  id: '/_protected',
+const AdminRouteRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRoute,
 } as any)
 
-const AdminRouteRoute = AdminRouteImport.update({
-  id: '/_admin',
+const ProtectedRouteRoute = ProtectedRouteImport.update({
+  id: '/_protected',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -53,128 +58,158 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const PublicSourcesRoute = PublicSourcesImport.update({
-  id: '/_public/sources',
+const AdminIndexRoute = AdminIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+
+const AdminDashboardRoute = AdminDashboardImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+
+const publicSourcesRoute = publicSourcesImport.update({
+  id: '/(public)/sources',
   path: '/sources',
   getParentRoute: () => rootRoute,
 } as any)
 
-const PublicPartnerRoute = PublicPartnerImport.update({
-  id: '/_public/partner',
+const publicPartnerRoute = publicPartnerImport.update({
+  id: '/(public)/partner',
   path: '/partner',
   getParentRoute: () => rootRoute,
 } as any)
 
-const PublicFaqRoute = PublicFaqImport.update({
-  id: '/_public/faq',
+const publicFaqRoute = publicFaqImport.update({
+  id: '/(public)/faq',
   path: '/faq',
   getParentRoute: () => rootRoute,
 } as any)
 
-const PublicContactRoute = PublicContactImport.update({
-  id: '/_public/contact',
+const publicContactRoute = publicContactImport.update({
+  id: '/(public)/contact',
   path: '/contact',
   getParentRoute: () => rootRoute,
 } as any)
 
-const PublicAboutRoute = PublicAboutImport.update({
-  id: '/_public/about',
+const publicAboutRoute = publicAboutImport.update({
+  id: '/(public)/about',
   path: '/about',
   getParentRoute: () => rootRoute,
 } as any)
 
-const ProtectedReferenceRoute = ProtectedReferenceImport.update({
-  id: '/reference',
-  path: '/reference',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
-
-const AuthSignupRoute = AuthSignupImport.update({
-  id: '/_auth/signup',
+const authSignupRoute = authSignupImport.update({
+  id: '/(auth)/signup',
   path: '/signup',
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthResetPasswordRoute = AuthResetPasswordImport.update({
-  id: '/_auth/reset-password',
+const authResetPasswordRoute = authResetPasswordImport.update({
+  id: '/(auth)/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthLoginRoute = AuthLoginImport.update({
-  id: '/_auth/login',
+const authLoginRoute = authLoginImport.update({
+  id: '/(auth)/login',
   path: '/login',
   getParentRoute: () => rootRoute,
 } as any)
 
-const AuthForgotPasswordRoute = AuthForgotPasswordImport.update({
-  id: '/_auth/forgot-password',
+const authForgotPasswordRoute = authForgotPasswordImport.update({
+  id: '/(auth)/forgot-password',
   path: '/forgot-password',
   getParentRoute: () => rootRoute,
 } as any)
 
 const ProtectedCompteRouteRoute = ProtectedCompteRouteImport.update({
-  id: '/_compte',
+  id: '/compte',
+  path: '/compte',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
 
-const PublicEntrepreneursIndexRoute = PublicEntrepreneursIndexImport.update({
-  id: '/_public/entrepreneurs/',
-  path: '/entrepreneurs/',
-  getParentRoute: () => rootRoute,
+const ProtectedCompteIndexRoute = ProtectedCompteIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProtectedCompteRouteRoute,
 } as any)
 
-const PublicEntreprisesSlugRoute = PublicEntreprisesSlugImport.update({
-  id: '/_public/entreprises/$slug',
+const ProtectedComptePreferencesRoute = ProtectedComptePreferencesImport.update(
+  {
+    id: '/preferences',
+    path: '/preferences',
+    getParentRoute: () => ProtectedCompteRouteRoute,
+  } as any,
+)
+
+const publicEntreprisesSlugRoute = publicEntreprisesSlugImport.update({
+  id: '/(public)/entreprises/$slug',
   path: '/entreprises/$slug',
   getParentRoute: () => rootRoute,
 } as any)
 
-const PublicCategoriesSlugRoute = PublicCategoriesSlugImport.update({
-  id: '/_public/categories/$slug',
+const publicCategoriesSlugRoute = publicCategoriesSlugImport.update({
+  id: '/(public)/categories/$slug',
   path: '/categories/$slug',
   getParentRoute: () => rootRoute,
 } as any)
 
-const AdminAdminDashboardRoute = AdminAdminDashboardImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-
-const ProtectedCompteComptePreferencesRoute =
-  ProtectedCompteComptePreferencesImport.update({
-    id: '/compte/preferences',
-    path: '/compte/preferences',
+const ProtectedCompteEntreprisesIndexRoute =
+  ProtectedCompteEntreprisesIndexImport.update({
+    id: '/entreprises/',
+    path: '/entreprises/',
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
 
-const ProtectedCompteCompteEntreprisesIndexRoute =
-  ProtectedCompteCompteEntreprisesIndexImport.update({
-    id: '/compte/entreprises/',
-    path: '/compte/entreprises/',
+const ProtectedCompteEntreprisesCreateIndexRoute =
+  ProtectedCompteEntreprisesCreateIndexImport.update({
+    id: '/entreprises/create/',
+    path: '/entreprises/create/',
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
 
-const ProtectedCompteCompteEntreprisesAddIndexRoute =
-  ProtectedCompteCompteEntreprisesAddIndexImport.update({
-    id: '/compte/entreprises/add/',
-    path: '/compte/entreprises/add/',
+const ProtectedCompteEntreprisesCreatePreviewRoute =
+  ProtectedCompteEntreprisesCreatePreviewImport.update({
+    id: '/entreprises/create/preview',
+    path: '/entreprises/create/preview',
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
 
-const ProtectedCompteCompteEntreprisesAddPreviewRoute =
-  ProtectedCompteCompteEntreprisesAddPreviewImport.update({
-    id: '/compte/entreprises/add/preview',
-    path: '/compte/entreprises/add/preview',
+const ProtectedCompteEntreprisesSlugEditRouteRoute =
+  ProtectedCompteEntreprisesSlugEditRouteImport.update({
+    id: '/entreprises/$slug/edit',
+    path: '/entreprises/$slug/edit',
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
 
-const ProtectedCompteCompteEntreprisesIdEditRoute =
-  ProtectedCompteCompteEntreprisesIdEditImport.update({
-    id: '/compte/entreprises/$id/edit',
-    path: '/compte/entreprises/$id/edit',
-    getParentRoute: () => ProtectedCompteRouteRoute,
+const ProtectedCompteEntreprisesSlugEditIndexRoute =
+  ProtectedCompteEntreprisesSlugEditIndexImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => ProtectedCompteEntreprisesSlugEditRouteRoute,
+  } as any)
+
+const ProtectedCompteEntreprisesSlugEditPreviewRoute =
+  ProtectedCompteEntreprisesSlugEditPreviewImport.update({
+    id: '/preview',
+    path: '/preview',
+    getParentRoute: () => ProtectedCompteEntreprisesSlugEditRouteRoute,
+  } as any)
+
+const ProtectedCompteEntreprisesSlugEditMediasRoute =
+  ProtectedCompteEntreprisesSlugEditMediasImport.update({
+    id: '/medias',
+    path: '/medias',
+    getParentRoute: () => ProtectedCompteEntreprisesSlugEditRouteRoute,
+  } as any)
+
+const ProtectedCompteEntreprisesSlugEditInfosRoute =
+  ProtectedCompteEntreprisesSlugEditInfosImport.update({
+    id: '/infos',
+    path: '/infos',
+    getParentRoute: () => ProtectedCompteEntreprisesSlugEditRouteRoute,
   } as any)
 
 // Populate the FileRoutesByPath interface
@@ -188,13 +223,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/_admin': {
-      id: '/_admin'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRoute
-    }
     '/_protected': {
       id: '/_protected'
       path: ''
@@ -202,181 +230,229 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedRouteImport
       parentRoute: typeof rootRoute
     }
-    '/_protected/_compte': {
-      id: '/_protected/_compte'
-      path: ''
-      fullPath: ''
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/_protected/compte': {
+      id: '/_protected/compte'
+      path: '/compte'
+      fullPath: '/compte'
       preLoaderRoute: typeof ProtectedCompteRouteImport
       parentRoute: typeof ProtectedRouteImport
     }
-    '/_auth/forgot-password': {
-      id: '/_auth/forgot-password'
+    '/(auth)/forgot-password': {
+      id: '/(auth)/forgot-password'
       path: '/forgot-password'
       fullPath: '/forgot-password'
-      preLoaderRoute: typeof AuthForgotPasswordImport
+      preLoaderRoute: typeof authForgotPasswordImport
       parentRoute: typeof rootRoute
     }
-    '/_auth/login': {
-      id: '/_auth/login'
+    '/(auth)/login': {
+      id: '/(auth)/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof AuthLoginImport
+      preLoaderRoute: typeof authLoginImport
       parentRoute: typeof rootRoute
     }
-    '/_auth/reset-password': {
-      id: '/_auth/reset-password'
+    '/(auth)/reset-password': {
+      id: '/(auth)/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordImport
+      preLoaderRoute: typeof authResetPasswordImport
       parentRoute: typeof rootRoute
     }
-    '/_auth/signup': {
-      id: '/_auth/signup'
+    '/(auth)/signup': {
+      id: '/(auth)/signup'
       path: '/signup'
       fullPath: '/signup'
-      preLoaderRoute: typeof AuthSignupImport
+      preLoaderRoute: typeof authSignupImport
       parentRoute: typeof rootRoute
     }
-    '/_protected/reference': {
-      id: '/_protected/reference'
-      path: '/reference'
-      fullPath: '/reference'
-      preLoaderRoute: typeof ProtectedReferenceImport
-      parentRoute: typeof ProtectedRouteImport
-    }
-    '/_public/about': {
-      id: '/_public/about'
+    '/(public)/about': {
+      id: '/(public)/about'
       path: '/about'
       fullPath: '/about'
-      preLoaderRoute: typeof PublicAboutImport
+      preLoaderRoute: typeof publicAboutImport
       parentRoute: typeof rootRoute
     }
-    '/_public/contact': {
-      id: '/_public/contact'
+    '/(public)/contact': {
+      id: '/(public)/contact'
       path: '/contact'
       fullPath: '/contact'
-      preLoaderRoute: typeof PublicContactImport
+      preLoaderRoute: typeof publicContactImport
       parentRoute: typeof rootRoute
     }
-    '/_public/faq': {
-      id: '/_public/faq'
+    '/(public)/faq': {
+      id: '/(public)/faq'
       path: '/faq'
       fullPath: '/faq'
-      preLoaderRoute: typeof PublicFaqImport
+      preLoaderRoute: typeof publicFaqImport
       parentRoute: typeof rootRoute
     }
-    '/_public/partner': {
-      id: '/_public/partner'
+    '/(public)/partner': {
+      id: '/(public)/partner'
       path: '/partner'
       fullPath: '/partner'
-      preLoaderRoute: typeof PublicPartnerImport
+      preLoaderRoute: typeof publicPartnerImport
       parentRoute: typeof rootRoute
     }
-    '/_public/sources': {
-      id: '/_public/sources'
+    '/(public)/sources': {
+      id: '/(public)/sources'
       path: '/sources'
       fullPath: '/sources'
-      preLoaderRoute: typeof PublicSourcesImport
+      preLoaderRoute: typeof publicSourcesImport
       parentRoute: typeof rootRoute
     }
-    '/_admin/admin/dashboard': {
-      id: '/_admin/admin/dashboard'
-      path: '/admin/dashboard'
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
       fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminAdminDashboardImport
+      preLoaderRoute: typeof AdminDashboardImport
       parentRoute: typeof AdminRouteImport
     }
-    '/_public/categories/$slug': {
-      id: '/_public/categories/$slug'
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexImport
+      parentRoute: typeof AdminRouteImport
+    }
+    '/(public)/categories/$slug': {
+      id: '/(public)/categories/$slug'
       path: '/categories/$slug'
       fullPath: '/categories/$slug'
-      preLoaderRoute: typeof PublicCategoriesSlugImport
+      preLoaderRoute: typeof publicCategoriesSlugImport
       parentRoute: typeof rootRoute
     }
-    '/_public/entreprises/$slug': {
-      id: '/_public/entreprises/$slug'
+    '/(public)/entreprises/$slug': {
+      id: '/(public)/entreprises/$slug'
       path: '/entreprises/$slug'
       fullPath: '/entreprises/$slug'
-      preLoaderRoute: typeof PublicEntreprisesSlugImport
+      preLoaderRoute: typeof publicEntreprisesSlugImport
       parentRoute: typeof rootRoute
     }
-    '/_public/entrepreneurs/': {
-      id: '/_public/entrepreneurs/'
-      path: '/entrepreneurs'
-      fullPath: '/entrepreneurs'
-      preLoaderRoute: typeof PublicEntrepreneursIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/_protected/_compte/compte/preferences': {
-      id: '/_protected/_compte/compte/preferences'
-      path: '/compte/preferences'
+    '/_protected/compte/preferences': {
+      id: '/_protected/compte/preferences'
+      path: '/preferences'
       fullPath: '/compte/preferences'
-      preLoaderRoute: typeof ProtectedCompteComptePreferencesImport
+      preLoaderRoute: typeof ProtectedComptePreferencesImport
       parentRoute: typeof ProtectedCompteRouteImport
     }
-    '/_protected/_compte/compte/entreprises/': {
-      id: '/_protected/_compte/compte/entreprises/'
-      path: '/compte/entreprises'
+    '/_protected/compte/': {
+      id: '/_protected/compte/'
+      path: '/'
+      fullPath: '/compte/'
+      preLoaderRoute: typeof ProtectedCompteIndexImport
+      parentRoute: typeof ProtectedCompteRouteImport
+    }
+    '/_protected/compte/entreprises/': {
+      id: '/_protected/compte/entreprises/'
+      path: '/entreprises'
       fullPath: '/compte/entreprises'
-      preLoaderRoute: typeof ProtectedCompteCompteEntreprisesIndexImport
+      preLoaderRoute: typeof ProtectedCompteEntreprisesIndexImport
       parentRoute: typeof ProtectedCompteRouteImport
     }
-    '/_protected/_compte/compte/entreprises/$id/edit': {
-      id: '/_protected/_compte/compte/entreprises/$id/edit'
-      path: '/compte/entreprises/$id/edit'
-      fullPath: '/compte/entreprises/$id/edit'
-      preLoaderRoute: typeof ProtectedCompteCompteEntreprisesIdEditImport
+    '/_protected/compte/entreprises/$slug/edit': {
+      id: '/_protected/compte/entreprises/$slug/edit'
+      path: '/entreprises/$slug/edit'
+      fullPath: '/compte/entreprises/$slug/edit'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditRouteImport
       parentRoute: typeof ProtectedCompteRouteImport
     }
-    '/_protected/_compte/compte/entreprises/add/preview': {
-      id: '/_protected/_compte/compte/entreprises/add/preview'
-      path: '/compte/entreprises/add/preview'
-      fullPath: '/compte/entreprises/add/preview'
-      preLoaderRoute: typeof ProtectedCompteCompteEntreprisesAddPreviewImport
+    '/_protected/compte/entreprises/create/preview': {
+      id: '/_protected/compte/entreprises/create/preview'
+      path: '/entreprises/create/preview'
+      fullPath: '/compte/entreprises/create/preview'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesCreatePreviewImport
       parentRoute: typeof ProtectedCompteRouteImport
     }
-    '/_protected/_compte/compte/entreprises/add/': {
-      id: '/_protected/_compte/compte/entreprises/add/'
-      path: '/compte/entreprises/add'
-      fullPath: '/compte/entreprises/add'
-      preLoaderRoute: typeof ProtectedCompteCompteEntreprisesAddIndexImport
+    '/_protected/compte/entreprises/create/': {
+      id: '/_protected/compte/entreprises/create/'
+      path: '/entreprises/create'
+      fullPath: '/compte/entreprises/create'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesCreateIndexImport
       parentRoute: typeof ProtectedCompteRouteImport
+    }
+    '/_protected/compte/entreprises/$slug/edit/infos': {
+      id: '/_protected/compte/entreprises/$slug/edit/infos'
+      path: '/infos'
+      fullPath: '/compte/entreprises/$slug/edit/infos'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditInfosImport
+      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteImport
+    }
+    '/_protected/compte/entreprises/$slug/edit/medias': {
+      id: '/_protected/compte/entreprises/$slug/edit/medias'
+      path: '/medias'
+      fullPath: '/compte/entreprises/$slug/edit/medias'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditMediasImport
+      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteImport
+    }
+    '/_protected/compte/entreprises/$slug/edit/preview': {
+      id: '/_protected/compte/entreprises/$slug/edit/preview'
+      path: '/preview'
+      fullPath: '/compte/entreprises/$slug/edit/preview'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditPreviewImport
+      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteImport
+    }
+    '/_protected/compte/entreprises/$slug/edit/': {
+      id: '/_protected/compte/entreprises/$slug/edit/'
+      path: '/'
+      fullPath: '/compte/entreprises/$slug/edit/'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditIndexImport
+      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteImport
     }
   }
 }
 
 // Create and export the route tree
 
-interface AdminRouteRouteChildren {
-  AdminAdminDashboardRoute: typeof AdminAdminDashboardRoute
+interface ProtectedCompteEntreprisesSlugEditRouteRouteChildren {
+  ProtectedCompteEntreprisesSlugEditInfosRoute: typeof ProtectedCompteEntreprisesSlugEditInfosRoute
+  ProtectedCompteEntreprisesSlugEditMediasRoute: typeof ProtectedCompteEntreprisesSlugEditMediasRoute
+  ProtectedCompteEntreprisesSlugEditPreviewRoute: typeof ProtectedCompteEntreprisesSlugEditPreviewRoute
+  ProtectedCompteEntreprisesSlugEditIndexRoute: typeof ProtectedCompteEntreprisesSlugEditIndexRoute
 }
 
-const AdminRouteRouteChildren: AdminRouteRouteChildren = {
-  AdminAdminDashboardRoute: AdminAdminDashboardRoute,
-}
+const ProtectedCompteEntreprisesSlugEditRouteRouteChildren: ProtectedCompteEntreprisesSlugEditRouteRouteChildren =
+  {
+    ProtectedCompteEntreprisesSlugEditInfosRoute:
+      ProtectedCompteEntreprisesSlugEditInfosRoute,
+    ProtectedCompteEntreprisesSlugEditMediasRoute:
+      ProtectedCompteEntreprisesSlugEditMediasRoute,
+    ProtectedCompteEntreprisesSlugEditPreviewRoute:
+      ProtectedCompteEntreprisesSlugEditPreviewRoute,
+    ProtectedCompteEntreprisesSlugEditIndexRoute:
+      ProtectedCompteEntreprisesSlugEditIndexRoute,
+  }
 
-const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
-  AdminRouteRouteChildren,
-)
+const ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren =
+  ProtectedCompteEntreprisesSlugEditRouteRoute._addFileChildren(
+    ProtectedCompteEntreprisesSlugEditRouteRouteChildren,
+  )
 
 interface ProtectedCompteRouteRouteChildren {
-  ProtectedCompteComptePreferencesRoute: typeof ProtectedCompteComptePreferencesRoute
-  ProtectedCompteCompteEntreprisesIndexRoute: typeof ProtectedCompteCompteEntreprisesIndexRoute
-  ProtectedCompteCompteEntreprisesIdEditRoute: typeof ProtectedCompteCompteEntreprisesIdEditRoute
-  ProtectedCompteCompteEntreprisesAddPreviewRoute: typeof ProtectedCompteCompteEntreprisesAddPreviewRoute
-  ProtectedCompteCompteEntreprisesAddIndexRoute: typeof ProtectedCompteCompteEntreprisesAddIndexRoute
+  ProtectedComptePreferencesRoute: typeof ProtectedComptePreferencesRoute
+  ProtectedCompteIndexRoute: typeof ProtectedCompteIndexRoute
+  ProtectedCompteEntreprisesIndexRoute: typeof ProtectedCompteEntreprisesIndexRoute
+  ProtectedCompteEntreprisesSlugEditRouteRoute: typeof ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren
+  ProtectedCompteEntreprisesCreatePreviewRoute: typeof ProtectedCompteEntreprisesCreatePreviewRoute
+  ProtectedCompteEntreprisesCreateIndexRoute: typeof ProtectedCompteEntreprisesCreateIndexRoute
 }
 
 const ProtectedCompteRouteRouteChildren: ProtectedCompteRouteRouteChildren = {
-  ProtectedCompteComptePreferencesRoute: ProtectedCompteComptePreferencesRoute,
-  ProtectedCompteCompteEntreprisesIndexRoute:
-    ProtectedCompteCompteEntreprisesIndexRoute,
-  ProtectedCompteCompteEntreprisesIdEditRoute:
-    ProtectedCompteCompteEntreprisesIdEditRoute,
-  ProtectedCompteCompteEntreprisesAddPreviewRoute:
-    ProtectedCompteCompteEntreprisesAddPreviewRoute,
-  ProtectedCompteCompteEntreprisesAddIndexRoute:
-    ProtectedCompteCompteEntreprisesAddIndexRoute,
+  ProtectedComptePreferencesRoute: ProtectedComptePreferencesRoute,
+  ProtectedCompteIndexRoute: ProtectedCompteIndexRoute,
+  ProtectedCompteEntreprisesIndexRoute: ProtectedCompteEntreprisesIndexRoute,
+  ProtectedCompteEntreprisesSlugEditRouteRoute:
+    ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren,
+  ProtectedCompteEntreprisesCreatePreviewRoute:
+    ProtectedCompteEntreprisesCreatePreviewRoute,
+  ProtectedCompteEntreprisesCreateIndexRoute:
+    ProtectedCompteEntreprisesCreateIndexRoute,
 }
 
 const ProtectedCompteRouteRouteWithChildren =
@@ -384,91 +460,116 @@ const ProtectedCompteRouteRouteWithChildren =
 
 interface ProtectedRouteRouteChildren {
   ProtectedCompteRouteRoute: typeof ProtectedCompteRouteRouteWithChildren
-  ProtectedReferenceRoute: typeof ProtectedReferenceRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedCompteRouteRoute: ProtectedCompteRouteRouteWithChildren,
-  ProtectedReferenceRoute: ProtectedReferenceRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
   ProtectedRouteRouteChildren,
 )
 
+interface AdminRouteRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '': typeof ProtectedCompteRouteRouteWithChildren
-  '/forgot-password': typeof AuthForgotPasswordRoute
-  '/login': typeof AuthLoginRoute
-  '/reset-password': typeof AuthResetPasswordRoute
-  '/signup': typeof AuthSignupRoute
-  '/reference': typeof ProtectedReferenceRoute
-  '/about': typeof PublicAboutRoute
-  '/contact': typeof PublicContactRoute
-  '/faq': typeof PublicFaqRoute
-  '/partner': typeof PublicPartnerRoute
-  '/sources': typeof PublicSourcesRoute
-  '/admin/dashboard': typeof AdminAdminDashboardRoute
-  '/categories/$slug': typeof PublicCategoriesSlugRoute
-  '/entreprises/$slug': typeof PublicEntreprisesSlugRoute
-  '/entrepreneurs': typeof PublicEntrepreneursIndexRoute
-  '/compte/preferences': typeof ProtectedCompteComptePreferencesRoute
-  '/compte/entreprises': typeof ProtectedCompteCompteEntreprisesIndexRoute
-  '/compte/entreprises/$id/edit': typeof ProtectedCompteCompteEntreprisesIdEditRoute
-  '/compte/entreprises/add/preview': typeof ProtectedCompteCompteEntreprisesAddPreviewRoute
-  '/compte/entreprises/add': typeof ProtectedCompteCompteEntreprisesAddIndexRoute
+  '': typeof ProtectedRouteRouteWithChildren
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/compte': typeof ProtectedCompteRouteRouteWithChildren
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/login': typeof authLoginRoute
+  '/reset-password': typeof authResetPasswordRoute
+  '/signup': typeof authSignupRoute
+  '/about': typeof publicAboutRoute
+  '/contact': typeof publicContactRoute
+  '/faq': typeof publicFaqRoute
+  '/partner': typeof publicPartnerRoute
+  '/sources': typeof publicSourcesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/': typeof AdminIndexRoute
+  '/categories/$slug': typeof publicCategoriesSlugRoute
+  '/entreprises/$slug': typeof publicEntreprisesSlugRoute
+  '/compte/preferences': typeof ProtectedComptePreferencesRoute
+  '/compte/': typeof ProtectedCompteIndexRoute
+  '/compte/entreprises': typeof ProtectedCompteEntreprisesIndexRoute
+  '/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren
+  '/compte/entreprises/create/preview': typeof ProtectedCompteEntreprisesCreatePreviewRoute
+  '/compte/entreprises/create': typeof ProtectedCompteEntreprisesCreateIndexRoute
+  '/compte/entreprises/$slug/edit/infos': typeof ProtectedCompteEntreprisesSlugEditInfosRoute
+  '/compte/entreprises/$slug/edit/medias': typeof ProtectedCompteEntreprisesSlugEditMediasRoute
+  '/compte/entreprises/$slug/edit/preview': typeof ProtectedCompteEntreprisesSlugEditPreviewRoute
+  '/compte/entreprises/$slug/edit/': typeof ProtectedCompteEntreprisesSlugEditIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '': typeof ProtectedCompteRouteRouteWithChildren
-  '/forgot-password': typeof AuthForgotPasswordRoute
-  '/login': typeof AuthLoginRoute
-  '/reset-password': typeof AuthResetPasswordRoute
-  '/signup': typeof AuthSignupRoute
-  '/reference': typeof ProtectedReferenceRoute
-  '/about': typeof PublicAboutRoute
-  '/contact': typeof PublicContactRoute
-  '/faq': typeof PublicFaqRoute
-  '/partner': typeof PublicPartnerRoute
-  '/sources': typeof PublicSourcesRoute
-  '/admin/dashboard': typeof AdminAdminDashboardRoute
-  '/categories/$slug': typeof PublicCategoriesSlugRoute
-  '/entreprises/$slug': typeof PublicEntreprisesSlugRoute
-  '/entrepreneurs': typeof PublicEntrepreneursIndexRoute
-  '/compte/preferences': typeof ProtectedCompteComptePreferencesRoute
-  '/compte/entreprises': typeof ProtectedCompteCompteEntreprisesIndexRoute
-  '/compte/entreprises/$id/edit': typeof ProtectedCompteCompteEntreprisesIdEditRoute
-  '/compte/entreprises/add/preview': typeof ProtectedCompteCompteEntreprisesAddPreviewRoute
-  '/compte/entreprises/add': typeof ProtectedCompteCompteEntreprisesAddIndexRoute
+  '': typeof ProtectedRouteRouteWithChildren
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/login': typeof authLoginRoute
+  '/reset-password': typeof authResetPasswordRoute
+  '/signup': typeof authSignupRoute
+  '/about': typeof publicAboutRoute
+  '/contact': typeof publicContactRoute
+  '/faq': typeof publicFaqRoute
+  '/partner': typeof publicPartnerRoute
+  '/sources': typeof publicSourcesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin': typeof AdminIndexRoute
+  '/categories/$slug': typeof publicCategoriesSlugRoute
+  '/entreprises/$slug': typeof publicEntreprisesSlugRoute
+  '/compte/preferences': typeof ProtectedComptePreferencesRoute
+  '/compte': typeof ProtectedCompteIndexRoute
+  '/compte/entreprises': typeof ProtectedCompteEntreprisesIndexRoute
+  '/compte/entreprises/create/preview': typeof ProtectedCompteEntreprisesCreatePreviewRoute
+  '/compte/entreprises/create': typeof ProtectedCompteEntreprisesCreateIndexRoute
+  '/compte/entreprises/$slug/edit/infos': typeof ProtectedCompteEntreprisesSlugEditInfosRoute
+  '/compte/entreprises/$slug/edit/medias': typeof ProtectedCompteEntreprisesSlugEditMediasRoute
+  '/compte/entreprises/$slug/edit/preview': typeof ProtectedCompteEntreprisesSlugEditPreviewRoute
+  '/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/_admin': typeof AdminRouteRouteWithChildren
   '/_protected': typeof ProtectedRouteRouteWithChildren
-  '/_protected/_compte': typeof ProtectedCompteRouteRouteWithChildren
-  '/_auth/forgot-password': typeof AuthForgotPasswordRoute
-  '/_auth/login': typeof AuthLoginRoute
-  '/_auth/reset-password': typeof AuthResetPasswordRoute
-  '/_auth/signup': typeof AuthSignupRoute
-  '/_protected/reference': typeof ProtectedReferenceRoute
-  '/_public/about': typeof PublicAboutRoute
-  '/_public/contact': typeof PublicContactRoute
-  '/_public/faq': typeof PublicFaqRoute
-  '/_public/partner': typeof PublicPartnerRoute
-  '/_public/sources': typeof PublicSourcesRoute
-  '/_admin/admin/dashboard': typeof AdminAdminDashboardRoute
-  '/_public/categories/$slug': typeof PublicCategoriesSlugRoute
-  '/_public/entreprises/$slug': typeof PublicEntreprisesSlugRoute
-  '/_public/entrepreneurs/': typeof PublicEntrepreneursIndexRoute
-  '/_protected/_compte/compte/preferences': typeof ProtectedCompteComptePreferencesRoute
-  '/_protected/_compte/compte/entreprises/': typeof ProtectedCompteCompteEntreprisesIndexRoute
-  '/_protected/_compte/compte/entreprises/$id/edit': typeof ProtectedCompteCompteEntreprisesIdEditRoute
-  '/_protected/_compte/compte/entreprises/add/preview': typeof ProtectedCompteCompteEntreprisesAddPreviewRoute
-  '/_protected/_compte/compte/entreprises/add/': typeof ProtectedCompteCompteEntreprisesAddIndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/_protected/compte': typeof ProtectedCompteRouteRouteWithChildren
+  '/(auth)/forgot-password': typeof authForgotPasswordRoute
+  '/(auth)/login': typeof authLoginRoute
+  '/(auth)/reset-password': typeof authResetPasswordRoute
+  '/(auth)/signup': typeof authSignupRoute
+  '/(public)/about': typeof publicAboutRoute
+  '/(public)/contact': typeof publicContactRoute
+  '/(public)/faq': typeof publicFaqRoute
+  '/(public)/partner': typeof publicPartnerRoute
+  '/(public)/sources': typeof publicSourcesRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/': typeof AdminIndexRoute
+  '/(public)/categories/$slug': typeof publicCategoriesSlugRoute
+  '/(public)/entreprises/$slug': typeof publicEntreprisesSlugRoute
+  '/_protected/compte/preferences': typeof ProtectedComptePreferencesRoute
+  '/_protected/compte/': typeof ProtectedCompteIndexRoute
+  '/_protected/compte/entreprises/': typeof ProtectedCompteEntreprisesIndexRoute
+  '/_protected/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren
+  '/_protected/compte/entreprises/create/preview': typeof ProtectedCompteEntreprisesCreatePreviewRoute
+  '/_protected/compte/entreprises/create/': typeof ProtectedCompteEntreprisesCreateIndexRoute
+  '/_protected/compte/entreprises/$slug/edit/infos': typeof ProtectedCompteEntreprisesSlugEditInfosRoute
+  '/_protected/compte/entreprises/$slug/edit/medias': typeof ProtectedCompteEntreprisesSlugEditMediasRoute
+  '/_protected/compte/entreprises/$slug/edit/preview': typeof ProtectedCompteEntreprisesSlugEditPreviewRoute
+  '/_protected/compte/entreprises/$slug/edit/': typeof ProtectedCompteEntreprisesSlugEditIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -476,25 +577,31 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | ''
+    | '/admin'
+    | '/compte'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/signup'
-    | '/reference'
     | '/about'
     | '/contact'
     | '/faq'
     | '/partner'
     | '/sources'
     | '/admin/dashboard'
+    | '/admin/'
     | '/categories/$slug'
     | '/entreprises/$slug'
-    | '/entrepreneurs'
     | '/compte/preferences'
+    | '/compte/'
     | '/compte/entreprises'
-    | '/compte/entreprises/$id/edit'
-    | '/compte/entreprises/add/preview'
-    | '/compte/entreprises/add'
+    | '/compte/entreprises/$slug/edit'
+    | '/compte/entreprises/create/preview'
+    | '/compte/entreprises/create'
+    | '/compte/entreprises/$slug/edit/infos'
+    | '/compte/entreprises/$slug/edit/medias'
+    | '/compte/entreprises/$slug/edit/preview'
+    | '/compte/entreprises/$slug/edit/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -503,83 +610,88 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
-    | '/reference'
     | '/about'
     | '/contact'
     | '/faq'
     | '/partner'
     | '/sources'
     | '/admin/dashboard'
+    | '/admin'
     | '/categories/$slug'
     | '/entreprises/$slug'
-    | '/entrepreneurs'
     | '/compte/preferences'
+    | '/compte'
     | '/compte/entreprises'
-    | '/compte/entreprises/$id/edit'
-    | '/compte/entreprises/add/preview'
-    | '/compte/entreprises/add'
+    | '/compte/entreprises/create/preview'
+    | '/compte/entreprises/create'
+    | '/compte/entreprises/$slug/edit/infos'
+    | '/compte/entreprises/$slug/edit/medias'
+    | '/compte/entreprises/$slug/edit/preview'
+    | '/compte/entreprises/$slug/edit'
   id:
     | '__root__'
     | '/'
-    | '/_admin'
     | '/_protected'
-    | '/_protected/_compte'
-    | '/_auth/forgot-password'
-    | '/_auth/login'
-    | '/_auth/reset-password'
-    | '/_auth/signup'
-    | '/_protected/reference'
-    | '/_public/about'
-    | '/_public/contact'
-    | '/_public/faq'
-    | '/_public/partner'
-    | '/_public/sources'
-    | '/_admin/admin/dashboard'
-    | '/_public/categories/$slug'
-    | '/_public/entreprises/$slug'
-    | '/_public/entrepreneurs/'
-    | '/_protected/_compte/compte/preferences'
-    | '/_protected/_compte/compte/entreprises/'
-    | '/_protected/_compte/compte/entreprises/$id/edit'
-    | '/_protected/_compte/compte/entreprises/add/preview'
-    | '/_protected/_compte/compte/entreprises/add/'
+    | '/admin'
+    | '/_protected/compte'
+    | '/(auth)/forgot-password'
+    | '/(auth)/login'
+    | '/(auth)/reset-password'
+    | '/(auth)/signup'
+    | '/(public)/about'
+    | '/(public)/contact'
+    | '/(public)/faq'
+    | '/(public)/partner'
+    | '/(public)/sources'
+    | '/admin/dashboard'
+    | '/admin/'
+    | '/(public)/categories/$slug'
+    | '/(public)/entreprises/$slug'
+    | '/_protected/compte/preferences'
+    | '/_protected/compte/'
+    | '/_protected/compte/entreprises/'
+    | '/_protected/compte/entreprises/$slug/edit'
+    | '/_protected/compte/entreprises/create/preview'
+    | '/_protected/compte/entreprises/create/'
+    | '/_protected/compte/entreprises/$slug/edit/infos'
+    | '/_protected/compte/entreprises/$slug/edit/medias'
+    | '/_protected/compte/entreprises/$slug/edit/preview'
+    | '/_protected/compte/entreprises/$slug/edit/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
-  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
-  AuthLoginRoute: typeof AuthLoginRoute
-  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
-  AuthSignupRoute: typeof AuthSignupRoute
-  PublicAboutRoute: typeof PublicAboutRoute
-  PublicContactRoute: typeof PublicContactRoute
-  PublicFaqRoute: typeof PublicFaqRoute
-  PublicPartnerRoute: typeof PublicPartnerRoute
-  PublicSourcesRoute: typeof PublicSourcesRoute
-  PublicCategoriesSlugRoute: typeof PublicCategoriesSlugRoute
-  PublicEntreprisesSlugRoute: typeof PublicEntreprisesSlugRoute
-  PublicEntrepreneursIndexRoute: typeof PublicEntrepreneursIndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  authForgotPasswordRoute: typeof authForgotPasswordRoute
+  authLoginRoute: typeof authLoginRoute
+  authResetPasswordRoute: typeof authResetPasswordRoute
+  authSignupRoute: typeof authSignupRoute
+  publicAboutRoute: typeof publicAboutRoute
+  publicContactRoute: typeof publicContactRoute
+  publicFaqRoute: typeof publicFaqRoute
+  publicPartnerRoute: typeof publicPartnerRoute
+  publicSourcesRoute: typeof publicSourcesRoute
+  publicCategoriesSlugRoute: typeof publicCategoriesSlugRoute
+  publicEntreprisesSlugRoute: typeof publicEntreprisesSlugRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRouteRoute: AdminRouteRouteWithChildren,
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
-  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
-  AuthLoginRoute: AuthLoginRoute,
-  AuthResetPasswordRoute: AuthResetPasswordRoute,
-  AuthSignupRoute: AuthSignupRoute,
-  PublicAboutRoute: PublicAboutRoute,
-  PublicContactRoute: PublicContactRoute,
-  PublicFaqRoute: PublicFaqRoute,
-  PublicPartnerRoute: PublicPartnerRoute,
-  PublicSourcesRoute: PublicSourcesRoute,
-  PublicCategoriesSlugRoute: PublicCategoriesSlugRoute,
-  PublicEntreprisesSlugRoute: PublicEntreprisesSlugRoute,
-  PublicEntrepreneursIndexRoute: PublicEntrepreneursIndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  authForgotPasswordRoute: authForgotPasswordRoute,
+  authLoginRoute: authLoginRoute,
+  authResetPasswordRoute: authResetPasswordRoute,
+  authSignupRoute: authSignupRoute,
+  publicAboutRoute: publicAboutRoute,
+  publicContactRoute: publicContactRoute,
+  publicFaqRoute: publicFaqRoute,
+  publicPartnerRoute: publicPartnerRoute,
+  publicSourcesRoute: publicSourcesRoute,
+  publicCategoriesSlugRoute: publicCategoriesSlugRoute,
+  publicEntreprisesSlugRoute: publicEntreprisesSlugRoute,
 }
 
 export const routeTree = rootRoute
@@ -593,112 +705,135 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_admin",
         "/_protected",
-        "/_auth/forgot-password",
-        "/_auth/login",
-        "/_auth/reset-password",
-        "/_auth/signup",
-        "/_public/about",
-        "/_public/contact",
-        "/_public/faq",
-        "/_public/partner",
-        "/_public/sources",
-        "/_public/categories/$slug",
-        "/_public/entreprises/$slug",
-        "/_public/entrepreneurs/"
+        "/admin",
+        "/(auth)/forgot-password",
+        "/(auth)/login",
+        "/(auth)/reset-password",
+        "/(auth)/signup",
+        "/(public)/about",
+        "/(public)/contact",
+        "/(public)/faq",
+        "/(public)/partner",
+        "/(public)/sources",
+        "/(public)/categories/$slug",
+        "/(public)/entreprises/$slug"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/_admin": {
-      "filePath": "_admin/route.tsx",
-      "children": [
-        "/_admin/admin/dashboard"
-      ]
-    },
     "/_protected": {
       "filePath": "_protected/route.tsx",
       "children": [
-        "/_protected/_compte",
-        "/_protected/reference"
+        "/_protected/compte"
       ]
     },
-    "/_protected/_compte": {
-      "filePath": "_protected/_compte/route.tsx",
+    "/admin": {
+      "filePath": "admin/route.tsx",
+      "children": [
+        "/admin/dashboard",
+        "/admin/"
+      ]
+    },
+    "/_protected/compte": {
+      "filePath": "_protected/compte/route.tsx",
       "parent": "/_protected",
       "children": [
-        "/_protected/_compte/compte/preferences",
-        "/_protected/_compte/compte/entreprises/",
-        "/_protected/_compte/compte/entreprises/$id/edit",
-        "/_protected/_compte/compte/entreprises/add/preview",
-        "/_protected/_compte/compte/entreprises/add/"
+        "/_protected/compte/preferences",
+        "/_protected/compte/",
+        "/_protected/compte/entreprises/",
+        "/_protected/compte/entreprises/$slug/edit",
+        "/_protected/compte/entreprises/create/preview",
+        "/_protected/compte/entreprises/create/"
       ]
     },
-    "/_auth/forgot-password": {
-      "filePath": "_auth/forgot-password.tsx"
+    "/(auth)/forgot-password": {
+      "filePath": "(auth)/forgot-password.tsx"
     },
-    "/_auth/login": {
-      "filePath": "_auth/login.tsx"
+    "/(auth)/login": {
+      "filePath": "(auth)/login.tsx"
     },
-    "/_auth/reset-password": {
-      "filePath": "_auth/reset-password.tsx"
+    "/(auth)/reset-password": {
+      "filePath": "(auth)/reset-password.tsx"
     },
-    "/_auth/signup": {
-      "filePath": "_auth/signup.tsx"
+    "/(auth)/signup": {
+      "filePath": "(auth)/signup.tsx"
     },
-    "/_protected/reference": {
-      "filePath": "_protected/reference.tsx",
-      "parent": "/_protected"
+    "/(public)/about": {
+      "filePath": "(public)/about.tsx"
     },
-    "/_public/about": {
-      "filePath": "_public/about.tsx"
+    "/(public)/contact": {
+      "filePath": "(public)/contact.tsx"
     },
-    "/_public/contact": {
-      "filePath": "_public/contact.tsx"
+    "/(public)/faq": {
+      "filePath": "(public)/faq.tsx"
     },
-    "/_public/faq": {
-      "filePath": "_public/faq.tsx"
+    "/(public)/partner": {
+      "filePath": "(public)/partner.tsx"
     },
-    "/_public/partner": {
-      "filePath": "_public/partner.tsx"
+    "/(public)/sources": {
+      "filePath": "(public)/sources.tsx"
     },
-    "/_public/sources": {
-      "filePath": "_public/sources.tsx"
+    "/admin/dashboard": {
+      "filePath": "admin/dashboard.tsx",
+      "parent": "/admin"
     },
-    "/_admin/admin/dashboard": {
-      "filePath": "_admin/admin/dashboard.tsx",
-      "parent": "/_admin"
+    "/admin/": {
+      "filePath": "admin/index.tsx",
+      "parent": "/admin"
     },
-    "/_public/categories/$slug": {
-      "filePath": "_public/categories/$slug.tsx"
+    "/(public)/categories/$slug": {
+      "filePath": "(public)/categories/$slug.tsx"
     },
-    "/_public/entreprises/$slug": {
-      "filePath": "_public/entreprises/$slug.tsx"
+    "/(public)/entreprises/$slug": {
+      "filePath": "(public)/entreprises/$slug.tsx"
     },
-    "/_public/entrepreneurs/": {
-      "filePath": "_public/entrepreneurs/index.tsx"
+    "/_protected/compte/preferences": {
+      "filePath": "_protected/compte/preferences.tsx",
+      "parent": "/_protected/compte"
     },
-    "/_protected/_compte/compte/preferences": {
-      "filePath": "_protected/_compte/compte/preferences.tsx",
-      "parent": "/_protected/_compte"
+    "/_protected/compte/": {
+      "filePath": "_protected/compte/index.tsx",
+      "parent": "/_protected/compte"
     },
-    "/_protected/_compte/compte/entreprises/": {
-      "filePath": "_protected/_compte/compte/entreprises/index.tsx",
-      "parent": "/_protected/_compte"
+    "/_protected/compte/entreprises/": {
+      "filePath": "_protected/compte/entreprises/index.tsx",
+      "parent": "/_protected/compte"
     },
-    "/_protected/_compte/compte/entreprises/$id/edit": {
-      "filePath": "_protected/_compte/compte/entreprises/$id/edit.tsx",
-      "parent": "/_protected/_compte"
+    "/_protected/compte/entreprises/$slug/edit": {
+      "filePath": "_protected/compte/entreprises/$slug/edit/route.tsx",
+      "parent": "/_protected/compte",
+      "children": [
+        "/_protected/compte/entreprises/$slug/edit/infos",
+        "/_protected/compte/entreprises/$slug/edit/medias",
+        "/_protected/compte/entreprises/$slug/edit/preview",
+        "/_protected/compte/entreprises/$slug/edit/"
+      ]
     },
-    "/_protected/_compte/compte/entreprises/add/preview": {
-      "filePath": "_protected/_compte/compte/entreprises/add/preview.tsx",
-      "parent": "/_protected/_compte"
+    "/_protected/compte/entreprises/create/preview": {
+      "filePath": "_protected/compte/entreprises/create/preview.tsx",
+      "parent": "/_protected/compte"
     },
-    "/_protected/_compte/compte/entreprises/add/": {
-      "filePath": "_protected/_compte/compte/entreprises/add/index.tsx",
-      "parent": "/_protected/_compte"
+    "/_protected/compte/entreprises/create/": {
+      "filePath": "_protected/compte/entreprises/create/index.tsx",
+      "parent": "/_protected/compte"
+    },
+    "/_protected/compte/entreprises/$slug/edit/infos": {
+      "filePath": "_protected/compte/entreprises/$slug/edit/infos.tsx",
+      "parent": "/_protected/compte/entreprises/$slug/edit"
+    },
+    "/_protected/compte/entreprises/$slug/edit/medias": {
+      "filePath": "_protected/compte/entreprises/$slug/edit/medias.tsx",
+      "parent": "/_protected/compte/entreprises/$slug/edit"
+    },
+    "/_protected/compte/entreprises/$slug/edit/preview": {
+      "filePath": "_protected/compte/entreprises/$slug/edit/preview.tsx",
+      "parent": "/_protected/compte/entreprises/$slug/edit"
+    },
+    "/_protected/compte/entreprises/$slug/edit/": {
+      "filePath": "_protected/compte/entreprises/$slug/edit/index.tsx",
+      "parent": "/_protected/compte/entreprises/$slug/edit"
     }
   }
 }
