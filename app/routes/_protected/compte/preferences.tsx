@@ -9,6 +9,7 @@ import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "~/components/ui/dialog";
 import { deleteUser } from "~/lib/api/users/mutations/delete-user";
+import { updateUserEmailFn } from "~/lib/api/users/mutations/update-user-email";
 import { updateUserInfos } from "~/lib/api/users/mutations/update-user-infos";
 import { updateUserPasswordFn } from "~/lib/api/users/mutations/update-user-password";
 
@@ -26,6 +27,9 @@ function RouteComponent() {
   });
   const { mutate: updatePassword, isPending: isUpdatingUserPassword } = useMutation({
     mutationFn: useServerFn(updateUserPasswordFn),
+  });
+  const { mutate: updateEmail, isPending: isUpdatingUserEmail } = useMutation({
+    mutationFn: useServerFn(updateUserEmailFn),
   });
 
   function onDelete() {
@@ -60,6 +64,20 @@ function RouteComponent() {
         onSuccess: () => {
           setIsModalOpenPassword(false);
           toast.success("Mot de passe modifié avec succès");
+        },
+      },
+    );
+  }
+
+  function onUpdateUserEmail(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
+    updateEmail(
+      { data: formData },
+      {
+        onSuccess: () => {
+          toast.success("Email modifié avec succès");
         },
       },
     );
@@ -118,24 +136,30 @@ function RouteComponent() {
         </article>
 
         <article className="border border-gray-300 p-4 rounded-sm">
-          <div className="flex flex-col gap-2">
-            <h2 className="text-xl font-bold">Email</h2>
-            <p className="text-sm text-pretty">
-              Un email de confirmation vous sera envoyé afin de vérifier votre identité
-            </p>
-            <Label>
-              <span className="sr-only">Email</span>
-              <Input defaultValue={context.user.email} className="max-w-1/3 text-sm" />
-            </Label>
-          </div>
+          <form onSubmit={onUpdateUserEmail}>
+            <div className="flex flex-col gap-2">
+              <h2 className="text-xl font-bold">Email</h2>
+              <p className="text-sm text-pretty">
+                Un email de confirmation vous sera envoyé afin de vérifier votre identité
+              </p>
+              <Label>
+                <span className="sr-only">Email</span>
+                <Input
+                  name="email"
+                  defaultValue={context.user.email}
+                  className="max-w-1/3 text-sm"
+                />
+              </Label>
+            </div>
 
-          <Separator.Root className="my-4 -mx-4 h-px bg-gray-300" />
+            <Separator.Root className="my-4 -mx-4 h-px bg-gray-300" />
 
-          <div className="flex gap-2 justify-end">
-            <button type="button" className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs">
-              Modifier mon email
-            </button>
-          </div>
+            <div className="flex gap-2 justify-end">
+              <button type="submit" className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs">
+                {isUpdatingUserEmail ? "Modification en cours..." : "Modifier mon email"}
+              </button>
+            </div>
+          </form>
         </article>
 
         <article className="border border-gray-300 p-4 rounded-sm">
