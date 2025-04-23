@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { TrashIcon } from "~/components/icons/trash";
-import { UserRole } from "~/db/schema/auth";
+import type { UserRole } from "~/db/schema/auth";
 import type { CompanyStatus } from "~/db/schema/companies";
 import { updateUserRoleFn } from "~/lib/api/admin/mutations/update-user-role";
 import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
