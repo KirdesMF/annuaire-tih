@@ -25,6 +25,14 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+    changeEmail: {
+      enabled: true,
+    },
+  },
 });
 
 export type AuthSession = typeof auth.$Infer.Session;
