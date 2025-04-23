@@ -10,6 +10,7 @@ import { Label } from "~/components/label";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "~/components/ui/dialog";
 import { deleteUser } from "~/lib/api/users/mutations/delete-user";
 import { updateUserInfos } from "~/lib/api/users/mutations/update-user-infos";
+import { updateUserPasswordFn } from "~/lib/api/users/mutations/update-user-password";
 
 export const Route = createFileRoute("/_protected/compte/preferences")({
   component: RouteComponent,
@@ -18,9 +19,13 @@ export const Route = createFileRoute("/_protected/compte/preferences")({
 function RouteComponent() {
   const context = Route.useRouteContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenPassword, setIsModalOpenPassword] = useState(false);
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(deleteUser) });
   const { mutate: update, isPending: isUpdatingUserInfos } = useMutation({
     mutationFn: useServerFn(updateUserInfos),
+  });
+  const { mutate: updatePassword, isPending: isUpdatingUserPassword } = useMutation({
+    mutationFn: useServerFn(updateUserPasswordFn),
   });
 
   function onDelete() {
@@ -40,6 +45,21 @@ function RouteComponent() {
             refetchType: "all",
           });
           toast.success("Nom et prénom modifié avec succès");
+        },
+      },
+    );
+  }
+
+  function onUpdateUserPassword(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
+    updatePassword(
+      { data: formData },
+      {
+        onSuccess: () => {
+          setIsModalOpenPassword(false);
+          toast.success("Mot de passe modifié avec succès");
         },
       },
     );
@@ -127,16 +147,70 @@ function RouteComponent() {
             </p>
             <Label>
               <span className="sr-only">Mot de passe</span>
-              <Input type="password" className="max-w-1/3 text-sm" />
+              <Input
+                type="password"
+                name="password"
+                defaultValue="password"
+                className="max-w-1/3 text-sm"
+              />
             </Label>
           </div>
 
           <Separator.Root className="my-4 -mx-4 h-px bg-gray-300" />
 
           <div className="flex gap-2 justify-end">
-            <button type="button" className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs">
+            <button
+              type="button"
+              className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs"
+              onClick={() => setIsModalOpenPassword(true)}
+            >
               Modifier mon mot de passe
             </button>
+
+            <Dialog open={isModalOpenPassword} onOpenChange={setIsModalOpenPassword}>
+              <DialogContent>
+                <DialogTitle>Modifier mon mot de passe</DialogTitle>
+
+                <Separator.Root className="my-4 -mx-4 h-px bg-gray-300" />
+
+                <DialogDescription className="mb-6">
+                  Veuillez entrer votre mot de passe actuel et votre nouveau mot de passe.
+                </DialogDescription>
+
+                <form onSubmit={onUpdateUserPassword}>
+                  <div className="flex flex-col gap-4 mb-4">
+                    <Label className="flex flex-col gap-2">
+                      <span className="text-sm">Mot de passe actuel</span>
+                      <Input type="password" name="password" className="text-sm" />
+                    </Label>
+
+                    <Label className="flex flex-col gap-2">
+                      <span className="text-sm">Nouveau mot de passe</span>
+                      <Input type="password" name="newPassword" className="text-sm" />
+                    </Label>
+                  </div>
+
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      type="button"
+                      className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs"
+                      onClick={() => setIsModalOpenPassword(false)}
+                    >
+                      Annuler
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs"
+                    >
+                      {isUpdatingUserPassword
+                        ? "Modification en cours..."
+                        : "Modifier mon mot de passe"}
+                    </button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
           </div>
         </article>
 
