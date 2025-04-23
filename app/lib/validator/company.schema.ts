@@ -14,6 +14,26 @@ export const CompanyMediaSchema = v.object({
   ),
 });
 
+export const LogoCompanySchema = v.object({
+  companyId: v.string(),
+  logo_public_id: v.optional(v.string()),
+  logo: v.optional(
+    v.pipe(
+      v.instance(File),
+      v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
+      v.maxSize(1024 * 1024 * 3, "La taille du fichier doit être inférieure à 3MB"),
+    ),
+  ),
+});
+
+export const GalleryCompanySchema = v.object({
+  companyId: v.string(),
+  gallery_public_id: v.optional(v.array(v.string())),
+  gallery: v.optional(
+    v.pipe(v.array(v.instance(File)), v.maxLength(2, "Veuillez entrer au plus 2 images")),
+  ),
+});
+
 export const CompanyInfosSchema = v.object({
   name: v.pipe(
     v.string(),
