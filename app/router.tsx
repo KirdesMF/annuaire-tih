@@ -7,18 +7,18 @@ import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 const queryClient = new QueryClient();
 
 export function createRouter() {
-	return routerWithQueryClient(
-		createTanStackRouter({
-			routeTree,
-			context: { queryClient },
-			scrollRestoration: true,
-		}),
-		queryClient,
-	);
+  return routerWithQueryClient(
+    createTanStackRouter({
+      routeTree,
+      context: { queryClient },
+      scrollRestoration: true,
+    }),
+    queryClient,
+  );
 }
 
 declare module "@tanstack/react-router" {
-	interface Register {
-		router: ReturnType<typeof createRouter>;
-	}
+  interface Register {
+    router: ReturnType<typeof createRouter>;
+  }
 }

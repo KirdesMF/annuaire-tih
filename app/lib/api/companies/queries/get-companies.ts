@@ -10,26 +10,26 @@ import { PgSelect } from "drizzle-orm/pg-core";
 const status: CompanyStatus[] = ["active", "rejected", "pending"];
 
 const GetCompaniesSchema = v.object({
-	status: v.optional(v.picklist(status)),
+  status: v.optional(v.picklist(status)),
 });
 
 type GetCompaniesFilters = v.InferOutput<typeof GetCompaniesSchema>;
 
 export const getCompanies = createServerFn({ method: "GET" })
-	.validator((data: unknown) => v.parse(GetCompaniesSchema, data))
-	.handler(async ({ data }) => {
-		try {
-			const query = db.select().from(companiesTable);
+  .validator((data: unknown) => v.parse(GetCompaniesSchema, data))
+  .handler(async ({ data }) => {
+    try {
+      const query = db.select().from(companiesTable);
 
-			return await query;
-		} catch (error) {
-			console.error(error);
-		}
-	});
+      return await query;
+    } catch (error) {
+      console.error(error);
+    }
+  });
 
 export function companiesQuery(filters: GetCompaniesFilters = {}) {
-	return queryOptions({
-		queryKey: ["companies", filters],
-		queryFn: () => getCompanies({ data: filters }),
-	});
+  return queryOptions({
+    queryKey: ["companies", filters],
+    queryFn: () => getCompanies({ data: filters }),
+  });
 }

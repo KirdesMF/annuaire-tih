@@ -7,71 +7,71 @@ import { Label } from "~/components/label";
 import { companiesByCategoryQuery } from "~/lib/api/companies/queries/get-companies-by-category";
 
 const SearchSchema = v.object({
-	id: v.string(),
+  id: v.string(),
 });
 
 export const Route = createFileRoute("/(public)/categories/$slug")({
-	validateSearch: (search) => v.parse(SearchSchema, search),
-	loaderDeps: ({ search }) => ({
-		categoryId: search.id,
-	}),
-	loader: async ({ context, deps: { categoryId } }) => {
-		await context.queryClient.ensureQueryData(
-			companiesByCategoryQuery({ categoryId, status: "active" }),
-		);
-	},
-	component: RouteComponent,
+  validateSearch: (search) => v.parse(SearchSchema, search),
+  loaderDeps: ({ search }) => ({
+    categoryId: search.id,
+  }),
+  loader: async ({ context, deps: { categoryId } }) => {
+    await context.queryClient.ensureQueryData(
+      companiesByCategoryQuery({ categoryId, status: "active" }),
+    );
+  },
+  component: RouteComponent,
 });
 
 function RouteComponent() {
-	const slug = Route.useParams().slug;
-	const { id } = Route.useSearch();
-	const { data: companies } = useSuspenseQuery(
-		companiesByCategoryQuery({ categoryId: id, status: "active" }),
-	);
+  const slug = Route.useParams().slug;
+  const { id } = Route.useSearch();
+  const { data: companies } = useSuspenseQuery(
+    companiesByCategoryQuery({ categoryId: id, status: "active" }),
+  );
 
-	return (
-		<main>
-			<div className="container px-4 py-16 grid gap-6">
-				<header>
-					<Link to="/" className="text-sm text-gray-500">
-						Back
-					</Link>
-					<h1 className="text-2xl font-bold">{slug}</h1>
-				</header>
+  return (
+    <main>
+      <div className="container px-4 py-16 grid gap-6">
+        <header>
+          <Link to="/" className="text-sm text-gray-500">
+            Back
+          </Link>
+          <h1 className="text-2xl font-bold">{slug}</h1>
+        </header>
 
-				<div>
-					<Label>
-						<span className="sr-only">Rechercher une entreprise</span>
+        <div>
+          <Label>
+            <span className="sr-only">Rechercher une entreprise</span>
 
-						<div className="flex items-center rounded-md border border-gray-200 px-2 focus-within:border-gray-500">
-							<SearchIcon className="size-5" />
-							<Input
-								type="text"
-								placeholder="Rechercher une entreprise"
-								className="border-none outline-none"
-							/>
-						</div>
-					</Label>
-				</div>
+            <div className="flex items-center rounded-md border border-gray-200 px-2 focus-within:border-gray-500">
+              <SearchIcon className="size-5" />
+              <Input
+                type="text"
+                placeholder="Rechercher une entreprise"
+                className="border-none outline-none"
+              />
+            </div>
+          </Label>
+        </div>
 
-				{companies.length === 0 ? (
-					<div>No companies found</div>
-				) : (
-					<ul>
-						{companies.map((company) => (
-							<li
-								key={company.id}
-								className="flex flex-col gap-2 border border-gray-200 rounded-md p-4"
-							>
-								<Link to="/entreprises/$slug" params={{ slug: company.slug }}>
-									{company.name}
-								</Link>
-							</li>
-						))}
-					</ul>
-				)}
-			</div>
-		</main>
-	);
+        {companies.length === 0 ? (
+          <div>No companies found</div>
+        ) : (
+          <ul>
+            {companies.map((company) => (
+              <li
+                key={company.id}
+                className="flex flex-col gap-2 border border-gray-200 rounded-md p-4"
+              >
+                <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
+                  {company.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </main>
+  );
 }
