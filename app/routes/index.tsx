@@ -26,15 +26,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const navigate = Route.useNavigate();
   const categoriesQuery = useSuspenseQuery(categoriesQueryOptions);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
   const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
-
-  function onSelect(slug: string) {
-    navigate({ to: "/entreprises/$slug", params: { slug } });
-  }
 
   return (
     <main className="px-4 py-6 max-w-4xl mx-auto">
@@ -77,8 +72,10 @@ function Home() {
                 )}
 
                 {companies?.map((company) => (
-                  <CommandItem key={company.id} onSelect={() => onSelect(company.slug)}>
-                    {company.name}
+                  <CommandItem key={company.id} asChild>
+                    <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
+                      {company.name}
+                    </Link>
                   </CommandItem>
                 ))}
               </CommandList>
