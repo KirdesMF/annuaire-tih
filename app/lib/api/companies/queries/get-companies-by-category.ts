@@ -19,6 +19,7 @@ export const getCompaniesByCategory = createServerFn({ method: "GET" })
     const query = await db
       .select()
       .from(companiesTable)
+      .innerJoin(companyCategoriesTable, eq(companiesTable.id, companyCategoriesTable.company_id))
       .where(
         and(eq(companyCategoriesTable.category_id, categoryId), eq(companiesTable.status, status)),
       );
