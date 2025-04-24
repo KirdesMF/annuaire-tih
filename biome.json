@@ -8,7 +8,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["app/routeTree.gen.ts"]
+    "ignore": ["app/routeTree.gen.ts", "app/styles/app.css"]
   },
   "formatter": {
     "enabled": true,

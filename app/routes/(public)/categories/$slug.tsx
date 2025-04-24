@@ -26,9 +26,7 @@ export const Route = createFileRoute("/(public)/categories/$slug")({
 function RouteComponent() {
   const slug = Route.useParams().slug;
   const { id } = Route.useSearch();
-  const { data: companies } = useSuspenseQuery(
-    companiesByCategoryQuery({ categoryId: id, status: "active" }),
-  );
+  const { data } = useSuspenseQuery(companiesByCategoryQuery({ categoryId: id, status: "active" }));
 
   return (
     <main>
@@ -37,7 +35,7 @@ function RouteComponent() {
           <Link to="/" className="text-sm text-gray-500">
             Back
           </Link>
-          <h1 className="text-2xl font-bold">{slug}</h1>
+          <h1 className="text-2xl font-bold first-letter:capitalize">{slug.replace(/-/g, " ")}</h1>
         </header>
 
         <div>
@@ -55,11 +53,11 @@ function RouteComponent() {
           </Label>
         </div>
 
-        {companies.length === 0 ? (
-          <div>No companies found</div>
+        {data.companies.length === 0 ? (
+          <div>Aucune entreprise trouvée</div>
         ) : (
           <ul>
-            {companies.map((company) => (
+            {data.companies.map((company) => (
               <li
                 key={company.id}
                 className="flex flex-col gap-2 border border-gray-200 rounded-md p-4"

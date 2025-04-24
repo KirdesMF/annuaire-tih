@@ -24,7 +24,10 @@ export const getCompaniesByCategory = createServerFn({ method: "GET" })
         and(eq(companyCategoriesTable.category_id, categoryId), eq(companiesTable.status, status)),
       );
 
-    return query;
+    return {
+      companies: query.map((data) => data.companies),
+      categories: query.map((data) => data.company_categories),
+    };
   });
 
 export function companiesByCategoryQuery(data: GetCompaniesByCategoryData) {
