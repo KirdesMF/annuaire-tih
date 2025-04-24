@@ -5,7 +5,6 @@ import { LogoutIcon } from "./icons/logout";
 import { SettingsAccountIcon } from "./icons/settings-account";
 import { CompanyIcon } from "./icons/company";
 import { AddIcon } from "./icons/add";
-import { useState } from "react";
 import { DashboardIcon } from "./icons/dashboard";
 import { useAdminRole } from "~/hooks/use-admin-role";
 import { type QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -15,6 +14,7 @@ import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import type { User } from "better-auth";
 import { linkOptions } from "@tanstack/react-router";
+import { useThemeStore } from "~/stores/theme.store";
 
 const LINKS = linkOptions([
   { label: "Qui sommes-nous ?", to: "/about" },
@@ -105,7 +105,7 @@ function LoggedUserMenu({
   queryClient,
 }: { user: User | undefined; queryClient: QueryClient }) {
   const router = useRouter();
-  const [theme, setTheme] = useState("light");
+  const { theme, onThemeLight, onThemeDark, onThemeSystem, setTheme } = useThemeStore();
   const { isAdmin } = useAdminRole();
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
@@ -118,6 +118,7 @@ function LoggedUserMenu({
       onSuccess: () => {
         queryClient.clear();
         toast.success("Vous êtes déconnecté");
+        router.invalidate(); // check if this is needed
         router.navigate({ to: "/" });
       },
     });
@@ -133,7 +134,7 @@ function LoggedUserMenu({
         <DropdownMenu.Content
           sideOffset={2}
           align="end"
-          className="bg-white border rounded-sm border-gray-200 min-w-64 overflow-hidden p-1 shadow-xs"
+          className="bg-white border rounded-sm border-gray-200 min-w-64 overflow-hidden p-1 shadow-xs dark:bg-gray-900 dark:border-gray-400"
         >
           <div className="flex flex-col p-2">
             <span className="text-sm">{user.name}</span>
@@ -146,7 +147,7 @@ function LoggedUserMenu({
             <DropdownMenu.Item asChild>
               <Link
                 to="/compte/entreprises/create"
-                className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none"
+                className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none dark:data-highlighted:bg-gray-800"
               >
                 <AddIcon className="size-4" />
                 <span className="text-xs">Référencer</span>
@@ -156,7 +157,7 @@ function LoggedUserMenu({
             <DropdownMenu.Item asChild>
               <Link
                 to="/compte/entreprises"
-                className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none"
+                className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none dark:data-highlighted:bg-gray-800"
               >
                 <CompanyIcon className="size-4" />
                 <span className="text-xs">Mes entreprises</span>
@@ -166,7 +167,7 @@ function LoggedUserMenu({
             <DropdownMenu.Item asChild>
               <Link
                 to="/compte/preferences"
-                className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none"
+                className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none dark:data-highlighted:bg-gray-800"
               >
                 <SettingsAccountIcon className="size-4" />
                 <span className="text-xs">Mon compte</span>
@@ -177,7 +178,7 @@ function LoggedUserMenu({
               <DropdownMenu.Item asChild>
                 <Link
                   to="/admin/dashboard"
-                  className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none"
+                  className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none dark:data-highlighted:bg-gray-800"
                 >
                   <DashboardIcon className="size-4" />
                   <span className="text-xs">Admin dashboard</span>
@@ -193,10 +194,12 @@ function LoggedUserMenu({
             <DropdownMenu.Label className="text-sm font-light px-2 py-1.5">
               Thème
             </DropdownMenu.Label>
+
             <DropdownMenu.RadioGroup value={theme} onValueChange={setTheme}>
               <DropdownMenu.RadioItem
                 value="light"
-                className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center"
+                className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
+                onSelect={() => onThemeLight()}
               >
                 <DropdownMenu.ItemIndicator className="absolute start-2">
                   <span className="size-2 rounded-full flex bg-gray-400" />
@@ -205,7 +208,8 @@ function LoggedUserMenu({
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 value="dark"
-                className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center"
+                className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
+                onSelect={() => onThemeDark()}
               >
                 <DropdownMenu.ItemIndicator className="absolute start-2">
                   <span className="size-2 rounded-full flex bg-gray-400" />
@@ -214,7 +218,8 @@ function LoggedUserMenu({
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 value="system"
-                className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center"
+                className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
+                onSelect={() => onThemeSystem()}
               >
                 <DropdownMenu.ItemIndicator className="absolute start-2">
                   <span className="size-2 rounded-full flex bg-gray-400" />
@@ -229,7 +234,7 @@ function LoggedUserMenu({
           <DropdownMenu.Group>
             <DropdownMenu.Item
               onSelect={() => onLogout()}
-              className="text-xs px-2 py-1.5 outline-none cursor-pointer flex items-center gap-2 data-highlighted:bg-gray-100"
+              className="text-xs px-2 py-1.5 outline-none cursor-pointer flex items-center gap-2 data-highlighted:bg-gray-100 dark:data-highlighted:bg-gray-800"
             >
               <LogoutIcon className="size-4" />
               <span>Se déconnecter</span>

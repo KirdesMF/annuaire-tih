@@ -1,5 +1,5 @@
 // app/routes/__root.tsx
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
 import {
   Outlet,
@@ -7,6 +7,8 @@ import {
   Scripts,
   createRootRouteWithContext,
   redirect,
+  ScriptOnce,
+  useLayoutEffect,
 } from "@tanstack/react-router";
 import { Header } from "~/components/header";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -15,6 +17,7 @@ import { getWebRequest } from "@tanstack/react-start/server";
 import { auth } from "~/lib/auth/auth.server";
 import { Toaster } from "sonner";
 import appCSS from "~/styles/app.css?url";
+import { useThemeStore } from "~/stores/theme.store";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
   const request = getWebRequest();
@@ -62,13 +65,22 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const { user, queryClient } = Route.useRouteContext();
+  const { setTheme } = useThemeStore();
+
+  useLayoutEffect(() => {
+    setTheme(localStorage.getItem("theme") || "system");
+  }, [setTheme]);
 
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <ScriptOnce>
+          {`document.documentElement.dataset.theme = localStorage.theme === 'dark' || (!('theme' in localStorage) && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'`}
+        </ScriptOnce>
       </head>
-      <body className="font-sans text-gray-700 isolate">
+
+      <body className="font-sans text-gray-700 isolate dark:bg-gray-900 dark:text-gray-100">
         <Header user={user} queryClient={queryClient} />
         {children}
         <Toaster />
