@@ -10,7 +10,7 @@
 
 @layer components {
   .bg-diagonal-lines {
-    opacity: 0.8;
+    opacity: 0.4;
     background-size: 15px 15px;
     background-image: repeating-linear-gradient(
       45deg,

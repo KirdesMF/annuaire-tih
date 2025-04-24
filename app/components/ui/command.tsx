@@ -74,7 +74,7 @@ export function CommandItem({
   return (
     <CommandPrimitive.Item
       ref={ref}
-      className={cn("px-4 py-2 text-sm w-full aria-selected:bg-gray-100", className)}
+      className={cn("px-4 py-2 text-sm w-full aria-selected:bg-gray-100 inline-flex", className)}
       {...props}
     >
       {children}

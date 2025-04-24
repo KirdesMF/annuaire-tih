@@ -7,7 +7,7 @@ import { CompanyIcon } from "./icons/company";
 import { AddIcon } from "./icons/add";
 import { DashboardIcon } from "./icons/dashboard";
 import { useAdminRole } from "~/hooks/use-admin-role";
-import { type QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
+import { type QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { auth, type AuthSession } from "~/lib/auth/auth.server";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
@@ -15,6 +15,21 @@ import { getWebRequest } from "@tanstack/react-start/server";
 import type { User } from "better-auth";
 import { linkOptions } from "@tanstack/react-router";
 import { useThemeStore } from "~/stores/theme.store";
+import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
+import { useState } from "react";
+import { useDebounce } from "~/hooks/use-debounce";
+import {
+  CommandList,
+  CommandEmpty,
+  CommandInput,
+  CommandSeparator,
+  CommandItem,
+  CommandLoading,
+} from "./ui/command";
+import { PopoverContent } from "./ui/popover";
+import { PopoverTrigger } from "./ui/popover";
+import { Popover } from "./ui/popover";
+import { Command } from "./ui/command";
 
 const LINKS = linkOptions([
   { label: "Qui sommes-nous ?", to: "/about" },
@@ -35,30 +50,74 @@ export function Header({
   user,
   queryClient,
 }: { user: User | undefined; queryClient: QueryClient }) {
-  return (
-    <header className="px-16 py-1.5 border-b border-gray-200 backdrop-blur-sm">
-      <nav className="flex items-center justify-between">
-        <ul className="flex items-center gap-4">
-          <li>
-            <Link to="/" className="text-sm font-light">
-              Annuaire TIH
-            </Link>
-          </li>
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 1000);
+  const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
 
-          {LINKS.map((link) => (
-            <li key={link.to}>
-              <Link
-                to={link.to}
-                className="text-sm font-light"
-                activeProps={{ className: "text-blue-700" }}
-              >
-                {link.label}
+  return (
+    <header className="px-16 py-3 border-b border-gray-200 backdrop-blur-sm">
+      <div className="flex items-center justify-between">
+        <nav>
+          <ul className="flex items-center gap-4">
+            <li>
+              <Link to="/" className="text-sm font-light">
+                Annuaire TIH
               </Link>
             </li>
-          ))}
-        </ul>
+            {LINKS.map((link) => (
+              <li key={link.to}>
+                <Link
+                  to={link.to}
+                  className="text-sm font-light"
+                  activeProps={{ className: "text-blue-700" }}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         <div className="flex items-center gap-4">
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="text-start text-xs text-nowrap font-light px-4 border border-gray-400 rounded-sm bg-white w-80 h-8 focus-within:outline focus-within:outline-blue-500"
+              >
+                Rechercher un nom ou une activité...
+              </button>
+            </PopoverTrigger>
+
+            <PopoverContent>
+              <Command shouldFilter={false} className="py-2">
+                <CommandInput
+                  value={searchTerm}
+                  onValueChange={setSearchTerm}
+                  placeholder="Entrez un nom ou une activité..."
+                />
+
+                <CommandSeparator alwaysRender />
+
+                <CommandList>
+                  {!searchTerm && <CommandEmpty>Entrez au moins 3 caractères...</CommandEmpty>}
+                  {searchTerm && isFetching && <CommandLoading>Loading...</CommandLoading>}
+                  {searchTerm.length >= 3 && !isFetching && (
+                    <CommandEmpty>Aucune entreprise trouvée</CommandEmpty>
+                  )}
+
+                  {companies?.map((company) => (
+                    <CommandItem key={company.id} asChild>
+                      <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
+                        {company.name}
+                      </Link>
+                    </CommandItem>
+                  ))}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+
           <a
             href="https://linkedin.com/groups/13011531"
             target="_blank"
@@ -72,7 +131,7 @@ export function Header({
           <LoginButton user={user} />
           <LoggedUserMenu user={user} queryClient={queryClient} />
         </div>
-      </nav>
+      </div>
     </header>
   );
 }
@@ -195,7 +254,7 @@ function LoggedUserMenu({
               Thème
             </DropdownMenu.Label>
 
-            <DropdownMenu.RadioGroup value={theme} onValueChange={setTheme}>
+            <DropdownMenu.RadioGroup value={theme ?? "system"} onValueChange={setTheme}>
               <DropdownMenu.RadioItem
                 value="light"
                 className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
@@ -256,7 +315,7 @@ function AvatarUser({ user }: { user: User }) {
 
   if (user.image) {
     return (
-      <Avatar.Root className="size-6 rounded-full">
+      <Avatar.Root className="size-8 rounded-full">
         <Avatar.Image src={user.image} alt={user.name} className="size-full rounded-full" />
         <Avatar.Fallback className="size-full leading-1">{initials}</Avatar.Fallback>
       </Avatar.Root>
