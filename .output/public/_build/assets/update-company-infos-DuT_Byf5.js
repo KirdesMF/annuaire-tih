@@ -1,0 +1,1 @@
+import{m as e,n as a}from"./client-0TpWmm9u.js";const n=a("app_lib_api_companies_mutations_update-company-infos_ts--updateCompanyInfos_createServerFn_handler","/_server"),t=e({method:"POST"}).handler(n);export{t as u};

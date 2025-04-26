@@ -1,0 +1,29 @@
+{
+  "_index-I3xEeSmG.js": {
+    "file": "assets/index-I3xEeSmG.js",
+    "name": "index",
+    "dynamicImports": [
+      "app/routes/api/auth/$.ts?pick=APIRoute",
+      "app/routes/api/auth/$.ts?pick=APIRoute"
+    ]
+  },
+  "app/routes/api/auth/$.ts?pick=APIRoute": {
+    "file": "_.js",
+    "name": "_",
+    "src": "app/routes/api/auth/$.ts?pick=APIRoute",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-I3xEeSmG.js"
+    ]
+  },
+  "virtual:$vinxi/handler/api": {
+    "file": "api.js",
+    "name": "api",
+    "src": "virtual:$vinxi/handler/api",
+    "isEntry": true,
+    "imports": [
+      "_index-I3xEeSmG.js"
+    ]
+  }
+}

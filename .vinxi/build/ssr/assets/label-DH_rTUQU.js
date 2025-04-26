@@ -1,0 +1,1 @@
+import{jsx as e}from"react/jsx-runtime";import{I as o}from"./ssr-Bxxdisao.js";function l({className:t,children:r,...a}){return e("label",{...a,className:o("text-sm font-light text-gray-700",t),children:r})}export{l as L};

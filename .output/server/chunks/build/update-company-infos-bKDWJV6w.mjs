@@ -1,0 +1,2 @@
+import{s as a}from"./company.schema-5gxzbh_J.mjs";import{c as o,N as r,aL as s}from"../nitro/nitro.mjs";import{d as e}from"../_/index2.mjs";const t=s("app_lib_api_companies_mutations_update-company-infos_ts--updateCompanyInfos_createServerFn_handler","/_server"),n=o({method:"POST"}).validator((o=>{const s=e(o,{arrays:["categories"],booleans:["rqth"]});return r(a,s)})).handler(t);export{n as _};
+//# sourceMappingURL=update-company-infos-bKDWJV6w.mjs.map

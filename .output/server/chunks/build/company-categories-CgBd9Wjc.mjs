@@ -1,0 +1,2 @@
+import{_ as e}from"./companies-l5PKOmvG.mjs";import{n as a}from"./categories-B1A9pQfz.mjs";import{a8 as o,a9 as t,aa as c,ab as r}from"../nitro/nitro.mjs";const i=o("company_categories",{company_id:c("company_id").notNull().references((()=>e.id),{onDelete:"cascade"}),category_id:c("category_id").notNull().references((()=>a.id),{onDelete:"cascade"}),created_at:t("created_at").notNull().defaultNow()},(e=>[r({columns:[e.company_id,e.category_id]})]));export{i as d};
+//# sourceMappingURL=company-categories-CgBd9Wjc.mjs.map

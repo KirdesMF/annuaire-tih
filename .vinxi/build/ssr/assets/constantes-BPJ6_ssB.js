@@ -1,0 +1,1 @@
+import{createServerFn as t}from"@tanstack/start-client-core";import{k as a}from"./ssr-Bxxdisao.js";const r=a("app_lib_api_companies_mutations_delete-company_ts--deleteCompany_createServerFn_handler","/_server"),p=t({method:"POST"}).validator(e=>e).handler(r),d={pending:"En attente de validation",active:"Approuvée",rejected:"Rejetée"};export{d as C,p as d};

@@ -1,0 +1,2 @@
+import{r as e}from"../nitro/nitro.mjs";function c(){const[r,t]=e.useState({gallery:[]});return{imagePreviews:r,readImage:function({type:e,file:r,index:n=0}){const o=new FileReader;o.onload=()=>{const r=o.result;t((t=>{if("logo"===e)return{...t,logo:r};if("gallery"===e&&"number"==typeof n){const e=[...t.gallery];return e[n]=r,{...t,gallery:e}}return t}))},o.readAsDataURL(r)},setImagePreviews:t}}export{c};
+//# sourceMappingURL=use-image-preview-D0S5Wc-4.mjs.map
