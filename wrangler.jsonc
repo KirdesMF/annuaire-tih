@@ -2,7 +2,6 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "annuaire-tih",
   "main": ".output/server/index.mjs",
-  "pages_build_output_dir": "./dist",
   "compatibility_date": "2025-04-10",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
