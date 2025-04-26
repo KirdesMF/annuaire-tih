@@ -40,7 +40,7 @@ const LINKS = linkOptions([
 
 const signOutFn = createServerFn({ method: "POST" }).handler(async () => {
   const request = getWebRequest();
-  if (!request) return;
+  if (!request) throw new Error("No request");
   await auth.api.signOut({ headers: request.headers });
 });
 
