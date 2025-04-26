@@ -1,11 +1,22 @@
 @import "tailwindcss" source("../");
 
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
     "Segoe UI Symbol", "Noto Color Emoji";
   --color-primary: rgb(165, 101, 95);
+}
+
+@custom-variant dark {
+  &:where([data-theme=dark], [data-theme=dark] *) {
+    @slot
+  }
+
+  &:where([data-theme=system], [data-theme=system] *) {
+    @media (prefers-color-scheme: dark) {
+      @slot
+    }
+  }
 }
 
 @layer components {
