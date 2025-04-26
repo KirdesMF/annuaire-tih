@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
@@ -12,7 +12,7 @@ import { deleteUser } from "~/lib/api/users/mutations/delete-user";
 import { updateUserEmailFn } from "~/lib/api/users/mutations/update-user-email";
 import { updateUserInfos } from "~/lib/api/users/mutations/update-user-infos";
 import { updateUserPasswordFn } from "~/lib/api/users/mutations/update-user-password";
-import { useThemeStore } from "~/stores/theme.store";
+import { colorSchemeQuery, setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
 
 export const Route = createFileRoute("/_protected/compte/preferences")({
   component: RouteComponent,
@@ -22,9 +22,12 @@ function RouteComponent() {
   const context = Route.useRouteContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenPassword, setIsModalOpenPassword] = useState(false);
-  const { theme, onThemeLight, onThemeDark, onThemeSystem, setTheme } = useThemeStore();
+  const { data: colorScheme } = useQuery(colorSchemeQuery);
 
   // Mutations
+  const { mutate: setColorScheme } = useMutation({
+    mutationFn: useServerFn(setColorSchemeFn),
+  });
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(deleteUser) });
   const { mutate: update, isPending: isUpdatingUserInfos } = useMutation({
     mutationFn: useServerFn(updateUserInfos),
@@ -87,15 +90,16 @@ function RouteComponent() {
     );
   }
 
-  function onValueChangeTheme(value: string) {
-    const ACTION = {
-      light: onThemeLight,
-      dark: onThemeDark,
-      system: onThemeSystem,
-    };
-
-    setTheme(value);
-    ACTION[value as keyof typeof ACTION]();
+  function onValueChangeTheme(value: "light" | "dark" | "system") {
+    setColorScheme(
+      { data: value },
+      {
+        onSuccess: () => {
+          context.queryClient.invalidateQueries({ queryKey: ["color-scheme"] });
+          toast.success("Thème modifié avec succès");
+        },
+      },
+    );
   }
 
   return (
@@ -261,8 +265,8 @@ function RouteComponent() {
             </p>
 
             <RadioGroup.Root
-              defaultValue={theme ?? "system"}
-              onValueChange={(value) => onValueChangeTheme(value)}
+              defaultValue={colorScheme ?? "system"}
+              onValueChange={(value: "light" | "dark" | "system") => onValueChangeTheme(value)}
               className="flex gap-2"
             >
               <RadioGroup.Item
