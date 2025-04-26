@@ -7,14 +7,13 @@ import { CompanyIcon } from "./icons/company";
 import { AddIcon } from "./icons/add";
 import { DashboardIcon } from "./icons/dashboard";
 import { useAdminRole } from "~/hooks/use-admin-role";
-import { type QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { auth, type AuthSession } from "~/lib/auth/auth.server";
+import { auth } from "~/lib/auth/auth.server";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import type { User } from "better-auth";
 import { linkOptions } from "@tanstack/react-router";
-import { useThemeStore } from "~/stores/theme.store";
 import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
 import { useState } from "react";
 import { useDebounce } from "~/hooks/use-debounce";
@@ -30,6 +29,7 @@ import { PopoverContent } from "./ui/popover";
 import { PopoverTrigger } from "./ui/popover";
 import { Popover } from "./ui/popover";
 import { Command } from "./ui/command";
+import { colorSchemeQuery, setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
 
 const LINKS = linkOptions([
   { label: "Qui sommes-nous ?", to: "/about" },
@@ -40,16 +40,11 @@ const LINKS = linkOptions([
 
 const signOutFn = createServerFn({ method: "POST" }).handler(async () => {
   const request = getWebRequest();
-
   if (!request) return;
-
   await auth.api.signOut({ headers: request.headers });
 });
 
-export function Header({
-  user,
-  queryClient,
-}: { user: User | undefined; queryClient: QueryClient }) {
+export function Header({ user }: { user: User | undefined }) {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
   const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
@@ -129,7 +124,7 @@ export function Header({
 
           <RegisterLink user={user} />
           <LoginButton user={user} />
-          <LoggedUserMenu user={user} queryClient={queryClient} />
+          <LoggedUserMenu user={user} />
         </div>
       </div>
     </header>
@@ -159,15 +154,17 @@ function LoginButton({ user }: { user: User | undefined }) {
   );
 }
 
-function LoggedUserMenu({
-  user,
-  queryClient,
-}: { user: User | undefined; queryClient: QueryClient }) {
+function LoggedUserMenu({ user }: { user: User | undefined }) {
   const router = useRouter();
-  const { theme, onThemeLight, onThemeDark, onThemeSystem, setTheme } = useThemeStore();
+  const queryClient = useQueryClient();
   const { isAdmin } = useAdminRole();
+  const { data: colorScheme } = useQuery(colorSchemeQuery);
+
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
+  });
+  const { mutate: setColorScheme } = useMutation({
+    mutationFn: useServerFn(setColorSchemeFn),
   });
 
   if (!user) return null;
@@ -177,10 +174,21 @@ function LoggedUserMenu({
       onSuccess: () => {
         queryClient.clear();
         toast.success("Vous êtes déconnecté");
-        router.invalidate(); // check if this is needed
         router.navigate({ to: "/" });
       },
     });
+  }
+
+  function onSelectColorScheme(scheme: "light" | "dark" | "system") {
+    setColorScheme(
+      { data: scheme },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ["color-scheme"] });
+          toast.success("Thème mis à jour");
+        },
+      },
+    );
   }
 
   return (
@@ -254,11 +262,17 @@ function LoggedUserMenu({
               Thème
             </DropdownMenu.Label>
 
-            <DropdownMenu.RadioGroup value={theme ?? "system"} onValueChange={setTheme}>
+            <DropdownMenu.RadioGroup
+              value={colorScheme}
+              onValueChange={(value) => {
+                console.log("value", value);
+                onSelectColorScheme(value as "light" | "dark" | "system");
+              }}
+            >
               <DropdownMenu.RadioItem
                 value="light"
                 className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
-                onSelect={() => onThemeLight()}
+                onSelect={() => onSelectColorScheme("light")}
               >
                 <DropdownMenu.ItemIndicator className="absolute start-2">
                   <span className="size-2 rounded-full flex bg-gray-400" />
@@ -268,7 +282,7 @@ function LoggedUserMenu({
               <DropdownMenu.RadioItem
                 value="dark"
                 className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
-                onSelect={() => onThemeDark()}
+                onSelect={() => onSelectColorScheme("dark")}
               >
                 <DropdownMenu.ItemIndicator className="absolute start-2">
                   <span className="size-2 rounded-full flex bg-gray-400" />
@@ -278,7 +292,7 @@ function LoggedUserMenu({
               <DropdownMenu.RadioItem
                 value="system"
                 className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
-                onSelect={() => onThemeSystem()}
+                onSelect={() => onSelectColorScheme("system")}
               >
                 <DropdownMenu.ItemIndicator className="absolute start-2">
                   <span className="size-2 rounded-full flex bg-gray-400" />
