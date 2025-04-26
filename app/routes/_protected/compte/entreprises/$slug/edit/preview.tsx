@@ -14,7 +14,6 @@ import { InstagramIcon } from "~/components/icons/instagram";
 import { LinkChainIcon } from "~/components/icons/link-chain";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import { PhoneIcon } from "~/components/icons/phone";
-import { useImagePreview } from "~/hooks/use-image-preview";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
 import { useUpdatePreviewStore } from "~/stores/preview.store";
@@ -53,23 +52,10 @@ function RouteComponent() {
   const params = Route.useParams();
   const navigate = Route.useNavigate();
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
-  const { imagePreviews, readImage } = useImagePreview();
 
   const { mutate, isPending } = useMutation({
     mutationFn: useServerFn(updateCompanyInfos),
   });
-
-  useEffect(() => {
-    if (preview.logo) {
-      readImage({ type: "logo", file: preview.logo });
-    }
-
-    if (preview.gallery) {
-      preview.gallery.forEach((image, index) => {
-        readImage({ type: "gallery", file: image, index });
-      });
-    }
-  }, [preview.logo, preview.gallery, readImage]);
 
   const socialMedia = {
     facebook: preview.social_media?.facebook,
@@ -129,7 +115,11 @@ function RouteComponent() {
 
       <div className="container flex justify-between gap-4 border border-gray-300 p-6 rounded-sm">
         <div className="flex flex-col gap-2">
-          <CompanyLogo url={imagePreviews.logo} name={preview.name ?? ""} size="lg" />
+          <CompanyLogo
+            url={preview.logo ? URL.createObjectURL(preview.logo) : undefined}
+            name={preview.name ?? ""}
+            size="lg"
+          />
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">{preview.name}</h1>
             <CopyButton>{preview.siret}</CopyButton>
@@ -233,15 +223,19 @@ function RouteComponent() {
           </p>
         </div>
 
-        {imagePreviews.gallery.length ? (
+        {preview.gallery?.length ? (
           <>
             <Separator.Root className="h-px bg-gray-300 my-4" />
             <ul className="flex flex-wrap gap-2">
-              {imagePreviews.gallery.map((image, index) => (
+              {preview.gallery.map((image, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                 <li key={index}>
                   <img
-                    src={image}
+                    src={
+                      preview.gallery?.[index]
+                        ? URL.createObjectURL(preview.gallery?.[index])
+                        : undefined
+                    }
                     alt={preview.name}
                     className="size-16 aspect-square rounded-sm"
                   />

@@ -4,17 +4,14 @@ import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { PlusIcon } from "~/components/icons/plus";
 import { Label } from "~/components/label";
-import { useImagePreview } from "~/hooks/use-image-preview";
 import { updateCompanyMedia } from "~/lib/api/companies/mutations/update-company-medias";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import { decode } from "decode-formdata";
 import * as v from "valibot";
 import { UpdateCompanyMediaSchema } from "~/lib/validator/company.schema";
 import { TrashIcon } from "~/components/icons/trash";
-import {
-  deleteCompanyLogo,
-  deleteCompanyMedia,
-} from "~/lib/api/companies/mutations/delete-company-media";
+import { deleteCompanyMedia } from "~/lib/api/companies/mutations/delete-company-media";
+import { useAddPreviewStore } from "~/stores/preview.store";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/medias")({
   loader: async ({ context, params }) => {
@@ -28,11 +25,11 @@ function RouteComponent() {
   const context = Route.useRouteContext();
   const navigate = Route.useNavigate();
   const { data: company } = useSuspenseQuery(companyBySlugQuery(params.slug));
-  const { imagePreviews, readImage, setImagePreviews } = useImagePreview();
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompanyMedia) });
   const { mutate: deleteMedia, isPending: isDeletingMedia } = useMutation({
     mutationFn: useServerFn(deleteCompanyMedia),
   });
+  const { preview, setPreview } = useAddPreviewStore();
 
   function onImageChange(
     e: React.ChangeEvent<HTMLInputElement>,
@@ -41,7 +38,19 @@ function RouteComponent() {
   ) {
     const file = e.target.files?.[0];
     if (!file) return;
-    readImage({ type, file, index });
+
+    if (type === "logo") {
+      setPreview({ ...preview, logo: file, logoUrl: URL.createObjectURL(file) });
+    }
+    if (type === "gallery" && index !== undefined) {
+      const currentGallery = preview.gallery ? [...preview.gallery] : [];
+      currentGallery[index] = file;
+      setPreview({
+        ...preview,
+        gallery: currentGallery,
+        galleryUrls: currentGallery.map((image) => URL.createObjectURL(image)),
+      });
+    }
   }
 
   function onDeleteLogo({ companyId, publicId }: { companyId: string; publicId: string }) {
@@ -51,7 +60,6 @@ function RouteComponent() {
         onSuccess: () => {
           context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
           context.queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
-          setImagePreviews((prev) => ({ ...prev, logo: undefined }));
           toast.success("Logo supprimé avec succès");
         },
       },
@@ -69,10 +77,6 @@ function RouteComponent() {
         onSuccess: () => {
           context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
           context.queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
-          setImagePreviews((prev) => ({
-            ...prev,
-            gallery: prev.gallery.filter((_, i) => i !== index),
-          }));
           toast.success("Image supprimée avec succès");
         },
       },
@@ -133,9 +137,11 @@ function RouteComponent() {
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Logo (max. 3MB)</span>
                 <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-                  {imagePreviews.logo || company.logo?.secureUrl ? (
+                  {preview.logo || company.logo?.secureUrl ? (
                     <img
-                      src={imagePreviews.logo || company.logo?.secureUrl}
+                      src={
+                        preview.logo ? URL.createObjectURL(preview.logo) : company.logo?.secureUrl
+                      }
                       alt="Logo"
                       className="w-full h-full object-cover"
                     />
@@ -175,9 +181,13 @@ function RouteComponent() {
                 <Label className="relative flex flex-col gap-1 outline-none group">
                   <span className="text-xs font-medium">Image 1 (max. 2MB)</span>
                   <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-                    {imagePreviews.gallery[0] || company.gallery?.[0]?.secureUrl ? (
+                    {preview.gallery?.[0] || company.gallery?.[0]?.secureUrl ? (
                       <img
-                        src={imagePreviews.gallery[0] || company.gallery?.[0].secureUrl}
+                        src={
+                          preview.gallery?.[0]
+                            ? URL.createObjectURL(preview.gallery?.[0])
+                            : company.gallery?.[0].secureUrl
+                        }
                         alt="gallery 1"
                         className="w-full h-full object-cover"
                       />
@@ -218,9 +228,13 @@ function RouteComponent() {
                 <Label className="relative flex flex-col gap-1 outline-none group">
                   <span className="text-xs font-medium">Image 2 (max. 2MB)</span>
                   <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-                    {imagePreviews.gallery[1] || company.gallery?.[1]?.secureUrl ? (
+                    {preview.gallery?.[1] || company.gallery?.[1]?.secureUrl ? (
                       <img
-                        src={imagePreviews.gallery[1] || company.gallery?.[1].secureUrl}
+                        src={
+                          preview.gallery?.[1]
+                            ? URL.createObjectURL(preview.gallery?.[1])
+                            : company.gallery?.[1].secureUrl
+                        }
                         alt="gallery 2"
                         className="w-full h-full object-cover"
                       />
