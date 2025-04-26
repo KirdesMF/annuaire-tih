@@ -1,1 +1,0 @@
-import{jsx as n}from"react/jsx-runtime";import{I as t}from"./ssr-Bxxdisao.js";function p({className:r,...o}){return n("input",{...o,className:t("border border-gray-300 rounded-sm p-2 h-9 w-full",r)})}export{p as I};

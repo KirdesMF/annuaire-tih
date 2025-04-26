@@ -1,2 +1,0 @@
-import{a8 as a,a9 as t,ac as e,ad as d,aa as l,ae as o}from"../nitro/nitro.mjs";const i=a("categories",{id:l("id").primaryKey().$defaultFn((()=>o(32))),name:d("name",{length:255}).notNull().unique(),is_active:e("is_active").notNull().default(!0),created_at:t("created_at").notNull().defaultNow(),updated_at:t("updated_at").notNull().defaultNow()});export{i as n};
-//# sourceMappingURL=categories-B1A9pQfz.mjs.map

@@ -1,1 +1,0 @@
-import{j as o}from"./client-0TpWmm9u.js";function n(r){return o.jsxs("svg",{xmlns:"http://www.w3.org/2000/svg",width:"24",height:"24",viewBox:"0 0 24 24",...r,children:[o.jsx("title",{children:"Chevron down"}),o.jsx("path",{fill:"currentColor",d:"M7.41 8.58L12 13.17l4.59-4.59L18 10l-6 6l-6-6z"})]})}export{n as C};

@@ -1,1 +1,0 @@
-import{m as e,n as t}from"./client-0TpWmm9u.js";const a=t("app_lib_api_companies_mutations_delete-company_ts--deleteCompany_createServerFn_handler","/_server"),r=e({method:"POST"}).handler(a),o={pending:"En attente de validation",active:"Approuvée",rejected:"Rejetée"};export{o as C,r as d};

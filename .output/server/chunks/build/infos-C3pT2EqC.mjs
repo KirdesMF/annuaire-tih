@@ -1,2 +1,0 @@
-import{j as o}from"../nitro/nitro.mjs";import"node:net";import"node:stream";import"node:events";import"node:process";import"node:buffer";import"node:timers";import"node:async_hooks";import"node:url";import"node:stream/web";import"node:crypto";const r=()=>o.jsx("div",{className:"container px-4 py-6",children:"Company not found"});export{r as errorComponent};
-//# sourceMappingURL=infos-C3pT2EqC.mjs.map

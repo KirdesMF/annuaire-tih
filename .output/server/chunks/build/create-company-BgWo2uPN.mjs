@@ -1,2 +1,0 @@
-import{o as r}from"./company.schema-5gxzbh_J.mjs";import{c as a,N as e,aL as o}from"../nitro/nitro.mjs";import{d as t}from"../_/index2.mjs";const s=o("app_lib_api_companies_mutations_create-company_ts--createCompany_createServerFn_handler","/_server"),m=a({method:"POST"}).validator((a=>{const o=t(a,{files:["logo","gallery"],arrays:["categories","gallery"],booleans:["rqth"]});return e(r,o)})).handler(s);export{m as _};
-//# sourceMappingURL=create-company-BgWo2uPN.mjs.map
