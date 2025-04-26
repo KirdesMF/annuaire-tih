@@ -14,7 +14,7 @@ export default defineConfig({
     ],
   },
   server: {
-    preset: "cloudflare-module",
+    preset: "cloudflare-pages",
     unenv: cloudflare,
   },
 });
