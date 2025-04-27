@@ -9,7 +9,7 @@
     "start": "vinxi start",
     "lint": "biome lint",
     "format": "biome format --write",
-    "deploy": "bun run build && bunx wrangler deploy --cwd .output/ deploy"
+    "deploy": "bun run build && bunx wrangler --cwd .output/ deploy"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
