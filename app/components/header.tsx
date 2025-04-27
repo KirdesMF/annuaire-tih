@@ -1,4 +1,4 @@
-import { Link, useRouter } from "@tanstack/react-router";
+import { Link, useRouter, linkOptions } from "@tanstack/react-router";
 import { LinkedinIcon } from "./icons/linkedin";
 import { Avatar, DropdownMenu } from "radix-ui";
 import { LogoutIcon } from "./icons/logout";
@@ -13,7 +13,6 @@ import { auth } from "~/lib/auth/auth.server";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import type { User } from "better-auth";
-import { linkOptions } from "@tanstack/react-router";
 import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
 import { useState } from "react";
 import { useDebounce } from "~/hooks/use-debounce";
@@ -40,7 +39,7 @@ const LINKS = linkOptions([
 
 const signOutFn = createServerFn({ method: "POST" }).handler(async () => {
   const request = getWebRequest();
-  if (!request) throw new Error("No request");
+  if (!request) return;
   await auth.api.signOut({ headers: request.headers });
 });
 
