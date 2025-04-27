@@ -1,8 +1,7 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Separator } from "radix-ui";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
@@ -14,7 +13,6 @@ import { InstagramIcon } from "~/components/icons/instagram";
 import { LinkChainIcon } from "~/components/icons/link-chain";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import { PhoneIcon } from "~/components/icons/phone";
-import { useImagePreview } from "~/hooks/use-image-preview";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
 import { useAddPreviewStore } from "~/stores/preview.store";
@@ -52,21 +50,8 @@ function RouteComponent() {
   const { preview, queryClient } = Route.useRouteContext();
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const navigate = Route.useNavigate();
-  const { imagePreviews, readImage } = useImagePreview();
 
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
-
-  useEffect(() => {
-    if (preview.logo) {
-      readImage({ type: "logo", file: preview.logo });
-    }
-
-    if (preview.gallery) {
-      preview.gallery.forEach((image, index) => {
-        readImage({ type: "gallery", file: image, index });
-      });
-    }
-  }, [preview.logo, preview.gallery, readImage]);
 
   const socialMedia = {
     facebook: preview.social_media.facebook,
@@ -99,7 +84,15 @@ function RouteComponent() {
       }
     }
 
-    console.log(Object.fromEntries(formData.entries()));
+    if (preview.logoUrl) {
+      URL.revokeObjectURL(preview.logoUrl);
+    }
+
+    if (preview.galleryUrls) {
+      for (const url of preview.galleryUrls) {
+        URL.revokeObjectURL(url);
+      }
+    }
 
     mutate(
       { data: formData },
@@ -120,7 +113,7 @@ function RouteComponent() {
       </Link>
       <div className="container flex justify-between gap-4 border border-gray-300 p-6 rounded-sm">
         <div className="flex flex-col gap-2">
-          <CompanyLogo url={imagePreviews.logo} name={preview.name} size="lg" />
+          <CompanyLogo url={preview.logoUrl} name={preview.name} size="lg" />
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">{preview.name}</h1>
             <CopyButton>{preview.siret}</CopyButton>
@@ -224,18 +217,13 @@ function RouteComponent() {
           </p>
         </div>
 
-        {imagePreviews.gallery.length ? (
+        {preview.galleryUrls?.length ? (
           <>
             <Separator.Root className="h-px bg-gray-300 my-4" />
             <ul className="flex flex-wrap gap-2">
-              {imagePreviews.gallery.map((image, index) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                <li key={index}>
-                  <img
-                    src={image}
-                    alt={preview.name}
-                    className="size-16 aspect-square rounded-sm"
-                  />
+              {preview.galleryUrls?.map((url) => (
+                <li key={url}>
+                  <img src={url} alt={preview.name} className="size-16 aspect-square rounded-sm" />
                 </li>
               ))}
             </ul>

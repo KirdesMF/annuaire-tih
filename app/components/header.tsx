@@ -1,35 +1,33 @@
-import { Link, useRouter } from "@tanstack/react-router";
-import { LinkedinIcon } from "./icons/linkedin";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, linkOptions } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import type { User } from "better-auth";
 import { Avatar, DropdownMenu } from "radix-ui";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useAdminRole } from "~/hooks/use-admin-role";
+import { useDebounce } from "~/hooks/use-debounce";
+import { signOutFn } from "~/lib/api/auth/sign-out";
+import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
+import { colorSchemeQuery, setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
+import { AddIcon } from "./icons/add";
+import { CompanyIcon } from "./icons/company";
+import { DashboardIcon } from "./icons/dashboard";
+import { LinkedinIcon } from "./icons/linkedin";
 import { LogoutIcon } from "./icons/logout";
 import { SettingsAccountIcon } from "./icons/settings-account";
-import { CompanyIcon } from "./icons/company";
-import { AddIcon } from "./icons/add";
-import { DashboardIcon } from "./icons/dashboard";
-import { useAdminRole } from "~/hooks/use-admin-role";
-import { type QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { auth, type AuthSession } from "~/lib/auth/auth.server";
-import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
-import type { User } from "better-auth";
-import { linkOptions } from "@tanstack/react-router";
-import { useThemeStore } from "~/stores/theme.store";
-import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
-import { useState } from "react";
-import { useDebounce } from "~/hooks/use-debounce";
 import {
-  CommandList,
   CommandEmpty,
   CommandInput,
-  CommandSeparator,
   CommandItem,
+  CommandList,
   CommandLoading,
+  CommandSeparator,
 } from "./ui/command";
+import { Command } from "./ui/command";
 import { PopoverContent } from "./ui/popover";
 import { PopoverTrigger } from "./ui/popover";
 import { Popover } from "./ui/popover";
-import { Command } from "./ui/command";
 
 const LINKS = linkOptions([
   { label: "Qui sommes-nous ?", to: "/about" },
@@ -38,18 +36,7 @@ const LINKS = linkOptions([
   { label: "Contact", to: "/contact" },
 ]);
 
-const signOutFn = createServerFn({ method: "POST" }).handler(async () => {
-  const request = getWebRequest();
-
-  if (!request) return;
-
-  await auth.api.signOut({ headers: request.headers });
-});
-
-export function Header({
-  user,
-  queryClient,
-}: { user: User | undefined; queryClient: QueryClient }) {
+export function Header({ user }: { user: User | undefined }) {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
   const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
@@ -129,7 +116,7 @@ export function Header({
 
           <RegisterLink user={user} />
           <LoginButton user={user} />
-          <LoggedUserMenu user={user} queryClient={queryClient} />
+          <LoggedUserMenu user={user} />
         </div>
       </div>
     </header>
@@ -159,28 +146,39 @@ function LoginButton({ user }: { user: User | undefined }) {
   );
 }
 
-function LoggedUserMenu({
-  user,
-  queryClient,
-}: { user: User | undefined; queryClient: QueryClient }) {
-  const router = useRouter();
-  const { theme, onThemeLight, onThemeDark, onThemeSystem, setTheme } = useThemeStore();
+function LoggedUserMenu({ user }: { user: User | undefined }) {
+  const queryClient = useQueryClient();
   const { isAdmin } = useAdminRole();
+  const { data: colorScheme } = useQuery(colorSchemeQuery);
+
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
+    onSuccess: () => {
+      toast.success("Vous êtes déconnecté");
+    },
+  });
+
+  const { mutate: setColorScheme, variables } = useMutation({
+    mutationFn: setColorSchemeFn,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
+    mutationKey: ["set-color-scheme"],
   });
 
   if (!user) return null;
 
-  async function onLogout() {
-    signOut(undefined, {
-      onSuccess: () => {
-        queryClient.clear();
-        toast.success("Vous êtes déconnecté");
-        router.invalidate(); // check if this is needed
-        router.navigate({ to: "/" });
+  function onLogout() {
+    signOut(undefined);
+  }
+
+  function onSelectColorScheme(scheme: "light" | "dark" | "system") {
+    setColorScheme(
+      { data: scheme },
+      {
+        onSuccess: () => {
+          toast.success("Thème mis à jour");
+        },
       },
-    });
+    );
   }
 
   return (
@@ -254,11 +252,17 @@ function LoggedUserMenu({
               Thème
             </DropdownMenu.Label>
 
-            <DropdownMenu.RadioGroup value={theme ?? "system"} onValueChange={setTheme}>
+            <DropdownMenu.RadioGroup
+              value={variables?.data ?? colorScheme}
+              onValueChange={(value) => {
+                console.log("value", value);
+                onSelectColorScheme(value as "light" | "dark" | "system");
+              }}
+            >
               <DropdownMenu.RadioItem
                 value="light"
                 className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
-                onSelect={() => onThemeLight()}
+                onSelect={() => onSelectColorScheme("light")}
               >
                 <DropdownMenu.ItemIndicator className="absolute start-2">
                   <span className="size-2 rounded-full flex bg-gray-400" />
@@ -268,7 +272,7 @@ function LoggedUserMenu({
               <DropdownMenu.RadioItem
                 value="dark"
                 className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
-                onSelect={() => onThemeDark()}
+                onSelect={() => onSelectColorScheme("dark")}
               >
                 <DropdownMenu.ItemIndicator className="absolute start-2">
                   <span className="size-2 rounded-full flex bg-gray-400" />
@@ -278,7 +282,7 @@ function LoggedUserMenu({
               <DropdownMenu.RadioItem
                 value="system"
                 className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
-                onSelect={() => onThemeSystem()}
+                onSelect={() => onSelectColorScheme("system")}
               >
                 <DropdownMenu.ItemIndicator className="absolute start-2">
                   <span className="size-2 rounded-full flex bg-gray-400" />

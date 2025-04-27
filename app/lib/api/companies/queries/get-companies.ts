@@ -1,11 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { companiesTable, type CompanyStatus } from "~/db/schema/companies";
 import * as v from "valibot";
-import { companyCategoriesTable } from "~/db/schema/company-categories";
-import { and, eq } from "drizzle-orm";
-import { PgSelect } from "drizzle-orm/pg-core";
 
 const status: CompanyStatus[] = ["active", "rejected", "pending"];
 
@@ -19,7 +16,7 @@ export const getCompanies = createServerFn({ method: "GET" })
   .validator((data: unknown) => v.parse(GetCompaniesSchema, data))
   .handler(async ({ data }) => {
     try {
-      const query = db.select().from(companiesTable);
+      const query = getDb().select().from(companiesTable);
 
       return await query;
     } catch (error) {

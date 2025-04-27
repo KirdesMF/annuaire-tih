@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { companiesTable, COMPANY_STATUSES } from "~/db/schema/companies";
 import * as v from "valibot";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
@@ -16,7 +16,7 @@ type GetCompaniesByCategoryData = v.InferOutput<typeof GetCompaniesByCategorySch
 export const getCompaniesByCategory = createServerFn({ method: "GET" })
   .validator((data: unknown) => v.parse(GetCompaniesByCategorySchema, data))
   .handler(async ({ data: { categoryId, status = "active" } }) => {
-    const query = await db
+    const query = await getDb()
       .select()
       .from(companiesTable)
       .innerJoin(companyCategoriesTable, eq(companiesTable.id, companyCategoriesTable.company_id))
