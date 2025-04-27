@@ -1,34 +1,33 @@
-import { Link, useRouter, linkOptions } from "@tanstack/react-router";
-import { LinkedinIcon } from "./icons/linkedin";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, linkOptions } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import type { User } from "better-auth";
 import { Avatar, DropdownMenu } from "radix-ui";
+import { useState } from "react";
+import { toast } from "sonner";
+import { useAdminRole } from "~/hooks/use-admin-role";
+import { useDebounce } from "~/hooks/use-debounce";
+import { signOutFn } from "~/lib/api/auth/sign-out";
+import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
+import { colorSchemeQuery, setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
+import { AddIcon } from "./icons/add";
+import { CompanyIcon } from "./icons/company";
+import { DashboardIcon } from "./icons/dashboard";
+import { LinkedinIcon } from "./icons/linkedin";
 import { LogoutIcon } from "./icons/logout";
 import { SettingsAccountIcon } from "./icons/settings-account";
-import { CompanyIcon } from "./icons/company";
-import { AddIcon } from "./icons/add";
-import { DashboardIcon } from "./icons/dashboard";
-import { useAdminRole } from "~/hooks/use-admin-role";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { auth } from "~/lib/auth/auth.server";
-import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
-import type { User } from "better-auth";
-import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
-import { useState } from "react";
-import { useDebounce } from "~/hooks/use-debounce";
 import {
-  CommandList,
   CommandEmpty,
   CommandInput,
-  CommandSeparator,
   CommandItem,
+  CommandList,
   CommandLoading,
+  CommandSeparator,
 } from "./ui/command";
+import { Command } from "./ui/command";
 import { PopoverContent } from "./ui/popover";
 import { PopoverTrigger } from "./ui/popover";
 import { Popover } from "./ui/popover";
-import { Command } from "./ui/command";
-import { colorSchemeQuery, setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
 
 const LINKS = linkOptions([
   { label: "Qui sommes-nous ?", to: "/about" },
@@ -36,12 +35,6 @@ const LINKS = linkOptions([
   { label: "Sources", to: "/sources" },
   { label: "Contact", to: "/contact" },
 ]);
-
-const signOutFn = createServerFn({ method: "POST" }).handler(async () => {
-  const request = getWebRequest();
-  if (!request) return;
-  await auth.api.signOut({ headers: request.headers });
-});
 
 export function Header({ user }: { user: User | undefined }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -154,13 +147,15 @@ function LoginButton({ user }: { user: User | undefined }) {
 }
 
 function LoggedUserMenu({ user }: { user: User | undefined }) {
-  const router = useRouter();
   const queryClient = useQueryClient();
   const { isAdmin } = useAdminRole();
   const { data: colorScheme } = useQuery(colorSchemeQuery);
 
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
+    onSuccess: () => {
+      toast.success("Vous êtes déconnecté");
+    },
   });
 
   const { mutate: setColorScheme, variables } = useMutation({
@@ -171,14 +166,8 @@ function LoggedUserMenu({ user }: { user: User | undefined }) {
 
   if (!user) return null;
 
-  async function onLogout() {
-    signOut(undefined, {
-      onSuccess: () => {
-        queryClient.clear();
-        toast.success("Vous êtes déconnecté");
-        router.navigate({ to: "/" });
-      },
-    });
+  function onLogout() {
+    signOut(undefined);
   }
 
   function onSelectColorScheme(scheme: "light" | "dark" | "system") {
