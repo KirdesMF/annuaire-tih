@@ -21,7 +21,7 @@ const getColorSchemeFn = createServerFn({ method: "GET" })
   .validator(() => {
     const cookie = getCookie("color-scheme") ?? "system";
     const scheme = v.parse(ColorSchemeSchema, cookie);
-    return scheme ?? "system";
+    return scheme;
   })
   .handler(({ data }) => {
     return data;

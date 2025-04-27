@@ -162,8 +162,11 @@ function LoggedUserMenu({ user }: { user: User | undefined }) {
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
   });
-  const { mutate: setColorScheme } = useMutation({
-    mutationFn: useServerFn(setColorSchemeFn),
+
+  const { mutate: setColorScheme, variables } = useMutation({
+    mutationFn: setColorSchemeFn,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
+    mutationKey: ["set-color-scheme"],
   });
 
   if (!user) return null;
@@ -183,7 +186,6 @@ function LoggedUserMenu({ user }: { user: User | undefined }) {
       { data: scheme },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: ["color-scheme"] });
           toast.success("Thème mis à jour");
         },
       },
@@ -262,7 +264,7 @@ function LoggedUserMenu({ user }: { user: User | undefined }) {
             </DropdownMenu.Label>
 
             <DropdownMenu.RadioGroup
-              value={colorScheme}
+              value={variables?.data ?? colorScheme}
               onValueChange={(value) => {
                 console.log("value", value);
                 onSelectColorScheme(value as "light" | "dark" | "system");

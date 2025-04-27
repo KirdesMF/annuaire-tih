@@ -25,9 +25,12 @@ function RouteComponent() {
   const { data: colorScheme } = useQuery(colorSchemeQuery);
 
   // Mutations
-  const { mutate: setColorScheme } = useMutation({
-    mutationFn: useServerFn(setColorSchemeFn),
+  const { mutate: setColorScheme, variables } = useMutation({
+    mutationFn: setColorSchemeFn,
+    onSettled: () => context.queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
+    mutationKey: ["set-color-scheme"],
   });
+
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(deleteUser) });
   const { mutate: update, isPending: isUpdatingUserInfos } = useMutation({
     mutationFn: useServerFn(updateUserInfos),
@@ -95,7 +98,6 @@ function RouteComponent() {
       { data: value },
       {
         onSuccess: () => {
-          context.queryClient.invalidateQueries({ queryKey: ["color-scheme"] });
           toast.success("Thème modifié avec succès");
         },
       },
@@ -265,7 +267,7 @@ function RouteComponent() {
             </p>
 
             <RadioGroup.Root
-              defaultValue={colorScheme ?? "system"}
+              defaultValue={variables?.data ?? colorScheme ?? "system"}
               onValueChange={(value: "light" | "dark" | "system") => onValueChangeTheme(value)}
               className="flex gap-2"
             >
