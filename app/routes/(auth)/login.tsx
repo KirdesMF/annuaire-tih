@@ -1,29 +1,27 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
+import { Link, createFileRoute, redirect } from "@tanstack/react-router";
+import { createServerFn, useServerFn } from "@tanstack/react-start";
+import * as v from "valibot";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
-import { authClient } from "~/lib/auth/auth.client";
-import * as v from "valibot";
-import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { auth } from "~/lib/auth/auth.server";
 
 const LoginSchema = v.object({
   email: v.pipe(v.string(), v.email()),
-  password: v.pipe(v.string(), v.minLength(8)),
+  password: v.string(),
 });
 
-type LoginData = v.InferOutput<typeof LoginSchema>;
-
 export const loginFn = createServerFn({ method: "POST" })
-  .validator((data: unknown) => v.parse(LoginSchema, data))
+  .validator(LoginSchema)
   .handler(async ({ data }) => {
-    console.log(data);
     await auth.api.signInEmail({
       body: {
         email: data.email,
         password: data.password,
       },
     });
+
+    throw redirect({ to: "/compte/entreprises" });
   });
 
 export const Route = createFileRoute("/(auth)/login")({
@@ -36,28 +34,20 @@ export const Route = createFileRoute("/(auth)/login")({
 });
 
 function RouteComponent() {
-  const router = useRouter();
   const { mutate, isPending } = useMutation({
     mutationFn: useServerFn(loginFn),
   });
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
-    mutate(
-      {
-        data: {
-          email: formData.get("email") as string,
-          password: formData.get("password") as string,
-        },
+    mutate({
+      data: {
+        email: formData.get("email") as string,
+        password: formData.get("password") as string,
       },
-      {
-        onSuccess: async () => {
-          router.navigate({ to: "/compte/entreprises" });
-        },
-      },
-    );
+    });
   }
 
   return (

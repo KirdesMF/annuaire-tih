@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 
 import { createServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 import {
   GalleryCompanySchema,
@@ -16,7 +16,7 @@ const updateCompanyInDb = async (
   companyId: string,
   data: Partial<typeof companiesTable.$inferSelect>,
 ) => {
-  return db.update(companiesTable).set(data).where(eq(companiesTable.id, companyId));
+  return getDb().update(companiesTable).set(data).where(eq(companiesTable.id, companyId));
 };
 
 export const updateCompanyMedia = createServerFn({ method: "POST" })
@@ -32,7 +32,7 @@ export const updateCompanyMedia = createServerFn({ method: "POST" })
       const { logo, gallery, logo_public_id, gallery_public_id, companyId } = data;
 
       // Get current company data once
-      const [company] = await db
+      const [company] = await getDb()
         .select()
         .from(companiesTable)
         .where(eq(companiesTable.id, companyId));
@@ -95,6 +95,8 @@ export const updateCompanyLogo = createServerFn({ method: "POST" })
 
     if (!logo?.size) throw new Error("Aucune image de logo fournie");
 
+    const db = getDb();
+
     const [company] = await db
       .select()
       .from(companiesTable)
@@ -132,6 +134,8 @@ export const updateCompanyGallery = createServerFn({ method: "POST" })
     const { gallery, gallery_public_id, companyId } = data;
 
     if (!gallery) throw new Error("Aucune image de galerie fournie");
+
+    const db = getDb();
 
     const [company] = await db
       .select()
