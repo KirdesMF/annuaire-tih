@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq, sql } from "drizzle-orm";
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 
 export const getCompaniesByTerm = createServerFn({ method: "GET" })
@@ -15,7 +15,7 @@ export const getCompaniesByTerm = createServerFn({ method: "GET" })
     // Join words with & for AND operation
     const tsQuery = searchWords.join(" & ");
 
-    return await db
+    return await getDb()
       .select()
       .from(companiesTable)
       .where(

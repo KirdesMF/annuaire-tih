@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { desc, eq, inArray } from "drizzle-orm";
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { categoriesTable } from "~/db/schema/categories";
 import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
@@ -9,6 +9,7 @@ import { companyCategoriesTable } from "~/db/schema/company-categories";
 export const getUserCompanies = createServerFn({ method: "GET" })
   .validator((userId: string) => userId)
   .handler(async ({ data }) => {
+    const db = getDb();
     // Get companies
     const companiesQuery = await db
       .select({

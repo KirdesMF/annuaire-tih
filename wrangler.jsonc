@@ -1,0 +1,10 @@
+{
+  "name": "annuaire-tih",
+  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_date": "2025-04-12",
+  "main": ".output/server/index.mjs",
+  "assets": {
+    "directory": "./.output/public/",
+    "binding": "ASSETS"
+  }
+}
