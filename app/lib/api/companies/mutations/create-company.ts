@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 import { type CreateCompanyData, CreateCompanySchema } from "~/lib/validator/company.schema";
 import * as v from "valibot";
@@ -35,16 +35,18 @@ async function uploadImages({
 }
 
 async function insertCategories(companyId: string, categories: string[]) {
-  await db.insert(companyCategoriesTable).values(
-    categories.map((category) => ({
-      company_id: companyId,
-      category_id: category,
-    })),
-  );
+  await getDb()
+    .insert(companyCategoriesTable)
+    .values(
+      categories.map((category) => ({
+        company_id: companyId,
+        category_id: category,
+      })),
+    );
 }
 
 async function insertCompany(data: Omit<CreateCompanyData, "categories" | "logo" | "gallery">) {
-  const [company] = await db
+  const [company] = await getDb()
     .insert(companiesTable)
     .values({ ...data, created_by: data.user_id, slug: generateUniqueSlug(data.name) })
     .returning();
@@ -71,7 +73,7 @@ export const createCompany = createServerFn({ method: "POST" })
     const { logo, gallery, categories, ...rest } = data;
 
     try {
-      await db.transaction(async (tx) => {
+      await getDb().transaction(async (tx) => {
         const company = await insertCompany(rest);
 
         // Insert categories

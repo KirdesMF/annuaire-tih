@@ -4,5 +4,8 @@ import { config } from "dotenv";
 
 config({ path: ".env" });
 
-const client = postgres(process.env.DATABASE_URL as string, { prepare: false });
-export const db = drizzle(client);
+export function getDb() {
+  const client = postgres(process.env.DATABASE_URL as string, { prepare: false });
+  const db = drizzle(client);
+  return db;
+}
