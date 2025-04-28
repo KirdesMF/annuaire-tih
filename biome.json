@@ -30,7 +30,7 @@
           "level": "error",
           "options": {
             "inputComponents": ["Input"],
-            "labelComponents": ["Label"],
+            "labelComponents": ["Label", "DropdownMenuLabel"],
             "labelAttributes": ["label"]
           }
         }
