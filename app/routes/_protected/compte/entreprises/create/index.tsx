@@ -22,7 +22,6 @@ import { PhoneIcon } from "~/components/icons/phone";
 import { GlobeIcon } from "~/components/icons/globe";
 import { EmailIcon } from "~/components/icons/email";
 import { useAddPreviewStore } from "~/stores/preview.store";
-import { useImagePreview } from "~/hooks/use-image-preview";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 
@@ -48,16 +47,14 @@ function RouteComponent() {
   const navigate = Route.useNavigate();
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
+  const { preview, setPreview } = useAddPreviewStore();
 
   const formRef = useRef<HTMLFormElement>(null);
-  const preview = useAddPreviewStore((state) => state.preview);
-  const setPreview = useAddPreviewStore((state) => state.setPreview);
 
   const [selectedCategories, setSelectedCategories] = useState(
     new Set<string>(preview?.categories),
   );
   const [descriptionLength, setDescriptionLength] = useState(0);
-  const { imagePreviews, readImage } = useImagePreview();
 
   function onSelectCategory(categoryId: string) {
     setSelectedCategories((prev) => {
@@ -81,14 +78,26 @@ function RouteComponent() {
     setDescriptionLength(e.target.value.length);
   }
 
-  function onImageChange(
+  async function onImageChange(
     e: React.ChangeEvent<HTMLInputElement>,
     type: "logo" | "gallery",
     index?: number,
   ) {
     const file = e.target.files?.[0];
     if (!file) return;
-    readImage({ type, file, index });
+
+    if (type === "logo") {
+      const logoUrl = URL.createObjectURL(file);
+      setPreview({ ...preview, logo: file, logoUrl });
+    }
+
+    if (type === "gallery" && index !== undefined) {
+      const currentGallery = preview.gallery ? [...preview.gallery] : [];
+      const currentGalleryUrls = preview.galleryUrls ? [...preview.galleryUrls] : [];
+      currentGallery[index] = file;
+      currentGalleryUrls[index] = URL.createObjectURL(file);
+      setPreview({ ...preview, gallery: currentGallery, galleryUrls: currentGalleryUrls });
+    }
   }
 
   function onPreview() {
@@ -115,13 +124,23 @@ function RouteComponent() {
       return;
     }
 
-    setPreview(result.output);
+    setPreview({ ...preview, ...result.output });
     navigate({ to: "/compte/entreprises/create/preview" });
   }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
+
+    if (preview.logoUrl) {
+      URL.revokeObjectURL(preview.logoUrl);
+    }
+
+    if (preview.galleryUrls) {
+      for (const url of preview.galleryUrls) {
+        URL.revokeObjectURL(url);
+      }
+    }
 
     mutate(
       { data: formData },
@@ -464,12 +483,8 @@ function RouteComponent() {
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Logo (max. 3MB)</span>
                 <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-                  {imagePreviews.logo ? (
-                    <img
-                      src={imagePreviews.logo}
-                      alt="Logo"
-                      className="w-full h-full object-cover"
-                    />
+                  {preview.logoUrl ? (
+                    <img src={preview.logoUrl} alt="Logo" className="w-full h-full object-cover" />
                   ) : (
                     <PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
                   )}
@@ -486,9 +501,9 @@ function RouteComponent() {
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Image 1 (max. 2MB)</span>
                 <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-                  {imagePreviews.gallery[0] ? (
+                  {preview.galleryUrls?.[0] ? (
                     <img
-                      src={imagePreviews.gallery[0]}
+                      src={preview.galleryUrls[0]}
                       alt="gallery 1"
                       className="w-full h-full object-cover"
                     />
@@ -508,9 +523,9 @@ function RouteComponent() {
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Image 2 (max. 2MB)</span>
                 <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-                  {imagePreviews.gallery[1] ? (
+                  {preview.galleryUrls?.[1] ? (
                     <img
-                      src={imagePreviews.gallery[1]}
+                      src={preview.galleryUrls[1]}
                       alt="gallery 2"
                       className="w-full h-full object-cover"
                     />

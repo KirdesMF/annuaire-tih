@@ -5,7 +5,3 @@ export const Route = createFileRoute("/_protected/compte/")({
     throw redirect({ to: "/compte/entreprises" });
   },
 });
-
-function RouteComponent() {
-  return <div>Hello "/_protected/compte/"!</div>;
-}

@@ -179,23 +179,15 @@ function RouteComponent() {
       {companiesQuery.data.length < 3 && (
         <>
           <Separator.Root className="my-6 h-px bg-gray-300" />
-          <CardCreateCompany />
+          <Link
+            to="/compte/entreprises/create"
+            className="text-sm border px-2 py-1 rounded-sm flex items-center gap-1.5 max-w-fit"
+          >
+            <PlusIcon className="size-4" />
+            Créer une entreprise
+          </Link>
         </>
       )}
     </div>
-  );
-}
-
-function CardCreateCompany() {
-  return (
-    <article className="border border-gray-300 p-5 rounded-sm">
-      <Link
-        to="/compte/entreprises/create"
-        className="text-sm border px-2 py-1 rounded-sm flex items-center gap-1.5 max-w-fit"
-      >
-        <PlusIcon className="size-4" />
-        Créer une entreprise
-      </Link>
-    </article>
   );
 }
