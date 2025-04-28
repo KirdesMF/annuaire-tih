@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, linkOptions } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
-import { Avatar, DropdownMenu } from "radix-ui";
+import { Avatar } from "radix-ui";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAdminRole } from "~/hooks/use-admin-role";
@@ -11,9 +11,10 @@ import { signOutFn } from "~/lib/api/auth/sign-out";
 import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
 import { colorSchemeQuery, setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
 import { AddIcon } from "./icons/add";
+import { ColorSchemeIcon } from "./icons/color-scheme";
 import { CompanyIcon } from "./icons/company";
 import { DashboardIcon } from "./icons/dashboard";
-import { LinkedinIcon } from "./icons/linkedin";
+// import { LinkedinIcon } from "./icons/linkedin";
 import { LogoutIcon } from "./icons/logout";
 import { SettingsAccountIcon } from "./icons/settings-account";
 import {
@@ -25,6 +26,18 @@ import {
   CommandSeparator,
 } from "./ui/command";
 import { Command } from "./ui/command";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuItemIndicator,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { PopoverContent } from "./ui/popover";
 import { PopoverTrigger } from "./ui/popover";
 import { Popover } from "./ui/popover";
@@ -65,12 +78,12 @@ export function Header({ user }: { user: User | undefined }) {
           </ul>
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Popover>
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="text-start text-xs text-nowrap font-light px-4 border border-gray-400 rounded-sm bg-white w-80 h-8 focus-within:outline focus-within:outline-blue-500"
+                className="text-start text-xs text-nowrap font-light px-4 py-2 border border-gray-400 rounded-sm bg-white w-80 focus-within:outline focus-within:outline-blue-500"
               >
                 Rechercher un nom ou une activité...
               </button>
@@ -105,18 +118,18 @@ export function Header({ user }: { user: User | undefined }) {
             </PopoverContent>
           </Popover>
 
-          <a
+          {/* <a
             href="https://linkedin.com/groups/13011531"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-blue-700 transition-colors"
           >
             <LinkedinIcon className="size-5" />
-          </a>
+          </a> */}
 
           <RegisterLink user={user} />
           <LoginButton user={user} />
-          <LoggedUserMenu user={user} />
+          {user ? <LoggedUserMenu user={user} /> : <ThemeToggle />}
         </div>
       </div>
     </header>
@@ -153,169 +166,125 @@ function LoggedUserMenu({ user }: { user: User | undefined }) {
 
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
-    onSuccess: () => {
-      toast.success("Vous êtes déconnecté");
-    },
+    onSuccess: () => toast.success("Vous êtes déconnecté"),
   });
 
-  const { mutate: setColorScheme, variables } = useMutation({
+  const { mutate: setColorScheme } = useMutation({
     mutationFn: setColorSchemeFn,
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
-    mutationKey: ["set-color-scheme"],
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
   });
-
-  if (!user) return null;
 
   function onLogout() {
     signOut(undefined);
   }
 
   function onSelectColorScheme(scheme: "light" | "dark" | "system") {
-    setColorScheme(
-      { data: scheme },
-      {
-        onSuccess: () => {
-          toast.success("Thème mis à jour");
-        },
-      },
-    );
+    setColorScheme({ data: scheme }, { onSuccess: () => toast.success("Thème mis à jour") });
   }
 
+  if (!user) return null;
+
   return (
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger className="rounded-full cursor-pointer">
+    <DropdownMenu>
+      <DropdownMenuTrigger className="rounded-full cursor-pointer">
         <AvatarUser user={user} />
-      </DropdownMenu.Trigger>
+      </DropdownMenuTrigger>
 
-      <DropdownMenu.Portal>
-        <DropdownMenu.Content
-          sideOffset={2}
-          align="end"
-          className="bg-white border rounded-sm border-gray-200 min-w-64 overflow-hidden p-1 shadow-xs dark:bg-gray-900 dark:border-gray-400"
-        >
-          <div className="flex flex-col p-2">
-            <span className="text-sm">{user.name}</span>
-            <span className="truncate text-xs">{user.email}</span>
-          </div>
+      <DropdownMenuContent sideOffset={2} align="end" className="min-w-64">
+        <div className="flex flex-col p-2">
+          <span className="text-sm">{user.name}</span>
+          <span className="truncate text-xs">{user.email}</span>
+        </div>
 
-          <DropdownMenu.Separator className="h-px bg-gray-200 my-1 -mx-1" />
+        <DropdownMenuSeparator className="h-px bg-gray-200 my-1 -mx-1" />
 
-          <DropdownMenu.Group>
-            <DropdownMenu.Item asChild>
-              <Link
-                to="/compte/entreprises/create"
-                className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none dark:data-highlighted:bg-gray-800"
-              >
-                <AddIcon className="size-4" />
-                <span className="text-xs">Référencer</span>
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link to="/compte/entreprises/create">
+              <AddIcon className="size-4" />
+              <span className="text-xs">Référencer</span>
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem asChild>
+            <Link to="/compte/entreprises">
+              <CompanyIcon className="size-4" />
+              <span className="text-xs">Mes entreprises</span>
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem asChild>
+            <Link to="/compte/preferences">
+              <SettingsAccountIcon className="size-4" />
+              <span className="text-xs">Mon compte</span>
+            </Link>
+          </DropdownMenuItem>
+
+          {isAdmin ? (
+            <DropdownMenuItem asChild>
+              <Link to="/admin/dashboard">
+                <DashboardIcon className="size-4" />
+                <span className="text-xs">Admin dashboard</span>
               </Link>
-            </DropdownMenu.Item>
+            </DropdownMenuItem>
+          ) : null}
+        </DropdownMenuGroup>
 
-            <DropdownMenu.Item asChild>
-              <Link
-                to="/compte/entreprises"
-                className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none dark:data-highlighted:bg-gray-800"
-              >
-                <CompanyIcon className="size-4" />
-                <span className="text-xs">Mes entreprises</span>
-              </Link>
-            </DropdownMenu.Item>
+        <DropdownMenuSeparator className="h-px bg-gray-200 my-1 -mx-1" />
 
-            <DropdownMenu.Item asChild>
-              <Link
-                to="/compte/preferences"
-                className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none dark:data-highlighted:bg-gray-800"
-              >
-                <SettingsAccountIcon className="size-4" />
-                <span className="text-xs">Mon compte</span>
-              </Link>
-            </DropdownMenu.Item>
+        <DropdownMenuGroup>
+          {/* biome-ignore lint/a11y/noLabelWithoutControl: dropdown menu */}
+          <DropdownMenuLabel className="text-sm font-light px-2 py-1.5">Thème</DropdownMenuLabel>
 
-            {isAdmin ? (
-              <DropdownMenu.Item asChild>
-                <Link
-                  to="/admin/dashboard"
-                  className="outline-none flex items-center gap-2 px-2 py-1.5 data-highlighted:bg-gray-100 select-none dark:data-highlighted:bg-gray-800"
-                >
-                  <DashboardIcon className="size-4" />
-                  <span className="text-xs">Admin dashboard</span>
-                </Link>
-              </DropdownMenu.Item>
-            ) : null}
-          </DropdownMenu.Group>
+          <DropdownMenuRadioGroup
+            value={colorScheme}
+            onValueChange={(value) => onSelectColorScheme(value as "light" | "dark" | "system")}
+          >
+            <DropdownMenuRadioItem value="light" className="relative ps-8 ">
+              <DropdownMenuItemIndicator className="absolute start-2">
+                <span className="size-2 rounded-full flex bg-gray-400" />
+              </DropdownMenuItemIndicator>
+              Light
+            </DropdownMenuRadioItem>
 
-          <DropdownMenu.Separator className="h-px bg-gray-200 my-1 -mx-1" />
+            <DropdownMenuRadioItem value="dark" className="relative ps-8">
+              <DropdownMenuItemIndicator className="absolute start-2">
+                <span className="size-2 rounded-full flex bg-gray-400" />
+              </DropdownMenuItemIndicator>
+              Dark
+            </DropdownMenuRadioItem>
 
-          <DropdownMenu.Group>
-            {/* biome-ignore lint/a11y/noLabelWithoutControl: dropdown menu */}
-            <DropdownMenu.Label className="text-sm font-light px-2 py-1.5">
-              Thème
-            </DropdownMenu.Label>
+            <DropdownMenuRadioItem value="system" className="relative ps-8">
+              <DropdownMenuItemIndicator className="absolute start-2">
+                <span className="size-2 rounded-full flex bg-gray-400" />
+              </DropdownMenuItemIndicator>
+              System
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
 
-            <DropdownMenu.RadioGroup
-              value={variables?.data ?? colorScheme}
-              onValueChange={(value) => {
-                console.log("value", value);
-                onSelectColorScheme(value as "light" | "dark" | "system");
-              }}
-            >
-              <DropdownMenu.RadioItem
-                value="light"
-                className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
-                onSelect={() => onSelectColorScheme("light")}
-              >
-                <DropdownMenu.ItemIndicator className="absolute start-2">
-                  <span className="size-2 rounded-full flex bg-gray-400" />
-                </DropdownMenu.ItemIndicator>
-                Light
-              </DropdownMenu.RadioItem>
-              <DropdownMenu.RadioItem
-                value="dark"
-                className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
-                onSelect={() => onSelectColorScheme("dark")}
-              >
-                <DropdownMenu.ItemIndicator className="absolute start-2">
-                  <span className="size-2 rounded-full flex bg-gray-400" />
-                </DropdownMenu.ItemIndicator>
-                Dark
-              </DropdownMenu.RadioItem>
-              <DropdownMenu.RadioItem
-                value="system"
-                className="text-xs py-1.5 ps-8 select-none outline-none data-highlighted:bg-gray-100 relative flex items-center dark:data-highlighted:bg-gray-800"
-                onSelect={() => onSelectColorScheme("system")}
-              >
-                <DropdownMenu.ItemIndicator className="absolute start-2">
-                  <span className="size-2 rounded-full flex bg-gray-400" />
-                </DropdownMenu.ItemIndicator>
-                System
-              </DropdownMenu.RadioItem>
-            </DropdownMenu.RadioGroup>
-          </DropdownMenu.Group>
+        <DropdownMenuSeparator className="h-px bg-gray-200 my-1 -mx-1" />
 
-          <DropdownMenu.Separator className="h-px bg-gray-200 my-1 -mx-1" />
-
-          <DropdownMenu.Group>
-            <DropdownMenu.Item
-              onSelect={() => onLogout()}
-              className="text-xs px-2 py-1.5 outline-none cursor-pointer flex items-center gap-2 data-highlighted:bg-gray-100 dark:data-highlighted:bg-gray-800"
-            >
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <button type="button" onClick={onLogout}>
               <LogoutIcon className="size-4" />
               <span>Se déconnecter</span>
-            </DropdownMenu.Item>
-          </DropdownMenu.Group>
-        </DropdownMenu.Content>
-      </DropdownMenu.Portal>
-    </DropdownMenu.Root>
+            </button>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
 function AvatarUser({ user }: { user: User }) {
-  if (!user) return null;
-
   const initials = user.name
     ?.split(" ")
     .map((name) => name[0])
     .join("");
+
+  if (!user) return null;
 
   if (user.image) {
     return (
@@ -332,5 +301,61 @@ function AvatarUser({ user }: { user: User }) {
         {initials}
       </Avatar.Fallback>
     </Avatar.Root>
+  );
+}
+
+function ThemeToggle() {
+  const queryClient = useQueryClient();
+  const { data: colorScheme } = useQuery(colorSchemeQuery);
+
+  const { mutate: setColorScheme } = useMutation({
+    mutationFn: setColorSchemeFn,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
+  });
+
+  function onSelectColorScheme(scheme: "light" | "dark" | "system") {
+    setColorScheme({ data: scheme }, { onSuccess: () => toast.success("Thème mis à jour") });
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="text-xs px-2 py-1 rounded-sm border border-gray-400 cursor-pointer"
+        >
+          <ColorSchemeIcon className="size-4" />
+          <span className="sr-only">Thème</span>
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent sideOffset={2} align="end">
+        <DropdownMenuRadioGroup
+          value={colorScheme}
+          onValueChange={(value) => onSelectColorScheme(value as "light" | "dark" | "system")}
+        >
+          <DropdownMenuRadioItem value="light" className="flex items-center gap-2 px-2">
+            <DropdownMenuItemIndicator>
+              <span className="size-2 rounded-full flex bg-gray-400" />
+            </DropdownMenuItemIndicator>
+            Light
+          </DropdownMenuRadioItem>
+
+          <DropdownMenuRadioItem value="dark" className="flex items-center gap-2 px-2">
+            <DropdownMenuItemIndicator>
+              <span className="size-2 rounded-full flex bg-gray-400" />
+            </DropdownMenuItemIndicator>
+            Dark
+          </DropdownMenuRadioItem>
+
+          <DropdownMenuRadioItem value="system" className="flex items-center gap-2 px-2">
+            <DropdownMenuItemIndicator>
+              <span className="size-2 rounded-full flex bg-gray-400" />
+            </DropdownMenuItemIndicator>
+            System
+          </DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
