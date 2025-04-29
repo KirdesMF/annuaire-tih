@@ -21,9 +21,9 @@ import { Route as publicPartnerImport } from './routes/(public)/partner'
 import { Route as publicFaqImport } from './routes/(public)/faq'
 import { Route as publicContactImport } from './routes/(public)/contact'
 import { Route as publicAboutImport } from './routes/(public)/about'
-import { Route as authSignupImport } from './routes/(auth)/signup'
+import { Route as authSignUpImport } from './routes/(auth)/sign-up'
+import { Route as authSignInImport } from './routes/(auth)/sign-in'
 import { Route as authResetPasswordImport } from './routes/(auth)/reset-password'
-import { Route as authLoginImport } from './routes/(auth)/login'
 import { Route as authForgotPasswordImport } from './routes/(auth)/forgot-password'
 import { Route as ProtectedCompteRouteImport } from './routes/_protected/compte/route'
 import { Route as ProtectedCompteIndexImport } from './routes/_protected/compte/index'
@@ -100,21 +100,21 @@ const publicAboutRoute = publicAboutImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const authSignupRoute = authSignupImport.update({
-  id: '/(auth)/signup',
-  path: '/signup',
+const authSignUpRoute = authSignUpImport.update({
+  id: '/(auth)/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const authSignInRoute = authSignInImport.update({
+  id: '/(auth)/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRoute,
 } as any)
 
 const authResetPasswordRoute = authResetPasswordImport.update({
   id: '/(auth)/reset-password',
   path: '/reset-password',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const authLoginRoute = authLoginImport.update({
-  id: '/(auth)/login',
-  path: '/login',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -251,13 +251,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authForgotPasswordImport
       parentRoute: typeof rootRoute
     }
-    '/(auth)/login': {
-      id: '/(auth)/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof authLoginImport
-      parentRoute: typeof rootRoute
-    }
     '/(auth)/reset-password': {
       id: '/(auth)/reset-password'
       path: '/reset-password'
@@ -265,11 +258,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authResetPasswordImport
       parentRoute: typeof rootRoute
     }
-    '/(auth)/signup': {
-      id: '/(auth)/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof authSignupImport
+    '/(auth)/sign-in': {
+      id: '/(auth)/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof authSignInImport
+      parentRoute: typeof rootRoute
+    }
+    '/(auth)/sign-up': {
+      id: '/(auth)/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof authSignUpImport
       parentRoute: typeof rootRoute
     }
     '/(public)/about': {
@@ -490,9 +490,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/compte': typeof ProtectedCompteRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
-  '/login': typeof authLoginRoute
   '/reset-password': typeof authResetPasswordRoute
-  '/signup': typeof authSignupRoute
+  '/sign-in': typeof authSignInRoute
+  '/sign-up': typeof authSignUpRoute
   '/about': typeof publicAboutRoute
   '/contact': typeof publicContactRoute
   '/faq': typeof publicFaqRoute
@@ -518,9 +518,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '': typeof ProtectedRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
-  '/login': typeof authLoginRoute
   '/reset-password': typeof authResetPasswordRoute
-  '/signup': typeof authSignupRoute
+  '/sign-in': typeof authSignInRoute
+  '/sign-up': typeof authSignUpRoute
   '/about': typeof publicAboutRoute
   '/contact': typeof publicContactRoute
   '/faq': typeof publicFaqRoute
@@ -548,9 +548,9 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/_protected/compte': typeof ProtectedCompteRouteRouteWithChildren
   '/(auth)/forgot-password': typeof authForgotPasswordRoute
-  '/(auth)/login': typeof authLoginRoute
   '/(auth)/reset-password': typeof authResetPasswordRoute
-  '/(auth)/signup': typeof authSignupRoute
+  '/(auth)/sign-in': typeof authSignInRoute
+  '/(auth)/sign-up': typeof authSignUpRoute
   '/(public)/about': typeof publicAboutRoute
   '/(public)/contact': typeof publicContactRoute
   '/(public)/faq': typeof publicFaqRoute
@@ -580,9 +580,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/compte'
     | '/forgot-password'
-    | '/login'
     | '/reset-password'
-    | '/signup'
+    | '/sign-in'
+    | '/sign-up'
     | '/about'
     | '/contact'
     | '/faq'
@@ -607,9 +607,9 @@ export interface FileRouteTypes {
     | '/'
     | ''
     | '/forgot-password'
-    | '/login'
     | '/reset-password'
-    | '/signup'
+    | '/sign-in'
+    | '/sign-up'
     | '/about'
     | '/contact'
     | '/faq'
@@ -635,9 +635,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/_protected/compte'
     | '/(auth)/forgot-password'
-    | '/(auth)/login'
     | '/(auth)/reset-password'
-    | '/(auth)/signup'
+    | '/(auth)/sign-in'
+    | '/(auth)/sign-up'
     | '/(public)/about'
     | '/(public)/contact'
     | '/(public)/faq'
@@ -665,9 +665,9 @@ export interface RootRouteChildren {
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   authForgotPasswordRoute: typeof authForgotPasswordRoute
-  authLoginRoute: typeof authLoginRoute
   authResetPasswordRoute: typeof authResetPasswordRoute
-  authSignupRoute: typeof authSignupRoute
+  authSignInRoute: typeof authSignInRoute
+  authSignUpRoute: typeof authSignUpRoute
   publicAboutRoute: typeof publicAboutRoute
   publicContactRoute: typeof publicContactRoute
   publicFaqRoute: typeof publicFaqRoute
@@ -682,9 +682,9 @@ const rootRouteChildren: RootRouteChildren = {
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   authForgotPasswordRoute: authForgotPasswordRoute,
-  authLoginRoute: authLoginRoute,
   authResetPasswordRoute: authResetPasswordRoute,
-  authSignupRoute: authSignupRoute,
+  authSignInRoute: authSignInRoute,
+  authSignUpRoute: authSignUpRoute,
   publicAboutRoute: publicAboutRoute,
   publicContactRoute: publicContactRoute,
   publicFaqRoute: publicFaqRoute,
@@ -708,9 +708,9 @@ export const routeTree = rootRoute
         "/_protected",
         "/admin",
         "/(auth)/forgot-password",
-        "/(auth)/login",
         "/(auth)/reset-password",
-        "/(auth)/signup",
+        "/(auth)/sign-in",
+        "/(auth)/sign-up",
         "/(public)/about",
         "/(public)/contact",
         "/(public)/faq",
@@ -751,14 +751,14 @@ export const routeTree = rootRoute
     "/(auth)/forgot-password": {
       "filePath": "(auth)/forgot-password.tsx"
     },
-    "/(auth)/login": {
-      "filePath": "(auth)/login.tsx"
-    },
     "/(auth)/reset-password": {
       "filePath": "(auth)/reset-password.tsx"
     },
-    "/(auth)/signup": {
-      "filePath": "(auth)/signup.tsx"
+    "/(auth)/sign-in": {
+      "filePath": "(auth)/sign-in.tsx"
+    },
+    "/(auth)/sign-up": {
+      "filePath": "(auth)/sign-up.tsx"
     },
     "/(public)/about": {
       "filePath": "(public)/about.tsx"

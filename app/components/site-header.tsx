@@ -48,7 +48,7 @@ export function SiteHeader({ user }: { user: User | undefined }) {
   }, []);
 
   return (
-    <header className="px-4 md:px-8 py-3 border-b-[0.5px] border-gray-200 backdrop-blur-sm sticky top-0 z-50 w-full">
+    <header className="px-4 md:px-8 py-3 border-b-[0.5px] border-gray-200 dark:border-gray-800 backdrop-blur-sm sticky top-0 z-50 w-full">
       <div className="flex items-center gap-2 justify-between">
         <MainNav />
         <MobileNav />
@@ -58,7 +58,7 @@ export function SiteHeader({ user }: { user: User | undefined }) {
             <DialogTrigger asChild>
               <button
                 type="button"
-                className="flex w-full md:w-auto items-center gap-2 text-start text-xs text-nowrap font-light px-2.5 h-8 border border-gray-400 rounded-sm focus-within:outline focus-within:outline-blue-500"
+                className="flex w-full md:w-auto items-center gap-2 text-start text-xs text-nowrap font-light px-2.5 h-8 border border-gray-400 dark:border-gray-700 rounded-sm focus-within:outline focus-within:outline-blue-500"
               >
                 <span className="hidden lg:block">Rechercher un nom ou une activité...</span>
                 <span className="block lg:hidden">Rechercher...</span>
@@ -120,8 +120,8 @@ export function SiteHeader({ user }: { user: User | undefined }) {
 function RegisterLink({ user }: { user: User | undefined }) {
   return (
     <Link
-      to={user ? "/compte/entreprises/create" : "/signup"}
-      className="text-xs px-2 py-1 h-8 items-center rounded-sm border border-gray-400 text-nowrap hidden md:inline-flex"
+      to={user ? "/compte/entreprises/create" : "/sign-up"}
+      className="text-xs px-2 py-1 h-8 items-center rounded-sm border border-gray-400 dark:border-gray-700 text-nowrap hidden md:inline-flex"
     >
       Se référencer
     </Link>
@@ -133,7 +133,7 @@ function LoginButton({ user }: { user: User | undefined }) {
 
   return (
     <Link
-      to="/login"
+      to="/sign-in"
       className="text-xs px-2 py-1 h-8 hidden md:inline-flex items-center rounded-sm text-nowrap bg-blue-500 text-white"
     >
       Se connecter
@@ -159,7 +159,7 @@ function ThemeToggle() {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="text-xs px-2 py-1 h-8 inline-flex items-center rounded-sm border border-gray-400 text-nowrap cursor-pointer"
+          className="text-xs px-2 py-1 h-8 inline-flex items-center rounded-sm border border-gray-400 dark:border-gray-700 text-nowrap cursor-pointer"
         >
           <ColorSchemeIcon className="size-4" />
           <span className="sr-only">Thème</span>

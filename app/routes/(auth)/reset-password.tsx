@@ -46,7 +46,7 @@ function RouteComponent() {
       {
         onSuccess: () => {
           toast.success("Mot de passe réinitialisé avec succès");
-          navigate({ to: "/login" });
+          navigate({ to: "/sign-in" });
         },
         onError: (error) => {
           toast.error(error.message);

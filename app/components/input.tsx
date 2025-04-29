@@ -6,8 +6,8 @@ type Props = InputHTMLAttributes<HTMLInputElement>;
 export function Input({ className, ...props }: Props) {
   return (
     <input
-      {...props}
       className={cn("border border-gray-300 rounded-sm p-2 h-9 w-full", className)}
+      {...props}
     />
   );
 }
