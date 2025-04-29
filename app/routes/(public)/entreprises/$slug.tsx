@@ -1,19 +1,19 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
-import * as v from "valibot";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { CopyButton } from "~/components/copy-button";
-import { CompanyLogo } from "~/components/company-logo";
-import { FacebookIcon } from "~/components/icons/facebook";
-import { InstagramIcon } from "~/components/icons/instagram";
-import { LinkedinIcon } from "~/components/icons/linkedin";
-import { CalendlyIcon } from "~/components/icons/calendly";
-import type { Entries } from "~/utils/types";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { Separator } from "radix-ui";
+import { CompanyLogo } from "~/components/company-logo";
+import { CopyButton } from "~/components/copy-button";
+import { CalendlyIcon } from "~/components/icons/calendly";
 import { EmailIcon } from "~/components/icons/email";
-import { PhoneIcon } from "~/components/icons/phone";
+import { FacebookIcon } from "~/components/icons/facebook";
 import { GlobeIcon } from "~/components/icons/globe";
+import { InstagramIcon } from "~/components/icons/instagram";
 import { LinkChainIcon } from "~/components/icons/link-chain";
+import { LinkedinIcon } from "~/components/icons/linkedin";
+import { PhoneIcon } from "~/components/icons/phone";
+import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { slugify } from "~/utils/slug";
+import type { Entries } from "~/utils/types";
 
 export const Route = createFileRoute("/(public)/entreprises/$slug")({
   component: RouteComponent,
@@ -66,9 +66,15 @@ function RouteComponent() {
             )}
           </div>
           <ul className="flex flex-wrap gap-2">
-            {data.categories?.map((category) => (
+            {data.categories.map((category) => (
               <li key={category?.id} className="bg-gray-100 px-2 py-1 rounded-sm text-xs">
-                {category?.name}
+                <Link
+                  to="/categories/$slug"
+                  params={{ slug: slugify(category?.name ?? "") }}
+                  search={{ id: category?.id ?? "" }}
+                >
+                  {category?.name}
+                </Link>
               </li>
             ))}
           </ul>
