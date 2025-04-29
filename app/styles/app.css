@@ -19,6 +19,16 @@
   }
 }
 
+@layer base {
+  html[data-theme="dark"] input:-webkit-autofill {
+    box-shadow: 0 0 0 100px var(--color-gray-900) inset;
+  }
+
+  html[data-theme="light"] input:-webkit-autofill {
+    box-shadow: 0 0 0 100px white inset;
+  }
+}
+
 @layer components {
   .bg-diagonal-lines {
     opacity: 0.4;

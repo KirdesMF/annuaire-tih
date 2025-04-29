@@ -63,12 +63,16 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const { data: colorScheme } = useSuspenseQuery(colorSchemeQuery);
 
   return (
-    <html lang="fr" data-theme={colorScheme}>
+    <html
+      lang="fr"
+      data-theme={colorScheme}
+      style={{ colorScheme: colorScheme === "system" ? undefined : colorScheme }}
+    >
       <head>
         <HeadContent />
       </head>
 
-      <body className="font-sans text-gray-700 isolate dark:bg-gray-900 dark:text-gray-100">
+      <body className="font-sans isolate dark:bg-gray-950 dark:text-white">
         <SiteHeader user={user} />
         {children}
         <Toaster />

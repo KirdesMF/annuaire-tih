@@ -1,6 +1,6 @@
-import { pgTable, text, timestamp, boolean, varchar } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
-export const USER_ROLES = ["admin", "user"] as const;
+export const USER_ROLES = ["admin", "user", "superadmin"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
 export const isValidRole = (role?: string | null): role is UserRole => {

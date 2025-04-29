@@ -9,8 +9,8 @@ const LINKS = linkOptions([
   { label: "FAQ", to: "/faq" },
   { label: "Sources", to: "/sources" },
   { label: "Contact", to: "/contact" },
-  { label: "Se référencer", to: "/signup" },
-  { label: "Se connecter", to: "/login" },
+  { label: "Se référencer", to: "/sign-up" },
+  { label: "Se connecter", to: "/sign-in" },
 ]);
 
 export function MobileNav() {
