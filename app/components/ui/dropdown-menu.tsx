@@ -20,7 +20,7 @@ export function DropdownMenuContent({
       <DropdownMenuPrimitive.Content
         ref={ref}
         className={cn(
-          "bg-white border rounded-sm border-gray-200 overflow-hidden p-1 shadow-xs dark:bg-gray-900 dark:border-gray-400",
+          "bg-white border rounded-sm border-gray-200 overflow-hidden p-1 shadow-xs dark:bg-gray-900 dark:border-gray-400 z-60",
           className,
         )}
         {...props}

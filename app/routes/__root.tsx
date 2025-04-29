@@ -1,20 +1,15 @@
-// app/routes/__root.tsx
-import type { ReactNode } from "react";
-import {
-  queryOptions,
-  useMutationState,
-  useSuspenseQuery,
-  type QueryClient,
-} from "@tanstack/react-query";
-import { Outlet, HeadContent, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
-import { Header } from "~/components/header";
+import { type QueryClient, queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
-import { auth } from "~/lib/auth/auth.server";
+// app/routes/__root.tsx
+import type { ReactNode } from "react";
 import { Toaster } from "sonner";
-import appCSS from "~/styles/app.css?url";
+import { SiteHeader } from "~/components/site-header";
+import { auth } from "~/lib/auth/auth.server";
 import { colorSchemeQuery } from "~/lib/cookies/color-scheme.cookie";
+import appCSS from "~/styles/app.css?url";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
   const request = getWebRequest();
@@ -74,7 +69,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
 
       <body className="font-sans text-gray-700 isolate dark:bg-gray-900 dark:text-gray-100">
-        <Header user={user} />
+        <SiteHeader user={user} />
         {children}
         <Toaster />
         <ReactQueryDevtools buttonPosition="bottom-left" />
