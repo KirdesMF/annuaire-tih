@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
@@ -7,12 +7,12 @@ import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
+import { type Theme, useTheme } from "~/components/providers/theme-provider";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "~/components/ui/dialog";
 import { deleteUser } from "~/lib/api/users/mutations/delete-user";
 import { updateUserEmailFn } from "~/lib/api/users/mutations/update-user-email";
 import { updateUserInfos } from "~/lib/api/users/mutations/update-user-infos";
 import { updateUserPasswordFn } from "~/lib/api/users/mutations/update-user-password";
-import { colorSchemeQuery, setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
 
 export const Route = createFileRoute("/_protected/compte/preferences")({
   component: RouteComponent,
@@ -22,14 +22,7 @@ function RouteComponent() {
   const context = Route.useRouteContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenPassword, setIsModalOpenPassword] = useState(false);
-  const { data: colorScheme } = useQuery(colorSchemeQuery);
-
-  // Mutations
-  const { mutate: setColorScheme, variables } = useMutation({
-    mutationFn: setColorSchemeFn,
-    onSettled: () => context.queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
-    mutationKey: ["set-color-scheme"],
-  });
+  const { setTheme, theme } = useTheme();
 
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(deleteUser) });
   const { mutate: update, isPending: isUpdatingUserInfos } = useMutation({
@@ -88,17 +81,6 @@ function RouteComponent() {
       {
         onSuccess: () => {
           toast.success("Email modifié avec succès");
-        },
-      },
-    );
-  }
-
-  function onValueChangeTheme(value: "light" | "dark" | "system") {
-    setColorScheme(
-      { data: value },
-      {
-        onSuccess: () => {
-          toast.success("Thème modifié avec succès");
         },
       },
     );
@@ -267,8 +249,8 @@ function RouteComponent() {
             </p>
 
             <RadioGroup.Root
-              defaultValue={variables?.data ?? colorScheme ?? "system"}
-              onValueChange={(value: "light" | "dark" | "system") => onValueChangeTheme(value)}
+              defaultValue={theme}
+              onValueChange={(value) => setTheme(value as Theme)}
               className="flex gap-2"
             >
               <RadioGroup.Item

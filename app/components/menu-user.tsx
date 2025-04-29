@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
@@ -23,27 +23,16 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { useAdminRole } from "~/hooks/use-admin-role";
 import { signOutFn } from "~/lib/api/auth/sign-out";
-import { setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
-import { colorSchemeQuery } from "~/lib/cookies/color-scheme.cookie";
+import { type Theme, useTheme } from "./providers/theme-provider";
 
 export function MenuUser({ user }: { user: User | undefined }) {
-  const queryClient = useQueryClient();
   const { isAdmin } = useAdminRole();
-  const { data: colorScheme } = useQuery(colorSchemeQuery);
+  const { theme, setTheme } = useTheme();
 
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
     onSuccess: () => toast.success("Vous êtes déconnecté"),
   });
-
-  const { mutate: setColorScheme } = useMutation({
-    mutationFn: setColorSchemeFn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
-  });
-
-  function onSelectColorScheme(scheme: "light" | "dark" | "system") {
-    setColorScheme({ data: scheme }, { onSuccess: () => toast.success("Thème mis à jour") });
-  }
 
   if (!user) return null;
 
@@ -99,10 +88,7 @@ export function MenuUser({ user }: { user: User | undefined }) {
           {/* biome-ignore lint/a11y/noLabelWithoutControl: dropdown menu */}
           <DropdownMenuLabel className="text-sm font-light px-2 py-1.5">Thème</DropdownMenuLabel>
 
-          <DropdownMenuRadioGroup
-            value={colorScheme}
-            onValueChange={(value) => onSelectColorScheme(value as "light" | "dark" | "system")}
-          >
+          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as Theme)}>
             <DropdownMenuRadioItem value="light" className="relative ps-8 ">
               <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
                 <span className="size-2 rounded-full flex bg-accent-foreground" />

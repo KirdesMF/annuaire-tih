@@ -1,14 +1,15 @@
-import { type QueryClient, queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+// app/routes/__root.tsx
+import { type QueryClient, queryOptions } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
-// app/routes/__root.tsx
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
+import { ThemeProvider, useTheme } from "~/components/providers/theme-provider";
 import { SiteHeader } from "~/components/site-header";
 import { auth } from "~/lib/auth/auth.server";
-import { colorSchemeQuery } from "~/lib/cookies/color-scheme.cookie";
+import { getThemeServerFn } from "~/lib/theme";
 import appCSS from "~/styles/app.css?url";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
@@ -22,9 +23,7 @@ const sessionQueryOptions = queryOptions({
   queryFn: ({ signal }) => getSession({ signal }),
 });
 
-export type RootRouterContext = {
-  queryClient: QueryClient;
-};
+export type RootRouterContext = { queryClient: QueryClient };
 
 export const Route = createRootRouteWithContext<RootRouterContext>()({
   head: () => ({
@@ -42,32 +41,28 @@ export const Route = createRootRouteWithContext<RootRouterContext>()({
     const session = await context.queryClient.fetchQuery(sessionQueryOptions);
     return { user: session?.user };
   },
-  loader: async ({ context }) => {
-    const colorScheme = await context.queryClient.fetchQuery(colorSchemeQuery);
-    return { colorScheme };
-  },
-  notFoundComponent: () => <div>Not found</div>,
+  loader: () => getThemeServerFn(),
   component: RootComponent,
 });
 
 function RootComponent() {
+  const theme = Route.useLoaderData();
+
   return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
+    <ThemeProvider theme={theme}>
+      <RootDocument>
+        <Outlet />
+      </RootDocument>
+    </ThemeProvider>
   );
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const { user } = Route.useRouteContext();
-  const { data: colorScheme } = useSuspenseQuery(colorSchemeQuery);
+  const { theme } = useTheme();
 
   return (
-    <html
-      lang="fr"
-      data-theme={colorScheme}
-      style={{ colorScheme: colorScheme === "system" ? undefined : colorScheme }}
-    >
+    <html lang="fr" data-theme={theme}>
       <head>
         <HeadContent />
       </head>
