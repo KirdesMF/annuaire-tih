@@ -1,5 +1,5 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { Separator } from "radix-ui";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ import {
 import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 import { COMPANY_STATUSES } from "~/utils/constantes";
+import { slugify } from "~/utils/slug";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/")({
   loader: async ({ context }) => {
@@ -82,7 +83,9 @@ function RouteComponent() {
             <article className="border border-gray-300 p-5 rounded-sm grid gap-4 shadow-2xs">
               <header className="flex items-baseline gap-2 justify-between">
                 <div className="flex items-center gap-2">
-                  <CompanyLogo name={company.name} url={company.logo?.secureUrl} />
+                  <div className="size-16">
+                    <CompanyLogo name={company.name} url={company.logo?.secureUrl} />
+                  </div>
                   <h2 className="text-lg font-bold leading-1">{company.name}</h2>
                   <p className="text-xs text-orange-300">{COMPANY_STATUSES[company.status]}</p>
                 </div>
@@ -99,7 +102,13 @@ function RouteComponent() {
                       key={category.category_id}
                       className="bg-gray-100 px-2 py-1 rounded-sm text-xs flex items-center gap-2"
                     >
-                      {category.category_name}
+                      <Link
+                        to="/categories/$slug"
+                        params={{ slug: slugify(category.category_name ?? "") }}
+                        search={{ id: category.category_id ?? "" }}
+                      >
+                        {category.category_name}
+                      </Link>
                     </li>
                   ))}
                 </ul>

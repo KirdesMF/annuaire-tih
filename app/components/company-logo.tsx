@@ -1,11 +1,10 @@
-import type { Company } from "~/db/schema/companies";
-import { StoreIcon } from "./icons/store";
 import { cn } from "~/utils/cn";
+import { StoreIcon } from "./icons/store";
 
 const SIZES = {
-  sm: "size-8",
-  md: "size-12",
-  lg: "size-16",
+  sm: "w-8 h-auto",
+  md: "w-12 h-auto",
+  lg: "w-32 h-auto",
 };
 
 export function CompanyLogo({
@@ -13,7 +12,7 @@ export function CompanyLogo({
   name,
   size = "sm",
 }: { url?: string; name: string; size?: keyof typeof SIZES }) {
-  if (!url) return <StoreIcon className={cn(SIZES[size])} />;
+  if (!url) return <StoreIcon className="size-full" />;
 
-  return <img src={url} alt={name} className={cn(SIZES[size], "aspect-square rounded-sm")} />;
+  return <img src={url} alt={name} className={cn("rounded-sm object-contain size-full")} />;
 }
