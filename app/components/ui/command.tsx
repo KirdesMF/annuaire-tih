@@ -44,7 +44,7 @@ export function CommandInput({
   return (
     <CommandPrimitive.Input
       className={cn(
-        ["w-full px-4 py-1.5 rounded-md outline-none text-sm", "placeholder:text-sm"],
+        ["w-full px-4 py-1 rounded-md outline-none text-sm", "placeholder:text-sm"],
         className,
       )}
       {...props}
@@ -74,7 +74,11 @@ export function CommandItem({
   return (
     <CommandPrimitive.Item
       ref={ref}
-      className={cn("px-4 py-2 text-sm w-full aria-selected:bg-gray-100 inline-flex", className)}
+      className={cn(
+        "px-4 py-2 text-sm w-full inline-flex",
+        "aria-selected:bg-gray-100 dark:aria-selected:bg-gray-800",
+        className,
+      )}
       {...props}
     >
       {children}

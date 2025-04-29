@@ -1,6 +1,7 @@
 // app/routes/index.tsx
 import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { Separator } from "radix-ui";
 import { useState } from "react";
 import banner from "~/assets/img/banner.png?url";
 import {
@@ -48,7 +49,7 @@ function Home() {
           <PopoverTrigger asChild>
             <button
               type="button"
-              className="text-start text-sm font-light px-4 border border-gray-400 rounded-md shadow-sm bg-white w-full h-12 focus-within:outline focus-within:outline-blue-500"
+              className="text-start text-nowrap truncate text-sm font-light px-4 border border-gray-400 rounded-md shadow-sm w-full h-12 focus-within:outline focus-within:outline-blue-500 cursor-pointer"
             >
               Rechercher un nom ou une activité...
             </button>
@@ -84,7 +85,7 @@ function Home() {
         </Popover>
       </div>
 
-      <div role="separator" tabIndex={-1} className="h-px w-1/3 bg-gray-400 my-12 mx-auto" />
+      <Separator.Root className="h-px w-1/3 bg-gray-400 my-12 mx-auto" />
 
       <ul className="flex flex-wrap justify-center gap-2 mt-12 max-w-3xl mx-auto">
         {categoriesQuery.data.map((category) => (
@@ -93,34 +94,13 @@ function Home() {
               to="/categories/$slug"
               params={{ slug: slugify(category.name) }}
               search={{ id: category.id }}
-              className="text-sm px-4 py-2 border border-gray-400 rounded-md flex"
+              className="text-sm px-4 py-1.5 border border-gray-400 rounded-md flex text-nowrap"
             >
               {category.name}
             </Link>
           </li>
         ))}
       </ul>
-
-      <div className="flex flex-col gap-4 mt-12 max-w-3xl mx-auto">
-        <article className="p-4 flex flex-col gap-3">
-          <h2>D'entreprise à TIH, de gagnant à gagnant !</h2>
-          <p className="text-sm font-light">
-            Élargissez votre vivier de talents en découvrant des profils d'entrepreneurs·ses
-            expert·e·s dans leur domaine et doté·e·s d'une grande force d'adaptation. Renforcez
-            votre politique inclusive et bénéficiez de réductions sur votre contribution OETH en
-            sous-traitant avec des TIH !
-          </p>
-        </article>
-
-        <article className="p-4 flex flex-col gap-3">
-          <h2>De nombreux services proposés aux particuliers !</h2>
-          <p className="text-sm font-light">
-            Faites appel à un·e professionnel·le pour vous accompagner ou réaliser vos tâches, de
-            façon ponctuelle ou pour des missions plus longues. Profitez de services sur mesure et
-            découvrez les nombreux domaines couverts par les TIH.
-          </p>
-        </article>
-      </div>
     </main>
   );
 }

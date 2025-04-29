@@ -11,7 +11,7 @@ export function PopoverContent({ className, children, ref, ...props }: Props) {
       <PopoverPrimitive.Content
         ref={ref}
         className={cn(
-          "w-(--radix-popper-anchor-width) border border-gray-400 rounded-md shadow-sm bg-white",
+          "w-(--radix-popper-anchor-width) border border-gray-400 rounded-md shadow-sm bg-white dark:bg-gray-900 z-60",
           className,
         )}
         sideOffset={5}
