@@ -1,6 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Separator } from "radix-ui";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
@@ -8,7 +7,6 @@ import { EmailIcon } from "~/components/icons/email";
 import { FacebookIcon } from "~/components/icons/facebook";
 import { GlobeIcon } from "~/components/icons/globe";
 import { InstagramIcon } from "~/components/icons/instagram";
-import { LinkChainIcon } from "~/components/icons/link-chain";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import { PhoneIcon } from "~/components/icons/phone";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
@@ -52,7 +50,10 @@ function RouteComponent() {
     <main className="px-4 py-8 grid gap-4">
       <div className="container flex justify-between gap-4 border border-gray-300 p-6 rounded-sm">
         <div className="flex flex-col gap-2">
-          <CompanyLogo url={data.logo?.secureUrl} name={data.name} size="lg" />
+          <div className="size-24">
+            <CompanyLogo url={data.logo?.secureUrl} name={data.name} size="lg" />
+          </div>
+
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">{data.name}</h1>
             <CopyButton>{data.siret}</CopyButton>
@@ -80,25 +81,19 @@ function RouteComponent() {
             ))}
           </ul>
         </div>
-
-        <div className="flex gap-2">
-          <button type="button" className="bg-gray-100 p-2 rounded-sm cursor-pointer h-min">
-            <LinkChainIcon className="size-5" />
-          </button>
-        </div>
       </div>
 
-      <div className="container flex gap-2">
+      <div className="container flex gap-2 flex-wrap">
         <div className="flex-1 flex flex-col justify-center gap-4 border border-gray-300 p-6 rounded-sm">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <EmailIcon className="size-5" />
-              <p className="text-xs text-gray-500">{data.email || "Non renseigné"}</p>
+              <p className="text-xs text-gray-500 text-nowrap">{data.email || "Non renseigné"}</p>
             </div>
 
             <div className="flex items-center gap-2">
               <PhoneIcon className="size-5" />
-              <p className="text-xs text-gray-500">{data.phone || "Non renseigné"}</p>
+              <p className="text-xs text-gray-500 text-nowrap">{data.phone || "Non renseigné"}</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -108,12 +103,12 @@ function RouteComponent() {
                   href={data.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-gray-500"
+                  className="text-xs text-gray-500 text-nowrap"
                 >
                   {data.website}
                 </a>
               ) : (
-                <span className="text-xs text-gray-500">Non renseigné</span>
+                <span className="text-xs text-gray-500 text-nowrap">Non renseigné</span>
               )}
             </div>
           </div>
@@ -134,22 +129,22 @@ function RouteComponent() {
         </div>
 
         <div className="flex-1 border border-gray-300 p-6 rounded-sm flex flex-col gap-2">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 text-nowrap">
             <span className="font-bold">Entrepreneur:</span>{" "}
             {data.business_owner || "Non renseigné"}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 text-nowrap">
             <span className="font-bold">Zone géographique:</span>{" "}
             {data.service_area || "Non renseigné"}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 text-nowrap">
             <span className="font-bold">Mode de travail:</span>{" "}
             {WORK_MODES[data.work_mode ?? "not_specified"]}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 text-nowrap">
             <span className="font-bold">RQTH:</span> {data.rqth ? "Oui" : "Non"}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 text-nowrap">
             <span className="font-bold">Sous domaine:</span> {data.subdomain || "Non renseigné"}
           </p>
         </div>
@@ -162,43 +157,46 @@ function RouteComponent() {
             {data.description || "Non renseigné"}
           </p>
         </div>
-
-        {data.gallery?.length ? (
-          <>
-            <Separator.Root className="h-px bg-gray-300 my-4" />
-
-            <ul className="flex flex-wrap gap-2">
-              {data.gallery?.map((image) => {
-                return (
-                  <li key={image.publicId}>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <button type="button" className="grid place-items-center cursor-pointer">
-                          <img
-                            src={image.secureUrl}
-                            alt={data.name}
-                            className="size-24 aspect-square rounded-sm"
-                          />
-                        </button>
-                      </DialogTrigger>
-                      <DialogContent className="w-auto p-16">
-                        <DialogTitle className="sr-only">{data.name}</DialogTitle>
-                        <div className="grid place-items-center">
-                          <img
-                            src={image.secureUrl}
-                            alt={data.name}
-                            className="max-h-[70vh] max-w-full object-contain"
-                          />
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </li>
-                );
-              })}
-            </ul>
-          </>
-        ) : null}
       </div>
+
+      {data.gallery?.length ? <GalleryImages gallery={data.gallery} /> : null}
     </main>
+  );
+}
+
+function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; publicId: string }> }) {
+  return (
+    <div className="container border border-gray-300 p-6 rounded-sm grid gap-4">
+      <h2 className="text-lg font-bold">Galerie</h2>
+      <ul className="flex flex-wrap gap-4 items-center justify-center">
+        {gallery.map((image) => {
+          return (
+            <li key={image.publicId}>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button type="button" className="grid place-items-center cursor-pointer size-64">
+                    <img
+                      src={image.secureUrl}
+                      alt={image.publicId}
+                      className="object-contain rounded-sm"
+                    />
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="w-auto p-16">
+                  <DialogTitle className="sr-only">{image.publicId}</DialogTitle>
+                  <div className="grid place-items-center">
+                    <img
+                      src={image.secureUrl}
+                      alt={image.publicId}
+                      className="max-h-[70vh] max-w-full object-contain"
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
