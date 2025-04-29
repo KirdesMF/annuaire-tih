@@ -11,6 +11,7 @@ import { InstagramIcon } from "~/components/icons/instagram";
 import { LinkChainIcon } from "~/components/icons/link-chain";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import { PhoneIcon } from "~/components/icons/phone";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import { slugify } from "~/utils/slug";
 import type { Entries } from "~/utils/types";
@@ -103,7 +104,12 @@ function RouteComponent() {
             <div className="flex items-center gap-2">
               <GlobeIcon className="size-5" />
               {data.website ? (
-                <a href={data.website} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={data.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-gray-500"
+                >
                   {data.website}
                 </a>
               ) : (
@@ -162,15 +168,33 @@ function RouteComponent() {
             <Separator.Root className="h-px bg-gray-300 my-4" />
 
             <ul className="flex flex-wrap gap-2">
-              {data.gallery?.map((image) => (
-                <li key={image.publicId}>
-                  <img
-                    src={image.secureUrl}
-                    alt={data.name}
-                    className="size-16 aspect-square rounded-sm"
-                  />
-                </li>
-              ))}
+              {data.gallery?.map((image) => {
+                return (
+                  <li key={image.publicId}>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button type="button" className="grid place-items-center cursor-pointer">
+                          <img
+                            src={image.secureUrl}
+                            alt={data.name}
+                            className="size-24 aspect-square rounded-sm"
+                          />
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="w-auto p-16">
+                        <DialogTitle className="sr-only">{data.name}</DialogTitle>
+                        <div className="grid place-items-center">
+                          <img
+                            src={image.secureUrl}
+                            alt={data.name}
+                            className="max-h-[70vh] max-w-full object-contain"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </li>
+                );
+              })}
             </ul>
           </>
         ) : null}
