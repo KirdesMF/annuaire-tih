@@ -1,5 +1,5 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { Separator } from "radix-ui";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ import {
 import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 import { COMPANY_STATUSES } from "~/utils/constantes";
+import { slugify } from "~/utils/slug";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/")({
   loader: async ({ context }) => {
@@ -99,7 +100,13 @@ function RouteComponent() {
                       key={category.category_id}
                       className="bg-gray-100 px-2 py-1 rounded-sm text-xs flex items-center gap-2"
                     >
-                      {category.category_name}
+                      <Link
+                        to="/categories/$slug"
+                        params={{ slug: slugify(category.category_name ?? "") }}
+                        search={{ id: category.category_id ?? "" }}
+                      >
+                        {category.category_name}
+                      </Link>
                     </li>
                   ))}
                 </ul>

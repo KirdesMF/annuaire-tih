@@ -1,4 +1,4 @@
-import { pgTable, varchar, timestamp, uuid, boolean, text } from "drizzle-orm/pg-core";
+import { boolean, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
 export const categoriesTable = pgTable("categories", {
