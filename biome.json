@@ -8,7 +8,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["app/routeTree.gen.ts", "app/styles/app.css", ".output/*", ".vinxi/*", ".wrangler/*"]
+    "ignore": ["app/routeTree.gen.ts", ".output/*", ".vinxi/*", ".wrangler/*"]
   },
   "formatter": {
     "enabled": true,

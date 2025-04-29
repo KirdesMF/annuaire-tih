@@ -59,7 +59,7 @@ export function MenuUser({ user }: { user: User | undefined }) {
           <span className="truncate text-xs">{user.email}</span>
         </div>
 
-        <DropdownMenuSeparator className="h-px bg-gray-200 my-1 -mx-1" />
+        <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
@@ -93,7 +93,7 @@ export function MenuUser({ user }: { user: User | undefined }) {
           ) : null}
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator className="h-px bg-gray-200 my-1 -mx-1" />
+        <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
           {/* biome-ignore lint/a11y/noLabelWithoutControl: dropdown menu */}
@@ -104,29 +104,29 @@ export function MenuUser({ user }: { user: User | undefined }) {
             onValueChange={(value) => onSelectColorScheme(value as "light" | "dark" | "system")}
           >
             <DropdownMenuRadioItem value="light" className="relative ps-8 ">
-              <DropdownMenuItemIndicator className="absolute start-2">
-                <span className="size-2 rounded-full flex bg-gray-400" />
+              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
+                <span className="size-2 rounded-full flex bg-accent-foreground" />
               </DropdownMenuItemIndicator>
               Light
             </DropdownMenuRadioItem>
 
             <DropdownMenuRadioItem value="dark" className="relative ps-8">
-              <DropdownMenuItemIndicator className="absolute start-2">
-                <span className="size-2 rounded-full flex bg-gray-400" />
+              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
+                <span className="size-2 rounded-full flex bg-accent-foreground" />
               </DropdownMenuItemIndicator>
               Dark
             </DropdownMenuRadioItem>
 
             <DropdownMenuRadioItem value="system" className="relative ps-8">
-              <DropdownMenuItemIndicator className="absolute start-2">
-                <span className="size-2 rounded-full flex bg-gray-400" />
+              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
+                <span className="size-2 rounded-full flex bg-accent-foreground" />
               </DropdownMenuItemIndicator>
               System
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator className="h-px bg-gray-200 my-1 -mx-1" />
+        <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
@@ -159,8 +159,8 @@ function AvatarUser({ user }: { user: User }) {
   }
 
   return (
-    <Avatar.Root className="size-8 rounded-full border border-gray-200 flex">
-      <Avatar.Fallback className="size-full leading-1 text-xs grid place-items-center text-blue-500">
+    <Avatar.Root className="size-8 rounded-full bg-secondary flex">
+      <Avatar.Fallback className="size-full leading-1 text-xs grid place-items-center text-secondary-foreground">
         {initials}
       </Avatar.Fallback>
     </Avatar.Root>

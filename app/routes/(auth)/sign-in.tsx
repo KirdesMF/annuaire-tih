@@ -64,7 +64,7 @@ function RouteComponent() {
 
   return (
     <main className="min-h-[calc(100dvh-60px)] flex items-center justify-center px-4">
-      <div className="w-full max-w-md mx-auto border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 px-8 py-12 rounded-md shadow-xs">
+      <div className="w-full max-w-lg mx-auto border border-border bg-card text-card-foreground px-8 py-12 rounded-sm shadow-xs">
         <div className="flex flex-col gap-2 mb-12">
           <h1 className="text-2xl font-bold text-center">Welcome back</h1>
           <p className="text-sm text-center">Connectez-vous pour accéder à votre compte.</p>
@@ -73,8 +73,8 @@ function RouteComponent() {
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
           <div className="flex flex-col gap-1">
             <Label htmlFor="email">Email *</Label>
-            <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-sm px-2 focus-within:outline focus-within:outline-blue-500">
-              <EmailIcon className="size-6 text-gray-500 dark:text-gray-400" />
+            <div className="flex items-center border border-border rounded-sm px-2 focus-within:outline focus-within:outline-blue-500">
+              <EmailIcon className="size-6 text-muted-foreground" />
               <Input
                 type="email"
                 name="email"
@@ -86,8 +86,8 @@ function RouteComponent() {
 
           <div className="flex flex-col gap-1">
             <Label htmlFor="password">Mot de passe *</Label>
-            <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-sm px-2 focus-within:outline focus-within:outline-blue-500">
-              <LockIcon className="size-6 text-gray-500 dark:text-gray-400" />
+            <div className="flex items-center border border-border rounded-sm px-2 focus-within:outline focus-within:outline-blue-500">
+              <LockIcon className="size-6 text-muted-foreground" />
               <Input
                 type="password"
                 name="password"
@@ -97,7 +97,7 @@ function RouteComponent() {
             </div>
 
             <div className="flex justify-end mt-1">
-              <Link className="text-xs text-blue-500" to="/forgot-password">
+              <Link className="text-xs text-secondary" to="/forgot-password">
                 Mot de passe oublié ?
               </Link>
             </div>
@@ -105,7 +105,7 @@ function RouteComponent() {
 
           <button
             type="submit"
-            className="transition-colors px-2 py-3 rounded-sm font-medium text-sm bg-blue-700 text-white hover:bg-blue-800 flex items-center justify-center gap-1"
+            className="transition-colors px-2 py-3 rounded-sm font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1"
             disabled={isPending}
           >
             {isPending ? (
@@ -121,7 +121,7 @@ function RouteComponent() {
 
         <div className="flex items-center justify-center gap-1 mt-6">
           <p className="text-sm">Pas encore inscrit ?</p>
-          <Link className="text-sm text-blue-500" to="/sign-up">
+          <Link className="text-sm text-secondary" to="/sign-up">
             Créer un compte
           </Link>
         </div>

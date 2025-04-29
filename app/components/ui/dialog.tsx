@@ -9,11 +9,11 @@ export function DialogContent({
 }: React.ComponentPropsWithRef<typeof DialogPrimitive.Content>) {
   return (
     <DialogPrimitive.Portal>
-      <DialogPrimitive.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[1px]" />
+      <DialogPrimitive.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[1px] z-70" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm w-[min(90vw,400px)]",
-          "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800",
+          "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm w-[min(90vw,400px)] z-70",
+          "bg-popover border border-border",
           className,
         )}
         {...props}

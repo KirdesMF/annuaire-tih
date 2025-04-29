@@ -18,7 +18,7 @@ export function MainNav() {
               to={link.to}
               className="text-sm font-light text-nowrap"
               activeProps={{
-                className: "data-[status=active]:text-red-400 data-[status=active]:font-bold",
+                className: "data-[status=active]:text-primary data-[status=active]:font-bold",
               }}
             >
               {link.label}
