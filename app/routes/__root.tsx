@@ -72,7 +72,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
       </head>
 
-      <body className="font-sans isolate dark:bg-gray-950 dark:text-white">
+      <body className="font-sans isolate bg-background text-foreground">
         <SiteHeader user={user} />
         {children}
         <Toaster />
