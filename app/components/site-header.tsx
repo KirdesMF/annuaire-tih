@@ -1,8 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import type { User } from "better-auth";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { ColorSchemeIcon } from "~/components/icons/color-scheme";
 import { MainNav } from "~/components/main-nav";
 import { MenuUser } from "~/components/menu-user";
@@ -27,7 +26,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { useDebounce } from "~/hooks/use-debounce";
 import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
-import { colorSchemeQuery, setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
+import { type Theme, useTheme } from "./providers/theme-provider";
 
 export function SiteHeader({ user }: { user: User | undefined }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -142,17 +141,7 @@ function LoginButton({ user }: { user: User | undefined }) {
 }
 
 function ThemeToggle() {
-  const queryClient = useQueryClient();
-  const { data: colorScheme } = useQuery(colorSchemeQuery);
-
-  const { mutate: setColorScheme } = useMutation({
-    mutationFn: setColorSchemeFn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
-  });
-
-  function onSelectColorScheme(scheme: "light" | "dark" | "system") {
-    setColorScheme({ data: scheme }, { onSuccess: () => toast.success("Thème mis à jour") });
-  }
+  const { setTheme, theme } = useTheme();
 
   return (
     <DropdownMenu>
@@ -167,10 +156,7 @@ function ThemeToggle() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent sideOffset={5} align="end" className="min-w-20">
-        <DropdownMenuRadioGroup
-          value={colorScheme}
-          onValueChange={(value) => onSelectColorScheme(value as "light" | "dark" | "system")}
-        >
+        <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as Theme)}>
           <DropdownMenuRadioItem value="light" className="flex items-center gap-2 px-2">
             <DropdownMenuItemIndicator>
               <span className="size-2 rounded-full flex bg-accent-foreground" />

@@ -33,7 +33,7 @@ const SignupSchema = v.object({
 });
 
 export const signupFn = createServerFn()
-  .validator((data: unknown) => v.parse(SignupSchema, data))
+  .validator(SignupSchema)
   .handler(async ({ data }) => {
     try {
       await auth.api.signUpEmail({
