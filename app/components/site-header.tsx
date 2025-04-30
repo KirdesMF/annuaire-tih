@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import type { User } from "better-auth";
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ColorSchemeIcon } from "~/components/icons/color-scheme";
 import { MainNav } from "~/components/main-nav";
 import { MenuUser } from "~/components/menu-user";
 import { MobileNav } from "~/components/mobile-nav";
@@ -19,9 +19,9 @@ import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "~/components/
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItemIndicator,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { useDebounce } from "~/hooks/use-debounce";
@@ -140,8 +140,16 @@ function LoginButton({ user }: { user: User | undefined }) {
   );
 }
 
+const TRIGGER_THEME_ICON = {
+  light: Sun,
+  dark: Moon,
+  system: Monitor,
+} as const;
+
 function ThemeToggle() {
   const { setTheme, theme } = useTheme();
+
+  const TriggerIcon = TRIGGER_THEME_ICON[theme];
 
   return (
     <DropdownMenu>
@@ -150,32 +158,36 @@ function ThemeToggle() {
           type="button"
           className="text-xs px-2 py-1 h-8 inline-flex items-center rounded-sm border border-border text-nowrap cursor-pointer"
         >
-          <ColorSchemeIcon className="size-4" />
-          <span className="sr-only">Thème</span>
+          <TriggerIcon className="size-4" />
+          <span className="sr-only">Modifier le thème</span>
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent sideOffset={5} align="end" className="min-w-20">
+      <DropdownMenuContent sideOffset={5} align="end" className="min-w-32">
         <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as Theme)}>
-          <DropdownMenuRadioItem value="light" className="flex items-center gap-2 px-2">
-            <DropdownMenuItemIndicator>
-              <span className="size-2 rounded-full flex bg-accent-foreground" />
-            </DropdownMenuItemIndicator>
-            Light
+          <DropdownMenuRadioItem value="light" className="flex items-center gap-2 px-2 group">
+            <div className="flex items-center gap-2">
+              <Sun size={16} className="group-aria-checked:text-primary" />
+              Light
+            </div>
           </DropdownMenuRadioItem>
 
-          <DropdownMenuRadioItem value="dark" className="flex items-center gap-2 px-2">
-            <DropdownMenuItemIndicator>
-              <span className="size-2 rounded-full flex bg-accent-foreground" />
-            </DropdownMenuItemIndicator>
-            Dark
+          <DropdownMenuSeparator className="h-px bg-border my-1" />
+
+          <DropdownMenuRadioItem value="dark" className="flex items-center gap-2 px-2 group">
+            <div className="flex items-center gap-2">
+              <Moon size={16} className="group-aria-checked:text-primary" />
+              Dark
+            </div>
           </DropdownMenuRadioItem>
 
-          <DropdownMenuRadioItem value="system" className="flex items-center gap-2 px-2">
-            <DropdownMenuItemIndicator>
-              <span className="size-2 rounded-full flex bg-accent-foreground" />
-            </DropdownMenuItemIndicator>
-            System
+          <DropdownMenuSeparator className="h-px bg-border my-1" />
+
+          <DropdownMenuRadioItem value="system" className="flex items-center gap-2 px-2 group">
+            <div className="flex items-center gap-2">
+              <Monitor size={16} className="group-aria-checked:text-primary" />
+              System
+            </div>
           </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>

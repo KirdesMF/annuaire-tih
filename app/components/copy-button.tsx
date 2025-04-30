@@ -1,5 +1,5 @@
+import { Copy } from "lucide-react";
 import { toast } from "sonner";
-import { CopyIcon } from "./icons/copy";
 
 type CopyButtonProps = React.ComponentPropsWithRef<"button">;
 
@@ -19,7 +19,7 @@ export function CopyButton({ children, ...props }: CopyButtonProps) {
       {...props}
     >
       {children}
-      <CopyIcon className="size-4" />
+      <Copy className="size-4" />
     </button>
   );
 }

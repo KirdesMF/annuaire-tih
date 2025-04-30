@@ -1,19 +1,15 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { Globe, Mail, Phone } from "lucide-react";
 import { Separator } from "radix-ui";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
-import { EmailIcon } from "~/components/icons/email";
 import { FacebookIcon } from "~/components/icons/facebook";
-import { GlobeIcon } from "~/components/icons/globe";
 import { InstagramIcon } from "~/components/icons/instagram";
-import { LinkChainIcon } from "~/components/icons/link-chain";
 import { LinkedinIcon } from "~/components/icons/linkedin";
-import { PhoneIcon } from "~/components/icons/phone";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
 import { useUpdatePreviewStore } from "~/stores/preview.store";
@@ -113,7 +109,7 @@ function RouteComponent() {
         Retour
       </Link>
 
-      <div className="container flex justify-between gap-4 border border-gray-300 p-6 rounded-sm">
+      <div className="container flex justify-between gap-4 border border-border p-6 rounded-sm">
         <div className="flex flex-col gap-2">
           <CompanyLogo
             url={preview.logo ? URL.createObjectURL(preview.logo) : undefined}
@@ -133,7 +129,7 @@ function RouteComponent() {
                 return (
                   <li
                     key={category.id}
-                    className="bg-gray-400 text-white px-2 py-1 rounded-sm text-xs"
+                    className="bg-secondary text-secondary-foreground px-2 py-1 rounded-sm text-xs"
                   >
                     <span className="max-w-[30ch] truncate">{category.name}</span>
                   </li>
@@ -142,29 +138,23 @@ function RouteComponent() {
             </ul>
           ) : null}
         </div>
-
-        <div className="flex gap-2">
-          <button type="button" className="bg-gray-100 p-2 rounded-sm cursor-pointer h-min">
-            <LinkChainIcon className="size-5" />
-          </button>
-        </div>
       </div>
 
       <div className="container flex gap-2">
         <div className="flex-1 flex flex-col justify-center gap-4 border border-gray-300 p-6 rounded-sm">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <EmailIcon className="size-5" />
+              <Mail className="size-5" />
               <p className="text-xs text-gray-500">{preview.email || "Non renseigné"}</p>
             </div>
 
             <div className="flex items-center gap-2">
-              <PhoneIcon className="size-5" />
+              <Phone className="size-5" />
               <p className="text-xs text-gray-500">{preview.phone || "Non renseigné"}</p>
             </div>
 
             <div className="flex items-center gap-2">
-              <GlobeIcon className="size-5" />
+              <Globe className="size-5" />
               {preview.website ? (
                 <a
                   href={preview.website}
@@ -193,39 +183,38 @@ function RouteComponent() {
           ) : null}
         </div>
 
-        <div className="flex-1 border border-gray-300 p-6 rounded-sm flex flex-col gap-2">
-          <p className="text-sm text-gray-500">
+        <div className="flex-1 border border-border p-6 rounded-sm flex flex-col gap-2">
+          <p className="text-sm">
             <span className="font-bold">Entrepreneur:</span>{" "}
             {preview.business_owner || "Non renseigné"}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm">
             <span className="font-bold">Zone géographique:</span>{" "}
             {preview.service_area || "Non renseigné"}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm">
             <span className="font-bold">Mode de travail:</span>{" "}
             {WORK_MODES[preview.work_mode ?? "not_specified"]}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm">
             <span className="font-bold">RQTH:</span> {preview.rqth ? "Oui" : "Non"}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm">
             <span className="font-bold">Sous domaine:</span> {preview.subdomain || "Non renseigné"}
           </p>
         </div>
       </div>
 
-      <div className="container border border-gray-300 p-6 rounded-sm grid gap-4">
+      <div className="container border border-border p-6 rounded-sm grid gap-4">
         <div className="flex flex-col gap-2">
           <h2 className="text-lg font-bold">Description</h2>
-          <p className="text-sm text-gray-500 text-pretty">
-            {preview.description || "Non renseigné"}
-          </p>
+          <p className="text-sm text-pretty">{preview.description || "Non renseigné"}</p>
         </div>
 
         {preview.gallery?.length ? (
           <>
-            <Separator.Root className="h-px bg-gray-300 my-4" />
+            <Separator.Root className="h-px bg-border my-4" />
+
             <ul className="flex flex-wrap gap-2">
               {preview.gallery.map((image, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
@@ -249,7 +238,7 @@ function RouteComponent() {
       <div className="container flex justify-end gap-2">
         <button
           type="submit"
-          className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs"
+          className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs"
           onClick={onValidate}
           disabled={isPending}
         >

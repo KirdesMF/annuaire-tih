@@ -2,13 +2,9 @@ import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
+import { BriefcaseBusiness, DiamondPlus, LayoutDashboard, LogOut, UserCog } from "lucide-react";
 import { Avatar } from "radix-ui";
 import { toast } from "sonner";
-import { AddIcon } from "~/components/icons/add";
-import { CompanyIcon } from "~/components/icons/company";
-import { DashboardIcon } from "~/components/icons/dashboard";
-import { LogoutIcon } from "~/components/icons/logout";
-import { SettingsAccountIcon } from "~/components/icons/settings-account";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,21 +49,21 @@ export function MenuUser({ user }: { user: User | undefined }) {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link to="/compte/entreprises/create">
-              <AddIcon className="size-4" />
+              <DiamondPlus className="size-4" />
               <span className="text-xs">Référencer</span>
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild>
             <Link to="/compte/entreprises">
-              <CompanyIcon className="size-4" />
+              <BriefcaseBusiness className="size-4" />
               <span className="text-xs">Mes entreprises</span>
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild>
             <Link to="/compte/preferences">
-              <SettingsAccountIcon className="size-4" />
+              <UserCog className="size-4" />
               <span className="text-xs">Mon compte</span>
             </Link>
           </DropdownMenuItem>
@@ -75,7 +71,7 @@ export function MenuUser({ user }: { user: User | undefined }) {
           {isAdmin ? (
             <DropdownMenuItem asChild>
               <Link to="/admin/dashboard">
-                <DashboardIcon className="size-4" />
+                <LayoutDashboard className="size-4" />
                 <span className="text-xs">Admin dashboard</span>
               </Link>
             </DropdownMenuItem>
@@ -117,7 +113,7 @@ export function MenuUser({ user }: { user: User | undefined }) {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <button type="button" onClick={() => signOut(undefined)}>
-              <LogoutIcon className="size-4" />
+              <LogOut className="size-4" />
               <span>Se déconnecter</span>
             </button>
           </DropdownMenuItem>
