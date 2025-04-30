@@ -3,9 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
 import { Loader, Plus, Trash2 } from "lucide-react";
-import { toast } from "sonner";
 import * as v from "valibot";
 import { Label } from "~/components/label";
+import { useToast } from "~/components/ui/toast";
 import { deleteCompanyMedia } from "~/lib/api/companies/mutations/delete-company-media";
 import { updateCompanyMedia } from "~/lib/api/companies/mutations/update-company-medias";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
@@ -23,6 +23,7 @@ function RouteComponent() {
   const params = Route.useParams();
   const context = Route.useRouteContext();
   const navigate = Route.useNavigate();
+  const { toast } = useToast();
   const { data: company } = useSuspenseQuery(companyBySlugQuery(params.slug));
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompanyMedia) });
   const { mutate: deleteMedia, isPending: isDeletingMedia } = useMutation({
@@ -59,7 +60,10 @@ function RouteComponent() {
         onSuccess: () => {
           context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
           context.queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
-          toast.success("Logo supprimé avec succès");
+          toast({
+            description: "Logo supprimé avec succès",
+            button: { label: "Fermer" },
+          });
         },
       },
     );
@@ -76,7 +80,10 @@ function RouteComponent() {
         onSuccess: () => {
           context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
           context.queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
-          toast.success("Image supprimée avec succès");
+          toast({
+            description: "Image supprimée avec succès",
+            button: { label: "Fermer" },
+          });
         },
       },
     );
@@ -96,14 +103,17 @@ function RouteComponent() {
     });
 
     if (!result.success) {
-      toast.error(
-        <div>
-          {result.issues.map((issue, idx) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            <p key={idx}>{issue.message}</p>
-          ))}
-        </div>,
-      );
+      toast({
+        description: (
+          <div>
+            {result.issues.map((issue, idx) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+              <p key={idx}>{issue.message}</p>
+            ))}
+          </div>
+        ),
+        button: { label: "Fermer" },
+      });
       return;
     }
 
@@ -113,12 +123,17 @@ function RouteComponent() {
         onSuccess: () => {
           context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
           context.queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
-          toast.success("Images mises à jour avec succès");
+          toast({
+            description: "Images mises à jour avec succès",
+            button: { label: "Fermer" },
+          });
           navigate({ to: "/compte/entreprises" });
         },
-        onError: (error) => {
-          console.error(error);
-          toast.error("Une erreur est survenue lors de la mise à jour des images");
+        onError: () => {
+          toast({
+            description: "Une erreur est survenue lors de la mise à jour des images",
+            button: { label: "Fermer" },
+          });
         },
       },
     );

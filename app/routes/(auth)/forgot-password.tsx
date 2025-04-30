@@ -2,10 +2,10 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
-import { toast } from "sonner";
 import * as v from "valibot";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
+import { useToast } from "~/components/ui/toast";
 import { auth } from "~/lib/auth/auth.server";
 
 const ForgotPasswordSchema = v.object({
@@ -29,6 +29,7 @@ export const Route = createFileRoute("/(auth)/forgot-password")({
 });
 
 function RouteComponent() {
+  const { toast } = useToast();
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(forgotPasswordFn) });
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -39,10 +40,16 @@ function RouteComponent() {
       { data: formData },
       {
         onSuccess: () => {
-          toast.success("Un email vous a été envoyé pour réinitialiser votre mot de passe");
+          toast({
+            description: "Un email vous a été envoyé pour réinitialiser votre mot de passe",
+            button: { label: "Fermer" },
+          });
         },
         onError: (error) => {
-          toast.error(error.message);
+          toast({
+            description: error.message,
+            button: { label: "Fermer" },
+          });
         },
       },
     );

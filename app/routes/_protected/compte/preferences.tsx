@@ -4,11 +4,11 @@ import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
 import { Avatar, RadioGroup, Separator } from "radix-ui";
 import { type FormEvent, useState } from "react";
-import { toast } from "sonner";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { type Theme, useTheme } from "~/components/providers/theme-provider";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "~/components/ui/dialog";
+import { useToast } from "~/components/ui/toast";
 import { deleteUser } from "~/lib/api/users/mutations/delete-user";
 import { updateUserEmailFn } from "~/lib/api/users/mutations/update-user-email";
 import { updateUserInfos } from "~/lib/api/users/mutations/update-user-infos";
@@ -23,6 +23,7 @@ function RouteComponent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenPassword, setIsModalOpenPassword] = useState(false);
   const { setTheme, theme } = useTheme();
+  const { toast } = useToast();
 
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(deleteUser) });
   const { mutate: update, isPending: isUpdatingUserInfos } = useMutation({
@@ -51,7 +52,10 @@ function RouteComponent() {
             queryKey: ["user", "session"],
             refetchType: "all",
           });
-          toast.success("Nom et prénom modifié avec succès");
+          toast({
+            description: "Nom et prénom modifié avec succès",
+            button: { label: "Fermer" },
+          });
         },
       },
     );
@@ -66,7 +70,10 @@ function RouteComponent() {
       {
         onSuccess: () => {
           setIsModalOpenPassword(false);
-          toast.success("Mot de passe modifié avec succès");
+          toast({
+            description: "Mot de passe modifié avec succès",
+            button: { label: "Fermer" },
+          });
         },
       },
     );
@@ -80,7 +87,10 @@ function RouteComponent() {
       { data: formData },
       {
         onSuccess: () => {
-          toast.success("Email modifié avec succès");
+          toast({
+            description: "Email modifié avec succès",
+            button: { label: "Fermer" },
+          });
         },
       },
     );

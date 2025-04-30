@@ -3,10 +3,10 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { APIError } from "better-auth/api";
 import { Resend } from "resend";
-import { toast } from "sonner";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useToast } from "~/components/ui/toast";
 import { auth } from "~/lib/auth/auth.server";
 
 const SignupSchema = v.object({
@@ -67,8 +67,6 @@ export const signupFn = createServerFn()
       console.error(error);
     }
 
-    console.log(emailData);
-
     throw redirect({ to: "/compte/entreprises" });
   });
 
@@ -82,6 +80,7 @@ export const Route = createFileRoute("/(auth)/sign-up")({
 });
 
 function RouteComponent() {
+  const { toast } = useToast();
   const { mutate, isPending } = useMutation({
     mutationFn: useServerFn(signupFn),
   });
@@ -102,7 +101,10 @@ function RouteComponent() {
     );
 
     if (!result.success) {
-      toast.error(result.issues[0].message);
+      toast({
+        description: result.issues[0].message,
+        button: { label: "Fermer" },
+      });
       return;
     }
 

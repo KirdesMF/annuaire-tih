@@ -1,14 +1,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { Globe, Mail, Phone } from "lucide-react";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
-import { EmailIcon } from "~/components/icons/email";
 import { FacebookIcon } from "~/components/icons/facebook";
-import { GlobeIcon } from "~/components/icons/globe";
 import { InstagramIcon } from "~/components/icons/instagram";
 import { LinkedinIcon } from "~/components/icons/linkedin";
-import { PhoneIcon } from "~/components/icons/phone";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import { slugify } from "~/utils/slug";
@@ -48,11 +46,9 @@ function RouteComponent() {
 
   return (
     <main className="px-4 py-8 grid gap-4">
-      <div className="container flex justify-between gap-4 border border-gray-300 p-6 rounded-sm">
+      <div className="container flex justify-between gap-4 border border-border p-6 rounded-sm">
         <div className="flex flex-col gap-2">
-          <div className="size-24">
-            <CompanyLogo url={data.logo?.secureUrl} name={data.name} size="lg" />
-          </div>
+          <CompanyLogo url={data.logo?.secureUrl} name={data.name} size="lg" />
 
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">{data.name}</h1>
@@ -61,7 +57,7 @@ function RouteComponent() {
               <Link
                 to={"/compte/entreprises/$slug/edit/infos"}
                 params={{ slug: params.slug }}
-                className="border border-gray-300 px-2 py-1 rounded-sm text-xs h-min"
+                className="border border-border px-2 py-1 rounded-sm text-xs h-min"
               >
                 Edit
               </Link>
@@ -69,7 +65,10 @@ function RouteComponent() {
           </div>
           <ul className="flex flex-wrap gap-2">
             {data.categories.map((category) => (
-              <li key={category?.id} className="bg-gray-100 px-2 py-1 rounded-sm text-xs">
+              <li
+                key={category?.id}
+                className="bg-muted text-foreground px-2 py-1 rounded-sm text-xs"
+              >
                 <Link
                   to="/categories/$slug"
                   params={{ slug: slugify(category?.name ?? "") }}
@@ -84,31 +83,31 @@ function RouteComponent() {
       </div>
 
       <div className="container flex gap-2 flex-wrap">
-        <div className="flex-1 flex flex-col justify-center gap-4 border border-gray-300 p-6 rounded-sm">
+        <div className="flex-1 flex flex-col justify-center gap-4 border border-border p-6 rounded-sm">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <EmailIcon className="size-5" />
-              <p className="text-xs text-gray-500 text-nowrap">{data.email || "Non renseigné"}</p>
+              <Mail className="size-5" />
+              <p className="text-xs text-nowrap">{data.email || "Non renseigné"}</p>
             </div>
 
             <div className="flex items-center gap-2">
-              <PhoneIcon className="size-5" />
-              <p className="text-xs text-gray-500 text-nowrap">{data.phone || "Non renseigné"}</p>
+              <Phone className="size-5" />
+              <p className="text-xs text-nowrap">{data.phone || "Non renseigné"}</p>
             </div>
 
             <div className="flex items-center gap-2">
-              <GlobeIcon className="size-5" />
+              <Globe className="size-5" />
               {data.website ? (
                 <a
                   href={data.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-gray-500 text-nowrap"
+                  className="text-xs text-nowrap"
                 >
                   {data.website}
                 </a>
               ) : (
-                <span className="text-xs text-gray-500 text-nowrap">Non renseigné</span>
+                <span className="text-xs text-nowrap">Non renseigné</span>
               )}
             </div>
           </div>
@@ -128,32 +127,32 @@ function RouteComponent() {
           ) : null}
         </div>
 
-        <div className="flex-1 border border-gray-300 p-6 rounded-sm flex flex-col gap-2">
-          <p className="text-sm text-gray-500 text-nowrap">
+        <div className="flex-1 border border-border p-6 rounded-sm flex flex-col gap-2">
+          <p className="text-sm text-nowrap">
             <span className="font-bold">Entrepreneur:</span>{" "}
             {data.business_owner || "Non renseigné"}
           </p>
-          <p className="text-sm text-gray-500 text-nowrap">
+          <p className="text-sm text-nowrap">
             <span className="font-bold">Zone géographique:</span>{" "}
             {data.service_area || "Non renseigné"}
           </p>
-          <p className="text-sm text-gray-500 text-nowrap">
+          <p className="text-sm text-nowrap">
             <span className="font-bold">Mode de travail:</span>{" "}
             {WORK_MODES[data.work_mode ?? "not_specified"]}
           </p>
-          <p className="text-sm text-gray-500 text-nowrap">
+          <p className="text-sm text-nowrap">
             <span className="font-bold">RQTH:</span> {data.rqth ? "Oui" : "Non"}
           </p>
-          <p className="text-sm text-gray-500 text-nowrap">
+          <p className="text-sm text-nowrap">
             <span className="font-bold">Sous domaine:</span> {data.subdomain || "Non renseigné"}
           </p>
         </div>
       </div>
 
-      <div className="container border border-gray-300 p-6 rounded-sm grid gap-4">
+      <div className="container border border-border p-6 rounded-sm grid gap-4">
         <div className="flex flex-col gap-2">
           <h2 className="text-lg font-bold">Description</h2>
-          <p className="text-sm text-gray-500 text-pretty whitespace-pre-line">
+          <p className="text-sm text-pretty whitespace-pre-line">
             {data.description || "Non renseigné"}
           </p>
         </div>
@@ -166,7 +165,7 @@ function RouteComponent() {
 
 function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; publicId: string }> }) {
   return (
-    <div className="container border border-gray-300 p-6 rounded-sm grid gap-4">
+    <div className="container border border-border p-6 rounded-sm grid gap-4">
       <h2 className="text-lg font-bold">Galerie</h2>
       <ul className="flex flex-wrap gap-4 items-center justify-center">
         {gallery.map((image) => {

@@ -2,10 +2,10 @@ import { useMutation } from "@tanstack/react-query";
 import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { ChevronRight, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
-import { toast } from "sonner";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useToast } from "~/components/ui/toast";
 import { auth } from "~/lib/auth/auth.server";
 
 const LoginSchema = v.object({
@@ -40,6 +40,7 @@ export const Route = createFileRoute("/(auth)/sign-in")({
 });
 
 function RouteComponent() {
+  const { toast } = useToast();
   const { mutate, isPending } = useMutation({
     mutationFn: useServerFn(loginFn),
   });
@@ -53,7 +54,10 @@ function RouteComponent() {
     const result = v.safeParse(LoginSchema, { email, password }, { abortEarly: true });
 
     if (!result.success) {
-      toast.error(result.issues[0].message);
+      toast({
+        description: result.issues[0].message,
+        button: { label: "Fermer" },
+      });
       return;
     }
 
@@ -72,8 +76,8 @@ function RouteComponent() {
           <div className="flex flex-col gap-1">
             <Label htmlFor="email">Email *</Label>
             <div className="flex items-center gap-1">
-              <div className="flex items-center justify-center size-11 rounded-sm border border-border">
-                <Mail className="size-5 text-accent" />
+              <div className="flex items-center justify-center size-9 rounded-sm border border-border">
+                <Mail className="size-4 text-accent" />
               </div>
               <Input type="email" name="email" id="email" placeholder="email@example.com" />
             </div>
@@ -82,8 +86,8 @@ function RouteComponent() {
           <div className="flex flex-col gap-1">
             <Label htmlFor="password">Mot de passe *</Label>
             <div className="flex items-center gap-1">
-              <div className="flex items-center justify-center size-11 rounded-sm border border-border">
-                <LockKeyhole className="size-5 text-accent" />
+              <div className="flex items-center justify-center size-9 rounded-sm border border-border">
+                <LockKeyhole className="size-4 text-accent" />
               </div>
               <Input type="password" name="password" id="password" placeholder="••••••••••••••••" />
             </div>

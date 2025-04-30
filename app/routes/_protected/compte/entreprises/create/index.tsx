@@ -6,7 +6,6 @@ import { decode } from "decode-formdata";
 import { ChevronDown, Globe, Mail, Phone, Plus, X } from "lucide-react";
 import { Popover, Separator } from "radix-ui";
 import { useRef, useState } from "react";
-import { toast } from "sonner";
 import * as v from "valibot";
 import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facebook";
@@ -14,6 +13,7 @@ import { InstagramIcon } from "~/components/icons/instagram";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
@@ -28,7 +28,6 @@ export const Route = createFileRoute("/_protected/compte/entreprises/create/")({
     );
 
     if (userCompanies && userCompanies?.length >= 3) {
-      toast.error("Vous ne pouvez pas créer plus de 3 entreprises");
       throw redirect({ to: "/compte/entreprises" });
     }
   },
@@ -38,6 +37,7 @@ export const Route = createFileRoute("/_protected/compte/entreprises/create/")({
 });
 
 function RouteComponent() {
+  const { toast } = useToast();
   const context = Route.useRouteContext();
   const navigate = Route.useNavigate();
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
@@ -54,7 +54,10 @@ function RouteComponent() {
   function onSelectCategory(categoryId: string) {
     setSelectedCategories((prev) => {
       if (prev.size >= 3) {
-        toast.error("Vous ne pouvez pas sélectionner plus de 3 catégories");
+        toast({
+          description: "Vous ne pouvez pas sélectionner plus de 3 catégories",
+          button: { label: "Fermer" },
+        });
         return prev;
       }
       return new Set(prev).add(categoryId);
@@ -108,14 +111,17 @@ function RouteComponent() {
     const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortPipeEarly: true });
 
     if (!result.success) {
-      toast.error(
-        <div>
-          {result.issues.map((issue, idx) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            <p key={idx}>{issue.message}</p>
-          ))}
-        </div>,
-      );
+      toast({
+        description: (
+          <div>
+            {result.issues.map((issue, idx) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+              <p key={idx}>{issue.message}</p>
+            ))}
+          </div>
+        ),
+        button: { label: "Fermer" },
+      });
       return;
     }
 
@@ -142,12 +148,17 @@ function RouteComponent() {
       {
         onSuccess: () => {
           context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
-          toast.success("Entreprise créée avec succès");
+          toast({
+            description: "Entreprise créée avec succès",
+            button: { label: "Fermer" },
+          });
           navigate({ to: "/compte/entreprises" });
         },
-        onError: (error) => {
-          console.error(error);
-          toast.error(error.message);
+        onError: () => {
+          toast({
+            description: "Une erreur est survenue lors de la création de l'entreprise",
+            button: { label: "Fermer" },
+          });
         },
       },
     );

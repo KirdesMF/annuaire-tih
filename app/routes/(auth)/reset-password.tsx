@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { toast } from "sonner";
 import * as v from "valibot";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
+import { useToast } from "~/components/ui/toast";
 import { auth } from "~/lib/auth/auth.server";
 
 const SearchParamsSchema = v.object({
@@ -33,6 +33,7 @@ export const Route = createFileRoute("/(auth)/reset-password")({
 });
 
 function RouteComponent() {
+  const { toast } = useToast();
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(resetPasswordFn) });
@@ -45,11 +46,17 @@ function RouteComponent() {
       { data: formData },
       {
         onSuccess: () => {
-          toast.success("Mot de passe réinitialisé avec succès");
+          toast({
+            description: "Mot de passe réinitialisé avec succès",
+            button: { label: "Fermer" },
+          });
           navigate({ to: "/sign-in" });
         },
         onError: (error) => {
-          toast.error(error.message);
+          toast({
+            description: error.message,
+            button: { label: "Fermer" },
+          });
         },
       },
     );
