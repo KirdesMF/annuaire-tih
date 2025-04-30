@@ -1,9 +1,9 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { Search } from "lucide-react";
 import * as v from "valibot";
-import { SearchIcon } from "~/components/icons/search";
-import { Input } from "~/components/input";
-import { Label } from "~/components/label";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { companiesByCategoryQuery } from "~/lib/api/companies/queries/get-companies-by-category";
 
 const SearchSchema = v.object({
@@ -32,7 +32,7 @@ function RouteComponent() {
     <main>
       <div className="container px-4 py-16 grid gap-6">
         <header>
-          <Link to="/" className="text-sm text-gray-500">
+          <Link to="/" className="text-sm text-muted-foreground">
             Back
           </Link>
           <h1 className="text-2xl font-bold first-letter:capitalize">{slug.replace(/-/g, " ")}</h1>
@@ -42,8 +42,8 @@ function RouteComponent() {
           <Label>
             <span className="sr-only">Rechercher une entreprise</span>
 
-            <div className="flex items-center rounded-md border border-gray-200 px-2 focus-within:border-gray-500">
-              <SearchIcon className="size-5" />
+            <div className="flex items-center rounded-md border border-input px-2 focus-within:outline-primary focus-within:outline">
+              <Search className="size-5" />
               <Input
                 type="text"
                 placeholder="Rechercher une entreprise"
@@ -60,7 +60,7 @@ function RouteComponent() {
             {data.companies.map((company) => (
               <li
                 key={company.id}
-                className="flex flex-col gap-2 border border-gray-200 rounded-md p-4"
+                className="flex flex-col gap-2 border border-border bg-card text-card-foreground rounded-md p-4 shadow-xs"
               >
                 <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
                   {company.name}

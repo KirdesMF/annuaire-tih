@@ -2,10 +2,11 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { APIError } from "better-auth/api";
-import { Input } from "~/components/input";
-import { Label } from "~/components/label";
-import * as v from "valibot";
 import { Resend } from "resend";
+import * as v from "valibot";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { useToast } from "~/components/ui/toast";
 import { auth } from "~/lib/auth/auth.server";
 
 const SignupSchema = v.object({
@@ -31,10 +32,8 @@ const SignupSchema = v.object({
   ),
 });
 
-type SignupData = v.InferOutput<typeof SignupSchema>;
-
 export const signupFn = createServerFn()
-  .validator((data: unknown) => v.parse(SignupSchema, data))
+  .validator(SignupSchema)
   .handler(async ({ data }) => {
     try {
       await auth.api.signUpEmail({
@@ -68,12 +67,10 @@ export const signupFn = createServerFn()
       console.error(error);
     }
 
-    console.log(emailData);
-
     throw redirect({ to: "/compte/entreprises" });
   });
 
-export const Route = createFileRoute("/(auth)/signup")({
+export const Route = createFileRoute("/(auth)/sign-up")({
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
     if (context.user) {
@@ -83,6 +80,7 @@ export const Route = createFileRoute("/(auth)/signup")({
 });
 
 function RouteComponent() {
+  const { toast } = useToast();
   const { mutate, isPending } = useMutation({
     mutationFn: useServerFn(signupFn),
   });
@@ -90,52 +88,70 @@ function RouteComponent() {
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    mutate({
-      data: {
-        email: formData.get("email") as string,
-        password: formData.get("password") as string,
-        firstName: formData.get("firstName") as string,
-        lastName: formData.get("lastName") as string,
+
+    const result = v.safeParse(
+      SignupSchema,
+      {
+        email: formData.get("email"),
+        password: formData.get("password"),
+        firstName: formData.get("firstName"),
+        lastName: formData.get("lastName"),
       },
-    });
+      { abortEarly: true },
+    );
+
+    if (!result.success) {
+      toast({
+        description: result.issues[0].message,
+        button: { label: "Fermer" },
+      });
+      return;
+    }
+
+    mutate({ data: result.output });
   }
 
   return (
-    <main className="py-12">
-      <h1 className="text-2xl font-bold text-center mb-6">Créer un compte</h1>
+    <main className="min-h-[calc(100dvh-60px)] flex items-center justify-center px-4">
+      <div className="max-w-lg w-full mx-auto border border-border bg-card text-card-foreground px-8 py-12 rounded-sm shadow-xs">
+        <div className="flex flex-col gap-2 mb-12">
+          <h1 className="text-2xl font-bold text-center">Créer un compte</h1>
+          <p className="text-sm text-center">
+            Un compte vous permet de référencer votre entreprise
+          </p>
+        </div>
 
-      <div className="max-w-lg mx-auto border border-gray-200 p-6 rounded-sm shadow-sm">
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
           <div className="grid gap-4">
             <Label className="flex flex-col gap-1">
               <span>Nom*</span>
-              <Input name="lastName" type="text" required />
+              <Input name="lastName" type="text" placeholder="Entrez votre nom" />
             </Label>
 
             <Label className="flex flex-col gap-1">
               <span>Prénom*</span>
-              <Input name="firstName" type="text" required />
+              <Input name="firstName" type="text" placeholder="Entrez votre prénom" />
             </Label>
 
             <Label className="flex flex-col gap-1">
               <span>Email*</span>
-              <Input name="email" type="email" required />
+              <Input name="email" type="email" placeholder="exemple@email.com" />
             </Label>
 
             <Label className="flex flex-col gap-1">
               <span>Mot de passe*</span>
-              <Input name="password" type="password" required />
+              <Input name="password" type="password" placeholder="••••••••••••••••" />
             </Label>
 
             <Label className="flex flex-col gap-1">
               <span>Confirmation du mot de passe*</span>
-              <Input name="confirmPassword" type="password" required />
+              <Input name="confirmPassword" type="password" placeholder="••••••••••••••••" />
             </Label>
           </div>
 
           <button
             type="submit"
-            className="border border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white transition-colors p-2 rounded-sm font-medium text-sm"
+            className="transition-colors px-2 py-3 rounded-sm font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1"
             disabled={isPending}
           >
             {isPending ? "Création en cours..." : "S'inscrire"}

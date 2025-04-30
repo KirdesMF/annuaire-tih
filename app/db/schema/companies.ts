@@ -1,16 +1,7 @@
-import {
-  pgTable,
-  uuid,
-  timestamp,
-  index,
-  varchar,
-  boolean,
-  jsonb,
-  text,
-} from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { user } from "./auth";
+import { boolean, index, jsonb, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
+import { user } from "./auth";
 export const companiesTable = pgTable(
   "companies",
   {

@@ -1,5 +1,4 @@
 import { cn } from "~/utils/cn";
-import { StoreIcon } from "./icons/store";
 
 const SIZES = {
   sm: "w-8 h-auto",
@@ -12,7 +11,8 @@ export function CompanyLogo({
   name,
   size = "sm",
 }: { url?: string; name: string; size?: keyof typeof SIZES }) {
-  if (!url) return <StoreIcon className="size-full" />;
-
-  return <img src={url} alt={name} className={cn("rounded-sm object-contain size-full")} />;
+  if (!url) return null;
+  return (
+    <img src={url} alt={name} className={cn("rounded-sm object-contain size-full", SIZES[size])} />
+  );
 }

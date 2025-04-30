@@ -1,29 +1,26 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Input } from "~/components/input";
-import { Label } from "~/components/label";
 import { Command } from "cmdk";
-import { useRef, useState } from "react";
-import { CloseIcon } from "~/components/icons/close";
-import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
-import { toast } from "sonner";
-import { Popover, Separator } from "radix-ui";
-import * as v from "valibot";
-import { CreateCompanySchema } from "~/lib/validator/company.schema";
-import { ChevronDownIcon } from "~/components/icons/chevron-down";
 import { decode } from "decode-formdata";
-import { LinkedinIcon } from "~/components/icons/linkedin";
-import { InstagramIcon } from "~/components/icons/instagram";
+import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
+import { Popover, Separator } from "radix-ui";
+import { useRef, useState } from "react";
+import * as v from "valibot";
 import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facebook";
-import { PlusIcon } from "~/components/icons/plus";
-import { PhoneIcon } from "~/components/icons/phone";
-import { GlobeIcon } from "~/components/icons/globe";
-import { EmailIcon } from "~/components/icons/email";
-import { useAddPreviewStore } from "~/stores/preview.store";
+import { InstagramIcon } from "~/components/icons/instagram";
+import { LinkedinIcon } from "~/components/icons/linkedin";
+import { InputFile } from "~/components/input-file";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { useToast } from "~/components/ui/toast";
+import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
+import { CreateCompanySchema } from "~/lib/validator/company.schema";
+import { useAddPreviewStore } from "~/stores/preview.store";
+import { cn } from "~/utils/cn";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/create/")({
   component: RouteComponent,
@@ -33,7 +30,6 @@ export const Route = createFileRoute("/_protected/compte/entreprises/create/")({
     );
 
     if (userCompanies && userCompanies?.length >= 3) {
-      toast.error("Vous ne pouvez pas créer plus de 3 entreprises");
       throw redirect({ to: "/compte/entreprises" });
     }
   },
@@ -43,6 +39,7 @@ export const Route = createFileRoute("/_protected/compte/entreprises/create/")({
 });
 
 function RouteComponent() {
+  const { toast } = useToast();
   const context = Route.useRouteContext();
   const navigate = Route.useNavigate();
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
@@ -59,7 +56,10 @@ function RouteComponent() {
   function onSelectCategory(categoryId: string) {
     setSelectedCategories((prev) => {
       if (prev.size >= 3) {
-        toast.error("Vous ne pouvez pas sélectionner plus de 3 catégories");
+        toast({
+          description: "Vous ne pouvez pas sélectionner plus de 3 catégories",
+          button: { label: "Fermer" },
+        });
         return prev;
       }
       return new Set(prev).add(categoryId);
@@ -113,14 +113,17 @@ function RouteComponent() {
     const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortPipeEarly: true });
 
     if (!result.success) {
-      toast.error(
-        <div>
-          {result.issues.map((issue, idx) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            <p key={idx}>{issue.message}</p>
-          ))}
-        </div>,
-      );
+      toast({
+        description: (
+          <div>
+            {result.issues.map((issue, idx) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+              <p key={idx}>{issue.message}</p>
+            ))}
+          </div>
+        ),
+        button: { label: "Fermer" },
+      });
       return;
     }
 
@@ -147,12 +150,17 @@ function RouteComponent() {
       {
         onSuccess: () => {
           context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
-          toast.success("Entreprise créée avec succès");
+          toast({
+            description: "Entreprise créée avec succès",
+            button: { label: "Fermer" },
+          });
           navigate({ to: "/compte/entreprises" });
         },
-        onError: (error) => {
-          console.error(error);
-          toast.error(error.message);
+        onError: () => {
+          toast({
+            description: "Une erreur est survenue lors de la création de l'entreprise",
+            button: { label: "Fermer" },
+          });
         },
       },
     );
@@ -165,13 +173,13 @@ function RouteComponent() {
 
         <form className="flex flex-col gap-3" ref={formRef} onSubmit={onSubmit}>
           <input type="hidden" name="user_id" value={context.user.id} />
+
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Nom de l'entreprise *</span>
             <Input
               type="text"
               name="name"
               placeholder="Ex: mon entreprise"
-              className="placeholder:text-xs"
               defaultValue={preview?.name}
             />
           </Label>
@@ -182,7 +190,6 @@ function RouteComponent() {
               type="text"
               name="siret"
               placeholder="Ex: 12345678901234"
-              className="placeholder:text-xs"
               defaultValue={preview?.siret}
             />
           </Label>
@@ -190,30 +197,30 @@ function RouteComponent() {
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Catégories * (max. 3)</span>
             <Popover.Root>
-              <Popover.Trigger className="h-9 cursor-pointer border rounded-sm border-gray-300 px-2 py-1 text-xs flex items-center justify-between gap-2">
-                <span className="rounded-sm text-xs flex items-center gap-2 text-gray-400">
+              <Popover.Trigger className="h-10 cursor-pointer border border-input rounded-sm px-2 py-1 text-xs flex items-center justify-between gap-2 shadow-2xs">
+                <span className="rounded-sm text-xs flex items-center gap-2 text-muted-foreground">
                   Ajouter une catégorie
                 </span>
-                <ChevronDownIcon className="size-5 text-gray-500" />
+                <ChevronDown className="size-4 text-muted-foreground" />
               </Popover.Trigger>
               <Popover.Portal>
                 <Popover.Content
-                  className="bg-white w-(--radix-popper-anchor-width)"
+                  className="bg-popover w-(--radix-popper-anchor-width)"
                   sideOffset={5}
                 >
-                  <Command className="border rounded-sm border-gray-300">
+                  <Command className="border border-input rounded-sm">
                     <Command.Input
                       placeholder="Rechercher une catégorie"
                       className="w-full h-10 px-2 outline-none placeholder:text-sm placeholder:font-light"
                     />
-                    <Command.Separator className="h-px bg-gray-300" />
+                    <Command.Separator className="h-px bg-border" />
                     <Command.List className="max-h-60 overflow-y-auto">
                       {categories.map((category) => (
                         <Command.Item
                           key={category.id}
                           value={category.name}
                           disabled={selectedCategories.has(category.id)}
-                          className="cursor-pointer py-1.5 px-2 aria-selected:bg-gray-100 text-sm font-light aria-disabled:opacity-20"
+                          className="cursor-pointer py-1.5 px-2 aria-selected:bg-secondary aria-selected:text-secondary-foreground text-sm font-light aria-disabled:opacity-20"
                           onSelect={() => onSelectCategory(category.id)}
                         >
                           {category.name}
@@ -235,16 +242,17 @@ function RouteComponent() {
                 return (
                   <li
                     key={category.id}
-                    className="bg-gray-400 text-white px-2 py-1 rounded-sm text-xs flex items-center gap-2"
+                    className="bg-secondary text-secondary-foreground px-2 py-1 rounded-sm text-xs flex items-center gap-2"
                   >
                     <input type="hidden" name={`categories[${idx}]`} value={category.id} />
                     <span className="max-w-[30ch] truncate">{category.name}</span>
                     <button
                       type="button"
-                      className="text-white inline-grid place-items-center cursor-pointer"
+                      className="text-secondary-foreground inline-grid place-items-center cursor-pointer"
                       onClick={() => onRemoveCategory(category.id)}
+                      tabIndex={-1}
                     >
-                      <CloseIcon className="size-3 text-white" />
+                      <X className="size-3" />
                     </button>
                   </li>
                 );
@@ -252,22 +260,29 @@ function RouteComponent() {
             </ul>
           ) : null}
 
-          <Separator.Root className="h-px bg-gray-300 my-4" />
-
           <div className="grid gap-1">
             <Label className="flex flex-col gap-1">
               <span className="text-xs font-medium">Description</span>
               <textarea
                 name="description"
-                className="border rounded-sm p-2 border-gray-300 resize-none placeholder:text-xs"
-                rows={4}
-                placeholder="Entrer une description de mon entreprise..."
+                className="border rounded-sm p-2 border-input placeholder:text-xs focus-visible:outline-primary"
+                rows={6}
+                placeholder="Entrer une description de l'entreprise..."
                 onChange={onDescriptionChange}
                 defaultValue={preview?.description}
               />
             </Label>
-            <span className="text-xs text-gray-500 justify-self-end">{descriptionLength}/1500</span>
+            <span
+              className={cn(
+                "text-xs justify-self-end",
+                descriptionLength > 1500 && "text-destructive-foreground",
+              )}
+            >
+              {descriptionLength}/1500
+            </span>
           </div>
+
+          <Separator.Root className="h-px bg-border my-4" />
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Entrepreneur</span>
@@ -275,19 +290,7 @@ function RouteComponent() {
               type="text"
               name="business_owner"
               placeholder="Ex: Nom Prénom"
-              className="placeholder:text-xs"
               defaultValue={preview?.business_owner}
-            />
-          </Label>
-
-          <Label className="flex flex-col gap-1">
-            <span className="text-xs font-medium">Perimètre d'intervention</span>
-            <Input
-              type="text"
-              name="service_area"
-              placeholder="Ex: Paris, Lyon, Marseille"
-              className="placeholder:text-xs"
-              defaultValue={preview?.service_area}
             />
           </Label>
 
@@ -297,20 +300,33 @@ function RouteComponent() {
               type="text"
               name="subdomain"
               placeholder="Ex: monentreprise"
-              className="placeholder:text-xs"
               defaultValue={preview?.subdomain}
             />
           </Label>
 
           <Label className="flex flex-col gap-1">
+            <span className="text-xs font-medium">Perimètre d'intervention</span>
+            <div className="relative">
+              <MapPinned className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Input
+                type="text"
+                name="service_area"
+                placeholder="Ex: Paris, Lyon, Marseille"
+                className="ps-8"
+                defaultValue={preview?.service_area}
+              />
+            </div>
+          </Label>
+
+          <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Email</span>
-            <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-              <EmailIcon className="size-5 text-gray-500" />
-              <input
+            <div className="relative">
+              <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Input
                 type="email"
                 name="email"
                 placeholder="Ex: contact@monentreprise.com"
-                className="placeholder:text-xs outline-none w-full"
+                className="ps-8"
                 defaultValue={preview?.email}
               />
             </div>
@@ -318,13 +334,13 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Numéro de téléphone</span>
-            <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-              <PhoneIcon className="size-5 text-gray-500" />
-              <input
+            <div className="relative">
+              <Phone className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Input
                 type="tel"
                 name="phone"
                 placeholder="Ex: 06 06 06 06 06"
-                className="placeholder:text-xs outline-none w-full"
+                className="ps-8"
                 defaultValue={preview?.phone}
               />
             </div>
@@ -332,77 +348,19 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Site web</span>
-            <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-              <GlobeIcon className="size-5 text-gray-500" />
-              <input
+            <div className="relative">
+              <Globe className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Input
                 type="text"
                 name="website"
                 placeholder="Ex: https://www.monentreprise.com"
-                className="placeholder:text-xs outline-none w-full"
+                className="ps-8"
                 defaultValue={preview?.website}
               />
             </div>
           </Label>
 
-          <Separator.Root className="h-px bg-gray-300 my-4" />
-
-          <fieldset className="flex flex-col gap-4">
-            <legend className="text-xs font-medium mb-2">Réseaux sociaux</legend>
-            <Label>
-              <span className="sr-only">Linkedin</span>
-              <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-                <LinkedinIcon className="size-5 text-gray-500" />
-                <input
-                  type="text"
-                  name="social_media.linkedin"
-                  placeholder="Ex: https://www.linkedin.com/company/monentreprise"
-                  className="placeholder:text-xs outline-none w-full"
-                  defaultValue={preview?.social_media.linkedin}
-                />
-              </div>
-            </Label>
-            <Label>
-              <span className="sr-only">Facebook</span>
-              <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-                <FacebookIcon className="size-5 text-gray-500" />
-                <input
-                  type="text"
-                  name="social_media.facebook"
-                  placeholder="Ex: https://www.facebook.com/monentreprise"
-                  className="placeholder:text-xs outline-none w-full"
-                  defaultValue={preview?.social_media.facebook}
-                />
-              </div>
-            </Label>
-            <Label>
-              <span className="sr-only">Instagram</span>
-              <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-                <InstagramIcon className="size-5 text-gray-500" />
-                <input
-                  type="text"
-                  name="social_media.instagram"
-                  placeholder="Ex: https://www.instagram.com/monentreprise"
-                  className="placeholder:text-xs outline-none w-full"
-                  defaultValue={preview?.social_media.instagram}
-                />
-              </div>
-            </Label>
-            <Label>
-              <span className="sr-only">Calendly</span>
-              <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-                <CalendlyIcon className="size-5 text-gray-500" />
-                <input
-                  type="text"
-                  name="social_media.calendly"
-                  placeholder="Ex: https://calendly.com/monentreprise"
-                  className="placeholder:text-xs outline-none w-full"
-                  defaultValue={preview?.social_media.calendly}
-                />
-              </div>
-            </Label>
-          </fieldset>
-
-          <Separator.Root className="h-px bg-gray-300 my-4" />
+          <Separator.Root className="h-px bg-border my-4" />
 
           <div className="grid gap-8">
             <fieldset className="flex gap-4">
@@ -413,7 +371,7 @@ function RouteComponent() {
                   name="work_mode"
                   value="not_specified"
                   defaultChecked={preview?.work_mode === "not_specified" || !preview?.work_mode}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">Non spécifié</span>
               </Label>
@@ -423,7 +381,7 @@ function RouteComponent() {
                   name="work_mode"
                   value="remote"
                   defaultChecked={preview?.work_mode === "remote"}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">À distance</span>
               </Label>
@@ -433,7 +391,7 @@ function RouteComponent() {
                   name="work_mode"
                   value="onsite"
                   defaultChecked={preview?.work_mode === "onsite"}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">Sur site</span>
               </Label>
@@ -443,7 +401,7 @@ function RouteComponent() {
                   name="work_mode"
                   value="hybrid"
                   defaultChecked={preview?.work_mode === "hybrid"}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">Hybride</span>
               </Label>
@@ -457,7 +415,7 @@ function RouteComponent() {
                   name="rqth"
                   value="true"
                   defaultChecked={preview?.rqth}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">Oui</span>
               </Label>
@@ -467,89 +425,121 @@ function RouteComponent() {
                   name="rqth"
                   value="false"
                   defaultChecked={!preview?.rqth}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">Non</span>
               </Label>
             </fieldset>
           </div>
 
-          <Separator.Root className="h-px bg-gray-300 my-4" />
+          <Separator.Root className="h-px bg-border my-4" />
 
-          <fieldset className="border rounded-sm border-gray-300 p-4">
-            <legend className="text-xs font-medium  bg-white px-2">Images</legend>
+          <fieldset className="flex flex-col gap-4">
+            <legend className="text-xs font-medium mb-2">Réseaux sociaux</legend>
+            <Label>
+              <span className="sr-only">Linkedin</span>
+              <div className="relative">
+                <LinkedinIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                <Input
+                  type="text"
+                  name="social_media.linkedin"
+                  placeholder="Ex: https://www.linkedin.com/company/monentreprise"
+                  className="ps-8"
+                  defaultValue={preview?.social_media.linkedin}
+                />
+              </div>
+            </Label>
+
+            <Label>
+              <span className="sr-only">Facebook</span>
+              <div className="relative">
+                <FacebookIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                <Input
+                  type="text"
+                  name="social_media.facebook"
+                  placeholder="Ex: https://www.facebook.com/monentreprise"
+                  className="ps-8"
+                  defaultValue={preview?.social_media.facebook}
+                />
+              </div>
+            </Label>
+
+            <Label>
+              <span className="sr-only">Instagram</span>
+              <div className="relative">
+                <InstagramIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                <Input
+                  type="text"
+                  name="social_media.instagram"
+                  placeholder="Ex: https://www.instagram.com/monentreprise"
+                  className="ps-8"
+                  defaultValue={preview?.social_media.instagram}
+                />
+              </div>
+            </Label>
+
+            <Label>
+              <span className="sr-only">Calendly</span>
+              <div className="relative">
+                <CalendlyIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                <Input
+                  type="text"
+                  name="social_media.calendly"
+                  placeholder="Ex: https://calendly.com/monentreprise"
+                  className="ps-8"
+                  defaultValue={preview?.social_media.calendly}
+                />
+              </div>
+            </Label>
+          </fieldset>
+
+          <Separator.Root className="h-px bg-border my-4" />
+
+          <fieldset className="border rounded-sm border-border p-4">
+            <legend className="text-xs font-medium px-2">Images</legend>
 
             <div className="flex gap-2 justify-center">
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Logo (max. 3MB)</span>
-                <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-                  {preview.logoUrl ? (
-                    <img src={preview.logoUrl} alt="Logo" className="w-full h-full object-cover" />
-                  ) : (
-                    <PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
-                  )}
-                  <input
-                    type="file"
-                    className="absolute inset-0 opacity-0"
-                    name="logo"
-                    onChange={(e) => onImageChange(e, "logo")}
-                    accept="image/*"
-                  />
-                </div>
+                <InputFile
+                  preview={preview.logoUrl}
+                  alt="Logo"
+                  name="logo"
+                  onChange={(e) => onImageChange(e, "logo")}
+                  accept="image/*"
+                />
               </Label>
 
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Image 1 (max. 2MB)</span>
-                <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-                  {preview.galleryUrls?.[0] ? (
-                    <img
-                      src={preview.galleryUrls[0]}
-                      alt="gallery 1"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
-                  )}
-                  <input
-                    type="file"
-                    className="absolute inset-0 opacity-0"
-                    name="gallery"
-                    onChange={(e) => onImageChange(e, "gallery", 0)}
-                    accept="image/*"
-                  />
-                </div>
+                <InputFile
+                  preview={preview.galleryUrls?.[0]}
+                  alt="gallery 1"
+                  name="gallery"
+                  onChange={(e) => onImageChange(e, "gallery", 0)}
+                  accept="image/*"
+                />
               </Label>
 
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Image 2 (max. 2MB)</span>
-                <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
-                  {preview.galleryUrls?.[1] ? (
-                    <img
-                      src={preview.galleryUrls[1]}
-                      alt="gallery 2"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
-                  )}
-                  <input
-                    type="file"
-                    className="absolute inset-0 opacity-0"
-                    name="gallery"
-                    onChange={(e) => onImageChange(e, "gallery", 1)}
-                    accept="image/*"
-                  />
-                </div>
+                <InputFile
+                  preview={preview.galleryUrls?.[1]}
+                  alt="gallery 2"
+                  name="gallery"
+                  onChange={(e) => onImageChange(e, "gallery", 1)}
+                  accept="image/*"
+                />
               </Label>
             </div>
           </fieldset>
 
-          <Separator.Root className="h-px bg-gray-300 my-4" />
+          <Separator.Root className="h-px bg-border my-4" />
 
           <div className="flex gap-2 justify-end">
             <button
               type="button"
-              className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50"
+              className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer"
               onClick={onPreview}
             >
               Prévisualiser
@@ -557,10 +547,10 @@ function RouteComponent() {
 
             <button
               type="submit"
-              className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs"
+              className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer"
               disabled={isPending}
             >
-              {isPending ? "Création en cours..." : "Créer un compte"}
+              {isPending ? <Loader className="size-4 animate-spin" /> : "Créer un compte"}
             </button>
           </div>
         </form>

@@ -1,14 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
+import { BriefcaseBusiness, DiamondPlus, LayoutDashboard, LogOut, UserCog } from "lucide-react";
 import { Avatar } from "radix-ui";
-import { toast } from "sonner";
-import { AddIcon } from "~/components/icons/add";
-import { CompanyIcon } from "~/components/icons/company";
-import { DashboardIcon } from "~/components/icons/dashboard";
-import { LogoutIcon } from "~/components/icons/logout";
-import { SettingsAccountIcon } from "~/components/icons/settings-account";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,27 +18,23 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { useAdminRole } from "~/hooks/use-admin-role";
 import { signOutFn } from "~/lib/api/auth/sign-out";
-import { setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
-import { colorSchemeQuery } from "~/lib/cookies/color-scheme.cookie";
+import { type Theme, useTheme } from "./providers/theme-provider";
+import { useToast } from "./ui/toast";
 
 export function MenuUser({ user }: { user: User | undefined }) {
-  const queryClient = useQueryClient();
   const { isAdmin } = useAdminRole();
-  const { data: colorScheme } = useQuery(colorSchemeQuery);
+  const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
 
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
-    onSuccess: () => toast.success("Vous êtes déconnecté"),
+    onSuccess: () =>
+      toast({
+        status: "success",
+        description: "Vous avez été déconnecté avec succès",
+        button: { label: "Fermer" },
+      }),
   });
-
-  const { mutate: setColorScheme } = useMutation({
-    mutationFn: setColorSchemeFn,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
-  });
-
-  function onSelectColorScheme(scheme: "light" | "dark" | "system") {
-    setColorScheme({ data: scheme }, { onSuccess: () => toast.success("Thème mis à jour") });
-  }
 
   if (!user) return null;
 
@@ -59,26 +50,26 @@ export function MenuUser({ user }: { user: User | undefined }) {
           <span className="truncate text-xs">{user.email}</span>
         </div>
 
-        <DropdownMenuSeparator className="h-px bg-gray-200 my-1 -mx-1" />
+        <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link to="/compte/entreprises/create">
-              <AddIcon className="size-4" />
+              <DiamondPlus className="size-4" />
               <span className="text-xs">Référencer</span>
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild>
             <Link to="/compte/entreprises">
-              <CompanyIcon className="size-4" />
+              <BriefcaseBusiness className="size-4" />
               <span className="text-xs">Mes entreprises</span>
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild>
             <Link to="/compte/preferences">
-              <SettingsAccountIcon className="size-4" />
+              <UserCog className="size-4" />
               <span className="text-xs">Mon compte</span>
             </Link>
           </DropdownMenuItem>
@@ -86,52 +77,49 @@ export function MenuUser({ user }: { user: User | undefined }) {
           {isAdmin ? (
             <DropdownMenuItem asChild>
               <Link to="/admin/dashboard">
-                <DashboardIcon className="size-4" />
+                <LayoutDashboard className="size-4" />
                 <span className="text-xs">Admin dashboard</span>
               </Link>
             </DropdownMenuItem>
           ) : null}
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator className="h-px bg-gray-200 my-1 -mx-1" />
+        <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
           {/* biome-ignore lint/a11y/noLabelWithoutControl: dropdown menu */}
           <DropdownMenuLabel className="text-sm font-light px-2 py-1.5">Thème</DropdownMenuLabel>
 
-          <DropdownMenuRadioGroup
-            value={colorScheme}
-            onValueChange={(value) => onSelectColorScheme(value as "light" | "dark" | "system")}
-          >
+          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as Theme)}>
             <DropdownMenuRadioItem value="light" className="relative ps-8 ">
-              <DropdownMenuItemIndicator className="absolute start-2">
-                <span className="size-2 rounded-full flex bg-gray-400" />
+              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
+                <span className="size-2 rounded-full flex bg-accent-foreground" />
               </DropdownMenuItemIndicator>
               Light
             </DropdownMenuRadioItem>
 
             <DropdownMenuRadioItem value="dark" className="relative ps-8">
-              <DropdownMenuItemIndicator className="absolute start-2">
-                <span className="size-2 rounded-full flex bg-gray-400" />
+              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
+                <span className="size-2 rounded-full flex bg-accent-foreground" />
               </DropdownMenuItemIndicator>
               Dark
             </DropdownMenuRadioItem>
 
             <DropdownMenuRadioItem value="system" className="relative ps-8">
-              <DropdownMenuItemIndicator className="absolute start-2">
-                <span className="size-2 rounded-full flex bg-gray-400" />
+              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
+                <span className="size-2 rounded-full flex bg-accent-foreground" />
               </DropdownMenuItemIndicator>
               System
             </DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator className="h-px bg-gray-200 my-1 -mx-1" />
+        <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <button type="button" onClick={() => signOut(undefined)}>
-              <LogoutIcon className="size-4" />
+              <LogOut className="size-4" />
               <span>Se déconnecter</span>
             </button>
           </DropdownMenuItem>
@@ -159,8 +147,8 @@ function AvatarUser({ user }: { user: User }) {
   }
 
   return (
-    <Avatar.Root className="size-8 rounded-full border border-gray-200 flex">
-      <Avatar.Fallback className="size-full leading-1 text-xs grid place-items-center text-blue-500">
+    <Avatar.Root className="size-8 rounded-full bg-secondary flex">
+      <Avatar.Fallback className="size-full leading-1 text-xs grid place-items-center text-secondary-foreground">
         {initials}
       </Avatar.Fallback>
     </Avatar.Root>

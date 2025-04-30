@@ -17,7 +17,7 @@ export function CommandSeparator({
 }: React.ComponentPropsWithRef<typeof CommandPrimitive.Separator>) {
   return (
     <CommandPrimitive.Separator
-      className={cn("my-2 h-px w-full bg-gray-400", className)}
+      className={cn("my-2 h-px w-full bg-border", className)}
       ref={ref}
       {...props}
     />
@@ -76,7 +76,7 @@ export function CommandItem({
       ref={ref}
       className={cn(
         "px-4 py-2 text-sm w-full inline-flex",
-        "aria-selected:bg-gray-100 dark:aria-selected:bg-gray-800",
+        "aria-selected:bg-accent aria-selected:text-accent-foreground",
         className,
       )}
       {...props}

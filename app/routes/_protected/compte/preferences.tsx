@@ -1,18 +1,19 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
+import { Loader, Lock, Mail } from "lucide-react";
 import { Avatar, RadioGroup, Separator } from "radix-ui";
 import { type FormEvent, useState } from "react";
-import { toast } from "sonner";
-import { Input } from "~/components/input";
-import { Label } from "~/components/label";
+import { type Theme, useTheme } from "~/components/providers/theme-provider";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { useToast } from "~/components/ui/toast";
 import { deleteUser } from "~/lib/api/users/mutations/delete-user";
 import { updateUserEmailFn } from "~/lib/api/users/mutations/update-user-email";
 import { updateUserInfos } from "~/lib/api/users/mutations/update-user-infos";
 import { updateUserPasswordFn } from "~/lib/api/users/mutations/update-user-password";
-import { colorSchemeQuery, setColorSchemeFn } from "~/lib/cookies/color-scheme.cookie";
 
 export const Route = createFileRoute("/_protected/compte/preferences")({
   component: RouteComponent,
@@ -22,14 +23,8 @@ function RouteComponent() {
   const context = Route.useRouteContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenPassword, setIsModalOpenPassword] = useState(false);
-  const { data: colorScheme } = useQuery(colorSchemeQuery);
-
-  // Mutations
-  const { mutate: setColorScheme, variables } = useMutation({
-    mutationFn: setColorSchemeFn,
-    onSettled: () => context.queryClient.invalidateQueries({ queryKey: ["color-scheme"] }),
-    mutationKey: ["set-color-scheme"],
-  });
+  const { setTheme, theme } = useTheme();
+  const { toast } = useToast();
 
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(deleteUser) });
   const { mutate: update, isPending: isUpdatingUserInfos } = useMutation({
@@ -58,7 +53,10 @@ function RouteComponent() {
             queryKey: ["user", "session"],
             refetchType: "all",
           });
-          toast.success("Nom et prénom modifié avec succès");
+          toast({
+            description: "Nom et prénom modifié avec succès",
+            button: { label: "Fermer" },
+          });
         },
       },
     );
@@ -73,7 +71,10 @@ function RouteComponent() {
       {
         onSuccess: () => {
           setIsModalOpenPassword(false);
-          toast.success("Mot de passe modifié avec succès");
+          toast({
+            description: "Mot de passe modifié avec succès",
+            button: { label: "Fermer" },
+          });
         },
       },
     );
@@ -87,18 +88,10 @@ function RouteComponent() {
       { data: formData },
       {
         onSuccess: () => {
-          toast.success("Email modifié avec succès");
-        },
-      },
-    );
-  }
-
-  function onValueChangeTheme(value: "light" | "dark" | "system") {
-    setColorScheme(
-      { data: value },
-      {
-        onSuccess: () => {
-          toast.success("Thème modifié avec succès");
+          toast({
+            description: "Email modifié avec succès",
+            button: { label: "Fermer" },
+          });
         },
       },
     );
@@ -111,10 +104,10 @@ function RouteComponent() {
         <p>Modifiez vos préférences utilisateur pour personnaliser votre expérience sur le site.</p>
       </header>
 
-      <Separator.Root className="my-8 h-px bg-gray-300" />
+      <Separator.Root className="my-8 h-px bg-border" />
 
       <div className="grid gap-8">
-        <article className="border border-gray-300 p-4 rounded-sm flex justify-between">
+        <article className="border border-border p-4 rounded-sm flex justify-between">
           <div className="flex flex-col gap-2">
             <h2 className="text-xl font-bold">Avatar</h2>
             <p className="text-sm text-pretty">
@@ -128,7 +121,7 @@ function RouteComponent() {
           </div>
         </article>
 
-        <article className="border border-gray-300 p-4 rounded-sm">
+        <article className="border border-border p-4 rounded-sm">
           <form onSubmit={onUpdateUserName}>
             <div className="flex flex-col gap-2 py-4">
               <h2 className="text-xl font-bold">Nom et prénom</h2>
@@ -142,21 +135,25 @@ function RouteComponent() {
               </Label>
             </div>
 
-            <Separator.Root className="my-4 -mx-4 h-px bg-gray-300" />
+            <Separator.Root className="my-4 -mx-4 h-px bg-border" />
 
             <div className="flex gap-2 justify-end">
               <button
                 type="submit"
-                className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs"
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-sm text-xs"
                 disabled={isUpdatingUserInfos}
               >
-                {isUpdatingUserInfos ? "Modification en cours..." : "Modifier mon nom et prénom"}
+                {isUpdatingUserInfos ? (
+                  <Loader className="size-4 animate-spin" />
+                ) : (
+                  "Modifier mon nom et prénom"
+                )}
               </button>
             </div>
           </form>
         </article>
 
-        <article className="border border-gray-300 p-4 rounded-sm">
+        <article className="border border-border p-4 rounded-sm">
           <form onSubmit={onUpdateUserEmail}>
             <div className="flex flex-col gap-2">
               <h2 className="text-xl font-bold">Email</h2>
@@ -165,25 +162,36 @@ function RouteComponent() {
               </p>
               <Label>
                 <span className="sr-only">Email</span>
-                <Input
-                  name="email"
-                  defaultValue={context.user.email}
-                  className="max-w-1/3 text-sm"
-                />
+                <div className="relative">
+                  <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                  <Input
+                    name="email"
+                    defaultValue={context.user.email}
+                    className="max-w-1/3 text-sm ps-8"
+                  />
+                </div>
               </Label>
             </div>
 
-            <Separator.Root className="my-4 -mx-4 h-px bg-gray-300" />
+            <Separator.Root className="my-4 -mx-4 h-px bg-border" />
 
             <div className="flex gap-2 justify-end">
-              <button type="submit" className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs">
-                {isUpdatingUserEmail ? "Modification en cours..." : "Modifier mon email"}
+              <button
+                type="submit"
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-sm text-xs"
+                disabled={isUpdatingUserEmail}
+              >
+                {isUpdatingUserEmail ? (
+                  <Loader className="size-4 animate-spin" />
+                ) : (
+                  "Modifier mon email"
+                )}
               </button>
             </div>
           </form>
         </article>
 
-        <article className="border border-gray-300 p-4 rounded-sm">
+        <article className="border border-border p-4 rounded-sm">
           <div className="flex flex-col gap-2">
             <h2 className="text-xl font-bold">Mot de passe</h2>
             <p className="text-sm text-pretty">
@@ -192,21 +200,24 @@ function RouteComponent() {
             </p>
             <Label>
               <span className="sr-only">Mot de passe</span>
-              <Input
-                type="password"
-                name="password"
-                defaultValue="password"
-                className="max-w-1/3 text-sm"
-              />
+              <div className="relative">
+                <Lock className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                <Input
+                  type="password"
+                  name="password"
+                  defaultValue="password"
+                  className="max-w-1/3 text-sm ps-8"
+                />
+              </div>
             </Label>
           </div>
 
-          <Separator.Root className="my-4 -mx-4 h-px bg-gray-300" />
+          <Separator.Root className="my-4 -mx-4 h-px bg-border" />
 
           <div className="flex gap-2 justify-end">
             <button
               type="button"
-              className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-sm text-xs"
               onClick={() => setIsModalOpenPassword(true)}
             >
               Modifier mon mot de passe
@@ -216,7 +227,7 @@ function RouteComponent() {
               <DialogContent>
                 <DialogTitle>Modifier mon mot de passe</DialogTitle>
 
-                <Separator.Root className="my-4 -mx-4 h-px bg-gray-300" />
+                <Separator.Root className="my-4 -mx-4 h-px bg-border" />
 
                 <DialogDescription className="mb-6">
                   Veuillez entrer votre mot de passe actuel et votre nouveau mot de passe.
@@ -238,7 +249,7 @@ function RouteComponent() {
                   <div className="flex gap-2 justify-end">
                     <button
                       type="button"
-                      className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs"
+                      className="bg-secondary text-secondary-foreground px-4 py-2 rounded-sm text-xs"
                       onClick={() => setIsModalOpenPassword(false)}
                     >
                       Annuler
@@ -246,11 +257,14 @@ function RouteComponent() {
 
                     <button
                       type="submit"
-                      className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs"
+                      className="bg-primary text-primary-foreground px-4 py-2 rounded-sm text-xs"
+                      disabled={isUpdatingUserPassword}
                     >
-                      {isUpdatingUserPassword
-                        ? "Modification en cours..."
-                        : "Modifier mon mot de passe"}
+                      {isUpdatingUserPassword ? (
+                        <Loader className="size-4 animate-spin" />
+                      ) : (
+                        "Modifier mon mot de passe"
+                      )}
                     </button>
                   </div>
                 </form>
@@ -259,7 +273,7 @@ function RouteComponent() {
           </div>
         </article>
 
-        <article className="border border-gray-300 p-4 rounded-sm">
+        <article className="border border-border p-4 rounded-sm">
           <div className="flex flex-col gap-2">
             <h2 className="text-xl font-bold">Thème</h2>
             <p className="text-sm text-pretty">
@@ -267,25 +281,25 @@ function RouteComponent() {
             </p>
 
             <RadioGroup.Root
-              defaultValue={variables?.data ?? colorScheme ?? "system"}
-              onValueChange={(value: "light" | "dark" | "system") => onValueChangeTheme(value)}
+              defaultValue={theme}
+              onValueChange={(value) => setTheme(value as Theme)}
               className="flex gap-2"
             >
               <RadioGroup.Item
                 value="light"
-                className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs cursor-pointer dark:bg-gray-900 dark:text-white dark:border dark:border-gray-700"
+                className="bg-secondary text-secondary-foreground px-4 py-2 rounded-sm text-xs cursor-pointer"
               >
                 Light
               </RadioGroup.Item>
               <RadioGroup.Item
                 value="dark"
-                className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs cursor-pointer dark:bg-gray-900 dark:text-white dark:border dark:border-gray-700"
+                className="bg-secondary text-secondary-foreground px-4 py-2 rounded-sm text-xs cursor-pointer"
               >
                 Dark
               </RadioGroup.Item>
               <RadioGroup.Item
                 value="system"
-                className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs cursor-pointer dark:bg-gray-900 dark:text-white dark:border dark:border-gray-700"
+                className="bg-secondary text-secondary-foreground px-4 py-2 rounded-sm text-xs cursor-pointer"
               >
                 System
               </RadioGroup.Item>
@@ -294,19 +308,19 @@ function RouteComponent() {
         </article>
         <Separator.Root className="my-8 h-px bg-gray-300" />
 
-        <article className="border border-red-500 rounded-sm flex flex-col gap-6">
+        <article className="border border-destructive rounded-sm flex flex-col gap-6">
           <div className="flex flex-col gap-2 p-4">
             <h2 className="text-lg font-bold">Supprimer mon compte</h2>
-            <p>
+            <p className="text-sm text-pretty">
               Supprimer votre compte utilisateur et toutes vos données associées. Cette action est
               irréversible.
             </p>
           </div>
 
-          <div className="flex justify-end p-4 border-t border-red-500">
+          <div className="flex justify-end p-4 border-t border-destructive">
             <button
               type="button"
-              className="bg-red-500 text-white px-4 py-2 rounded-sm text-sm"
+              className="bg-destructive text-destructive-foreground px-4 py-2 rounded-sm text-xs"
               onClick={() => setIsModalOpen(true)}
             >
               Supprimer mon compte
@@ -316,9 +330,9 @@ function RouteComponent() {
               <DialogContent>
                 <DialogTitle>Supprimer mon compte</DialogTitle>
 
-                <Separator.Root className="my-4 -mx-4 h-px bg-gray-300" />
+                <Separator.Root className="my-4 -mx-4 h-px bg-border" />
 
-                <DialogDescription className="mb-6">
+                <DialogDescription className="mb-6 text-sm">
                   Si vous souhaitez supprimer votre compte, veuillez cliquer sur le bouton
                   ci-dessous.
                 </DialogDescription>
@@ -326,7 +340,7 @@ function RouteComponent() {
                 <div className="flex justify-end gap-2 px-2">
                   <button
                     type="button"
-                    className="bg-gray-500 text-white px-4 py-2 rounded-sm text-xs"
+                    className="bg-secondary text-secondary-foreground px-4 py-2 rounded-sm text-xs"
                     onClick={() => setIsModalOpen(false)}
                   >
                     Annuler
@@ -334,11 +348,15 @@ function RouteComponent() {
 
                   <button
                     type="button"
-                    className="bg-red-500 text-white px-4 py-2 rounded-sm text-xs"
+                    className="bg-destructive text-destructive-foreground px-4 py-2 rounded-sm text-xs"
                     disabled={isPending}
                     onClick={onDelete}
                   >
-                    {isPending ? "Suppression en cours..." : "Supprimer mon compte"}
+                    {isPending ? (
+                      <Loader className="size-4 animate-spin" />
+                    ) : (
+                      "Supprimer mon compte"
+                    )}
                   </button>
                 </div>
               </DialogContent>
@@ -360,7 +378,7 @@ function AvatarUser({ user }: { user: User }) {
 
   if (user.image) {
     return (
-      <Avatar.Root className="size-16 rounded-full">
+      <Avatar.Root className="size-14 rounded-full">
         <Avatar.Image src={user.image} alt={user.name} className="size-full rounded-full" />
         <Avatar.Fallback className="size-full leading-1">{initials}</Avatar.Fallback>
       </Avatar.Root>
@@ -368,8 +386,8 @@ function AvatarUser({ user }: { user: User }) {
   }
 
   return (
-    <Avatar.Root className="size-16 rounded-full border border-gray-200 flex">
-      <Avatar.Fallback className="size-full leading-1 text-2xl grid place-items-center text-blue-500">
+    <Avatar.Root className="size-14 rounded-full border border-border flex">
+      <Avatar.Fallback className="size-full leading-1 text-2xl grid place-items-center text-primary">
         {initials}
       </Avatar.Fallback>
     </Avatar.Root>

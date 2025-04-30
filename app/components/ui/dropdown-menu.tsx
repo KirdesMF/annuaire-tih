@@ -20,7 +20,7 @@ export function DropdownMenuContent({
       <DropdownMenuPrimitive.Content
         ref={ref}
         className={cn(
-          "bg-white border rounded-sm border-gray-200 overflow-hidden p-1 shadow-xs dark:bg-gray-900 dark:border-gray-400 z-60",
+          "border rounded-sm border-border bg-popover overflow-hidden p-1 shadow-xs z-60",
           className,
         )}
         {...props}
@@ -41,7 +41,8 @@ export function DropdownMenuItem({
     <DropdownMenuPrimitive.Item
       ref={ref}
       className={cn(
-        "w-full text-xs px-2 py-1.5 outline-none cursor-pointer flex items-center gap-2 data-highlighted:bg-gray-100 dark:data-highlighted:bg-gray-800",
+        "w-full text-xs px-2 py-1.5 outline-none cursor-pointer flex items-center gap-2",
+        "data-highlighted:bg-accent data-highlighted:text-accent-foreground",
         className,
       )}
       {...props}
@@ -61,7 +62,7 @@ export function DropdownMenuRadioItem({
     <DropdownMenuPrimitive.RadioItem
       ref={ref}
       className={cn(
-        "text-xs py-1.5 select-none outline-none data-highlighted:bg-gray-100 flex items-center dark:data-highlighted:bg-gray-800",
+        "text-xs py-1.5 select-none outline-none data-highlighted:bg-accent",
         className,
       )}
       {...props}

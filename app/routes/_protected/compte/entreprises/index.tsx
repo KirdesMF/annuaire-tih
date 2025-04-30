@@ -1,10 +1,9 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { Plus } from "lucide-react";
 import { Separator } from "radix-ui";
 import { useState } from "react";
-import { toast } from "sonner";
 import { CompanyLogo } from "~/components/company-logo";
-import { PlusIcon } from "~/components/icons/plus";
 import {
   Dialog,
   DialogClose,
@@ -13,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import { useToast } from "~/components/ui/toast";
 import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 import { COMPANY_STATUSES } from "~/utils/constantes";
@@ -31,6 +31,7 @@ function RouteComponent() {
   const { mutate, isPending } = useMutation({ mutationFn: deleteCompany });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [companyId, setCompanyId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   function onDeleteCompany(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,10 +49,16 @@ function RouteComponent() {
           context.queryClient.invalidateQueries({ queryKey: ["company", companyId] });
 
           setIsDialogOpen(false);
-          toast.success("Entreprise supprimée avec succès");
+          toast({
+            description: "Entreprise supprimée avec succès",
+            button: { label: "Fermer" },
+          });
         },
         onError: () => {
-          toast.error("Une erreur est survenue lors de la suppression de l'entreprise");
+          toast({
+            description: "Une erreur est survenue lors de la suppression de l'entreprise",
+            button: { label: "Fermer" },
+          });
         },
       },
     );
@@ -62,7 +69,10 @@ function RouteComponent() {
       <div className="container px-4 py-6">
         <div className="flex flex-col items-center justify-center gap-4">
           <h1 className="text-2xl font-bold">Vous n'avez encore d'entreprise référencée</h1>
-          <Link to="/compte/entreprises/create" className="text-sm border px-2 py-1 rounded-sm">
+          <Link
+            to="/compte/entreprises/create"
+            className="text-sm bg-primary text-primary-foreground px-2 py-1 rounded-sm"
+          >
             Créer une entreprise
           </Link>
         </div>
@@ -80,17 +90,17 @@ function RouteComponent() {
       <ul className="flex flex-col gap-2 ">
         {companiesQuery.data?.map((company) => (
           <li key={company.id}>
-            <article className="border border-gray-300 p-5 rounded-sm grid gap-4 shadow-2xs">
+            <article className="border border-border p-5 rounded-sm grid gap-4 shadow-2xs">
               <header className="flex items-baseline gap-2 justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="size-16">
-                    <CompanyLogo name={company.name} url={company.logo?.secureUrl} />
-                  </div>
+                  <CompanyLogo name={company.name} url={company.logo?.secureUrl} size="lg" />
                   <h2 className="text-lg font-bold leading-1">{company.name}</h2>
-                  <p className="text-xs text-orange-300">{COMPANY_STATUSES[company.status]}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {COMPANY_STATUSES[company.status]}
+                  </p>
                 </div>
 
-                <p className="text-xs text-gray-500 border px-2 py-1 rounded-sm inline-flex gap-2 items-center hover:cursor-pointer ">
+                <p className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-sm inline-flex gap-2 items-center hover:cursor-pointer ">
                   {company.siret}
                 </p>
               </header>
@@ -100,7 +110,7 @@ function RouteComponent() {
                   {company.categories.map((category) => (
                     <li
                       key={category.category_id}
-                      className="bg-gray-100 px-2 py-1 rounded-sm text-xs flex items-center gap-2"
+                      className="bg-secondary text-secondary-foreground px-2 py-1 rounded-sm text-xs flex items-center gap-2"
                     >
                       <Link
                         to="/categories/$slug"
@@ -116,7 +126,7 @@ function RouteComponent() {
                   <Link
                     to="/entreprises/$slug"
                     params={{ slug: company.slug }}
-                    className="text-xs px-2 py-1 rounded-sm border border-blue-400 text-blue-400"
+                    className="text-xs px-2 py-1 rounded-sm border border-secondary-foreground text-secondary-foreground"
                   >
                     Consulter
                   </Link>
@@ -124,7 +134,7 @@ function RouteComponent() {
                   <Link
                     to="/compte/entreprises/$slug/edit/infos"
                     params={{ slug: company.slug }}
-                    className="text-xs px-2 py-1 rounded-sm border border-blue-400 text-blue-400"
+                    className="text-xs px-2 py-1 rounded-sm border border-secondary-foreground text-secondary-foreground"
                   >
                     Modifier
                   </Link>
@@ -136,7 +146,7 @@ function RouteComponent() {
                     <DialogTrigger asChild>
                       <button
                         type="button"
-                        className="text-xs px-2 py-1 rounded-sm border border-red-400 text-red-400 hover:bg-red-400 hover:text-white transition-colors"
+                        className="text-xs px-2 py-1 rounded-sm border border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
                         onClick={() => setCompanyId(company.id)}
                       >
                         Supprimer
@@ -187,12 +197,12 @@ function RouteComponent() {
 
       {companiesQuery.data.length < 3 && (
         <>
-          <Separator.Root className="my-6 h-px bg-gray-300" />
+          <Separator.Root className="my-6 h-px bg-border" />
           <Link
             to="/compte/entreprises/create"
-            className="text-sm border px-2 py-1 rounded-sm flex items-center gap-1.5 max-w-fit"
+            className="text-sm bg-primary text-primary-foreground px-2 py-1 rounded-sm flex items-center gap-1.5 max-w-fit"
           >
-            <PlusIcon className="size-4" />
+            <Plus className="size-4" />
             Créer une entreprise
           </Link>
         </>

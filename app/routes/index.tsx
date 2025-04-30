@@ -34,13 +34,12 @@ function Home() {
 
   return (
     <main className="px-4 py-6 max-w-4xl mx-auto">
-      <div className="mt-12 grid place-items-center relative h-60 border border-gray-400 rounded-md ">
-        <div className="absolute inset-0 bg-diagonal-lines" />
+      <div className="mt-12 grid place-items-center relative h-60 border border-border rounded-md">
         <img
           aria-hidden
           src={banner}
           alt="banner"
-          className="w-full h-full object-contain absolute inset-0"
+          className="size-full object-contain absolute inset-0"
         />
       </div>
 
@@ -49,7 +48,7 @@ function Home() {
           <PopoverTrigger asChild>
             <button
               type="button"
-              className="text-start text-nowrap truncate text-sm font-light px-4 border border-gray-400 rounded-md shadow-sm w-full h-12 focus-within:outline focus-within:outline-blue-500 cursor-pointer"
+              className="text-start text-nowrap truncate text-sm font-light px-4 border border-border rounded-md w-full h-12 focus-within:outline focus-within:outline-primary cursor-pointer"
             >
               Rechercher un nom ou une activité...
             </button>
@@ -85,7 +84,7 @@ function Home() {
         </Popover>
       </div>
 
-      <Separator.Root className="h-px w-1/3 bg-gray-400 my-12 mx-auto" />
+      <Separator.Root className="h-px w-1/3 bg-border my-12 mx-auto" />
 
       <ul className="flex flex-wrap justify-center gap-2 mt-12 max-w-3xl mx-auto">
         {categoriesQuery.data.map((category) => (
@@ -94,7 +93,7 @@ function Home() {
               to="/categories/$slug"
               params={{ slug: slugify(category.name) }}
               search={{ id: category.id }}
-              className="text-sm px-4 py-1.5 border border-gray-400 rounded-md flex text-nowrap"
+              className="text-sm px-4 py-1.5 bg-accent text-accent-foreground rounded-md flex text-nowrap"
             >
               {category.name}
             </Link>

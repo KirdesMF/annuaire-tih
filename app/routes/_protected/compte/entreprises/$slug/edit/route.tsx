@@ -1,4 +1,4 @@
-import { createFileRoute, Link, linkOptions, Outlet, redirect } from "@tanstack/react-router";
+import { Link, Outlet, createFileRoute, linkOptions, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit")({
   component: RouteComponent,
@@ -20,17 +20,14 @@ function RouteComponent() {
 
   return (
     <div className="container px-4 py-6">
-      <nav className="mb-6 sticky top-0 bg-white">
-        <ul className="flex shadow-[inset_0_-1px_0_0_var(--color-gray-300)]">
+      <nav className="mb-6 sticky top-0">
+        <ul className="flex shadow-[inset_0_-1px_0_0_var(--color-border)]">
           {navigation(params.slug).map((link) => (
             <li key={link.to}>
               <Link
                 to={link.to}
                 params={link.params}
-                className="text-sm font-medium px-4 h-10 flex items-center"
-                activeProps={{
-                  className: "text-blue-700 shadow-[inset_0_-2px_0_0_var(--color-blue-700)]",
-                }}
+                className="text-sm font-medium px-4 h-10 flex items-center data-[status=active]:text-primary data-[status=active]:shadow-[inset_0_-2px_0_0_var(--color-primary)]"
               >
                 {link.label}
               </Link>

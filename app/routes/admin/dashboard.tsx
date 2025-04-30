@@ -1,9 +1,9 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { Trash2 } from "lucide-react";
 import { useRef } from "react";
-import { toast } from "sonner";
-import { TrashIcon } from "~/components/icons/trash";
+import { useToast } from "~/components/ui/toast";
 import type { UserRole } from "~/db/schema/auth";
 import type { CompanyStatus } from "~/db/schema/companies";
 import { updateUserRoleFn } from "~/lib/api/admin/mutations/update-user-role";
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/admin/dashboard")({
 });
 
 function RouteComponent() {
+  const { toast } = useToast();
   const context = Route.useRouteContext();
   const { data: companies } = useSuspenseQuery(companiesQuery());
   const { data: users } = useSuspenseQuery(usersQuery);
@@ -45,7 +46,10 @@ function RouteComponent() {
       { data: { companyId, status: action } },
       {
         onSuccess: () => {
-          toast.success("Company status updated");
+          toast({
+            description: "Statut de l'entreprise mis à jour",
+            button: { label: "Fermer" },
+          });
           context.queryClient.invalidateQueries({ queryKey: ["companies"] });
         },
       },
@@ -58,7 +62,10 @@ function RouteComponent() {
       { data: { companyId, companySlug } },
       {
         onSuccess: () => {
-          toast.success("Company deleted");
+          toast({
+            description: "Entreprise supprimée avec succès",
+            button: { label: "Fermer" },
+          });
           context.queryClient.invalidateQueries({ queryKey: ["companies"] });
         },
       },
@@ -71,7 +78,10 @@ function RouteComponent() {
       { data: { userId, role } },
       {
         onSuccess: () => {
-          toast.success("User role updated");
+          toast({
+            description: "Rôle de l'utilisateur mis à jour",
+            button: { label: "Fermer" },
+          });
           context.queryClient.invalidateQueries({ queryKey: ["users"] });
         },
       },
@@ -89,10 +99,10 @@ function RouteComponent() {
             {companies?.map((company) => (
               <div
                 key={company.id}
-                className="bg-white shadow-md rounded-lg p-4 border border-gray-200"
+                className="bg-card text-card-foreground shadow-md rounded-lg p-4"
               >
                 <h2 className="text-lg font-bold">{company.name}</h2>
-                <p className="text-sm text-gray-500">{COMPANY_STATUSES[company.status]}</p>
+                <p className="text-sm text-card-foreground">{COMPANY_STATUSES[company.status]}</p>
 
                 <div className="flex gap-2">
                   <button
@@ -129,10 +139,10 @@ function RouteComponent() {
 
                 <button
                   type="button"
-                  className="text-xs text-gray-500 border px-2 py-1 rounded-sm hover:bg-gray-100 transition-colors"
+                  className="text-xs text-destructive border border-destructive px-2 py-1 rounded-sm transition-colors"
                   onClick={() => onDeleteCompany(company.id, company.slug)}
                 >
-                  <TrashIcon />
+                  <Trash2 className="size-4" />
                 </button>
               </div>
             ))}
@@ -143,10 +153,7 @@ function RouteComponent() {
           <h2 className="text-lg font-bold">Users</h2>
           <div className="grid gap-4">
             {users?.map((user) => (
-              <div
-                key={user.id}
-                className="bg-white shadow-md rounded-lg p-4 border border-gray-200"
-              >
+              <div key={user.id} className="bg-card text-card-foreground shadow-md rounded-lg p-4">
                 <p>{user.name}</p>
                 <p>{user.email}</p>
                 <p>{user.role}</p>
@@ -154,7 +161,7 @@ function RouteComponent() {
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    className="text-xs text-gray-500 border px-2 py-1 rounded-sm hover:bg-gray-100 transition-colors"
+                    className="text-xs text-secondary-foreground border border-secondary-foreground px-2 py-1 rounded-sm hover:bg-secondary transition-colors"
                     onClick={() => onUpdateUserRole(user.id, "admin")}
                   >
                     {isUpdatingUserRole && currentUser.current === user.id && user.role === "user"
@@ -164,7 +171,7 @@ function RouteComponent() {
 
                   <button
                     type="button"
-                    className="text-xs text-gray-500 border px-2 py-1 rounded-sm hover:bg-gray-100 transition-colors"
+                    className="text-xs text-secondary-foreground border border-secondary-foreground px-2 py-1 rounded-sm hover:bg-secondary transition-colors"
                     onClick={() => onUpdateUserRole(user.id, "user")}
                   >
                     {isUpdatingUserRole && currentUser.current === user.id && user.role === "admin"

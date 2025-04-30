@@ -21,11 +21,11 @@ export function DrawerContent({
 }: React.ComponentPropsWithRef<typeof DrawerPrimitive.Content>) {
   return (
     <DrawerPrimitive.Portal>
-      <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px]" />
+      <DrawerPrimitive.Overlay className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-70" />
       <DrawerPrimitive.Content
         ref={ref}
         className={cn(
-          "fixed inset-x-0 bottom-0 z-50 outline-none h-fit bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 rounded-t-md py-4",
+          "fixed inset-x-0 bottom-0 outline-none h-fit bg-popover border-t border-border rounded-t-md py-4 z-70",
           className,
         )}
         {...props}
