@@ -3,7 +3,6 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { Separator } from "radix-ui";
 import { useState } from "react";
-import { toast } from "sonner";
 import { CompanyLogo } from "~/components/company-logo";
 import {
   Dialog,
@@ -13,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import { useToast } from "~/components/ui/toast";
 import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 import { COMPANY_STATUSES } from "~/utils/constantes";
@@ -31,6 +31,7 @@ function RouteComponent() {
   const { mutate, isPending } = useMutation({ mutationFn: deleteCompany });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [companyId, setCompanyId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   function onDeleteCompany(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,10 +49,16 @@ function RouteComponent() {
           context.queryClient.invalidateQueries({ queryKey: ["company", companyId] });
 
           setIsDialogOpen(false);
-          toast.success("Entreprise supprimée avec succès");
+          toast({
+            description: "Entreprise supprimée avec succès",
+            button: { label: "Fermer" },
+          });
         },
         onError: () => {
-          toast.error("Une erreur est survenue lors de la suppression de l'entreprise");
+          toast({
+            description: "Une erreur est survenue lors de la suppression de l'entreprise",
+            button: { label: "Fermer" },
+          });
         },
       },
     );

@@ -3,13 +3,13 @@ import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Globe, Mail, Phone } from "lucide-react";
 import { Separator } from "radix-ui";
-import { toast } from "sonner";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facebook";
 import { InstagramIcon } from "~/components/icons/instagram";
 import { LinkedinIcon } from "~/components/icons/linkedin";
+import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
 import { useUpdatePreviewStore } from "~/stores/preview.store";
@@ -44,6 +44,7 @@ const SOCIAL_MEDIA_ICONS = {
 } as const;
 
 function RouteComponent() {
+  const { toast } = useToast();
   const { preview, queryClient } = Route.useRouteContext();
   const params = Route.useParams();
   const navigate = Route.useNavigate();
@@ -90,7 +91,10 @@ function RouteComponent() {
       { data: formData },
       {
         onSuccess: () => {
-          toast.success("Entreprise mise à jour avec succès");
+          toast({
+            description: "Entreprise mise à jour avec succès",
+            button: { label: "Fermer" },
+          });
           queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
           queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
           navigate({ to: "/compte/entreprises" });

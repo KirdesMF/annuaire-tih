@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
 import { BriefcaseBusiness, DiamondPlus, LayoutDashboard, LogOut, UserCog } from "lucide-react";
 import { Avatar } from "radix-ui";
-import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,14 +19,21 @@ import {
 import { useAdminRole } from "~/hooks/use-admin-role";
 import { signOutFn } from "~/lib/api/auth/sign-out";
 import { type Theme, useTheme } from "./providers/theme-provider";
+import { useToast } from "./ui/toast";
 
 export function MenuUser({ user }: { user: User | undefined }) {
   const { isAdmin } = useAdminRole();
   const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
 
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
-    onSuccess: () => toast.success("Vous êtes déconnecté"),
+    onSuccess: () =>
+      toast({
+        title: "Vous êtes déconnecté",
+        description: "Vous avez été déconnecté avec succès",
+        button: { label: "Fermer", onClick: () => {} },
+      }),
   });
 
   if (!user) return null;

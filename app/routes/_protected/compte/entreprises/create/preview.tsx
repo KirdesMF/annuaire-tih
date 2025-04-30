@@ -1,18 +1,15 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { Globe, Mail, Phone } from "lucide-react";
 import { Separator } from "radix-ui";
-import { toast } from "sonner";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
-import { EmailIcon } from "~/components/icons/email";
 import { FacebookIcon } from "~/components/icons/facebook";
-import { GlobeIcon } from "~/components/icons/globe";
 import { InstagramIcon } from "~/components/icons/instagram";
-import { LinkChainIcon } from "~/components/icons/link-chain";
 import { LinkedinIcon } from "~/components/icons/linkedin";
-import { PhoneIcon } from "~/components/icons/phone";
+import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
 import { useAddPreviewStore } from "~/stores/preview.store";
@@ -50,7 +47,7 @@ function RouteComponent() {
   const { preview, queryClient } = Route.useRouteContext();
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const navigate = Route.useNavigate();
-
+  const { toast } = useToast();
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
 
   const socialMedia = {
@@ -98,7 +95,10 @@ function RouteComponent() {
       { data: formData },
       {
         onSuccess: () => {
-          toast.success("Entreprise créée avec succès");
+          toast({
+            description: "Entreprise créée avec succès",
+            button: { label: "Fermer" },
+          });
           queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
           navigate({ to: "/compte/entreprises" });
         },
@@ -136,29 +136,23 @@ function RouteComponent() {
             </ul>
           ) : null}
         </div>
-
-        <div className="flex gap-2">
-          <button type="button" className="bg-gray-100 p-2 rounded-sm cursor-pointer h-min">
-            <LinkChainIcon className="size-5" />
-          </button>
-        </div>
       </div>
 
       <div className="container flex gap-2">
         <div className="flex-1 flex flex-col justify-center gap-4 border border-gray-300 p-6 rounded-sm">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <EmailIcon className="size-5" />
+              <Mail className="size-5" />
               <p className="text-xs text-gray-500">{preview.email || "Non renseigné"}</p>
             </div>
 
             <div className="flex items-center gap-2">
-              <PhoneIcon className="size-5" />
+              <Phone className="size-5" />
               <p className="text-xs text-gray-500">{preview.phone || "Non renseigné"}</p>
             </div>
 
             <div className="flex items-center gap-2">
-              <GlobeIcon className="size-5" />
+              <Globe className="size-5" />
               {preview.website ? (
                 <a
                   href={preview.website}

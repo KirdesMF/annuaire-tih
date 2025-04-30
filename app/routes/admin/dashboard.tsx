@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Trash2 } from "lucide-react";
 import { useRef } from "react";
-import { toast } from "sonner";
+import { useToast } from "~/components/ui/toast";
 import type { UserRole } from "~/db/schema/auth";
 import type { CompanyStatus } from "~/db/schema/companies";
 import { updateUserRoleFn } from "~/lib/api/admin/mutations/update-user-role";
@@ -25,6 +25,7 @@ export const Route = createFileRoute("/admin/dashboard")({
 });
 
 function RouteComponent() {
+  const { toast } = useToast();
   const context = Route.useRouteContext();
   const { data: companies } = useSuspenseQuery(companiesQuery());
   const { data: users } = useSuspenseQuery(usersQuery);
@@ -45,7 +46,10 @@ function RouteComponent() {
       { data: { companyId, status: action } },
       {
         onSuccess: () => {
-          toast.success("Company status updated");
+          toast({
+            description: "Statut de l'entreprise mis à jour",
+            button: { label: "Fermer" },
+          });
           context.queryClient.invalidateQueries({ queryKey: ["companies"] });
         },
       },
@@ -58,7 +62,10 @@ function RouteComponent() {
       { data: { companyId, companySlug } },
       {
         onSuccess: () => {
-          toast.success("Company deleted");
+          toast({
+            description: "Entreprise supprimée avec succès",
+            button: { label: "Fermer" },
+          });
           context.queryClient.invalidateQueries({ queryKey: ["companies"] });
         },
       },
@@ -71,7 +78,10 @@ function RouteComponent() {
       { data: { userId, role } },
       {
         onSuccess: () => {
-          toast.success("User role updated");
+          toast({
+            description: "Rôle de l'utilisateur mis à jour",
+            button: { label: "Fermer" },
+          });
           context.queryClient.invalidateQueries({ queryKey: ["users"] });
         },
       },

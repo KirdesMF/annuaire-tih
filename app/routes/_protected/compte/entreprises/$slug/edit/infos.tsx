@@ -5,13 +5,13 @@ import { Command } from "cmdk";
 import { ChevronDown, Globe, Mail, Phone, X } from "lucide-react";
 import { Popover, Separator } from "radix-ui";
 import { useRef, useState } from "react";
-import { toast } from "sonner";
 import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facebook";
 import { InstagramIcon } from "~/components/icons/instagram";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
@@ -34,6 +34,7 @@ function RouteComponent() {
   const context = Route.useRouteContext();
   const params = Route.useParams();
   const navigate = Route.useNavigate();
+  const { toast } = useToast();
 
   const formRef = useRef<HTMLFormElement>(null);
   const [categories, company] = useSuspenseQueries({
@@ -56,7 +57,10 @@ function RouteComponent() {
   function onSelectCategory(categoryId: string) {
     setSelectedCategories((prev) => {
       if (prev.size >= 3) {
-        toast.error("Vous ne pouvez pas sélectionner plus de 3 catégories");
+        toast({
+          description: "Vous ne pouvez pas sélectionner plus de 3 catégories",
+          button: { label: "Fermer" },
+        });
         return prev;
       }
       return new Set(prev).add(categoryId);
@@ -86,11 +90,17 @@ function RouteComponent() {
           context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
           context.queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
 
-          toast.success("Entreprise mise à jour avec succès");
+          toast({
+            description: "Entreprise mise à jour avec succès",
+            button: { label: "Fermer" },
+          });
           navigate({ to: "/compte/entreprises" });
         },
         onError: (error) => {
-          toast.error(error.message);
+          toast({
+            description: error.message,
+            button: { label: "Fermer" },
+          });
         },
       },
     );
