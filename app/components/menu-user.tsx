@@ -30,9 +30,9 @@ export function MenuUser({ user }: { user: User | undefined }) {
     mutationFn: useServerFn(signOutFn),
     onSuccess: () =>
       toast({
-        title: "Vous êtes déconnecté",
+        status: "success",
         description: "Vous avez été déconnecté avec succès",
-        button: { label: "Fermer", onClick: () => {} },
+        button: { label: "Fermer" },
       }),
   });
 

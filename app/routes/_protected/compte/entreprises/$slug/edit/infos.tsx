@@ -2,7 +2,7 @@ import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Command } from "cmdk";
-import { ChevronDown, Globe, Mail, Phone, X } from "lucide-react";
+import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
 import { Popover, Separator } from "radix-ui";
 import { useRef, useState } from "react";
 import { CalendlyIcon } from "~/components/icons/calendly";
@@ -138,7 +138,7 @@ function RouteComponent() {
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Catégories * (max. 3)</span>
             <Popover.Root>
-              <Popover.Trigger className="h-9 cursor-pointer border rounded-sm border-input px-2 py-1 text-xs flex items-center justify-between gap-2">
+              <Popover.Trigger className="h-9 cursor-pointer border rounded-sm border-input px-2 py-1 text-xs flex items-center justify-between gap-2 shadow-2xs">
                 <span className="rounded-sm text-xs flex items-center gap-2 text-muted-foreground">
                   Ajouter une catégorie
                 </span>
@@ -200,15 +200,13 @@ function RouteComponent() {
             </ul>
           ) : null}
 
-          <Separator.Root className="h-px bg-border my-4" />
-
           <div className="grid gap-1">
             <Label className="flex flex-col gap-1">
               <span className="text-xs font-medium">Description</span>
               <textarea
                 name="description"
-                className="border rounded-sm p-2 border-input resize-none placeholder:text-xs"
-                rows={4}
+                className="border rounded-sm p-2 border-input placeholder:text-xs focus-visible:outline-primary"
+                rows={6}
                 placeholder="Entrer une description de mon entreprise..."
                 onChange={onDescriptionChange}
                 defaultValue={company.data?.description ?? ""}
@@ -217,25 +215,15 @@ function RouteComponent() {
             <span className="text-xs justify-self-end">{descriptionLength}/1500</span>
           </div>
 
+          <Separator.Root className="h-px bg-border my-4" />
+
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Entrepreneur</span>
             <Input
               type="text"
               name="business_owner"
               placeholder="Ex: Nom Prénom"
-              className="placeholder:text-xs"
               defaultValue={company.data?.business_owner ?? ""}
-            />
-          </Label>
-
-          <Label className="flex flex-col gap-1">
-            <span className="text-xs font-medium">Perimètre d'intervention</span>
-            <Input
-              type="text"
-              name="service_area"
-              placeholder="Ex: Paris, Lyon, Marseille"
-              className="placeholder:text-xs"
-              defaultValue={company.data?.service_area ?? ""}
             />
           </Label>
 
@@ -245,20 +233,33 @@ function RouteComponent() {
               type="text"
               name="subdomain"
               placeholder="Ex: monentreprise"
-              className="placeholder:text-xs"
               defaultValue={company.data?.subdomain ?? ""}
             />
           </Label>
 
           <Label className="flex flex-col gap-1">
+            <span className="text-xs font-medium">Perimètre d'intervention</span>
+            <div className="relative">
+              <MapPinned className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Input
+                type="text"
+                name="service_area"
+                placeholder="Ex: Paris, Lyon, Marseille"
+                className="ps-8"
+                defaultValue={company.data?.service_area ?? ""}
+              />
+            </div>
+          </Label>
+
+          <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Email</span>
-            <div className="flex items-center gap-2 border rounded-sm border-input h-9 px-2 focus-within:border-primary">
-              <Mail className="size-4 text-muted-foreground" />
+            <div className="relative">
+              <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="email"
                 name="email"
                 placeholder="Ex: contact@monentreprise.com"
-                className="placeholder:text-xs outline-none w-full border-none"
+                className="ps-8"
                 defaultValue={company.data?.email ?? ""}
               />
             </div>
@@ -266,13 +267,13 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Numéro de téléphone</span>
-            <div className="flex items-center gap-2 border rounded-sm border-input h-9 px-2 focus-within:border-primary">
-              <Phone className="size-4 text-muted-foregound" />
+            <div className="relative">
+              <Phone className="size-4 text-muted-foregound absolute start-2 top-2.5" />
               <Input
                 type="tel"
                 name="phone"
                 placeholder="Ex: 06 06 06 06 06"
-                className="placeholder:text-xs outline-none w-full border-none"
+                className="ps-8"
                 defaultValue={company.data?.phone ?? ""}
               />
             </div>
@@ -280,75 +281,17 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Site web</span>
-            <div className="flex items-center gap-2 border rounded-sm border-input h-9 px-2 focus-within:border-primary">
-              <Globe className="size-4 text-muted-foreground" />
+            <div className="relative">
+              <Globe className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="text"
                 name="website"
                 placeholder="Ex: https://www.monentreprise.com"
-                className="placeholder:text-xs outline-none w-full border-none"
+                className="ps-8"
                 defaultValue={company.data?.website ?? ""}
               />
             </div>
           </Label>
-
-          <Separator.Root className="h-px bg-border my-4" />
-
-          <fieldset className="flex flex-col gap-4">
-            <legend className="text-xs font-medium mb-2">Réseaux sociaux</legend>
-            <Label>
-              <span className="sr-only">Linkedin</span>
-              <div className="flex items-center gap-2 border rounded-sm border-input h-9 px-2 focus-within:border-primary">
-                <LinkedinIcon className="size-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  name="social_media.linkedin"
-                  placeholder="Ex: https://www.linkedin.com/company/monentreprise"
-                  className="placeholder:text-xs outline-none w-full border-none"
-                  defaultValue={company.data?.social_media.linkedin ?? ""}
-                />
-              </div>
-            </Label>
-            <Label>
-              <span className="sr-only">Facebook</span>
-              <div className="flex items-center gap-2 border rounded-sm border-input h-9 px-2 focus-within:border-primary">
-                <FacebookIcon className="size-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  name="social_media.facebook"
-                  placeholder="Ex: https://www.facebook.com/monentreprise"
-                  className="placeholder:text-xs outline-none w-full border-none"
-                  defaultValue={company.data?.social_media.facebook ?? ""}
-                />
-              </div>
-            </Label>
-            <Label>
-              <span className="sr-only">Instagram</span>
-              <div className="flex items-center gap-2 border rounded-sm border-input h-9 px-2 focus-within:border-primary">
-                <InstagramIcon className="size-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  name="social_media.instagram"
-                  placeholder="Ex: https://www.instagram.com/monentreprise"
-                  className="placeholder:text-xs outline-none w-full border-none"
-                  defaultValue={company.data?.social_media.instagram ?? ""}
-                />
-              </div>
-            </Label>
-            <Label>
-              <span className="sr-only">Calendly</span>
-              <div className="flex items-center gap-2 border rounded-sm border-input h-9 px-2 focus-within:border-primary">
-                <CalendlyIcon className="size-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  name="social_media.calendly"
-                  placeholder="Ex: https://calendly.com/monentreprise"
-                  className="placeholder:text-xs outline-none w-full border-none"
-                  defaultValue={company.data?.social_media.calendly ?? ""}
-                />
-              </div>
-            </Label>
-          </fieldset>
 
           <Separator.Root className="h-px bg-border my-4" />
 
@@ -424,13 +367,71 @@ function RouteComponent() {
 
           <Separator.Root className="h-px bg-border my-4" />
 
+          <fieldset className="flex flex-col gap-4">
+            <legend className="text-xs font-medium mb-2">Réseaux sociaux</legend>
+            <Label>
+              <span className="sr-only">Linkedin</span>
+              <div className="relative">
+                <LinkedinIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                <Input
+                  type="text"
+                  name="social_media.linkedin"
+                  placeholder="Ex: https://www.linkedin.com/company/monentreprise"
+                  className="ps-8"
+                  defaultValue={company.data?.social_media.linkedin ?? ""}
+                />
+              </div>
+            </Label>
+            <Label>
+              <span className="sr-only">Facebook</span>
+              <div className="relative">
+                <FacebookIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                <Input
+                  type="text"
+                  name="social_media.facebook"
+                  placeholder="Ex: https://www.facebook.com/monentreprise"
+                  className="ps-8"
+                  defaultValue={company.data?.social_media.facebook ?? ""}
+                />
+              </div>
+            </Label>
+            <Label>
+              <span className="sr-only">Instagram</span>
+              <div className="relative">
+                <InstagramIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                <Input
+                  type="text"
+                  name="social_media.instagram"
+                  placeholder="Ex: https://www.instagram.com/monentreprise"
+                  className="ps-8"
+                  defaultValue={company.data?.social_media.instagram ?? ""}
+                />
+              </div>
+            </Label>
+            <Label>
+              <span className="sr-only">Calendly</span>
+              <div className="relative">
+                <CalendlyIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                <Input
+                  type="text"
+                  name="social_media.calendly"
+                  placeholder="Ex: https://calendly.com/monentreprise"
+                  className="ps-8"
+                  defaultValue={company.data?.social_media.calendly ?? ""}
+                />
+              </div>
+            </Label>
+          </fieldset>
+
+          <Separator.Root className="h-px bg-border my-4" />
+
           <div className="flex gap-2 justify-end">
             <button
               type="submit"
               className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs"
               disabled={isPending}
             >
-              {isPending ? "Mise à jour en cours..." : "Mettre à jour"}
+              {isPending ? <Loader className="size-4 animate-spin" /> : "Mettre à jour"}
             </button>
           </div>
         </form>

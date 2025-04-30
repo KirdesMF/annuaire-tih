@@ -17,6 +17,14 @@
   --accent-foreground: oklch(0.37 0.03 259.73);
   --destructive: oklch(0.64 0.21 25.33);
   --destructive-foreground: oklch(1.00 0 0);
+  --error: oklch(0.64 0.21 25.33);
+  --error-foreground: oklch(1.00 0 0);
+  --warning: oklch(0.93 0.03 272.79);
+  --warning-foreground: oklch(0.37 0.03 259.73);
+  --info: oklch(0.59 0.20 277.12);
+  --info-foreground: oklch(1.00 0 0);
+  --success: oklch(0.59 0.20 277.12);
+  --success-foreground: oklch(1.00 0 0);
   --border: oklch(0.87 0.01 258.34);
   --input: oklch(0.87 0.01 258.34);
   --ring: oklch(0.59 0.20 277.12);
@@ -64,6 +72,14 @@
   --accent-foreground: oklch(0.87 0.01 258.34);
   --destructive: oklch(0.64 0.21 25.33);
   --destructive-foreground: oklch(0.21 0.04 265.75);
+  --error: oklch(0.64 0.21 25.33);
+  --error-foreground: oklch(0.21 0.04 265.75);
+  --warning: oklch(0.93 0.03 272.79);
+  --warning-foreground: oklch(0.37 0.03 259.73);
+  --info: oklch(0.59 0.20 277.12);
+  --info-foreground: oklch(1.00 0 0);
+  --success: oklch(0.59 0.20 277.12);
+  --success-foreground: oklch(1.00 0 0);
   --border: oklch(0.45 0.03 256.80);
   --input: oklch(0.45 0.03 256.80);
   --ring: oklch(0.68 0.16 276.93);
@@ -112,6 +128,14 @@
     --accent-foreground: oklch(0.87 0.01 258.34);
     --destructive: oklch(0.64 0.21 25.33);
     --destructive-foreground: oklch(0.21 0.04 265.75);
+    --error: oklch(0.64 0.21 25.33);
+    --error-foreground: oklch(0.21 0.04 265.75);
+    --warning: oklch(0.93 0.03 272.79);
+    --warning-foreground: oklch(0.37 0.03 259.73);
+    --info: oklch(0.59 0.20 277.12);
+    --info-foreground: oklch(1.00 0 0);
+    --success: oklch(0.59 0.20 277.12);
+    --success-foreground: oklch(1.00 0 0);
     --border: oklch(0.45 0.03 256.80);
     --input: oklch(0.45 0.03 256.80);
     --ring: oklch(0.68 0.16 276.93);
@@ -160,6 +184,14 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -200,14 +232,3 @@
   margin-inline: auto;
 }
 
-@layer base {
-  input[data-autocompleted] {
-    background-color: transparent !important;
-  }
-
-  input:-webkit-autofill,
-  input:-webkit-autofill:focus {
-      transition: background-color 0s 0s, color 0s 0s;
-      transition-delay: calc(infinity * 1s);
-  }
-}

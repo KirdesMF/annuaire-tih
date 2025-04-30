@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { ChevronRight, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
+import { LoaderCircle, LockKeyhole, LogIn, Mail, X } from "lucide-react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -55,41 +55,65 @@ function RouteComponent() {
 
     if (!result.success) {
       toast({
+        status: "error",
         description: result.issues[0].message,
-        button: { label: "Fermer" },
       });
       return;
     }
 
-    mutate({ data: result.output });
+    mutate(
+      { data: result.output },
+      {
+        onError: () => {
+          toast({
+            status: "error",
+            description: "Email ou mot de passe incorrect",
+          });
+        },
+      },
+    );
   }
 
   return (
     <main className="min-h-[calc(100dvh-60px)] flex items-center justify-center px-4">
-      <div className="w-full max-w-lg mx-auto border border-border bg-card text-card-foreground px-8 py-12 rounded-sm shadow-xs">
-        <div className="flex flex-col gap-2 mb-12">
-          <h1 className="text-2xl font-bold text-center">Welcome back</h1>
+      <div className="w-full max-w-md mx-auto border border-border bg-card text-card-foreground px-8 py-10 rounded-md shadow-xs">
+        <div className="flex items-center justify-center mb-6">
+          <div className="shadow-xs p-2 rounded-sm bg-card text-primary">
+            <LogIn className="size-8" aria-hidden />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1 mb-6">
+          <h1 className="text-2xl font-bold text-center">Bienvenue</h1>
           <p className="text-sm text-center">Connectez-vous pour accéder à votre compte.</p>
         </div>
 
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
           <div className="flex flex-col gap-1">
             <Label htmlFor="email">Email *</Label>
-            <div className="flex items-center gap-1">
-              <div className="flex items-center justify-center size-9 rounded-sm border border-border">
-                <Mail className="size-4 text-accent" />
-              </div>
-              <Input type="email" name="email" id="email" placeholder="email@example.com" />
+            <div className="relative">
+              <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Input
+                type="email"
+                name="email"
+                id="email"
+                placeholder="email@example.com"
+                className="ps-8"
+              />
             </div>
           </div>
 
           <div className="flex flex-col gap-1">
             <Label htmlFor="password">Mot de passe *</Label>
-            <div className="flex items-center gap-1">
-              <div className="flex items-center justify-center size-9 rounded-sm border border-border">
-                <LockKeyhole className="size-4 text-accent" />
-              </div>
-              <Input type="password" name="password" id="password" placeholder="••••••••••••••••" />
+            <div className="relative">
+              <LockKeyhole className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Input
+                type="password"
+                name="password"
+                id="password"
+                placeholder="••••••••••••••••"
+                className="ps-8"
+              />
             </div>
 
             <div className="flex justify-end mt-1">
@@ -107,15 +131,12 @@ function RouteComponent() {
             {isPending ? (
               <LoaderCircle className="size-5 animate-spin" />
             ) : (
-              <div className="flex items-center justify-center gap-2 w-full">
-                <span>Se connecter</span>
-                <ChevronRight className="size-5" />
-              </div>
+              <span>Se connecter</span>
             )}
           </button>
         </form>
 
-        <div className="flex items-center justify-center gap-1 mt-6">
+        <div className="flex items-center justify-center gap-1 mt-3">
           <p className="text-sm">Pas encore inscrit ?</p>
           <Link className="text-sm text-muted-foreground" to="/sign-up">
             Créer un compte

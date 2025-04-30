@@ -2,9 +2,10 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
-import { Loader, Plus, Trash2 } from "lucide-react";
+import { Loader, Trash2 } from "lucide-react";
 import * as v from "valibot";
-import { Label } from "~/components/label";
+import { InputFile } from "~/components/input-file";
+import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
 import { deleteCompanyMedia } from "~/lib/api/companies/mutations/delete-company-media";
 import { updateCompanyMedia } from "~/lib/api/companies/mutations/update-company-medias";
@@ -151,25 +152,15 @@ function RouteComponent() {
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Logo (max. 3MB)</span>
                 <div className="w-35 h-40 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
-                  {preview.logo || company.logo?.secureUrl ? (
-                    <img
-                      src={
-                        preview.logo ? URL.createObjectURL(preview.logo) : company.logo?.secureUrl
-                      }
-                      alt="Logo"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Plus className="size-8 rounded-full p-1 bg-muted text-muted-foreground" />
-                  )}
-                  <input
-                    type="file"
-                    className="absolute inset-0 opacity-0"
-                    name="logo"
+                  <input type="hidden" name="logo_public_id" value={company.logo?.publicId} />
+                  <InputFile
+                    preview={
+                      preview.logo ? URL.createObjectURL(preview.logo) : company.logo?.secureUrl
+                    }
+                    alt="Logo"
                     onChange={(e) => onImageChange(e, "logo")}
                     accept="image/*"
                   />
-                  <input type="hidden" name="logo_public_id" value={company.logo?.publicId} />
                 </div>
               </Label>
 
@@ -198,33 +189,21 @@ function RouteComponent() {
               <div className="flex flex-col gap-2">
                 <Label className="relative flex flex-col gap-1 outline-none group">
                   <span className="text-xs font-medium">Image 1 (max. 2MB)</span>
-                  <div className="w-35 h-40 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
-                    {preview.gallery?.[0] || company.gallery?.[0]?.secureUrl ? (
-                      <img
-                        src={
-                          preview.gallery?.[0]
-                            ? URL.createObjectURL(preview.gallery?.[0])
-                            : company.gallery?.[0].secureUrl
-                        }
-                        alt="gallery 1"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <Plus className="size-8 rounded-full bg-muted p-1 text-muted-foreground" />
-                    )}
-                    <input
-                      type="file"
-                      className="absolute inset-0 opacity-0"
-                      name="gallery[0]"
-                      onChange={(e) => onImageChange(e, "gallery", 0)}
-                      accept="image/*"
-                    />
-                    <input
-                      type="hidden"
-                      name="gallery_public_id[0]"
-                      value={company.gallery?.[0]?.publicId}
-                    />
-                  </div>
+                  <input
+                    type="hidden"
+                    name="gallery_public_id[0]"
+                    value={company.gallery?.[0]?.publicId}
+                  />
+                  <InputFile
+                    preview={
+                      preview.gallery?.[0]
+                        ? URL.createObjectURL(preview.gallery?.[0])
+                        : company.gallery?.[0]?.secureUrl
+                    }
+                    alt="Gallery 1"
+                    onChange={(e) => onImageChange(e, "gallery", 0)}
+                    accept="image/*"
+                  />
                 </Label>
 
                 <button
@@ -249,34 +228,23 @@ function RouteComponent() {
               <div className="flex flex-col gap-2">
                 <Label className="relative flex flex-col gap-1 outline-none group">
                   <span className="text-xs font-medium">Image 2 (max. 2MB)</span>
-                  <div className="w-35 h-40 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
-                    {preview.gallery?.[1] || company.gallery?.[1]?.secureUrl ? (
-                      <img
-                        src={
-                          preview.gallery?.[1]
-                            ? URL.createObjectURL(preview.gallery?.[1])
-                            : company.gallery?.[1].secureUrl
-                        }
-                        alt="gallery 2"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <Plus className="size-8 rounded-full bg-muted p-1 text-muted-foreground" />
-                    )}
-                    <input
-                      type="file"
-                      className="absolute inset-0 opacity-0"
-                      name="gallery[1]"
-                      onChange={(e) => onImageChange(e, "gallery", 1)}
-                      accept="image/*"
-                    />
-                    <input
-                      type="hidden"
-                      name="gallery_public_id[1]"
-                      value={company.gallery?.[1]?.publicId}
-                    />
-                  </div>
+                  <input
+                    type="hidden"
+                    name="gallery_public_id[1]"
+                    value={company.gallery?.[1]?.publicId}
+                  />
+                  <InputFile
+                    preview={
+                      preview.gallery?.[1]
+                        ? URL.createObjectURL(preview.gallery?.[1])
+                        : company.gallery?.[1]?.secureUrl
+                    }
+                    alt="Gallery 2"
+                    onChange={(e) => onImageChange(e, "gallery", 1)}
+                    accept="image/*"
+                  />
                 </Label>
+
                 <button
                   type="button"
                   className="text-xs font-medium text-primary-foreground bg-primary p-2 rounded-sm w-max"
