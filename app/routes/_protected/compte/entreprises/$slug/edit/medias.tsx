@@ -1,16 +1,15 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { decode } from "decode-formdata";
+import { Loader, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { PlusIcon } from "~/components/icons/plus";
+import * as v from "valibot";
 import { Label } from "~/components/label";
+import { deleteCompanyMedia } from "~/lib/api/companies/mutations/delete-company-media";
 import { updateCompanyMedia } from "~/lib/api/companies/mutations/update-company-medias";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
-import { decode } from "decode-formdata";
-import * as v from "valibot";
 import { UpdateCompanyMediaSchema } from "~/lib/validator/company.schema";
-import { TrashIcon } from "~/components/icons/trash";
-import { deleteCompanyMedia } from "~/lib/api/companies/mutations/delete-company-media";
 import { useAddPreviewStore } from "~/stores/preview.store";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/medias")({
@@ -131,12 +130,12 @@ function RouteComponent() {
         <input type="hidden" name="companyId" value={company.id} />
 
         <div className="flex flex-col gap-2 justify-center">
-          <fieldset className="border rounded-sm border-gray-300 p-4 w-max">
-            <legend className="text-xs font-medium  bg-white px-2">Logo</legend>
+          <fieldset className="border rounded-sm border-border p-4 w-max">
+            <legend className="text-xs font-medium px-2">Logo</legend>
             <div className="grid gap-2">
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Logo (max. 3MB)</span>
-                <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
+                <div className="w-35 h-40 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
                   {preview.logo || company.logo?.secureUrl ? (
                     <img
                       src={
@@ -146,7 +145,7 @@ function RouteComponent() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
+                    <Plus className="size-8 rounded-full p-1 bg-muted text-muted-foreground" />
                   )}
                   <input
                     type="file"
@@ -161,7 +160,7 @@ function RouteComponent() {
 
               <button
                 type="button"
-                className="text-xs font-medium text-white bg-primary p-2 rounded-sm w-max"
+                className="text-xs font-medium text-primary-foreground bg-primary p-2 rounded-sm w-max"
                 onClick={() =>
                   onDeleteLogo({
                     companyId: company.id,
@@ -169,18 +168,22 @@ function RouteComponent() {
                   })
                 }
               >
-                {isDeletingMedia ? "..." : <TrashIcon className="size-5" />}
+                {isDeletingMedia ? (
+                  <Loader className="size-5 animate-spin" />
+                ) : (
+                  <Trash2 className="size-5" />
+                )}
               </button>
             </div>
           </fieldset>
 
-          <fieldset className="border rounded-sm border-gray-300 p-4">
-            <legend className="text-xs font-medium  bg-white px-2">Galerie</legend>
+          <fieldset className="border rounded-sm border-border p-4">
+            <legend className="text-xs font-mediu px-2">Galerie</legend>
             <div className="flex gap-2">
               <div className="flex flex-col gap-2">
                 <Label className="relative flex flex-col gap-1 outline-none group">
                   <span className="text-xs font-medium">Image 1 (max. 2MB)</span>
-                  <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
+                  <div className="w-35 h-40 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
                     {preview.gallery?.[0] || company.gallery?.[0]?.secureUrl ? (
                       <img
                         src={
@@ -192,7 +195,7 @@ function RouteComponent() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
+                      <Plus className="size-8 rounded-full bg-muted p-1 text-muted-foreground" />
                     )}
                     <input
                       type="file"
@@ -211,7 +214,7 @@ function RouteComponent() {
 
                 <button
                   type="button"
-                  className="text-xs font-medium text-white bg-primary p-2 rounded-sm w-max"
+                  className="text-xs font-medium text-primary-foreground bg-primary p-2 rounded-sm w-max"
                   onClick={() =>
                     onDeleteGallery({
                       companyId: company.id,
@@ -220,14 +223,18 @@ function RouteComponent() {
                     })
                   }
                 >
-                  {isDeletingMedia ? "..." : <TrashIcon className="size-5" />}
+                  {isDeletingMedia ? (
+                    <Loader className="size-5 animate-spin" />
+                  ) : (
+                    <Trash2 className="size-5" />
+                  )}
                 </button>
               </div>
 
               <div className="flex flex-col gap-2">
                 <Label className="relative flex flex-col gap-1 outline-none group">
                   <span className="text-xs font-medium">Image 2 (max. 2MB)</span>
-                  <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
+                  <div className="w-35 h-40 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
                     {preview.gallery?.[1] || company.gallery?.[1]?.secureUrl ? (
                       <img
                         src={
@@ -239,7 +246,7 @@ function RouteComponent() {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
+                      <Plus className="size-8 rounded-full bg-muted p-1 text-muted-foreground" />
                     )}
                     <input
                       type="file"
@@ -257,7 +264,7 @@ function RouteComponent() {
                 </Label>
                 <button
                   type="button"
-                  className="text-xs font-medium text-white bg-primary p-2 rounded-sm w-max"
+                  className="text-xs font-medium text-primary-foreground bg-primary p-2 rounded-sm w-max"
                   onClick={() =>
                     onDeleteGallery({
                       companyId: company.id,
@@ -266,7 +273,11 @@ function RouteComponent() {
                     })
                   }
                 >
-                  {isDeletingMedia ? "..." : <TrashIcon className="size-5" />}
+                  {isDeletingMedia ? (
+                    <Loader className="size-5 animate-spin" />
+                  ) : (
+                    <Trash2 className="size-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -275,9 +286,9 @@ function RouteComponent() {
 
         <button
           type="submit"
-          className="text-xs font-medium text-white bg-primary px-4 py-2 rounded-sm w-max"
+          className="text-xs font-medium text-primary-foreground bg-primary px-4 py-2 rounded-sm w-max"
         >
-          {isPending ? "En cours..." : "Mettre à jour"}
+          {isPending ? <Loader className="size-5 animate-spin" /> : "Mettre à jour"}
         </button>
       </form>
     </div>

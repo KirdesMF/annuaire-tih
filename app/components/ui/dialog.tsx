@@ -1,6 +1,6 @@
+import { X } from "lucide-react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { cn } from "~/utils/cn";
-import { CloseIcon } from "../icons/close";
 
 export function DialogContent({
   children,
@@ -20,7 +20,7 @@ export function DialogContent({
       >
         {children}
         <DialogPrimitive.Close aria-label="Fermer" className="absolute top-3 end-3 ">
-          <CloseIcon className="size-5" />
+          <X className="size-5" />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>

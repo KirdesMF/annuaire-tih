@@ -1,29 +1,24 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Input } from "~/components/input";
-import { Label } from "~/components/label";
 import { Command } from "cmdk";
-import { useRef, useState } from "react";
-import { CloseIcon } from "~/components/icons/close";
-import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
-import { toast } from "sonner";
-import { Popover, Separator } from "radix-ui";
-import * as v from "valibot";
-import { CreateCompanySchema } from "~/lib/validator/company.schema";
-import { ChevronDownIcon } from "~/components/icons/chevron-down";
 import { decode } from "decode-formdata";
-import { LinkedinIcon } from "~/components/icons/linkedin";
-import { InstagramIcon } from "~/components/icons/instagram";
+import { ChevronDown, Globe, Mail, Phone, Plus, X } from "lucide-react";
+import { Popover, Separator } from "radix-ui";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
+import * as v from "valibot";
 import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facebook";
-import { PlusIcon } from "~/components/icons/plus";
-import { PhoneIcon } from "~/components/icons/phone";
-import { GlobeIcon } from "~/components/icons/globe";
-import { EmailIcon } from "~/components/icons/email";
-import { useAddPreviewStore } from "~/stores/preview.store";
+import { InstagramIcon } from "~/components/icons/instagram";
+import { LinkedinIcon } from "~/components/icons/linkedin";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
+import { CreateCompanySchema } from "~/lib/validator/company.schema";
+import { useAddPreviewStore } from "~/stores/preview.store";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/create/")({
   component: RouteComponent,
@@ -190,30 +185,30 @@ function RouteComponent() {
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Catégories * (max. 3)</span>
             <Popover.Root>
-              <Popover.Trigger className="h-9 cursor-pointer border rounded-sm border-gray-300 px-2 py-1 text-xs flex items-center justify-between gap-2">
-                <span className="rounded-sm text-xs flex items-center gap-2 text-gray-400">
+              <Popover.Trigger className="h-9 cursor-pointer border border-input rounded-sm px-2 py-1 text-xs flex items-center justify-between gap-2">
+                <span className="rounded-sm text-xs flex items-center gap-2 text-muted-foreground">
                   Ajouter une catégorie
                 </span>
-                <ChevronDownIcon className="size-5 text-gray-500" />
+                <ChevronDown className="size-4 text-muted-foreground" />
               </Popover.Trigger>
               <Popover.Portal>
                 <Popover.Content
-                  className="bg-white w-(--radix-popper-anchor-width)"
+                  className="bg-popover w-(--radix-popper-anchor-width)"
                   sideOffset={5}
                 >
-                  <Command className="border rounded-sm border-gray-300">
+                  <Command className="border border-input rounded-sm">
                     <Command.Input
                       placeholder="Rechercher une catégorie"
                       className="w-full h-10 px-2 outline-none placeholder:text-sm placeholder:font-light"
                     />
-                    <Command.Separator className="h-px bg-gray-300" />
+                    <Command.Separator className="h-px bg-border" />
                     <Command.List className="max-h-60 overflow-y-auto">
                       {categories.map((category) => (
                         <Command.Item
                           key={category.id}
                           value={category.name}
                           disabled={selectedCategories.has(category.id)}
-                          className="cursor-pointer py-1.5 px-2 aria-selected:bg-gray-100 text-sm font-light aria-disabled:opacity-20"
+                          className="cursor-pointer py-1.5 px-2 aria-selected:bg-secondary aria-selected:text-secondary-foreground text-sm font-light aria-disabled:opacity-20"
                           onSelect={() => onSelectCategory(category.id)}
                         >
                           {category.name}
@@ -235,16 +230,16 @@ function RouteComponent() {
                 return (
                   <li
                     key={category.id}
-                    className="bg-gray-400 text-white px-2 py-1 rounded-sm text-xs flex items-center gap-2"
+                    className="bg-secondary text-secondary-foreground px-2 py-1 rounded-sm text-xs flex items-center gap-2"
                   >
                     <input type="hidden" name={`categories[${idx}]`} value={category.id} />
                     <span className="max-w-[30ch] truncate">{category.name}</span>
                     <button
                       type="button"
-                      className="text-white inline-grid place-items-center cursor-pointer"
+                      className="text-secondary-foreground inline-grid place-items-center cursor-pointer"
                       onClick={() => onRemoveCategory(category.id)}
                     >
-                      <CloseIcon className="size-3 text-white" />
+                      <X className="size-3" />
                     </button>
                   </li>
                 );
@@ -252,21 +247,21 @@ function RouteComponent() {
             </ul>
           ) : null}
 
-          <Separator.Root className="h-px bg-gray-300 my-4" />
+          <Separator.Root className="h-px bg-border my-4" />
 
           <div className="grid gap-1">
             <Label className="flex flex-col gap-1">
               <span className="text-xs font-medium">Description</span>
               <textarea
                 name="description"
-                className="border rounded-sm p-2 border-gray-300 resize-none placeholder:text-xs"
+                className="border rounded-sm p-2 border-input resize-none placeholder:text-xs"
                 rows={4}
                 placeholder="Entrer une description de mon entreprise..."
                 onChange={onDescriptionChange}
                 defaultValue={preview?.description}
               />
             </Label>
-            <span className="text-xs text-gray-500 justify-self-end">{descriptionLength}/1500</span>
+            <span className="text-xs justify-self-end">{descriptionLength}/1500</span>
           </div>
 
           <Label className="flex flex-col gap-1">
@@ -304,8 +299,8 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Email</span>
-            <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-              <EmailIcon className="size-5 text-gray-500" />
+            <div className="flex items-center gap-2 border border-input rounded-sm h-9 px-2 focus-within:border-primary">
+              <Mail className="size-4 text-muted-foreground" />
               <input
                 type="email"
                 name="email"
@@ -318,8 +313,8 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Numéro de téléphone</span>
-            <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-              <PhoneIcon className="size-5 text-gray-500" />
+            <div className="flex items-center gap-2 border border-input rounded-sm h-9 px-2 focus-within:border-primary">
+              <Phone className="size-4 text-muted-foreground" />
               <input
                 type="tel"
                 name="phone"
@@ -332,8 +327,8 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Site web</span>
-            <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-              <GlobeIcon className="size-5 text-gray-500" />
+            <div className="flex items-center gap-2 border border-input rounded-sm h-9 px-2 focus-within:border-primary">
+              <Globe className="size-4 text-muted-foreground" />
               <input
                 type="text"
                 name="website"
@@ -344,14 +339,14 @@ function RouteComponent() {
             </div>
           </Label>
 
-          <Separator.Root className="h-px bg-gray-300 my-4" />
+          <Separator.Root className="h-px bg-border my-4" />
 
           <fieldset className="flex flex-col gap-4">
             <legend className="text-xs font-medium mb-2">Réseaux sociaux</legend>
             <Label>
               <span className="sr-only">Linkedin</span>
-              <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-                <LinkedinIcon className="size-5 text-gray-500" />
+              <div className="flex items-center gap-2 border border-input rounded-sm h-9 px-2 focus-within:border-primary">
+                <LinkedinIcon className="size-4 text-muted-foreground" />
                 <input
                   type="text"
                   name="social_media.linkedin"
@@ -363,8 +358,8 @@ function RouteComponent() {
             </Label>
             <Label>
               <span className="sr-only">Facebook</span>
-              <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-                <FacebookIcon className="size-5 text-gray-500" />
+              <div className="flex items-center gap-2 border border-input rounded-sm h-9 px-2 focus-within:border-primary">
+                <FacebookIcon className="size-4 text-muted-foreground" />
                 <input
                   type="text"
                   name="social_media.facebook"
@@ -376,8 +371,8 @@ function RouteComponent() {
             </Label>
             <Label>
               <span className="sr-only">Instagram</span>
-              <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-                <InstagramIcon className="size-5 text-gray-500" />
+              <div className="flex items-center gap-2 border border-input rounded-sm h-9 px-2 focus-within:border-primary">
+                <InstagramIcon className="size-4 text-muted-foreground" />
                 <input
                   type="text"
                   name="social_media.instagram"
@@ -389,8 +384,8 @@ function RouteComponent() {
             </Label>
             <Label>
               <span className="sr-only">Calendly</span>
-              <div className="flex items-center gap-2 border rounded-sm border-gray-300 h-9 px-2 focus-within:border-gray-500">
-                <CalendlyIcon className="size-5 text-gray-500" />
+              <div className="flex items-center gap-2 border border-input rounded-sm h-9 px-2 focus-within:border-primary">
+                <CalendlyIcon className="size-4 text-muted-foreground" />
                 <input
                   type="text"
                   name="social_media.calendly"
@@ -402,7 +397,7 @@ function RouteComponent() {
             </Label>
           </fieldset>
 
-          <Separator.Root className="h-px bg-gray-300 my-4" />
+          <Separator.Root className="h-px bg-border my-4" />
 
           <div className="grid gap-8">
             <fieldset className="flex gap-4">
@@ -413,7 +408,7 @@ function RouteComponent() {
                   name="work_mode"
                   value="not_specified"
                   defaultChecked={preview?.work_mode === "not_specified" || !preview?.work_mode}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">Non spécifié</span>
               </Label>
@@ -423,7 +418,7 @@ function RouteComponent() {
                   name="work_mode"
                   value="remote"
                   defaultChecked={preview?.work_mode === "remote"}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">À distance</span>
               </Label>
@@ -433,7 +428,7 @@ function RouteComponent() {
                   name="work_mode"
                   value="onsite"
                   defaultChecked={preview?.work_mode === "onsite"}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">Sur site</span>
               </Label>
@@ -443,7 +438,7 @@ function RouteComponent() {
                   name="work_mode"
                   value="hybrid"
                   defaultChecked={preview?.work_mode === "hybrid"}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">Hybride</span>
               </Label>
@@ -457,7 +452,7 @@ function RouteComponent() {
                   name="rqth"
                   value="true"
                   defaultChecked={preview?.rqth}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">Oui</span>
               </Label>
@@ -467,26 +462,26 @@ function RouteComponent() {
                   name="rqth"
                   value="false"
                   defaultChecked={!preview?.rqth}
-                  className="size-4 accent-gray-600"
+                  className="size-4 accent-primary"
                 />
                 <span className="text-xs">Non</span>
               </Label>
             </fieldset>
           </div>
 
-          <Separator.Root className="h-px bg-gray-300 my-4" />
+          <Separator.Root className="h-px bg-border my-4" />
 
-          <fieldset className="border rounded-sm border-gray-300 p-4">
-            <legend className="text-xs font-medium  bg-white px-2">Images</legend>
+          <fieldset className="border rounded-sm border-border p-4">
+            <legend className="text-xs font-medium px-2">Images</legend>
 
             <div className="flex gap-2 justify-center">
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Logo (max. 3MB)</span>
-                <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
+                <div className="w-35 h-40 bg-gray-100 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
                   {preview.logoUrl ? (
                     <img src={preview.logoUrl} alt="Logo" className="w-full h-full object-cover" />
                   ) : (
-                    <PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
+                    <Plus className="size-8 rounded-full bg-secondary p-1 text-secondary-foreground" />
                   )}
                   <input
                     type="file"
@@ -500,7 +495,7 @@ function RouteComponent() {
 
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Image 1 (max. 2MB)</span>
-                <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
+                <div className="w-35 h-40 bg-gray-100 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
                   {preview.galleryUrls?.[0] ? (
                     <img
                       src={preview.galleryUrls[0]}
@@ -508,7 +503,7 @@ function RouteComponent() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
+                    <Plus className="size-8 rounded-full bg-secondary p-1 text-secondary-foreground" />
                   )}
                   <input
                     type="file"
@@ -522,7 +517,7 @@ function RouteComponent() {
 
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Image 2 (max. 2MB)</span>
-                <div className="w-35 h-40 bg-gray-100 border border-gray-300 rounded-sm grid place-items-center group-focus-within:border-gray-500">
+                <div className="w-35 h-40 bg-gray-100 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
                   {preview.galleryUrls?.[1] ? (
                     <img
                       src={preview.galleryUrls[1]}
@@ -530,7 +525,7 @@ function RouteComponent() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <PlusIcon className="size-8 rounded-full bg-gray-400 p-1 text-white" />
+                    <Plus className="size-8 rounded-full bg-secondary p-1 text-secondary-foreground" />
                   )}
                   <input
                     type="file"
@@ -544,12 +539,12 @@ function RouteComponent() {
             </div>
           </fieldset>
 
-          <Separator.Root className="h-px bg-gray-300 my-4" />
+          <Separator.Root className="h-px bg-border my-4" />
 
           <div className="flex gap-2 justify-end">
             <button
               type="button"
-              className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50"
+              className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50"
               onClick={onPreview}
             >
               Prévisualiser
@@ -557,7 +552,7 @@ function RouteComponent() {
 
             <button
               type="submit"
-              className="bg-gray-800 text-white px-3 py-2 rounded-sm font-light text-xs"
+              className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs"
               disabled={isPending}
             >
               {isPending ? "Création en cours..." : "Créer un compte"}

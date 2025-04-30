@@ -1,6 +1,6 @@
 import { Link, linkOptions } from "@tanstack/react-router";
+import { AlignLeft } from "lucide-react";
 import { useState } from "react";
-import { MenuIcon } from "./icons/menu";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "./ui/drawer";
 
 const LINKS = linkOptions([
@@ -20,7 +20,7 @@ export function MobileNav() {
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>
         <button type="button" className="md:hidden grid place-items-center cursor-pointer">
-          <MenuIcon />
+          <AlignLeft />
         </button>
       </DrawerTrigger>
 

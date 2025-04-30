@@ -1,11 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { ChevronRight, LoaderCircle, LockKeyhole, Mail } from "lucide-react";
 import { toast } from "sonner";
 import * as v from "valibot";
-import { ChevronRightIcon } from "~/components/icons/chevron-right";
-import { EmailIcon } from "~/components/icons/email";
-import { LockIcon } from "~/components/icons/lock";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { auth } from "~/lib/auth/auth.server";
@@ -73,31 +71,25 @@ function RouteComponent() {
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
           <div className="flex flex-col gap-1">
             <Label htmlFor="email">Email *</Label>
-            <div className="flex items-center border border-border rounded-sm px-2 focus-within:outline focus-within:outline-blue-500">
-              <EmailIcon className="size-6 text-muted-foreground" />
-              <Input
-                type="email"
-                name="email"
-                placeholder="email@example.com"
-                className="border-none outline-none"
-              />
+            <div className="flex items-center gap-1">
+              <div className="flex items-center justify-center size-11 rounded-sm border border-border">
+                <Mail className="size-5 text-accent" />
+              </div>
+              <Input type="email" name="email" id="email" placeholder="email@example.com" />
             </div>
           </div>
 
           <div className="flex flex-col gap-1">
             <Label htmlFor="password">Mot de passe *</Label>
-            <div className="flex items-center border border-border rounded-sm px-2 focus-within:outline focus-within:outline-blue-500">
-              <LockIcon className="size-6 text-muted-foreground" />
-              <Input
-                type="password"
-                name="password"
-                placeholder="••••••••••••••••"
-                className="border-none outline-none"
-              />
+            <div className="flex items-center gap-1">
+              <div className="flex items-center justify-center size-11 rounded-sm border border-border">
+                <LockKeyhole className="size-5 text-accent" />
+              </div>
+              <Input type="password" name="password" id="password" placeholder="••••••••••••••••" />
             </div>
 
             <div className="flex justify-end mt-1">
-              <Link className="text-xs text-secondary" to="/forgot-password">
+              <Link className="text-xs text-muted-foreground" to="/forgot-password">
                 Mot de passe oublié ?
               </Link>
             </div>
@@ -109,11 +101,11 @@ function RouteComponent() {
             disabled={isPending}
           >
             {isPending ? (
-              "Connection en cours..."
+              <LoaderCircle className="size-5 animate-spin" />
             ) : (
               <div className="flex items-center justify-center gap-2 w-full">
                 <span>Se connecter</span>
-                <ChevronRightIcon className="size-5" />
+                <ChevronRight className="size-5" />
               </div>
             )}
           </button>
@@ -121,7 +113,7 @@ function RouteComponent() {
 
         <div className="flex items-center justify-center gap-1 mt-6">
           <p className="text-sm">Pas encore inscrit ?</p>
-          <Link className="text-sm text-secondary" to="/sign-up">
+          <Link className="text-sm text-muted-foreground" to="/sign-up">
             Créer un compte
           </Link>
         </div>

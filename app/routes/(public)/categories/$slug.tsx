@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { Search } from "lucide-react";
 import * as v from "valibot";
-import { SearchIcon } from "~/components/icons/search";
 import { Input } from "~/components/input";
 import { Label } from "~/components/label";
 import { companiesByCategoryQuery } from "~/lib/api/companies/queries/get-companies-by-category";
@@ -43,7 +43,7 @@ function RouteComponent() {
             <span className="sr-only">Rechercher une entreprise</span>
 
             <div className="flex items-center rounded-md border border-gray-200 px-2 focus-within:border-gray-500">
-              <SearchIcon className="size-5" />
+              <Search className="size-5" />
               <Input
                 type="text"
                 placeholder="Rechercher une entreprise"
