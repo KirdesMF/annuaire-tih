@@ -2,9 +2,10 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
+import { Loader, Mail } from "lucide-react";
 import * as v from "valibot";
-import { Input } from "~/components/input";
-import { Label } from "~/components/label";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
 import { auth } from "~/lib/auth/auth.server";
 
@@ -62,15 +63,18 @@ function RouteComponent() {
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
           <Label className="flex flex-col gap-2">
             Email *
-            <Input type="email" name="email" placeholder="Email" />
+            <div className="relative">
+              <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Input type="email" name="email" placeholder="exemple@email.com" className="ps-8" />
+            </div>
           </Label>
 
           <button
             type="submit"
-            className="border border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white transition-colors p-2 rounded-sm font-medium text-sm"
+            className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors p-2 rounded-sm font-medium text-sm"
             disabled={isPending}
           >
-            {isPending ? "Envoi en cours..." : "Envoyer"}
+            {isPending ? <Loader className="size-4 animate-spin" /> : "Envoyer"}
           </button>
         </form>
       </div>

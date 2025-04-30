@@ -1,9 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { Loader, Lock } from "lucide-react";
 import * as v from "valibot";
-import { Input } from "~/components/input";
-import { Label } from "~/components/label";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
 import { auth } from "~/lib/auth/auth.server";
 
@@ -69,15 +70,23 @@ function RouteComponent() {
           <input type="hidden" name="token" value={searchParams.token} />
           <Label>
             Nouveau mot de passe *
-            <Input type="password" name="newPassword" placeholder="Mot de passe" />
+            <div className="relative">
+              <Lock className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Input
+                type="password"
+                name="newPassword"
+                placeholder="••••••••••••••••"
+                className="ps-8"
+              />
+            </div>
           </Label>
 
           <button
             type="submit"
-            className="border border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white transition-colors p-2 rounded-sm font-medium text-sm"
+            className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors p-2 rounded-sm font-medium text-sm"
             disabled={isPending}
           >
-            {isPending ? "Réinitialisation en cours..." : "Réinitialiser"}
+            {isPending ? <Loader className="size-4 animate-spin" /> : "Réinitialiser"}
           </button>
         </form>
       </div>
