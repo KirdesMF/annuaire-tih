@@ -53,12 +53,12 @@ export const signupFn = createServerFn()
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { data: emailData, error } = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
-      to: "cedgourville@gmail.com",
-      subject: "Bienvenue sur l'application de gestion de projet",
+      from: "noreply@annuaire-tih.fr",
+      to: data.email,
+      subject: "Bienvenue sur l'annuaire Tih",
       react: (
         <div>
-          <h1>Bienvenue sur l'application de gestion de projet</h1>
+          <h1>Bienvenue sur l'annuaire Tih</h1>
           <p>Votre compte a été créé avec succès</p>
         </div>
       ),

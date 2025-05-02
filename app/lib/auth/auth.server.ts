@@ -43,10 +43,10 @@ export const auth = betterAuth({
       const resend = new Resend(process.env.RESEND_API_KEY);
 
       const { data, error } = await resend.emails.send({
-        from: "Acme <onboarding@resend.dev>",
+        from: "noreply@annuaire-tih.fr",
         to: user.email,
-        subject: "Reset your password",
-        text: `Click ${url} to reset your password`,
+        subject: "Réinitialisation de mot de passe",
+        text: `Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ${url}`,
       });
 
       if (error) {
