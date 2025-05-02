@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Globe, Mail, Phone } from "lucide-react";
+import { Globe, Mail, PencilLine, Phone } from "lucide-react";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
@@ -46,7 +46,7 @@ function RouteComponent() {
 
   return (
     <main className="px-4 py-8 grid gap-4">
-      <div className="container flex justify-between gap-4 border border-border p-6 rounded-sm">
+      <div className="container flex justify-between gap-4 border border-border bg-card text-card-foreground p-6 rounded-sm">
         <div className="flex flex-col gap-2">
           <CompanyLogo url={data.logo?.secureUrl} name={data.name} size="lg" />
 
@@ -57,9 +57,10 @@ function RouteComponent() {
               <Link
                 to={"/compte/entreprises/$slug/edit/infos"}
                 params={{ slug: params.slug }}
-                className="border border-border px-2 py-1 rounded-sm text-xs h-min"
+                className="border border-border bg-muted text-muted-foreground px-2 py-1.5 rounded-sm text-xs h-min flex items-center gap-1"
               >
-                Edit
+                <span>Modifier</span>
+                <PencilLine className="size-4" />
               </Link>
             )}
           </div>
@@ -67,7 +68,7 @@ function RouteComponent() {
             {data.categories.map((category) => (
               <li
                 key={category?.id}
-                className="bg-muted text-foreground px-2 py-1 rounded-sm text-xs"
+                className="bg-accent text-accent-foreground px-2 py-1 rounded-sm text-xs"
               >
                 <Link
                   to="/categories/$slug"
@@ -83,7 +84,7 @@ function RouteComponent() {
       </div>
 
       <div className="container flex gap-2 flex-wrap">
-        <div className="flex-1 flex flex-col justify-center gap-4 border border-border p-6 rounded-sm">
+        <div className="flex-1 flex flex-col justify-center gap-4 border border-border bg-card text-card-foreground p-6 rounded-sm">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Mail className="size-5" />
@@ -127,7 +128,7 @@ function RouteComponent() {
           ) : null}
         </div>
 
-        <div className="flex-1 border border-border p-6 rounded-sm flex flex-col gap-2">
+        <div className="flex-1 border border-border bg-card text-card-foreground p-6 rounded-sm flex flex-col gap-2">
           <p className="text-sm text-nowrap">
             <span className="font-bold">Entrepreneur:</span>{" "}
             {data.business_owner || "Non renseigné"}
@@ -149,7 +150,7 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className="container border border-border p-6 rounded-sm grid gap-4">
+      <div className="container border border-border bg-card text-card-foreground p-6 rounded-sm grid gap-4">
         <div className="flex flex-col gap-2">
           <h2 className="text-lg font-bold">Description</h2>
           <p className="text-sm text-pretty whitespace-pre-line">
@@ -165,7 +166,7 @@ function RouteComponent() {
 
 function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; publicId: string }> }) {
   return (
-    <div className="container border border-border p-6 rounded-sm grid gap-4">
+    <div className="container border border-border bg-card text-card-foreground p-6 rounded-sm grid gap-4">
       <h2 className="text-lg font-bold">Galerie</h2>
       <ul className="flex flex-wrap gap-4 items-center justify-center">
         {gallery.map((image) => {

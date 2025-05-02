@@ -13,7 +13,7 @@ export function DialogContent({
       <DialogPrimitive.Content
         className={cn(
           "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-sm w-[min(90vw,400px)] z-70",
-          "bg-popover border border-border",
+          "bg-popover text-popover-foreground border border-border",
           className,
         )}
         {...props}

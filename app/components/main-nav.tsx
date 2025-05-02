@@ -16,7 +16,7 @@ export function MainNav() {
           <li key={link.to}>
             <Link
               to={link.to}
-              className="text-sm font-light text-nowrap"
+              className="text-sm font-light text-nowrap focus:outline-primary focus:outline-2  px-1.5 py-1 rounded-xs"
               activeProps={{
                 className: "data-[status=active]:text-primary data-[status=active]:font-bold",
               }}

@@ -197,7 +197,7 @@ function RouteComponent() {
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Catégories * (max. 3)</span>
             <Popover.Root>
-              <Popover.Trigger className="h-10 cursor-pointer border border-input rounded-sm px-2 py-1 text-xs flex items-center justify-between gap-2 shadow-2xs">
+              <Popover.Trigger className="h-10 cursor-pointer ring-1 ring-input/50 rounded-sm px-2 py-1 text-xs flex items-center justify-between gap-2 shadow-2xs">
                 <span className="rounded-sm text-xs flex items-center gap-2 text-muted-foreground">
                   Ajouter une catégorie
                 </span>
@@ -265,7 +265,7 @@ function RouteComponent() {
               <span className="text-xs font-medium">Description</span>
               <textarea
                 name="description"
-                className="border rounded-sm p-2 border-input placeholder:text-xs focus-visible:outline-primary"
+                className="ring-1 ring-input/50 shadow-2xs rounded-sm p-2 placeholder:text-xs focus-visible:outline-primary"
                 rows={6}
                 placeholder="Entrer une description de l'entreprise..."
                 onChange={onDescriptionChange}
@@ -274,8 +274,8 @@ function RouteComponent() {
             </Label>
             <span
               className={cn(
-                "text-xs justify-self-end",
-                descriptionLength > 1500 && "text-destructive-foreground",
+                "text-xs mt-1 justify-self-end px-2 py-0.5 rounded-xs bg-muted text-muted-foreground transition-colors",
+                descriptionLength > 1500 && "text-destructive-foreground bg-destructive",
               )}
             >
               {descriptionLength}/1500
@@ -366,7 +366,7 @@ function RouteComponent() {
             <fieldset className="flex gap-4">
               <legend className="text-xs font-medium mb-2">Mode de travail</legend>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="work_mode"
                   value="not_specified"
@@ -376,7 +376,7 @@ function RouteComponent() {
                 <span className="text-xs">Non spécifié</span>
               </Label>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="work_mode"
                   value="remote"
@@ -386,7 +386,7 @@ function RouteComponent() {
                 <span className="text-xs">À distance</span>
               </Label>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="work_mode"
                   value="onsite"
@@ -396,7 +396,7 @@ function RouteComponent() {
                 <span className="text-xs">Sur site</span>
               </Label>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="work_mode"
                   value="hybrid"
@@ -410,7 +410,7 @@ function RouteComponent() {
             <fieldset className="flex gap-2">
               <legend className="text-xs font-medium mb-2">RQTH</legend>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="rqth"
                   value="true"
@@ -420,7 +420,7 @@ function RouteComponent() {
                 <span className="text-xs">Oui</span>
               </Label>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="rqth"
                   value="false"
@@ -496,7 +496,7 @@ function RouteComponent() {
           <Separator.Root className="h-px bg-border my-4" />
 
           <fieldset className="border rounded-sm border-border p-4">
-            <legend className="text-xs font-medium px-2">Images</legend>
+            <legend className="text-sm font-medium px-2">Images</legend>
 
             <div className="flex gap-2 justify-center">
               <Label className="relative flex flex-col gap-1 outline-none group">
@@ -539,7 +539,7 @@ function RouteComponent() {
           <div className="flex gap-2 justify-end">
             <button
               type="button"
-              className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer"
+              className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer hover:bg-secondary/90 transition-colors"
               onClick={onPreview}
             >
               Prévisualiser
@@ -547,7 +547,7 @@ function RouteComponent() {
 
             <button
               type="submit"
-              className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer"
+              className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer hover:bg-primary/90 transition-colors"
               disabled={isPending}
             >
               {isPending ? <Loader className="size-4 animate-spin" /> : "Créer un compte"}

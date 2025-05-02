@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { APIError } from "better-auth/api";
+import { Lock, Mail } from "lucide-react";
 import { Resend } from "resend";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
@@ -113,8 +114,8 @@ function RouteComponent() {
 
   return (
     <main className="min-h-[calc(100dvh-60px)] flex items-center justify-center px-4">
-      <div className="max-w-lg w-full mx-auto border border-border bg-card text-card-foreground px-8 py-12 rounded-sm shadow-xs">
-        <div className="flex flex-col gap-2 mb-12">
+      <div className="max-w-md w-full mx-auto border border-border bg-card text-card-foreground px-8 py-12 rounded-sm shadow-xs">
+        <div className="flex flex-col gap-2 mb-8">
           <h1 className="text-2xl font-bold text-center">Créer un compte</h1>
           <p className="text-sm text-center">
             Un compte vous permet de référencer votre entreprise
@@ -135,17 +136,36 @@ function RouteComponent() {
 
             <Label className="flex flex-col gap-1">
               <span>Email*</span>
-              <Input name="email" type="email" placeholder="exemple@email.com" />
+              <div className="relative">
+                <Mail className="absolute start-2 top-2.5 size-4 text-muted-foreground" />
+                <Input name="email" type="email" placeholder="exemple@email.com" className="ps-8" />
+              </div>
             </Label>
 
             <Label className="flex flex-col gap-1">
               <span>Mot de passe*</span>
-              <Input name="password" type="password" placeholder="••••••••••••••••" />
+              <div className="relative">
+                <Lock className="absolute start-2 top-2.5 size-4 text-muted-foreground" />
+                <Input
+                  name="password"
+                  type="password"
+                  placeholder="••••••••••••••••"
+                  className="ps-8"
+                />
+              </div>
             </Label>
 
             <Label className="flex flex-col gap-1">
               <span>Confirmation du mot de passe*</span>
-              <Input name="confirmPassword" type="password" placeholder="••••••••••••••••" />
+              <div className="relative">
+                <Lock className="absolute start-2 top-2.5 size-4 text-muted-foreground" />
+                <Input
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="••••••••••••••••"
+                  className="ps-8"
+                />
+              </div>
             </Label>
           </div>
 

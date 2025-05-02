@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import type { User } from "better-auth";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Monitor, Moon, SearchIcon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { MainNav } from "~/components/main-nav";
 import { MenuUser } from "~/components/menu-user";
@@ -57,8 +57,9 @@ export function SiteHeader({ user }: { user: User | undefined }) {
             <DialogTrigger asChild>
               <button
                 type="button"
-                className="flex w-full md:w-auto items-center gap-2 text-start text-xs text-nowrap font-light px-2.5 h-8 border border-border rounded-sm focus-within:outline focus-within:outline-blue-500"
+                className="flex w-full md:w-auto items-center gap-2 text-xs text-nowrap font-light px-2.5 h-8 rounded-sm ring-1 ring-input/50 shadow-2xs focus:outline-primary focus:outline-2"
               >
+                <SearchIcon className="size-4 text-muted-foreground" />
                 <span className="hidden lg:block">Rechercher un nom ou une activité...</span>
                 <span className="block lg:hidden">Rechercher...</span>
                 <kbd className="text-xs px-1.5 py-0.5 rounded-sm bg-muted pointer-events-none hidden lg:flex gap-1 font-mono">
@@ -120,7 +121,7 @@ function RegisterLink({ user }: { user: User | undefined }) {
   return (
     <Link
       to={user ? "/compte/entreprises/create" : "/sign-up"}
-      className="text-xs px-2 py-1 h-8 items-center rounded-sm border border-border text-nowrap hidden md:inline-flex"
+      className="text-xs px-2 py-1 h-8 items-center rounded-sm ring-1 ring-border text-nowrap hidden md:inline-flex focus:outline-primary focus:outline-2"
     >
       Se référencer
     </Link>
@@ -133,7 +134,7 @@ function LoginButton({ user }: { user: User | undefined }) {
   return (
     <Link
       to="/sign-in"
-      className="text-xs px-2 py-1 h-8 hidden md:inline-flex items-center rounded-sm text-nowrap bg-primary text-primary-foreground"
+      className="text-xs px-2 py-1 h-8 hidden md:inline-flex items-center rounded-sm text-nowrap bg-primary text-primary-foreground focus:outline-primary focus:outline-1"
     >
       Se connecter
     </Link>

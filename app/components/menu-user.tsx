@@ -40,7 +40,7 @@ export function MenuUser({ user }: { user: User | undefined }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full cursor-pointer">
+      <DropdownMenuTrigger className="rounded-full cursor-pointer focus:outline-primary focus:outline-2">
         <AvatarUser user={user} />
       </DropdownMenuTrigger>
 
