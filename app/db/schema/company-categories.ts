@@ -1,6 +1,6 @@
-import { pgTable, text, timestamp, primaryKey } from "drizzle-orm/pg-core";
-import { companiesTable } from "./companies";
+import { pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
 import { categoriesTable } from "./categories";
+import { companiesTable } from "./companies";
 
 export const companyCategoriesTable = pgTable(
   "company_categories",

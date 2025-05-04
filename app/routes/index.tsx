@@ -12,7 +12,7 @@ import {
 import { Separator } from "radix-ui";
 import { useState } from "react";
 // import banner from "~/assets/img/banner.png?url";
-import { HeroCard } from "~/components/hero-card";
+// import { HeroCard } from "~/components/hero-card";
 import {
   Command,
   CommandEmpty,
@@ -43,46 +43,43 @@ function Home() {
 
   return (
     <main className="px-4 py-6 ">
-      <div className="flex flex-col gap-4 items-center pt-24 max-w-7xl mx-auto">
-        <div className="flex gap-12">
-          <div className="flex flex-col gap-6">
-            <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
-              <BookUser className="size-4" />
-              <span>Annuaire public et gratuit</span>
-            </div>
-            <h1 className="text-5xl font-bold text-pretty tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground from-10% via-foreground/90 via-30% to-foreground/60 to-80%">
-              Votre réseau de prestataires indépendants <span className="text-primary">TIH*</span>.
-            </h1>
-
-            <p className="text-muted-foreground text-pretty text-lg leading-relaxed">
-              Collaborez directement avec des prestataires indépendants bénéficiant du statut de{" "}
-              <span className="font-bold underline underline-offset-2">
-                Travailleur Indépendant Handicapé* (TIH)
-              </span>{" "}
-              grâce à cet annuaire spécialisé gratuit et public.
-            </p>
-
-            <div className="flex gap-4">
-              <Link
-                to="/sign-up"
-                className="text-xs px-4 py-2 bg-primary/75 ring-1 ring-primary/90 text-primary-foreground shadow-md rounded-sm flex items-center gap-2 text-nowrap focus:outline-primary focus:outline-2"
-              >
-                Ajouter mon entreprise
-              </Link>
-
-              <Link
-                to="/sign-in"
-                className="text-xs px-4 py-2 ring-1 ring-border shadow-md rounded-sm flex items-center gap-2 text-nowrap focus:outline-primary focus:outline-2"
-              >
-                Rechercher un prestataire
-              </Link>
-            </div>
+      <section className="flex flex-col gap-4 items-center py-24 max-w-xl mx-auto">
+        <div className="flex flex-col gap-6">
+          <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
+            <BookUser className="size-4" />
+            <span>Annuaire public et gratuit</span>
           </div>
-          <HeroCard />
-        </div>
-      </div>
+          <h1 className="text-5xl font-bold text-pretty tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground from-10% via-foreground/90 via-30% to-foreground/60 to-80%">
+            Votre réseau de prestataires indépendants <span className="text-primary">TIH*</span>.
+          </h1>
 
-      <section className="max-w-6xl mx-auto py-20 ">
+          <p className="text-muted-foreground text-pretty text-lg leading-relaxed">
+            Collaborez directement avec des prestataires indépendants bénéficiant du statut de{" "}
+            <span className="font-bold underline underline-offset-2">
+              Travailleur Indépendant Handicapé* (TIH)
+            </span>{" "}
+            grâce à cet annuaire spécialisé gratuit et public.
+          </p>
+
+          <div className="flex gap-4">
+            <Link
+              to="/sign-up"
+              className="text-xs px-4 py-2 bg-primary/75 ring-1 ring-primary/90 text-primary-foreground shadow-md rounded-sm flex items-center gap-2 text-nowrap focus:outline-primary focus:outline-2"
+            >
+              Ajouter mon entreprise
+            </Link>
+
+            <Link
+              to="/sign-in"
+              className="text-xs px-4 py-2 ring-1 ring-border shadow-md rounded-sm flex items-center gap-2 text-nowrap focus:outline-primary focus:outline-2"
+            >
+              Rechercher un prestataire
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-6xl mx-auto py-24">
         <div className="flex flex-col gap-8 items-center">
           <div className="flex flex-col gap-4 items-center">
             <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">

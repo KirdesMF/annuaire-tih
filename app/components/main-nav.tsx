@@ -4,6 +4,7 @@ const LINKS = linkOptions([
   { label: "Accueil", to: "/" },
   { label: "Qui sommes-nous ?", to: "/about" },
   { label: "FAQ", to: "/faq" },
+  { label: "Partenaires ", to: "/partner" },
   { label: "Sources", to: "/sources" },
   { label: "Contact", to: "/contact" },
 ]);

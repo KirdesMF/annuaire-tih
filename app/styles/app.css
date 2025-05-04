@@ -232,3 +232,17 @@
   margin-inline: auto;
 }
 
+@custom-variant dark {
+  /* This supports the .dark class */
+  &:where([data-theme=dark] *, [data-theme=dark]) {
+    @slot;
+  }
+
+  /* This supports the .system class + media query */
+  &:where([data-theme=system] *, [data-theme=system]) {
+    @media (prefers-color-scheme: dark) {
+      @slot;
+    }
+  }
+}
+
