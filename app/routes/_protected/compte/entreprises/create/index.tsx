@@ -433,65 +433,6 @@ function RouteComponent() {
 
           <SocialMedias />
 
-          {/* <fieldset className="flex flex-col gap-4">
-            <legend className="text-xs font-medium mb-2">Réseaux sociaux</legend>
-            <Label>
-              <span className="sr-only">Linkedin</span>
-              <div className="relative">
-                <LinkedinIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
-                <Input
-                  type="text"
-                  name="social_media.linkedin"
-                  placeholder="Ex: https://www.linkedin.com/company/monentreprise"
-                  className="ps-8"
-                  defaultValue={preview?.social_media.linkedin}
-                />
-              </div>
-            </Label>
-
-            <Label>
-              <span className="sr-only">Facebook</span>
-              <div className="relative">
-                <FacebookIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
-                <Input
-                  type="text"
-                  name="social_media.facebook"
-                  placeholder="Ex: https://www.facebook.com/monentreprise"
-                  className="ps-8"
-                  defaultValue={preview?.social_media.facebook}
-                />
-              </div>
-            </Label>
-
-            <Label>
-              <span className="sr-only">Instagram</span>
-              <div className="relative">
-                <InstagramIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
-                <Input
-                  type="text"
-                  name="social_media.instagram"
-                  placeholder="Ex: https://www.instagram.com/monentreprise"
-                  className="ps-8"
-                  defaultValue={preview?.social_media.instagram}
-                />
-              </div>
-            </Label>
-
-            <Label>
-              <span className="sr-only">Calendly</span>
-              <div className="relative">
-                <CalendlyIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
-                <Input
-                  type="text"
-                  name="social_media.calendly"
-                  placeholder="Ex: https://calendly.com/monentreprise"
-                  className="ps-8"
-                  defaultValue={preview?.social_media.calendly}
-                />
-              </div>
-            </Label>
-          </fieldset> */}
-
           <Separator.Root className="h-px bg-border my-4" />
 
           <fieldset className="border rounded-sm border-border p-4">

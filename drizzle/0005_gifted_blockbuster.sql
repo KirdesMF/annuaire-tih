@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "cgu" boolean DEFAULT false NOT NULL;

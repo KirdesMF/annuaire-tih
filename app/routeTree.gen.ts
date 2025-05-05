@@ -16,10 +16,11 @@ import { Route as ProtectedRouteImport } from './routes/_protected/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as AdminDashboardImport } from './routes/admin/dashboard'
+import { Route as ProtectedAcceptCguImport } from './routes/_protected/accept-cgu'
 import { Route as publicSourcesImport } from './routes/(public)/sources'
 import { Route as publicPartnerImport } from './routes/(public)/partner'
 import { Route as publicFaqImport } from './routes/(public)/faq'
-import { Route as publicContactImport } from './routes/(public)/contact'
+import { Route as publicCguImport } from './routes/(public)/cgu'
 import { Route as publicAboutImport } from './routes/(public)/about'
 import { Route as authSignUpImport } from './routes/(auth)/sign-up'
 import { Route as authSignInImport } from './routes/(auth)/sign-in'
@@ -70,6 +71,12 @@ const AdminDashboardRoute = AdminDashboardImport.update({
   getParentRoute: () => AdminRouteRoute,
 } as any)
 
+const ProtectedAcceptCguRoute = ProtectedAcceptCguImport.update({
+  id: '/accept-cgu',
+  path: '/accept-cgu',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+
 const publicSourcesRoute = publicSourcesImport.update({
   id: '/(public)/sources',
   path: '/sources',
@@ -88,9 +95,9 @@ const publicFaqRoute = publicFaqImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const publicContactRoute = publicContactImport.update({
-  id: '/(public)/contact',
-  path: '/contact',
+const publicCguRoute = publicCguImport.update({
+  id: '/(public)/cgu',
+  path: '/cgu',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -279,11 +286,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof publicAboutImport
       parentRoute: typeof rootRoute
     }
-    '/(public)/contact': {
-      id: '/(public)/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof publicContactImport
+    '/(public)/cgu': {
+      id: '/(public)/cgu'
+      path: '/cgu'
+      fullPath: '/cgu'
+      preLoaderRoute: typeof publicCguImport
       parentRoute: typeof rootRoute
     }
     '/(public)/faq': {
@@ -306,6 +313,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sources'
       preLoaderRoute: typeof publicSourcesImport
       parentRoute: typeof rootRoute
+    }
+    '/_protected/accept-cgu': {
+      id: '/_protected/accept-cgu'
+      path: '/accept-cgu'
+      fullPath: '/accept-cgu'
+      preLoaderRoute: typeof ProtectedAcceptCguImport
+      parentRoute: typeof ProtectedRouteImport
     }
     '/admin/dashboard': {
       id: '/admin/dashboard'
@@ -460,10 +474,12 @@ const ProtectedCompteRouteRouteWithChildren =
 
 interface ProtectedRouteRouteChildren {
   ProtectedCompteRouteRoute: typeof ProtectedCompteRouteRouteWithChildren
+  ProtectedAcceptCguRoute: typeof ProtectedAcceptCguRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedCompteRouteRoute: ProtectedCompteRouteRouteWithChildren,
+  ProtectedAcceptCguRoute: ProtectedAcceptCguRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
@@ -494,10 +510,11 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
   '/about': typeof publicAboutRoute
-  '/contact': typeof publicContactRoute
+  '/cgu': typeof publicCguRoute
   '/faq': typeof publicFaqRoute
   '/partner': typeof publicPartnerRoute
   '/sources': typeof publicSourcesRoute
+  '/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/': typeof AdminIndexRoute
   '/categories/$slug': typeof publicCategoriesSlugRoute
@@ -522,10 +539,11 @@ export interface FileRoutesByTo {
   '/sign-in': typeof authSignInRoute
   '/sign-up': typeof authSignUpRoute
   '/about': typeof publicAboutRoute
-  '/contact': typeof publicContactRoute
+  '/cgu': typeof publicCguRoute
   '/faq': typeof publicFaqRoute
   '/partner': typeof publicPartnerRoute
   '/sources': typeof publicSourcesRoute
+  '/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin': typeof AdminIndexRoute
   '/categories/$slug': typeof publicCategoriesSlugRoute
@@ -552,10 +570,11 @@ export interface FileRoutesById {
   '/(auth)/sign-in': typeof authSignInRoute
   '/(auth)/sign-up': typeof authSignUpRoute
   '/(public)/about': typeof publicAboutRoute
-  '/(public)/contact': typeof publicContactRoute
+  '/(public)/cgu': typeof publicCguRoute
   '/(public)/faq': typeof publicFaqRoute
   '/(public)/partner': typeof publicPartnerRoute
   '/(public)/sources': typeof publicSourcesRoute
+  '/_protected/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/': typeof AdminIndexRoute
   '/(public)/categories/$slug': typeof publicCategoriesSlugRoute
@@ -584,10 +603,11 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/about'
-    | '/contact'
+    | '/cgu'
     | '/faq'
     | '/partner'
     | '/sources'
+    | '/accept-cgu'
     | '/admin/dashboard'
     | '/admin/'
     | '/categories/$slug'
@@ -611,10 +631,11 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/sign-up'
     | '/about'
-    | '/contact'
+    | '/cgu'
     | '/faq'
     | '/partner'
     | '/sources'
+    | '/accept-cgu'
     | '/admin/dashboard'
     | '/admin'
     | '/categories/$slug'
@@ -639,10 +660,11 @@ export interface FileRouteTypes {
     | '/(auth)/sign-in'
     | '/(auth)/sign-up'
     | '/(public)/about'
-    | '/(public)/contact'
+    | '/(public)/cgu'
     | '/(public)/faq'
     | '/(public)/partner'
     | '/(public)/sources'
+    | '/_protected/accept-cgu'
     | '/admin/dashboard'
     | '/admin/'
     | '/(public)/categories/$slug'
@@ -669,7 +691,7 @@ export interface RootRouteChildren {
   authSignInRoute: typeof authSignInRoute
   authSignUpRoute: typeof authSignUpRoute
   publicAboutRoute: typeof publicAboutRoute
-  publicContactRoute: typeof publicContactRoute
+  publicCguRoute: typeof publicCguRoute
   publicFaqRoute: typeof publicFaqRoute
   publicPartnerRoute: typeof publicPartnerRoute
   publicSourcesRoute: typeof publicSourcesRoute
@@ -686,7 +708,7 @@ const rootRouteChildren: RootRouteChildren = {
   authSignInRoute: authSignInRoute,
   authSignUpRoute: authSignUpRoute,
   publicAboutRoute: publicAboutRoute,
-  publicContactRoute: publicContactRoute,
+  publicCguRoute: publicCguRoute,
   publicFaqRoute: publicFaqRoute,
   publicPartnerRoute: publicPartnerRoute,
   publicSourcesRoute: publicSourcesRoute,
@@ -712,7 +734,7 @@ export const routeTree = rootRoute
         "/(auth)/sign-in",
         "/(auth)/sign-up",
         "/(public)/about",
-        "/(public)/contact",
+        "/(public)/cgu",
         "/(public)/faq",
         "/(public)/partner",
         "/(public)/sources",
@@ -726,7 +748,8 @@ export const routeTree = rootRoute
     "/_protected": {
       "filePath": "_protected/route.tsx",
       "children": [
-        "/_protected/compte"
+        "/_protected/compte",
+        "/_protected/accept-cgu"
       ]
     },
     "/admin": {
@@ -763,8 +786,8 @@ export const routeTree = rootRoute
     "/(public)/about": {
       "filePath": "(public)/about.tsx"
     },
-    "/(public)/contact": {
-      "filePath": "(public)/contact.tsx"
+    "/(public)/cgu": {
+      "filePath": "(public)/cgu.tsx"
     },
     "/(public)/faq": {
       "filePath": "(public)/faq.tsx"
@@ -774,6 +797,10 @@ export const routeTree = rootRoute
     },
     "/(public)/sources": {
       "filePath": "(public)/sources.tsx"
+    },
+    "/_protected/accept-cgu": {
+      "filePath": "_protected/accept-cgu.tsx",
+      "parent": "/_protected"
     },
     "/admin/dashboard": {
       "filePath": "admin/dashboard.tsx",

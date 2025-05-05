@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { APIError } from "better-auth/api";
+import { decode } from "decode-formdata";
 import { EyeIcon, EyeOffIcon, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { Resend } from "resend";
@@ -9,41 +10,71 @@ import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
+import { getDb } from "~/db";
+import { userCguAcceptanceTable } from "~/db/schema/cgu";
 import { auth } from "~/lib/auth/auth.server";
 
-const SignupSchema = v.object({
-  email: v.pipe(
-    v.string(),
-    v.nonEmpty("Veuillez entrer votre email"),
-    v.email("Veuillez entrer un email valide"),
+const SignupSchema = v.pipe(
+  v.object({
+    lastName: v.pipe(
+      v.string(),
+      v.nonEmpty("Veuillez entrer votre nom"),
+      v.maxLength(100, "Le nom doit contenir au plus 100 caractères"),
+    ),
+    firstName: v.pipe(
+      v.string(),
+      v.nonEmpty("Veuillez entrer votre prénom"),
+      v.maxLength(100, "Le prénom doit contenir au plus 100 caractères"),
+    ),
+    email: v.pipe(
+      v.string(),
+      v.nonEmpty("Veuillez entrer votre email"),
+      v.email("Veuillez entrer un email valide"),
+    ),
+    password: v.pipe(
+      v.string(),
+      v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères"),
+      v.maxLength(100, "Le mot de passe doit contenir au plus 100 caractères"),
+    ),
+    confirmPassword: v.pipe(v.string(), v.minLength(1, "Veuillez confirmer votre mot de passe")),
+    cgu: v.boolean("Veuillez accepter les conditions générales d'utilisation"),
+  }),
+  v.forward(
+    v.partialCheck(
+      [["password"], ["confirmPassword"]],
+      ({ password, confirmPassword }) => password === confirmPassword,
+      "Les mots de passe ne correspondent pas",
+    ),
+    ["confirmPassword"],
   ),
-  password: v.pipe(
-    v.string(),
-    v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères"),
-    v.maxLength(100, "Le mot de passe doit contenir au plus 100 caractères"),
-  ),
-  firstName: v.pipe(
-    v.string(),
-    v.nonEmpty("Veuillez entrer votre prénom"),
-    v.maxLength(100, "Le prénom doit contenir au plus 100 caractères"),
-  ),
-  lastName: v.pipe(
-    v.string(),
-    v.nonEmpty("Veuillez entrer votre nom"),
-    v.maxLength(100, "Le nom doit contenir au plus 100 caractères"),
-  ),
-});
+);
 
 export const signupFn = createServerFn()
   .validator(SignupSchema)
   .handler(async ({ data }) => {
     try {
-      await auth().api.signUpEmail({
+      const res = await auth().api.signUpEmail({
         body: {
           email: data.email,
           password: data.password,
           name: `${data.firstName} ${data.lastName}`,
         },
+      });
+
+      // update user cgu acceptance
+      const db = getDb();
+      const activeCGU = await db.query.cguTable.findFirst({
+        where: (cgu, { eq }) => eq(cgu.isActive, true),
+      });
+
+      if (!activeCGU) {
+        throw new Error("No active CGU found");
+      }
+
+      await db.insert(userCguAcceptanceTable).values({
+        userId: res.user.id,
+        cguId: activeCGU.id,
+        acceptedAt: new Date(),
       });
     } catch (error) {
       if (error instanceof APIError) {
@@ -95,17 +126,9 @@ function RouteComponent() {
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
+    const decoded = decode(formData, { booleans: ["cgu"] });
 
-    const result = v.safeParse(
-      SignupSchema,
-      {
-        email: formData.get("email"),
-        password: formData.get("password"),
-        firstName: formData.get("firstName"),
-        lastName: formData.get("lastName"),
-      },
-      { abortEarly: true },
-    );
+    const result = v.safeParse(SignupSchema, decoded, { abortEarly: true });
 
     if (!result.success) {
       toast({
@@ -203,6 +226,17 @@ function RouteComponent() {
                   )}
                 </button>
               </div>
+            </Label>
+
+            <Label className="flex gap-2 items-center">
+              <input name="cgu" type="checkbox" className="accent-primary" />
+              <span className="text-xs">
+                Je reconnais avoir pris connaissance et j'accepte les{" "}
+                <Link to="/cgu" className="text-blue-500 underline">
+                  conditions générales d'utilisation
+                </Link>
+                .
+              </span>
             </Label>
           </div>
 

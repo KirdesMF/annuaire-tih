@@ -1,7 +1,7 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { admin } from "better-auth/plugins";
+import { admin, customSession } from "better-auth/plugins";
 import { reactStartCookies } from "better-auth/react-start";
 import { Resend } from "resend";
 import { getDb } from "~/db";
@@ -19,7 +19,39 @@ export const auth = () =>
         maxAge: 5 * 60,
       },
     },
-    plugins: [admin({ adminRoles: ["admin", "superadmin"] }), reactStartCookies()],
+    plugins: [
+      admin({ adminRoles: ["admin", "superadmin"] }),
+      customSession(async ({ user: currentUser, session }) => {
+        const db = getDb();
+
+        const activeCGU = await db.query.cguTable.findFirst({
+          where: (cgu, { eq }) => eq(cgu.isActive, true),
+        });
+
+        if (!activeCGU) {
+          return {
+            session,
+            user: { ...currentUser, cgu: false },
+          };
+        }
+
+        const userCGU = await db.query.userCguAcceptanceTable.findFirst({
+          where: (userCguAcceptance, { eq, and }) =>
+            and(
+              eq(userCguAcceptance.userId, currentUser.id),
+              eq(userCguAcceptance.cguId, activeCGU.id),
+            ),
+        });
+
+        const hasAcceptedCGU = !!userCGU;
+
+        return {
+          session,
+          user: { ...currentUser, cgu: hasAcceptedCGU },
+        };
+      }),
+      reactStartCookies(),
+    ],
     // advanced: {
     // 	database: {
     // 		generateId: false,
