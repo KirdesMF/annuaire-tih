@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { LoaderCircle, LockKeyhole, LogIn, Mail, X } from "lucide-react";
+import { EyeIcon, EyeOffIcon, LoaderCircle, LockKeyhole, LogIn, Mail } from "lucide-react";
+import { useState } from "react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -41,6 +42,7 @@ export const Route = createFileRoute("/(auth)/sign-in")({
 
 function RouteComponent() {
   const { toast } = useToast();
+  const [showPassword, setShowPassword] = useState(false);
   const { mutate, isPending } = useMutation({
     mutationFn: useServerFn(loginFn),
   });
@@ -108,12 +110,23 @@ function RouteComponent() {
             <div className="relative">
               <LockKeyhole className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 placeholder="••••••••••••••••"
                 className="ps-8"
               />
+              <button
+                type="button"
+                className="absolute end-2 top-2.5"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeIcon className="size-4 text-muted-foreground" />
+                ) : (
+                  <EyeOffIcon className="size-4 text-muted-foreground" />
+                )}
+              </button>
             </div>
 
             <div className="flex justify-end mt-1">

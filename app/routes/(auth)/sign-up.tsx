@@ -2,7 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { APIError } from "better-auth/api";
-import { Lock, Mail } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Lock, Mail } from "lucide-react";
+import { useState } from "react";
 import { Resend } from "resend";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
@@ -86,6 +87,11 @@ function RouteComponent() {
     mutationFn: useServerFn(signupFn),
   });
 
+  const [showPassword, setShowPassword] = useState({
+    password: false,
+    confirmPassword: false,
+  });
+
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
@@ -148,10 +154,24 @@ function RouteComponent() {
                 <Lock className="absolute start-2 top-2.5 size-4 text-muted-foreground" />
                 <Input
                   name="password"
-                  type="password"
+                  type={showPassword.password ? "text" : "password"}
                   placeholder="••••••••••••••••"
                   className="ps-8"
                 />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute end-2 top-2.5"
+                  onClick={() =>
+                    setShowPassword({ ...showPassword, password: !showPassword.password })
+                  }
+                >
+                  {showPassword.password ? (
+                    <EyeIcon className="size-4 text-muted-foreground" />
+                  ) : (
+                    <EyeOffIcon className="size-4 text-muted-foreground" />
+                  )}
+                </button>
               </div>
             </Label>
 
@@ -161,10 +181,27 @@ function RouteComponent() {
                 <Lock className="absolute start-2 top-2.5 size-4 text-muted-foreground" />
                 <Input
                   name="confirmPassword"
-                  type="password"
+                  type={showPassword.confirmPassword ? "text" : "password"}
                   placeholder="••••••••••••••••"
                   className="ps-8"
                 />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute end-2 top-2.5"
+                  onClick={() =>
+                    setShowPassword({
+                      ...showPassword,
+                      confirmPassword: !showPassword.confirmPassword,
+                    })
+                  }
+                >
+                  {showPassword.confirmPassword ? (
+                    <EyeIcon className="size-4 text-muted-foreground" />
+                  ) : (
+                    <EyeOffIcon className="size-4 text-muted-foreground" />
+                  )}
+                </button>
               </div>
             </Label>
           </div>

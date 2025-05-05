@@ -1,7 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { Loader, Lock } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Loader, Lock } from "lucide-react";
+import { useState } from "react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -38,6 +39,7 @@ function RouteComponent() {
   const searchParams = Route.useSearch();
   const navigate = Route.useNavigate();
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(resetPasswordFn) });
+  const [showPassword, setShowPassword] = useState(false);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -73,11 +75,22 @@ function RouteComponent() {
             <div className="relative">
               <Lock className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="newPassword"
                 placeholder="••••••••••••••••"
                 className="ps-8"
               />
+              <button
+                type="button"
+                className="absolute end-2 top-2.5"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeIcon className="size-4 text-muted-foreground" />
+                ) : (
+                  <EyeOffIcon className="size-4 text-muted-foreground" />
+                )}
+              </button>
             </div>
           </Label>
 
