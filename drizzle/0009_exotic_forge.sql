@@ -1,0 +1,2 @@
+DROP INDEX "company_search_index";--> statement-breakpoint
+CREATE INDEX "company_search_index" ON "companies" USING gin (to_tsvector('french', coalesce("name", '') || ' ' || coalesce("subdomain", '') || ' ' || coalesce("description", '') || ' ' || coalesce("business_owner", '')));

@@ -37,7 +37,7 @@ export const companiesTable = pgTable(
   (table) => [
     index("company_search_index").using(
       "gin",
-      sql`to_tsvector('french', coalesce(${table.name}, '') || ' ' || coalesce(${table.subdomain}, '') || ' ' || coalesce(${table.description}, ''))`,
+      sql`to_tsvector('french', coalesce(${table.name}, '') || ' ' || coalesce(${table.subdomain}, '') || ' ' || coalesce(${table.description}, '') || ' ' || coalesce(${table.business_owner}, ''))`,
     ),
   ],
 );

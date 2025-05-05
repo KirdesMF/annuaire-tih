@@ -64,6 +64,13 @@
       "when": 1746480070516,
       "tag": "0008_easy_nitro",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1746480481872,
+      "tag": "0009_exotic_forge",
+      "breakpoints": true
     }
   ]
 }
