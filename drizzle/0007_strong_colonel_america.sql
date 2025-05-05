@@ -1,0 +1,1 @@
+ALTER TABLE "companies" ALTER COLUMN "description" SET DATA TYPE varchar(2000);

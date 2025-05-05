@@ -21,7 +21,7 @@ export const companiesTable = pgTable(
     slug: varchar("slug", { length: 100 }).notNull().unique(),
     siret: varchar("siret", { length: 14 }).notNull(),
     business_owner: varchar("business_owner", { length: 255 }),
-    description: varchar("description", { length: 1500 }),
+    description: varchar("description", { length: 2000 }),
     website: varchar("website", { length: 255 }),
     location: varchar("location", { length: 255 }),
     service_area: varchar("service_area", { length: 255 }),
