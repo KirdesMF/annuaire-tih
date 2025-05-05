@@ -96,40 +96,66 @@ export const CompanyInfosSchema = v.object({
   ]),
   work_mode: v.nullable(v.picklist(COMPANY_WORK_MODES)),
   rqth: v.optional(v.boolean()),
-  social_media: v.object({
-    facebook: v.union([
-      v.literal(""),
-      v.pipe(
-        v.string(),
-        v.url("Veuillez entrer une url valide"),
-        v.startsWith("https://www.facebook.com/", "Veuillez entrer une url facebook valide"),
+  social_media: v.optional(
+    v.object({
+      facebook: v.optional(
+        v.pipe(
+          v.string(),
+          v.url("Veuillez entrer une url valide"),
+          v.startsWith("https://www.facebook.com/", "Veuillez entrer une url facebook valide"),
+        ),
       ),
-    ]),
-    instagram: v.union([
-      v.literal(""),
-      v.pipe(
-        v.string(),
-        v.url("Veuillez entrer une url valide"),
-        v.startsWith("https://www.instagram.com/", "Veuillez entrer une url instagram valide"),
+      instagram: v.optional(
+        v.pipe(
+          v.string(),
+          v.url("Veuillez entrer une url valide"),
+          v.startsWith("https://www.instagram.com/", "Veuillez entrer une url instagram valide"),
+        ),
       ),
-    ]),
-    linkedin: v.union([
-      v.literal(""),
-      v.pipe(
-        v.string(),
-        v.url("Veuillez entrer une url valide"),
-        v.startsWith("https://www.linkedin.com/", "Veuillez entrer une url linkedin valide"),
+      linkedin: v.optional(
+        v.pipe(
+          v.string(),
+          v.url("Veuillez entrer une url valide"),
+          v.startsWith("https://www.linkedin.com/", "Veuillez entrer une url linkedin valide"),
+        ),
       ),
-    ]),
-    calendly: v.union([
-      v.literal(""),
-      v.pipe(
-        v.string(),
-        v.url("Veuillez entrer une url valide"),
-        v.startsWith("https://calendly.com/", "Veuillez entrer une url calendly valide"),
+      calendly: v.optional(
+        v.pipe(
+          v.string(),
+          v.url("Veuillez entrer une url valide"),
+          v.startsWith("https://calendly.com/", "Veuillez entrer une url calendly valide"),
+        ),
       ),
-    ]),
-  }),
+      youtube: v.optional(
+        v.pipe(
+          v.string(),
+          v.url("Veuillez entrer une url valide"),
+          v.startsWith("https://www.youtube.com/", "Veuillez entrer une url youtube valide"),
+        ),
+      ),
+      tiktok: v.optional(
+        v.pipe(
+          v.string(),
+          v.url("Veuillez entrer une url valide"),
+          v.startsWith("https://www.tiktok.com/", "Veuillez entrer une url tiktok valide"),
+        ),
+      ),
+      twitter: v.optional(
+        v.pipe(
+          v.string(),
+          v.url("Veuillez entrer une url valide"),
+          v.startsWith("https://twitter.com/", "Veuillez entrer une url twitter valide"),
+        ),
+      ),
+      spotify: v.optional(
+        v.pipe(
+          v.string(),
+          v.url("Veuillez entrer une url valide"),
+          v.startsWith("https://open.spotify.com/", "Veuillez entrer une url spotify valide"),
+        ),
+      ),
+    }),
+  ),
 });
 
 export const CreateCompanySchema = v.object({

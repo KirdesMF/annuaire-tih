@@ -5,10 +5,6 @@ import { Command } from "cmdk";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
 import { Popover, Separator } from "radix-ui";
 import { useRef, useState } from "react";
-import { CalendlyIcon } from "~/components/icons/calendly";
-import { FacebookIcon } from "~/components/icons/facebook";
-import { InstagramIcon } from "~/components/icons/instagram";
-import { LinkedinIcon } from "~/components/icons/linkedin";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
@@ -16,6 +12,7 @@ import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categor
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import { useUpdatePreviewStore } from "~/stores/preview.store";
+import { SocialMedias } from "../../-components/social-medias";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/infos")({
   loader: async ({ context, params }) => {
@@ -299,7 +296,7 @@ function RouteComponent() {
             <fieldset className="flex gap-4">
               <legend className="text-xs font-medium mb-2">Mode de travail</legend>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="work_mode"
                   value="not_specified"
@@ -309,7 +306,7 @@ function RouteComponent() {
                 <span className="text-xs">Non spécifié</span>
               </Label>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="work_mode"
                   value="remote"
@@ -319,7 +316,7 @@ function RouteComponent() {
                 <span className="text-xs">À distance</span>
               </Label>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="work_mode"
                   value="onsite"
@@ -329,7 +326,7 @@ function RouteComponent() {
                 <span className="text-xs">Sur site</span>
               </Label>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="work_mode"
                   value="hybrid"
@@ -343,7 +340,7 @@ function RouteComponent() {
             <fieldset className="flex gap-2">
               <legend className="text-xs font-medium mb-2">RQTH</legend>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="rqth"
                   value="true"
@@ -353,7 +350,7 @@ function RouteComponent() {
                 <span className="text-xs">Oui</span>
               </Label>
               <Label className="flex items-center gap-1">
-                <Input
+                <input
                   type="radio"
                   name="rqth"
                   value="false"
@@ -367,61 +364,7 @@ function RouteComponent() {
 
           <Separator.Root className="h-px bg-border my-4" />
 
-          <fieldset className="flex flex-col gap-4">
-            <legend className="text-xs font-medium mb-2">Réseaux sociaux</legend>
-            <Label>
-              <span className="sr-only">Linkedin</span>
-              <div className="relative">
-                <LinkedinIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
-                <Input
-                  type="text"
-                  name="social_media.linkedin"
-                  placeholder="Ex: https://www.linkedin.com/company/monentreprise"
-                  className="ps-8"
-                  defaultValue={company.data?.social_media.linkedin ?? ""}
-                />
-              </div>
-            </Label>
-            <Label>
-              <span className="sr-only">Facebook</span>
-              <div className="relative">
-                <FacebookIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
-                <Input
-                  type="text"
-                  name="social_media.facebook"
-                  placeholder="Ex: https://www.facebook.com/monentreprise"
-                  className="ps-8"
-                  defaultValue={company.data?.social_media.facebook ?? ""}
-                />
-              </div>
-            </Label>
-            <Label>
-              <span className="sr-only">Instagram</span>
-              <div className="relative">
-                <InstagramIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
-                <Input
-                  type="text"
-                  name="social_media.instagram"
-                  placeholder="Ex: https://www.instagram.com/monentreprise"
-                  className="ps-8"
-                  defaultValue={company.data?.social_media.instagram ?? ""}
-                />
-              </div>
-            </Label>
-            <Label>
-              <span className="sr-only">Calendly</span>
-              <div className="relative">
-                <CalendlyIcon className="size-4 text-muted-foreground absolute start-2 top-2.5" />
-                <Input
-                  type="text"
-                  name="social_media.calendly"
-                  placeholder="Ex: https://calendly.com/monentreprise"
-                  className="ps-8"
-                  defaultValue={company.data?.social_media.calendly ?? ""}
-                />
-              </div>
-            </Label>
-          </fieldset>
+          <SocialMedias company={company.data} />
 
           <Separator.Root className="h-px bg-border my-4" />
 

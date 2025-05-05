@@ -1,0 +1,1 @@
+ALTER TABLE "companies" ALTER COLUMN "social_media" SET DEFAULT '{}'::jsonb;

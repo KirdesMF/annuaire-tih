@@ -9,6 +9,10 @@ import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facebook";
 import { InstagramIcon } from "~/components/icons/instagram";
 import { LinkedinIcon } from "~/components/icons/linkedin";
+import { SpotifyIcon } from "~/components/icons/spotify";
+import { TiktokIcon } from "~/components/icons/tiktok";
+import { TwitterIcon } from "~/components/icons/twitter";
+import { YoutubeIcon } from "~/components/icons/youtube";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
@@ -41,6 +45,10 @@ const SOCIAL_MEDIA_ICONS = {
   instagram: <InstagramIcon className="size-5" />,
   linkedin: <LinkedinIcon className="size-5" />,
   calendly: <CalendlyIcon className="size-5" />,
+  youtube: <YoutubeIcon className="size-5" />,
+  tiktok: <TiktokIcon className="size-5" />,
+  twitter: <TwitterIcon className="size-5" />,
+  spotify: <SpotifyIcon className="size-5" />,
 } as const;
 
 function RouteComponent() {
@@ -51,13 +59,17 @@ function RouteComponent() {
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
 
   const socialMedia = {
-    facebook: preview.social_media.facebook,
-    instagram: preview.social_media.instagram,
-    linkedin: preview.social_media.linkedin,
-    calendly: preview.social_media.calendly,
+    facebook: preview.social_media?.facebook,
+    instagram: preview.social_media?.instagram,
+    linkedin: preview.social_media?.linkedin,
+    calendly: preview.social_media?.calendly,
+    youtube: preview.social_media?.youtube,
+    tiktok: preview.social_media?.tiktok,
+    twitter: preview.social_media?.twitter,
+    spotify: preview.social_media?.spotify,
   };
 
-  const isSocialMediaEmpty = Object.values(socialMedia).every((value) => value === "");
+  const hasSocialMedia = Object.keys(socialMedia).length > 0;
 
   function onValidate() {
     const formData = new FormData();
@@ -168,7 +180,7 @@ function RouteComponent() {
             </div>
           </div>
 
-          {!isSocialMediaEmpty ? (
+          {hasSocialMedia ? (
             <ul className="flex gap-2">
               {(Object.entries(socialMedia) as Entries<typeof socialMedia>).map(([key, value]) => (
                 <li key={key}>
