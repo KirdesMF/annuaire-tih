@@ -8,7 +8,6 @@ const LINKS = linkOptions([
   { label: "Qui sommes-nous ?", to: "/about" },
   { label: "FAQ", to: "/faq" },
   { label: "Sources", to: "/sources" },
-  { label: "Contact", to: "/contact" },
   { label: "Se référencer", to: "/sign-up" },
   { label: "Se connecter", to: "/sign-in" },
 ]);

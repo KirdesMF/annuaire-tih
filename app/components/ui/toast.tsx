@@ -34,7 +34,7 @@ function Toast({ id, title, description, button, status = "info" }: ToastProps) 
         />
         <div className="flex flex-col">
           {title && <p className="text-sm font-medium">{title}</p>}
-          <p className="text-xs text-muted-foreground text-nowrap">{description}</p>
+          <p className="text-xs text-muted-foreground">{description}</p>
         </div>
       </div>
 

@@ -6,7 +6,6 @@ const LINKS = linkOptions([
   { label: "FAQ", to: "/faq" },
   { label: "Partenaires ", to: "/partner" },
   { label: "Sources", to: "/sources" },
-  { label: "Contact", to: "/contact" },
 ]);
 
 export function MainNav() {
