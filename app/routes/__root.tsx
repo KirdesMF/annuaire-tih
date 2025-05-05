@@ -35,7 +35,21 @@ export const Route = createRootRouteWithContext<RootRouterContext>()({
       },
       { title: "Annuaire TIH" },
     ],
-    links: [{ rel: "stylesheet", href: appCSS }],
+    links: [
+      { rel: "stylesheet", href: appCSS },
+      { rel: "manifest", href: "/site.webmanifest" },
+      { rel: "icon", href: "/img/android-chrome-192x192.png", type: "image/png", sizes: "192x192" },
+      { rel: "icon", href: "/img/android-chrome-512x512.png", type: "image/png", sizes: "512x512" },
+      {
+        rel: "apple-touch-icon",
+        href: "/img/apple-touch-icon.png",
+        type: "image/png",
+        sizes: "180x180",
+      },
+      { rel: "icon", href: "/img/favicon-16x16.png", type: "image/png", sizes: "16x16" },
+      { rel: "icon", href: "/img/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      { rel: "icon", href: "/img/favicon.ico", type: "image/x-icon" },
+    ],
   }),
   beforeLoad: async ({ context }) => {
     const session = await context.queryClient.fetchQuery(sessionQueryOptions);
