@@ -12,7 +12,6 @@ import {
 import { Separator } from "radix-ui";
 import { useState } from "react";
 // import banner from "~/assets/img/banner.png?url";
-// import { HeroCard } from "~/components/hero-card";
 import {
   Command,
   CommandEmpty,

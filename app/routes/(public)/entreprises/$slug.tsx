@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Globe, Mail, PencilLine, Phone } from "lucide-react";
+import { Globe, Globe2Icon, Mail, PencilLine, Phone, TwitterIcon, YoutubeIcon } from "lucide-react";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
@@ -10,7 +10,6 @@ import { LinkedinIcon } from "~/components/icons/linkedin";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import { slugify } from "~/utils/slug";
-import type { Entries } from "~/utils/types";
 
 export const Route = createFileRoute("/(public)/entreprises/$slug")({
   component: RouteComponent,
@@ -33,6 +32,10 @@ const SOCIAL_MEDIA_ICONS = {
   instagram: <InstagramIcon className="size-5" />,
   linkedin: <LinkedinIcon className="size-5" />,
   calendly: <CalendlyIcon className="size-5" />,
+  youtube: <YoutubeIcon className="size-5" />,
+  tiktok: <Globe2Icon className="size-5" />,
+  twitter: <TwitterIcon className="size-5" />,
+  spotify: <Globe2Icon className="size-5" />,
 } as const;
 
 function RouteComponent() {
@@ -42,7 +45,7 @@ function RouteComponent() {
 
   if (!data) return <div>Company not found</div>;
 
-  const isSocialMediaEmpty = Object.values(data.social_media).every((value) => value === "");
+  const hasSocialMedia = Object.keys(data.social_media).length > 0;
 
   return (
     <main className="px-4 py-8 grid gap-4">
@@ -113,17 +116,15 @@ function RouteComponent() {
             </div>
           </div>
 
-          {!isSocialMediaEmpty ? (
+          {hasSocialMedia ? (
             <ul className="flex gap-2">
-              {(Object.entries(data.social_media || {}) as Entries<typeof data.social_media>).map(
-                ([key, value]) => (
-                  <li key={key}>
-                    <a href={value} target="_blank" rel="noopener noreferrer">
-                      {SOCIAL_MEDIA_ICONS[key]}
-                    </a>
-                  </li>
-                ),
-              )}
+              {Object.entries(data.social_media).map(([key, value]) => (
+                <li key={key}>
+                  <a href={value} target="_blank" rel="noopener noreferrer">
+                    {SOCIAL_MEDIA_ICONS[key as keyof typeof SOCIAL_MEDIA_ICONS]}
+                  </a>
+                </li>
+              ))}
             </ul>
           ) : null}
         </div>

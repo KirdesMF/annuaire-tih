@@ -7,10 +7,6 @@ import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-re
 import { Popover, Separator } from "radix-ui";
 import { useRef, useState } from "react";
 import * as v from "valibot";
-import { CalendlyIcon } from "~/components/icons/calendly";
-import { FacebookIcon } from "~/components/icons/facebook";
-import { InstagramIcon } from "~/components/icons/instagram";
-import { LinkedinIcon } from "~/components/icons/linkedin";
 import { InputFile } from "~/components/input-file";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -21,6 +17,7 @@ import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 import { CreateCompanySchema } from "~/lib/validator/company.schema";
 import { useAddPreviewStore } from "~/stores/preview.store";
 import { cn } from "~/utils/cn";
+import { SocialMedias } from "../-components/social-medias";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/create/")({
   component: RouteComponent,
@@ -434,7 +431,9 @@ function RouteComponent() {
 
           <Separator.Root className="h-px bg-border my-4" />
 
-          <fieldset className="flex flex-col gap-4">
+          <SocialMedias />
+
+          {/* <fieldset className="flex flex-col gap-4">
             <legend className="text-xs font-medium mb-2">Réseaux sociaux</legend>
             <Label>
               <span className="sr-only">Linkedin</span>
@@ -491,7 +490,7 @@ function RouteComponent() {
                 />
               </div>
             </Label>
-          </fieldset>
+          </fieldset> */}
 
           <Separator.Root className="h-px bg-border my-4" />
 
@@ -537,20 +536,20 @@ function RouteComponent() {
           <Separator.Root className="h-px bg-border my-4" />
 
           <div className="flex gap-2 justify-end">
-            <button
+            {/* <button
               type="button"
               className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer hover:bg-secondary/90 transition-colors"
               onClick={onPreview}
             >
               Prévisualiser
-            </button>
+            </button> */}
 
             <button
               type="submit"
               className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer hover:bg-primary/90 transition-colors"
               disabled={isPending}
             >
-              {isPending ? <Loader className="size-4 animate-spin" /> : "Créer un compte"}
+              {isPending ? <Loader className="size-4 animate-spin" /> : "Référencer"}
             </button>
           </div>
         </form>

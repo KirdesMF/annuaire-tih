@@ -9,6 +9,10 @@ import { CalendlyIcon } from "~/components/icons/calendly";
 import { FacebookIcon } from "~/components/icons/facebook";
 import { InstagramIcon } from "~/components/icons/instagram";
 import { LinkedinIcon } from "~/components/icons/linkedin";
+import { SpotifyIcon } from "~/components/icons/spotify";
+import { TiktokIcon } from "~/components/icons/tiktok";
+import { TwitterIcon } from "~/components/icons/twitter";
+import { YoutubeIcon } from "~/components/icons/youtube";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
@@ -41,6 +45,10 @@ const SOCIAL_MEDIA_ICONS = {
   instagram: <InstagramIcon className="size-5" />,
   linkedin: <LinkedinIcon className="size-5" />,
   calendly: <CalendlyIcon className="size-5" />,
+  youtube: <YoutubeIcon className="size-5" />,
+  tiktok: <TiktokIcon className="size-5" />,
+  twitter: <TwitterIcon className="size-5" />,
+  spotify: <SpotifyIcon className="size-5" />,
 } as const;
 
 function RouteComponent() {

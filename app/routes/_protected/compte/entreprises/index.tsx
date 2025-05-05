@@ -153,7 +153,7 @@ function RouteComponent() {
                       </button>
                     </DialogTrigger>
 
-                    <DialogContent className="grid gap-4">
+                    <DialogContent className="grid gap-4 p-4">
                       <DialogTitle className="text-lg font-bold">
                         Supprimer une entreprise
                       </DialogTitle>
