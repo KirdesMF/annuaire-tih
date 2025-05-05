@@ -19,7 +19,7 @@ export const forgotPasswordFn = createServerFn({ method: "POST" })
     return v.parse(ForgotPasswordSchema, formObject);
   })
   .handler(async ({ data }) => {
-    await auth.api.forgetPassword({
+    await auth().api.forgetPassword({
       body: { email: data.email, redirectTo: "/reset-password" },
       headers: getWebRequest()?.headers,
     });

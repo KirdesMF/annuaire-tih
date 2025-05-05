@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
-import { auth } from "~/lib/auth/auth.server";
 import * as v from "valibot";
+import { auth } from "~/lib/auth/auth.server";
 
 const UserInfosSchema = v.object({
   name: v.optional(v.string()),
@@ -19,5 +19,5 @@ export const updateUserInfos = createServerFn({ method: "POST" })
 
     if (!request) throw new Error("Request not found");
 
-    await auth.api.updateUser({ headers: request.headers, body: { ...data } });
+    await auth().api.updateUser({ headers: request.headers, body: { ...data } });
   });
