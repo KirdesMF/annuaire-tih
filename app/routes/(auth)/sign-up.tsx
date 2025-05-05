@@ -37,7 +37,7 @@ export const signupFn = createServerFn()
   .validator(SignupSchema)
   .handler(async ({ data }) => {
     try {
-      await auth.api.signUpEmail({
+      await auth().api.signUpEmail({
         body: {
           email: data.email,
           password: data.password,

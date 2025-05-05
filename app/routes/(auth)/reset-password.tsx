@@ -23,7 +23,7 @@ const resetPasswordFn = createServerFn({ method: "POST" })
     return v.parse(ResetPasswordSchema, formObject);
   })
   .handler(async ({ data }) => {
-    await auth.api.resetPassword({
+    await auth().api.resetPassword({
       body: { token: data.token, newPassword: data.newPassword },
     });
   });

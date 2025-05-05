@@ -15,7 +15,7 @@ import appCSS from "~/styles/app.css?url";
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
   const request = getWebRequest();
   if (!request) return null;
-  return await auth.api.getSession({ headers: request.headers });
+  return await auth().api.getSession({ headers: request.headers });
 });
 
 const sessionQueryOptions = queryOptions({

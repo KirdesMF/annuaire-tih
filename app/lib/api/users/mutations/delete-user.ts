@@ -25,7 +25,7 @@ export const deleteUser = createServerFn({ method: "POST" })
     }
 
     // delete user
-    await auth.api.deleteUser({ body: {}, headers: request.headers });
+    await auth().api.deleteUser({ body: {}, headers: request.headers });
 
     throw redirect({ to: "/" });
   });

@@ -7,63 +7,64 @@ import { Resend } from "resend";
 import { getDb } from "~/db";
 import { account, session, user, verification } from "~/db/schema/auth";
 
-export const auth = betterAuth({
-  database: drizzleAdapter(getDb(), {
-    provider: "pg",
-    schema: { user, session, account, verification },
-  }),
-  session: {
-    cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60,
-    },
-  },
-  plugins: [admin({ adminRoles: ["admin", "superadmin"] }), reactStartCookies()],
-  // advanced: {
-  // 	database: {
-  // 		generateId: false,
-  // 	}
-  // },
-  emailAndPassword: {
-    enabled: true,
-    password: {
-      hash: async (password) => {
-        const salt = randomBytes(16).toString("hex");
-        const hash = scryptSync(password, salt, 64).toString("hex");
-        return `${salt}:${hash}`;
-      },
-      verify: async ({ hash, password }) => {
-        const [salt, key] = hash.split(":");
-        const hashedBuffer = scryptSync(password, salt, 64);
-        const keyBuffer = Buffer.from(key, "hex");
-        return timingSafeEqual(hashedBuffer, keyBuffer);
+export const auth = () =>
+  betterAuth({
+    database: drizzleAdapter(getDb(), {
+      provider: "pg",
+      schema: { user, session, account, verification },
+    }),
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60,
       },
     },
-    sendResetPassword: async ({ user, url, token }) => {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-
-      const { data, error } = await resend.emails.send({
-        from: "noreply@annuaire-tih.fr",
-        to: user.email,
-        subject: "Réinitialisation de mot de passe",
-        text: `Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ${url}`,
-      });
-
-      if (error) {
-        console.error(error);
-      }
-
-      console.log(data);
-    },
-  },
-  user: {
-    deleteUser: {
+    plugins: [admin({ adminRoles: ["admin", "superadmin"] }), reactStartCookies()],
+    // advanced: {
+    // 	database: {
+    // 		generateId: false,
+    // 	}
+    // },
+    emailAndPassword: {
       enabled: true,
-    },
-    changeEmail: {
-      enabled: true,
-    },
-  },
-});
+      password: {
+        hash: async (password) => {
+          const salt = randomBytes(16).toString("hex");
+          const hash = scryptSync(password, salt, 64).toString("hex");
+          return `${salt}:${hash}`;
+        },
+        verify: async ({ hash, password }) => {
+          const [salt, key] = hash.split(":");
+          const hashedBuffer = scryptSync(password, salt, 64);
+          const keyBuffer = Buffer.from(key, "hex");
+          return timingSafeEqual(hashedBuffer, keyBuffer);
+        },
+      },
+      sendResetPassword: async ({ user, url, token }) => {
+        const resend = new Resend(process.env.RESEND_API_KEY);
 
-export type AuthSession = typeof auth.$Infer.Session;
+        const { data, error } = await resend.emails.send({
+          from: "noreply@annuaire-tih.fr",
+          to: user.email,
+          subject: "Réinitialisation de mot de passe",
+          text: `Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ${url}`,
+        });
+
+        if (error) {
+          console.error(error);
+        }
+
+        console.log(data);
+      },
+    },
+    user: {
+      deleteUser: {
+        enabled: true,
+      },
+      changeEmail: {
+        enabled: true,
+      },
+    },
+  });
+
+export type AuthSession = ReturnType<typeof auth>["$Infer"]["Session"];
