@@ -20,7 +20,7 @@ export const getCompaniesByTerm = createServerFn({ method: "GET" })
       .from(companiesTable)
       .where(
         and(
-          sql`to_tsvector('french', ${companiesTable.name} || ' ' || ${companiesTable.subdomain} || ' ' || ${companiesTable.description}) @@ to_tsquery('french', ${tsQuery})`,
+          sql`to_tsvector('french', coalesce(${companiesTable.name}, '') || ' ' || coalesce(${companiesTable.subdomain}, '') || ' ' || coalesce(${companiesTable.description}, '')) @@ to_tsquery('french', ${tsQuery})`,
           eq(companiesTable.status, "active"),
         ),
       );

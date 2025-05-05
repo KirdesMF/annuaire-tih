@@ -57,6 +57,13 @@
       "when": 1746478910268,
       "tag": "0007_strong_colonel_america",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1746480070516,
+      "tag": "0008_easy_nitro",
+      "breakpoints": true
     }
   ]
 }
