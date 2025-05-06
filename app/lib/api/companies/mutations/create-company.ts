@@ -65,12 +65,12 @@ export const createCompany = createServerFn({ method: "POST" })
     const values = {
       ...Object.fromEntries(data.entries()),
       logo: data.get("logo"),
-      "gallery.0": data.get("gallery.0"),
-      "gallery.1": data.get("gallery.1"),
+      "gallery[0]": data.get("gallery[0]"),
+      "gallery[1]": data.get("gallery[1]"),
     };
 
     const logo = data.get("logo");
-    const gallery = [data.get("gallery.0"), data.get("gallery.1")];
+    const gallery = [data.get("gallery[0]"), data.get("gallery[1]")];
 
     console.log("logo", logo);
     console.log("gallery", gallery);
@@ -81,7 +81,7 @@ export const createCompany = createServerFn({ method: "POST" })
     }
 
     const decodedFormData = decode(formData, {
-      files: ["logo", "gallery.$"],
+      files: ["logo", "gallery"],
       arrays: ["categories", "gallery"],
       booleans: ["rqth"],
     });
