@@ -69,6 +69,12 @@ export const createCompany = createServerFn({ method: "POST" })
       "gallery.1": data.get("gallery.1"),
     };
 
+    const logo = data.get("logo");
+    const gallery = [data.get("gallery.0"), data.get("gallery.1")];
+
+    console.log("logo", logo);
+    console.log("gallery", gallery);
+
     const formData = new FormData();
     for (const [key, value] of Object.entries(values)) {
       formData.append(key, value as string);
