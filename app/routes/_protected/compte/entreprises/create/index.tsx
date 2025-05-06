@@ -153,25 +153,27 @@ function RouteComponent() {
     console.log("decodedFormData", decodedFormData);
     console.log("formData", formData);
 
-    mutate(
-      { data: formData },
-      {
-        onSuccess: () => {
-          context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
-          toast({
-            description: "Entreprise créée avec succès",
-            button: { label: "Fermer" },
-          });
-          navigate({ to: "/compte/entreprises" });
-        },
-        onError: () => {
-          toast({
-            description: "Une erreur est survenue lors de la création de l'entreprise",
-            button: { label: "Fermer" },
-          });
-        },
-      },
-    );
+    createCompany({ data: formData });
+
+    // mutate(
+    //   { data: formData },
+    //   {
+    //     onSuccess: () => {
+    //       context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
+    //       toast({
+    //         description: "Entreprise créée avec succès",
+    //         button: { label: "Fermer" },
+    //       });
+    //       navigate({ to: "/compte/entreprises" });
+    //     },
+    //     onError: () => {
+    //       toast({
+    //         description: "Une erreur est survenue lors de la création de l'entreprise",
+    //         button: { label: "Fermer" },
+    //       });
+    //     },
+    //   },
+    // );
   }
 
   return (
