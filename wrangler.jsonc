@@ -6,5 +6,8 @@
   "assets": {
     "directory": "./.output/public/",
     "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
   }
 }

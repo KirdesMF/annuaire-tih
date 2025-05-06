@@ -150,10 +150,8 @@ function RouteComponent() {
       booleans: ["rqth"],
     });
 
-    console.log(decodedFormData);
-
     mutate(
-      { data: formData },
+      { data: decodedFormData },
       {
         onSuccess: () => {
           context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
