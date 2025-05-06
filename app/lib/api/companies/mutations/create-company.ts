@@ -100,7 +100,7 @@ export const createCompany = createServerFn({ method: "POST" })
 
         // Upload gallery
         // @todo: handle errors
-        if (gallery && gallery.length > 0) {
+        if (gallery?.some((image) => image.size > 0)) {
           const uploadedImages = await uploadImages({
             type: "gallery",
             images: gallery,
