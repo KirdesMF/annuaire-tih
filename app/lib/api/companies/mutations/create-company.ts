@@ -70,10 +70,12 @@ export const createCompany = createServerFn({ method: "POST" })
     };
 
     const logo = data.get("logo");
-    const gallery = [data.get("gallery[0]"), data.get("gallery[1]")];
+    const gallery_1 = data.get("gallery[0]");
+    const gallery_2 = data.get("gallery[1]");
 
     console.log("logo", logo);
-    console.log("gallery", gallery);
+    console.log("gallery_1", gallery_1);
+    console.log("gallery_2", gallery_2);
 
     const formData = new FormData();
     for (const [key, value] of Object.entries(values)) {
@@ -87,7 +89,7 @@ export const createCompany = createServerFn({ method: "POST" })
     });
 
     console.log("decodedFormData", decodedFormData);
-    console.log("formData", formData);
+    console.log("formData", Object.fromEntries(formData.entries()));
     console.log("values", values);
 
     return v.parse(CreateCompanySchema, decodedFormData);
