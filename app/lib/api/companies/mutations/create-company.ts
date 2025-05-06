@@ -67,6 +67,12 @@ export const createCompany = createServerFn({ method: "POST" })
       booleans: ["rqth"],
     });
 
+    const logo = data.get("logo");
+    const gallery = data.get("gallery");
+
+    console.log("logo", logo);
+    console.log("gallery", gallery);
+
     console.log("decodedFormData", decodedFormData);
     console.log("formData", Object.fromEntries(data.entries()));
 
