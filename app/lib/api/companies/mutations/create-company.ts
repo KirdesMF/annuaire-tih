@@ -68,7 +68,7 @@ export const createCompany = createServerFn({ method: "POST" })
     });
 
     console.log(decodedFormData);
-    console.log(data);
+    console.log(Object.fromEntries(data.entries()));
 
     return v.parse(CreateCompanySchema, decodedFormData);
   })
