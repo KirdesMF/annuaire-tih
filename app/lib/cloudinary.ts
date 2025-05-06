@@ -102,6 +102,6 @@ export async function deleteCompanyFromCloudinary(slug: string) {
     await cloudinary.api.delete_folder(path);
   } catch (error) {
     console.error(error);
-    throw new Error("Failed to delete images from Cloudinary");
+    throw new Error("Failed to delete images from Cloudinary", { cause: error });
   }
 }

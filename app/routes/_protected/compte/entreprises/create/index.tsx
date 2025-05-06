@@ -144,7 +144,7 @@ function RouteComponent() {
     }
 
     const decodedFormData = decode(formData, {
-      files: ["logo", "gallery"],
+      files: ["logo", "gallery.$"],
       arrays: ["categories", "gallery"],
       booleans: ["rqth"],
     });
@@ -259,7 +259,7 @@ function RouteComponent() {
                     key={category.id}
                     className="bg-secondary text-secondary-foreground px-2 py-1 rounded-sm text-xs flex items-center gap-2"
                   >
-                    <input type="hidden" name={`categories[${idx}]`} value={category.id} />
+                    <input type="hidden" name={`categories.${idx}`} value={category.id} />
                     <span className="max-w-[30ch] truncate">{category.name}</span>
                     <button
                       type="button"
@@ -473,7 +473,7 @@ function RouteComponent() {
                 <InputFile
                   preview={preview.galleryUrls?.[0]}
                   alt="gallery 1"
-                  name="gallery[0]"
+                  name="gallery.0"
                   onChange={(e) => onImageChange(e, "gallery", 0)}
                   accept="image/*"
                 />
@@ -484,7 +484,7 @@ function RouteComponent() {
                 <InputFile
                   preview={preview.galleryUrls?.[1]}
                   alt="gallery 2"
-                  name="gallery[1]"
+                  name="gallery.1"
                   onChange={(e) => onImageChange(e, "gallery", 1)}
                   accept="image/*"
                 />

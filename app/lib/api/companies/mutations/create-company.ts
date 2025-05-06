@@ -64,8 +64,8 @@ export const createCompany = createServerFn({ method: "POST" })
     const values = {
       ...Object.fromEntries(data.entries()),
       logo: data.get("logo"),
-      "gallery[0]": data.get("gallery[0]"),
-      "gallery[1]": data.get("gallery[1]"),
+      "gallery.0": data.get("gallery.0"),
+      "gallery.1": data.get("gallery.1"),
     };
 
     const formData = new FormData();
@@ -74,7 +74,7 @@ export const createCompany = createServerFn({ method: "POST" })
     }
 
     const decodedFormData = decode(formData, {
-      files: ["logo", "gallery"],
+      files: ["logo", "gallery.$"],
       arrays: ["categories", "gallery"],
       booleans: ["rqth"],
     });
