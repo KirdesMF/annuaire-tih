@@ -144,6 +144,14 @@ function RouteComponent() {
       }
     }
 
+    const decodedFormData = decode(formData, {
+      files: ["logo", "gallery"],
+      arrays: ["categories", "gallery"],
+      booleans: ["rqth"],
+    });
+
+    console.log(decodedFormData);
+
     mutate(
       { data: formData },
       {
