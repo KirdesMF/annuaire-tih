@@ -9,6 +9,7 @@ import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { uploadImageToCloudinary } from "~/lib/cloudinary";
 import { type CreateCompanyData, CreateCompanySchema } from "~/lib/validator/company.schema";
 import { generateUniqueSlug } from "~/utils/slug";
+
 async function uploadImages({
   images,
   companyId,
@@ -61,20 +62,23 @@ async function insertCompany(data: Omit<CreateCompanyData, "categories" | "logo"
  */
 export const createCompany = createServerFn({ method: "POST" })
   .validator((data: FormData) => {
-    const decodedFormData = decode(data, {
-      files: ["logo", "gallery"],
+    const values = {
+      ...Object.fromEntries(data.entries()),
+      logo: data.get("logo"),
+      "gallery.0": data.get("gallery.0"),
+      "gallery.1": data.get("gallery.1"),
+    };
+
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(values)) {
+      formData.append(key, value as string);
+    }
+
+    const decodedFormData = decode(formData, {
+      files: ["logo", "gallery.$"],
       arrays: ["categories", "gallery"],
       booleans: ["rqth"],
     });
-
-    const logo = data.get("logo");
-    const gallery = data.get("gallery");
-
-    console.log("logo", logo);
-    console.log("gallery", gallery);
-
-    console.log("decodedFormData", decodedFormData);
-    console.log("formData", Object.fromEntries(data.entries()));
 
     return v.parse(CreateCompanySchema, decodedFormData);
   })

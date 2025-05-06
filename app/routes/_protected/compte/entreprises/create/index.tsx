@@ -40,7 +40,7 @@ function RouteComponent() {
   const navigate = Route.useNavigate();
 
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
-  const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
+  const { mutate, isPending } = useMutation({ mutationFn: createCompany });
 
   const { preview, setPreview } = useAddPreviewStore();
   const { toast } = useToast();
@@ -145,13 +145,19 @@ function RouteComponent() {
     }
 
     const decodedFormData = decode(formData, {
-      files: ["logo", "gallery"],
+      files: ["logo", "gallery.$"],
       arrays: ["categories", "gallery"],
       booleans: ["rqth"],
     });
 
+    const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortPipeEarly: true });
+
+    if (!result.success) {
+      console.log("result", result);
+    }
+
     console.log("decodedFormData", decodedFormData);
-    console.log("formData", formData);
+    console.log("formData", Object.fromEntries(formData.entries()));
 
     // createCompany({ data: formData });
 
@@ -468,7 +474,7 @@ function RouteComponent() {
                 <InputFile
                   preview={preview.galleryUrls?.[0]}
                   alt="gallery 1"
-                  name="gallery"
+                  name="gallery.0"
                   onChange={(e) => onImageChange(e, "gallery", 0)}
                   accept="image/*"
                 />
@@ -479,7 +485,7 @@ function RouteComponent() {
                 <InputFile
                   preview={preview.galleryUrls?.[1]}
                   alt="gallery 2"
-                  name="gallery"
+                  name="gallery.1"
                   onChange={(e) => onImageChange(e, "gallery", 1)}
                   accept="image/*"
                 />
