@@ -1,6 +1,6 @@
 {
   "name": "annuaire-tih",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": ["nodejs_compat", "formdata_parser_supports_files"],
   "compatibility_date": "2025-04-12",
   "main": ".output/server/index.mjs",
   "assets": {
