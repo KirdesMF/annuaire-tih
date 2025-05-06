@@ -9,17 +9,14 @@ import * as companyCategoriesSchema from "./schema/company-categories";
 
 config({ path: ".env" });
 
-export function getDb() {
-  const client = postgres(process.env.DATABASE_URL as string, { prepare: false });
-  const db = drizzle({
-    client,
-    schema: {
-      ...authSchema,
-      ...cguSchema,
-      ...companyCategoriesSchema,
-      ...companiesSchema,
-      ...categoriesSchema,
-    },
-  });
-  return db;
-}
+const client = postgres(process.env.DATABASE_URL as string, { prepare: false });
+export const db = drizzle({
+  client,
+  schema: {
+    ...authSchema,
+    ...cguSchema,
+    ...companyCategoriesSchema,
+    ...companiesSchema,
+    ...categoriesSchema,
+  },
+});

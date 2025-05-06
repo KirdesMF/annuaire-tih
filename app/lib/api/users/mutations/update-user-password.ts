@@ -18,7 +18,7 @@ export const updateUserPasswordFn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { password, newPassword } = data;
 
-    await auth().api.changePassword({
+    await auth.api.changePassword({
       body: {
         currentPassword: password,
         newPassword,

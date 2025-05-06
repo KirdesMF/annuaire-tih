@@ -19,5 +19,5 @@ export const updateUserInfos = createServerFn({ method: "POST" })
 
     if (!request) throw new Error("Request not found");
 
-    await auth().api.updateUser({ headers: request.headers, body: { ...data } });
+    await auth.api.updateUser({ headers: request.headers, body: { ...data } });
   });

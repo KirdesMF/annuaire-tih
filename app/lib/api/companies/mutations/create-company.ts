@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
 import { eq } from "drizzle-orm";
 import * as v from "valibot";
-import { getDb } from "~/db";
+import { db } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { uploadImageToCloudinary } from "~/lib/cloudinary";
@@ -35,18 +35,16 @@ async function uploadImages({
 }
 
 async function insertCategories(companyId: string, categories: string[]) {
-  await getDb()
-    .insert(companyCategoriesTable)
-    .values(
-      categories.map((category) => ({
-        company_id: companyId,
-        category_id: category,
-      })),
-    );
+  await db.insert(companyCategoriesTable).values(
+    categories.map((category) => ({
+      company_id: companyId,
+      category_id: category,
+    })),
+  );
 }
 
 async function insertCompany(data: Omit<CreateCompanyData, "categories" | "logo" | "gallery">) {
-  const [company] = await getDb()
+  const [company] = await db
     .insert(companiesTable)
     .values({ ...data, created_by: data.user_id, slug: generateUniqueSlug(data.name) })
     .returning();
@@ -73,7 +71,7 @@ export const createCompany = createServerFn({ method: "POST" })
     const { logo, gallery, categories, ...rest } = data;
 
     try {
-      await getDb().transaction(async (tx) => {
+      await db.transaction(async (tx) => {
         const company = await insertCompany(rest);
 
         // Insert categories

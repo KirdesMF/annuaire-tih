@@ -11,12 +11,19 @@ type UploadApiResponse = {
   public_id: string;
 };
 
+type UploadImageToCloudinaryProps = {
+  type: "logo" | "gallery";
+  file: File;
+  companyId: string;
+  companySlug: string;
+};
+
 export async function uploadImageToCloudinary({
   type,
   file,
   companyId,
   companySlug,
-}: { type: "logo" | "gallery"; file: File; companyId: string; companySlug: string }) {
+}: UploadImageToCloudinaryProps) {
   const path =
     type === "logo" ? `companies/${companySlug}/logo` : `companies/${companySlug}/gallery`;
 
@@ -50,42 +57,52 @@ export async function updateImageInCloudinary({
   publicId,
 }: { file: File; publicId: string }) {
   try {
-    const buffer = await file.arrayBuffer();
-    console.log("buffer", buffer);
-    const res = await new Promise<UploadApiResponse>((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            public_id: publicId,
-            overwrite: true,
-            invalidate: true,
-            allowed_formats: ["jpg", "png", "jpeg", "webp"],
-          },
-          (error, result) => {
-            if (error) reject(error);
-            if (result) resolve({ secure_url: result.secure_url, public_id: result.public_id });
-          },
-        )
-        .end(Buffer.from(buffer));
-    });
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("public_id", publicId);
+    formData.append("overwrite", "true");
+    formData.append("upload_preset", "annuaire-tih");
 
-    return res;
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
+
+    if (!res.ok) {
+      throw new Error(await res.text());
+    }
+
+    const data = (await res.json()) as UploadApiResponse;
+    return data;
   } catch (error) {
     console.error(error);
-    throw new Error("Failed to upload image to Cloudinary");
+    throw new Error("Failed to update image in Cloudinary");
   }
 }
 
 //https://res.cloudinary.com/kirdes/image/upload/v1745353041/companies/kirdescorp-q1dBykLgOa/logo/L0xU7rCdIiwyOjHD_uGmtQPuXwq28qnd-1745019806996.jpg
 
 export async function deleteImageFromCloudinary(publicId: string) {
-  try {
-    await cloudinary.uploader.destroy(publicId);
-    // remove folder and images from Cloudinary
-  } catch (error) {
-    console.error(error);
-    throw new Error("Failed to delete image from Cloudinary");
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  const url = `https://api.cloudinary.com/v1_1/${cloudName}/resources/image/upload?public_ids[]=${encodeURIComponent(publicId)}`;
+
+  const res = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString("base64")}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(await res.text());
   }
+  return await res.json();
 }
 
 export async function deleteCompanyFromCloudinary(slug: string) {
@@ -103,5 +120,31 @@ export async function deleteCompanyFromCloudinary(slug: string) {
   } catch (error) {
     console.error(error);
     throw new Error("Failed to delete images from Cloudinary", { cause: error });
+  }
+}
+
+export async function deleteFoldersAndContents(folderPaths: string[]) {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  for (const folderPath of folderPaths) {
+    // 1. Delete all resources in the folder
+    const deleteResourcesUrl = `https://api.cloudinary.com/v1_1/${cloudName}/resources/image/upload?prefix=${encodeURIComponent(folderPath)}`;
+    await fetch(deleteResourcesUrl, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString("base64")}`,
+      },
+    });
+
+    // 2. Delete the folder itself
+    const deleteFolderUrl = `https://api.cloudinary.com/v1_1/${cloudName}/folders/${folderPath}`;
+    await fetch(deleteFolderUrl, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${apiKey}:${apiSecret}`).toString("base64")}`,
+      },
+    });
   }
 }

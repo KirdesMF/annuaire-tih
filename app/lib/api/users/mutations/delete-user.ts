@@ -2,7 +2,7 @@ import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
-import { getDb } from "~/db";
+import { db } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 import { auth } from "~/lib/auth/auth.server";
 import { deleteCompanyFromCloudinary } from "~/lib/cloudinary";
@@ -14,7 +14,7 @@ export const deleteUser = createServerFn({ method: "POST" })
     if (!request) throw new Error("Request not found");
 
     // get all companies of the user
-    const companies = await getDb()
+    const companies = await db
       .select()
       .from(companiesTable)
       .where(eq(companiesTable.user_id, data.userId));
@@ -25,7 +25,7 @@ export const deleteUser = createServerFn({ method: "POST" })
     }
 
     // delete user
-    await auth().api.deleteUser({ body: {}, headers: request.headers });
+    await auth.api.deleteUser({ body: {}, headers: request.headers });
 
     throw redirect({ to: "/" });
   });

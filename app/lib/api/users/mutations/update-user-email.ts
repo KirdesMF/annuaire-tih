@@ -14,7 +14,7 @@ export const updateUserEmailFn = createServerFn({ method: "POST" })
     });
   })
   .handler(async ({ data }) => {
-    await auth().api.changeEmail({
+    await auth.api.changeEmail({
       body: { newEmail: data.email },
       headers: getWebRequest()?.headers,
     });
