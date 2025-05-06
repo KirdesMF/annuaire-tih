@@ -179,7 +179,14 @@ function RouteComponent() {
       <div className="max-w-xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Référencez votre entreprise</h1>
 
-        <form className="flex flex-col gap-3" ref={formRef} onSubmit={onSubmit}>
+        <form
+          className="flex flex-col gap-3"
+          ref={formRef}
+          action={createCompany.url}
+          method="POST"
+          encType="multipart/form-data"
+          onSubmit={onSubmit}
+        >
           <input type="hidden" name="user_id" value={context.user.id} />
 
           <Label className="flex flex-col gap-1">
@@ -466,7 +473,7 @@ function RouteComponent() {
                 <InputFile
                   preview={preview.galleryUrls?.[0]}
                   alt="gallery 1"
-                  name="gallery.0"
+                  name="gallery"
                   onChange={(e) => onImageChange(e, "gallery", 0)}
                   accept="image/*"
                 />
@@ -477,7 +484,7 @@ function RouteComponent() {
                 <InputFile
                   preview={preview.galleryUrls?.[1]}
                   alt="gallery 2"
-                  name="gallery.1"
+                  name="gallery"
                   onChange={(e) => onImageChange(e, "gallery", 1)}
                   accept="image/*"
                 />

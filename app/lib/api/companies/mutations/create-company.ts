@@ -1,3 +1,4 @@
+import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
 import { eq } from "drizzle-orm";
@@ -8,7 +9,6 @@ import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { uploadImageToCloudinary } from "~/lib/cloudinary";
 import { type CreateCompanyData, CreateCompanySchema } from "~/lib/validator/company.schema";
 import { generateUniqueSlug } from "~/utils/slug";
-
 async function uploadImages({
   images,
   companyId,
@@ -59,7 +59,7 @@ async function insertCompany(data: Omit<CreateCompanyData, "categories" | "logo"
  * @todo: attempt to generate a unique slug
  * @todo: get user id from form data
  */
-export const createCompany = createServerFn({ method: "POST" })
+export const createCompany = createServerFn({ method: "POST", response: "raw" })
   .validator((data: FormData) => {
     const decodedFormData = decode(data, {
       files: ["logo", "gallery"],
@@ -114,7 +114,10 @@ export const createCompany = createServerFn({ method: "POST" })
             .where(eq(companiesTable.id, company.id));
         }
       });
+
+      throw redirect({ to: "/compte/entreprises" });
     } catch (error) {
       console.error(error);
+      throw redirect({ to: "/compte/entreprises" });
     }
   });
