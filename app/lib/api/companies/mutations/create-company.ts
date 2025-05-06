@@ -69,6 +69,9 @@ export const createCompany = createServerFn({ method: "POST" })
       "gallery[1]": data.get("gallery[1]"),
     };
 
+    console.log("values instanceof File ", values["gallery[0]"] instanceof File);
+    console.log("values gallery[0]", typeof values["gallery[0]"]);
+
     const logo = data.get("logo");
     const gallery_1 = data.get("gallery[0]");
     const gallery_2 = data.get("gallery[1]");
@@ -107,6 +110,7 @@ export const createCompany = createServerFn({ method: "POST" })
         // Upload logo
         // @todo: handle errors
         if (logo && logo.size > 0) {
+          console.log("logo upload", logo);
           const uploadedImage = await uploadImages({
             type: "logo",
             images: [logo],
@@ -123,6 +127,7 @@ export const createCompany = createServerFn({ method: "POST" })
         // Upload gallery
         // @todo: handle errors
         if (gallery?.some((image) => image.size > 0)) {
+          console.log("gallery upload", gallery);
           const uploadedImages = await uploadImages({
             type: "gallery",
             images: gallery,
