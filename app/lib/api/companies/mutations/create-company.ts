@@ -61,26 +61,11 @@ async function insertCompany(data: Omit<CreateCompanyData, "categories" | "logo"
  */
 export const createCompany = createServerFn({ method: "POST" })
   .validator((data: FormData) => {
-    const values = {
-      ...Object.fromEntries(data.entries()),
-      logo: data.get("logo"),
-      "gallery.0": data.get("gallery.0"),
-      "gallery.1": data.get("gallery.1"),
-    };
-
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(values)) {
-      formData.append(key, value as string);
-    }
-
-    const decodedFormData = decode(formData, {
+    const decodedFormData = decode(data, {
       files: ["logo", "gallery.$"],
       arrays: ["categories", "gallery"],
       booleans: ["rqth"],
     });
-
-    console.log("instance of logo", decodedFormData.logo instanceof File);
-    console.log("decodedFormData", decodedFormData);
 
     return v.parse(CreateCompanySchema, decodedFormData);
   })

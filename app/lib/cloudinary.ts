@@ -21,26 +21,24 @@ export async function uploadImageToCloudinary({
     type === "logo" ? `companies/${companySlug}/logo` : `companies/${companySlug}/gallery`;
 
   try {
-    const buffer = await file.arrayBuffer();
-    console.log("buffer", buffer);
-    const res = await new Promise<UploadApiResponse>((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            folder: path,
-            resource_type: "auto",
-            public_id: `${companyId}-${Date.now()}`,
-            allowed_formats: ["jpg", "png", "jpeg", "webp"],
-          },
-          (error, result) => {
-            if (error) reject(error);
-            if (result) resolve({ secure_url: result.secure_url, public_id: result.public_id });
-          },
-        )
-        .end(Buffer.from(buffer));
-    });
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", path);
+    formData.append("resource_type", "auto");
+    formData.append("public_id", `${companyId}-${Date.now()}`);
+    formData.append("upload_preset", "annuaire-tih");
 
-    return res;
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
+
+    const data = (await res.json()) as UploadApiResponse;
+
+    return data;
   } catch (error) {
     console.error(error);
     throw new Error("Failed to upload image to Cloudinary");
