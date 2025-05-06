@@ -52,6 +52,7 @@ export async function updateImageInCloudinary({
 }: { file: File; publicId: string }) {
   try {
     const buffer = await file.arrayBuffer();
+    console.log("buffer", buffer);
     const res = await new Promise<UploadApiResponse>((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
