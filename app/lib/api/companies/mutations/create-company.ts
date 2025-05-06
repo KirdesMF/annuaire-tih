@@ -1,4 +1,3 @@
-import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
 import { eq } from "drizzle-orm";
@@ -69,17 +68,6 @@ export const createCompany = createServerFn({ method: "POST" })
       "gallery[1]": data.get("gallery[1]"),
     };
 
-    console.log("values instanceof File ", values["gallery[0]"] instanceof File);
-    console.log("values gallery[0]", typeof values["gallery[0]"]);
-
-    const logo = data.get("logo");
-    const gallery_1 = data.get("gallery[0]");
-    const gallery_2 = data.get("gallery[1]");
-
-    console.log("logo", logo);
-    console.log("gallery_1", gallery_1);
-    console.log("gallery_2", gallery_2);
-
     const formData = new FormData();
     for (const [key, value] of Object.entries(values)) {
       formData.append(key, value as string);
@@ -90,16 +78,6 @@ export const createCompany = createServerFn({ method: "POST" })
       arrays: ["categories", "gallery"],
       booleans: ["rqth"],
     });
-
-    console.log("decodedFormData", decodedFormData);
-    console.log("formData", Object.fromEntries(formData.entries()));
-    console.log("values", values);
-
-    const debugValues = {};
-    for (const [key, value] of Object.entries(values)) {
-      debugValues[key] = value instanceof File ? value.name : value;
-    }
-    console.log("values", debugValues);
 
     return v.parse(CreateCompanySchema, decodedFormData);
   })
@@ -132,19 +110,24 @@ export const createCompany = createServerFn({ method: "POST" })
 
         // Upload gallery
         // @todo: handle errors
-        if (gallery?.some((image) => image.size > 0)) {
-          console.log("gallery upload", gallery);
-          const uploadedImages = await uploadImages({
-            type: "gallery",
-            images: gallery,
-            companyId: company.id,
-            companySlug: company.slug,
-          });
+        if (gallery?.length) {
+          // Filter out empty files
+          const validGalleryImages = gallery.filter((image) => image && image.size > 0);
 
-          await tx
-            .update(companiesTable)
-            .set({ gallery: uploadedImages })
-            .where(eq(companiesTable.id, company.id));
+          if (validGalleryImages.length > 0) {
+            console.log("gallery upload", validGalleryImages);
+            const uploadedImages = await uploadImages({
+              type: "gallery",
+              images: validGalleryImages,
+              companyId: company.id,
+              companySlug: company.slug,
+            });
+
+            await tx
+              .update(companiesTable)
+              .set({ gallery: uploadedImages })
+              .where(eq(companiesTable.id, company.id));
+          }
         }
       });
     } catch (error) {

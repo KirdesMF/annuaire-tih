@@ -1,5 +1,5 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Command } from "cmdk";
 import { decode } from "decode-formdata";
@@ -38,9 +38,8 @@ export const Route = createFileRoute("/_protected/compte/entreprises/create/")({
 function RouteComponent() {
   const context = Route.useRouteContext();
   const navigate = Route.useNavigate();
-
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
-  const { mutate, isPending } = useMutation({ mutationFn: createCompany });
+  const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
 
   const { preview, setPreview } = useAddPreviewStore();
   const { toast } = useToast();

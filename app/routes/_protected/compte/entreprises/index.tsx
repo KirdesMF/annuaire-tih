@@ -1,5 +1,5 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { Separator } from "radix-ui";
 import { useState } from "react";
@@ -47,7 +47,6 @@ function RouteComponent() {
         onSuccess: () => {
           context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
           context.queryClient.invalidateQueries({ queryKey: ["company", companyId] });
-
           setIsDialogOpen(false);
           toast({
             description: "Entreprise supprimée avec succès",

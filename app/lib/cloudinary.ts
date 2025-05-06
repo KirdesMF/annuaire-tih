@@ -94,6 +94,10 @@ export async function deleteCompanyFromCloudinary(slug: string) {
     // delete all images in the company folder
     await cloudinary.api.delete_resources_by_prefix(path);
 
+    // delete subfolders
+    await cloudinary.api.delete_folder(`${path}/gallery`);
+    await cloudinary.api.delete_folder(`${path}/logo`);
+
     // delete the company folder
     await cloudinary.api.delete_folder(path);
   } catch (error) {
