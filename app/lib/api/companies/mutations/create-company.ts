@@ -67,8 +67,8 @@ export const createCompany = createServerFn({ method: "POST" })
       booleans: ["rqth"],
     });
 
-    console.log(decodedFormData);
-    console.log(Object.fromEntries(data.entries()));
+    console.log("decodedFormData", decodedFormData);
+    console.log("formData", Object.fromEntries(data.entries()));
 
     return v.parse(CreateCompanySchema, decodedFormData);
   })

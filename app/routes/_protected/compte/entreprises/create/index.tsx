@@ -150,7 +150,8 @@ function RouteComponent() {
       booleans: ["rqth"],
     });
 
-    console.log(decodedFormData);
+    console.log("decodedFormData", decodedFormData);
+    console.log("formData", formData);
 
     mutate(
       { data: formData },
