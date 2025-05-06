@@ -95,6 +95,12 @@ export const createCompany = createServerFn({ method: "POST" })
     console.log("formData", Object.fromEntries(formData.entries()));
     console.log("values", values);
 
+    const debugValues = {};
+    for (const [key, value] of Object.entries(values)) {
+      debugValues[key] = value instanceof File ? value.name : value;
+    }
+    console.log("values", debugValues);
+
     return v.parse(CreateCompanySchema, decodedFormData);
   })
   .handler(async ({ data }) => {
