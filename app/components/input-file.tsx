@@ -7,7 +7,7 @@ type Props = {
 
 function Preview({ url, alt }: { url: string | undefined; alt: string }) {
   if (!url) return <FileUp className="size-8 text-muted-foreground" />;
-  return <img src={url} alt={alt} className="w-full h-full object-cover" />;
+  return <img src={url} alt={alt} className="w-full h-full object-contain" />;
 }
 
 export function InputFile({ preview, alt, ...props }: Props) {

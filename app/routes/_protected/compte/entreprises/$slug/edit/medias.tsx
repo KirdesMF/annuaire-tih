@@ -24,12 +24,14 @@ function RouteComponent() {
   const params = Route.useParams();
   const context = Route.useRouteContext();
   const navigate = Route.useNavigate();
-  const { toast } = useToast();
+
   const { data: company } = useSuspenseQuery(companyBySlugQuery(params.slug));
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompanyMedia) });
   const { mutate: deleteMedia, isPending: isDeletingMedia } = useMutation({
     mutationFn: useServerFn(deleteCompanyMedia),
   });
+
+  const { toast } = useToast();
   const { preview, setPreview } = useAddPreviewStore();
 
   function onImageChange(
@@ -43,6 +45,7 @@ function RouteComponent() {
     if (type === "logo") {
       setPreview({ ...preview, logo: file, logoUrl: URL.createObjectURL(file) });
     }
+
     if (type === "gallery" && index !== undefined) {
       const currentGallery = preview.gallery ? [...preview.gallery] : [];
       currentGallery[index] = file;
@@ -99,6 +102,8 @@ function RouteComponent() {
       arrays: ["gallery", "gallery_public_id"],
     });
 
+    console.log(decodedFormData);
+
     const result = v.safeParse(UpdateCompanyMediaSchema, decodedFormData, {
       abortPipeEarly: true,
     });
@@ -118,6 +123,8 @@ function RouteComponent() {
       return;
     }
 
+    console.log(decodedFormData);
+
     mutate(
       { data: formData },
       {
@@ -128,6 +135,19 @@ function RouteComponent() {
             description: "Images mises à jour avec succès",
             button: { label: "Fermer" },
           });
+
+          if (preview.logoUrl) {
+            URL.revokeObjectURL(preview.logoUrl);
+            setPreview({ ...preview, logoUrl: undefined });
+          }
+
+          if (preview.galleryUrls) {
+            for (const url of preview.galleryUrls) {
+              URL.revokeObjectURL(url);
+            }
+            setPreview({ ...preview, galleryUrls: undefined });
+          }
+
           navigate({ to: "/compte/entreprises" });
         },
         onError: () => {
@@ -152,7 +172,7 @@ function RouteComponent() {
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Logo (max. 3MB)</span>
                 <div className="w-35 h-40 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
-                  <input type="hidden" name="logo_public_id" value={company.logo?.publicId} />
+                  <input type="hidden" name="logo_public_id" value={company.logo?.publicId || ""} />
                   <InputFile
                     preview={
                       preview.logo ? URL.createObjectURL(preview.logo) : company.logo?.secureUrl
@@ -160,6 +180,7 @@ function RouteComponent() {
                     alt="Logo"
                     onChange={(e) => onImageChange(e, "logo")}
                     accept="image/*"
+                    name="logo"
                   />
                 </div>
               </Label>
@@ -192,7 +213,7 @@ function RouteComponent() {
                   <input
                     type="hidden"
                     name="gallery_public_id[0]"
-                    value={company.gallery?.[0]?.publicId}
+                    value={company.gallery?.[0]?.publicId || ""}
                   />
                   <InputFile
                     preview={
@@ -203,6 +224,7 @@ function RouteComponent() {
                     alt="Gallery 1"
                     onChange={(e) => onImageChange(e, "gallery", 0)}
                     accept="image/*"
+                    name="gallery.0"
                   />
                 </Label>
 
@@ -231,7 +253,7 @@ function RouteComponent() {
                   <input
                     type="hidden"
                     name="gallery_public_id[1]"
-                    value={company.gallery?.[1]?.publicId}
+                    value={company.gallery?.[1]?.publicId || ""}
                   />
                   <InputFile
                     preview={
@@ -242,6 +264,7 @@ function RouteComponent() {
                     alt="Gallery 2"
                     onChange={(e) => onImageChange(e, "gallery", 1)}
                     accept="image/*"
+                    name="gallery.1"
                   />
                 </Label>
 

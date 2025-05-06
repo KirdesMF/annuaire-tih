@@ -36,19 +36,21 @@ export const Route = createFileRoute("/_protected/compte/entreprises/create/")({
 });
 
 function RouteComponent() {
-  const { toast } = useToast();
   const context = Route.useRouteContext();
   const navigate = Route.useNavigate();
+
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
+
   const { preview, setPreview } = useAddPreviewStore();
+  const { toast } = useToast();
 
   const formRef = useRef<HTMLFormElement>(null);
 
+  const [descriptionLength, setDescriptionLength] = useState(0);
   const [selectedCategories, setSelectedCategories] = useState(
     new Set<string>(preview?.categories),
   );
-  const [descriptionLength, setDescriptionLength] = useState(0);
 
   function onSelectCategory(categoryId: string) {
     setSelectedCategories((prev) => {
@@ -442,7 +444,7 @@ function RouteComponent() {
               <Label className="relative flex flex-col gap-1 outline-none group">
                 <span className="text-xs font-medium">Logo (max. 3MB)</span>
                 <InputFile
-                  preview={preview.logoUrl}
+                  preview={preview?.logoUrl}
                   alt="Logo"
                   name="logo"
                   onChange={(e) => onImageChange(e, "logo")}
@@ -455,7 +457,7 @@ function RouteComponent() {
                 <InputFile
                   preview={preview.galleryUrls?.[0]}
                   alt="gallery 1"
-                  name="gallery"
+                  name="gallery.0"
                   onChange={(e) => onImageChange(e, "gallery", 0)}
                   accept="image/*"
                 />
@@ -466,7 +468,7 @@ function RouteComponent() {
                 <InputFile
                   preview={preview.galleryUrls?.[1]}
                   alt="gallery 2"
-                  name="gallery"
+                  name="gallery.1"
                   onChange={(e) => onImageChange(e, "gallery", 1)}
                   accept="image/*"
                 />

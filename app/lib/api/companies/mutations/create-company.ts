@@ -1,12 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
+import { decode } from "decode-formdata";
 import { eq } from "drizzle-orm";
+import * as v from "valibot";
 import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
-import { type CreateCompanyData, CreateCompanySchema } from "~/lib/validator/company.schema";
-import * as v from "valibot";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { uploadImageToCloudinary } from "~/lib/cloudinary";
-import { decode } from "decode-formdata";
+import { type CreateCompanyData, CreateCompanySchema } from "~/lib/validator/company.schema";
 import { generateUniqueSlug } from "~/utils/slug";
 
 async function uploadImages({
@@ -66,6 +66,8 @@ export const createCompany = createServerFn({ method: "POST" })
       arrays: ["categories", "gallery"],
       booleans: ["rqth"],
     });
+
+    console.log(decodedFormData);
 
     return v.parse(CreateCompanySchema, decodedFormData);
   })

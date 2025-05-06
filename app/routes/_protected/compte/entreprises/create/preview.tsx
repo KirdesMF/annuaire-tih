@@ -53,10 +53,12 @@ const SOCIAL_MEDIA_ICONS = {
 
 function RouteComponent() {
   const { preview, queryClient } = Route.useRouteContext();
-  const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const navigate = Route.useNavigate();
-  const { toast } = useToast();
+
+  const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
+
+  const { toast } = useToast();
 
   const socialMedia = {
     facebook: preview.social_media?.facebook,

@@ -2,15 +2,15 @@ import { eq } from "drizzle-orm";
 
 import { createServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
+import * as v from "valibot";
 import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
+import { updateImageInCloudinary, uploadImageToCloudinary } from "~/lib/cloudinary";
 import {
   GalleryCompanySchema,
   LogoCompanySchema,
   UpdateCompanyMediaSchema,
 } from "~/lib/validator/company.schema";
-import * as v from "valibot";
-import { updateImageInCloudinary, uploadImageToCloudinary } from "~/lib/cloudinary";
 
 const updateCompanyInDb = async (
   companyId: string,
@@ -25,6 +25,9 @@ export const updateCompanyMedia = createServerFn({ method: "POST" })
       files: ["logo", "gallery"],
       arrays: ["gallery", "gallery_public_id"],
     });
+
+    console.log(decodedFormData);
+
     return v.parse(UpdateCompanyMediaSchema, decodedFormData);
   })
   .handler(async ({ data }) => {
@@ -38,11 +41,19 @@ export const updateCompanyMedia = createServerFn({ method: "POST" })
         .where(eq(companiesTable.id, companyId));
 
       // Handle logo update
-      if (logo && logo.size > 0 && logo_public_id) {
-        const logoResult = await updateImageInCloudinary({
-          file: logo,
-          publicId: logo_public_id,
-        });
+      if (logo && logo.size > 0) {
+        const logoResult = logo_public_id
+          ? await updateImageInCloudinary({
+              file: logo,
+              publicId: logo_public_id,
+            })
+          : await uploadImageToCloudinary({
+              type: "logo",
+              file: logo,
+              companyId,
+              companySlug: company.slug,
+            });
+
         await updateCompanyInDb(companyId, {
           logo: { secureUrl: logoResult.secure_url, publicId: logoResult.public_id },
         });
