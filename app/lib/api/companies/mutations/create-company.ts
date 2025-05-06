@@ -59,7 +59,7 @@ async function insertCompany(data: Omit<CreateCompanyData, "categories" | "logo"
  * @todo: attempt to generate a unique slug
  * @todo: get user id from form data
  */
-export const createCompany = createServerFn({ method: "POST", response: "raw" })
+export const createCompany = createServerFn({ method: "POST" })
   .validator((data: FormData) => {
     const decodedFormData = decode(data, {
       files: ["logo", "gallery"],
@@ -114,10 +114,7 @@ export const createCompany = createServerFn({ method: "POST", response: "raw" })
             .where(eq(companiesTable.id, company.id));
         }
       });
-
-      throw redirect({ to: "/compte/entreprises" });
     } catch (error) {
       console.error(error);
-      throw redirect({ to: "/compte/entreprises" });
     }
   });
