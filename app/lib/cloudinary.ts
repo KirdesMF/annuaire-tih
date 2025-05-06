@@ -22,6 +22,7 @@ export async function uploadImageToCloudinary({
 
   try {
     const buffer = await file.arrayBuffer();
+    console.log("buffer", buffer);
     const res = await new Promise<UploadApiResponse>((resolve, reject) => {
       cloudinary.uploader
         .upload_stream(
