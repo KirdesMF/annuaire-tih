@@ -153,27 +153,27 @@ function RouteComponent() {
     console.log("decodedFormData", decodedFormData);
     console.log("formData", formData);
 
-    createCompany({ data: formData });
+    // createCompany({ data: formData });
 
-    // mutate(
-    //   { data: formData },
-    //   {
-    //     onSuccess: () => {
-    //       context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
-    //       toast({
-    //         description: "Entreprise créée avec succès",
-    //         button: { label: "Fermer" },
-    //       });
-    //       navigate({ to: "/compte/entreprises" });
-    //     },
-    //     onError: () => {
-    //       toast({
-    //         description: "Une erreur est survenue lors de la création de l'entreprise",
-    //         button: { label: "Fermer" },
-    //       });
-    //     },
-    //   },
-    // );
+    mutate(
+      { data: formData },
+      {
+        onSuccess: () => {
+          context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
+          toast({
+            description: "Entreprise créée avec succès",
+            button: { label: "Fermer" },
+          });
+          navigate({ to: "/compte/entreprises" });
+        },
+        onError: () => {
+          toast({
+            description: "Une erreur est survenue lors de la création de l'entreprise",
+            button: { label: "Fermer" },
+          });
+        },
+      },
+    );
   }
 
   return (
@@ -181,14 +181,7 @@ function RouteComponent() {
       <div className="max-w-xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Référencez votre entreprise</h1>
 
-        <form
-          className="flex flex-col gap-3"
-          ref={formRef}
-          action={createCompany.url}
-          method="POST"
-          encType="multipart/form-data"
-          onSubmit={onSubmit}
-        >
+        <form className="flex flex-col gap-3" ref={formRef} onSubmit={onSubmit}>
           <input type="hidden" name="user_id" value={context.user.id} />
 
           <Label className="flex flex-col gap-1">
