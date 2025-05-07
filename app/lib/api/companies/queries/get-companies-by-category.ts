@@ -22,7 +22,8 @@ export const getCompaniesByCategory = createServerFn({ method: "GET" })
       .innerJoin(companyCategoriesTable, eq(companiesTable.id, companyCategoriesTable.company_id))
       .where(
         and(eq(companyCategoriesTable.category_id, categoryId), eq(companiesTable.status, status)),
-      );
+      )
+      .orderBy(companiesTable.name);
 
     return {
       companies: query.map((data) => data.companies),

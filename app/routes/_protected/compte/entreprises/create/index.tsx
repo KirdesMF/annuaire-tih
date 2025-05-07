@@ -5,7 +5,7 @@ import { Command } from "cmdk";
 import { decode } from "decode-formdata";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
 import { Popover, Separator } from "radix-ui";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as v from "valibot";
 import { InputFile } from "~/components/input-file";
 import { Input } from "~/components/ui/input";
@@ -41,7 +41,7 @@ function RouteComponent() {
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
 
-  const { preview, setPreview } = useAddPreviewStore();
+  const { preview, setPreview, revokeAll } = useAddPreviewStore();
   const { toast } = useToast();
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -76,7 +76,7 @@ function RouteComponent() {
     setDescriptionLength(e.target.value.length);
   }
 
-  async function onImageChange(
+  function onImageChange(
     e: React.ChangeEvent<HTMLInputElement>,
     type: "logo" | "gallery",
     index?: number,
@@ -133,38 +133,17 @@ function RouteComponent() {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
-    if (preview.logoUrl) {
-      URL.revokeObjectURL(preview.logoUrl);
-    }
-
-    if (preview.galleryUrls) {
-      for (const url of preview.galleryUrls) {
-        URL.revokeObjectURL(url);
-      }
-    }
-
-    const decodedFormData = decode(formData, {
-      files: ["logo", "gallery.$"],
-      arrays: ["categories", "gallery"],
-      booleans: ["rqth"],
-    });
-
-    const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortPipeEarly: true });
-
-    if (!result.success) {
-      console.log("result", result);
-    }
-
-    console.log("decodedFormData", decodedFormData);
-    console.log("formData", Object.fromEntries(formData.entries()));
-
-    // createCompany({ data: formData });
+    revokeAll();
 
     mutate(
       { data: formData },
       {
         onSuccess: () => {
-          context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
+          console.log("invalidating user companies", context.user.id);
+          context.queryClient.invalidateQueries({
+            queryKey: ["user", "companies", context.user.id],
+          });
+
           toast({
             description: "Entreprise créée avec succès",
             button: { label: "Fermer" },
@@ -180,6 +159,10 @@ function RouteComponent() {
       },
     );
   }
+
+  useEffect(() => {
+    return () => revokeAll();
+  }, [revokeAll]);
 
   return (
     <div className="container px-4 py-6">

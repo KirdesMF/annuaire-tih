@@ -47,8 +47,8 @@ export function SiteHeader({ user }: { user: User | undefined }) {
   }, []);
 
   return (
-    <header className="px-4 md:px-8 py-3 border-b-[0.5px] border-border backdrop-blur-sm sticky top-0 z-50 w-full">
-      <div className="flex items-center gap-2 justify-between">
+    <header className="px-4 md:px-8 py-3 border-b-[0.5px] border-border backdrop-blur-sm sticky top-0 z-50 w-full h-16 flex items-center">
+      <div className="flex items-center gap-2 justify-between flex-1">
         <MainNav />
         <MobileNav />
 
@@ -89,7 +89,11 @@ export function SiteHeader({ user }: { user: User | undefined }) {
 
                   {companies?.map((company) => (
                     <CommandItem key={company.id} asChild>
-                      <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
+                      <Link
+                        to="/entreprises/$slug"
+                        params={{ slug: company.slug }}
+                        onClick={() => setIsDialogOpen(false)}
+                      >
                         {company.name}
                       </Link>
                     </CommandItem>

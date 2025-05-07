@@ -1,9 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { ArrowLeftIcon } from "lucide-react";
 import * as v from "valibot";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import { companiesByCategoryQuery } from "~/lib/api/companies/queries/get-companies-by-category";
 
 const SearchSchema = v.object({
@@ -30,33 +28,19 @@ function RouteComponent() {
 
   return (
     <main>
-      <div className="container px-4 py-16 grid gap-6">
-        <header>
-          <Link to="/" className="text-sm text-muted-foreground">
-            Back
+      <div className="max-w-5xl mx-auto px-4 py-16 grid gap-6">
+        <header className="space-y-2">
+          <Link to="/" className="text-sm text-muted-foreground flex items-center gap-1">
+            <ArrowLeftIcon className="size-4" />
+            <span>Back</span>
           </Link>
           <h1 className="text-2xl font-bold first-letter:capitalize">{slug.replace(/-/g, " ")}</h1>
         </header>
 
-        <div>
-          <Label>
-            <span className="sr-only">Rechercher une entreprise</span>
-
-            <div className="flex items-center rounded-md border border-input px-2 focus-within:outline-primary focus-within:outline">
-              <Search className="size-5" />
-              <Input
-                type="text"
-                placeholder="Rechercher une entreprise"
-                className="border-none outline-none"
-              />
-            </div>
-          </Label>
-        </div>
-
         {data.companies.length === 0 ? (
           <div>Aucune entreprise trouvée</div>
         ) : (
-          <ul>
+          <ul className="grid gap-2">
             {data.companies.map((company) => (
               <li
                 key={company.id}

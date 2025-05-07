@@ -28,7 +28,12 @@ export const Route = createFileRoute("/_protected/compte/entreprises/")({
 function RouteComponent() {
   const context = Route.useRouteContext();
   const companiesQuery = useSuspenseQuery(userCompaniesQuery(context.user.id));
-  const { mutate, isPending } = useMutation({ mutationFn: deleteCompany });
+  const { mutate, isPending } = useMutation({
+    mutationFn: deleteCompany,
+    onSettled: () => {
+      context.queryClient.invalidateQueries({ queryKey: ["user", "companies", context.user.id] });
+    },
+  });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [companyId, setCompanyId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -45,8 +50,6 @@ function RouteComponent() {
       },
       {
         onSuccess: () => {
-          context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
-          context.queryClient.invalidateQueries({ queryKey: ["company", companyId] });
           setIsDialogOpen(false);
           toast({
             description: "Entreprise supprimée avec succès",

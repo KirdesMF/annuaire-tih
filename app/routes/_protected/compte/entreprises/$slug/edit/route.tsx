@@ -1,4 +1,4 @@
-import { Link, Outlet, createFileRoute, linkOptions, redirect } from "@tanstack/react-router";
+import { Link, Outlet, createFileRoute, linkOptions } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit")({
   component: RouteComponent,
@@ -8,19 +8,19 @@ const navigation = (slug: string) =>
   linkOptions([
     { label: "Infos", to: "/compte/entreprises/$slug/edit/infos", params: { slug } },
     { label: "Média", to: "/compte/entreprises/$slug/edit/medias", params: { slug } },
-    {
-      label: "Previsualiser",
-      to: "/compte/entreprises/$slug/edit/preview",
-      params: { slug },
-    },
+    // {
+    //   label: "Previsualiser",
+    //   to: "/compte/entreprises/$slug/edit/preview",
+    //   params: { slug },
+    // },
   ]);
 
 function RouteComponent() {
   const params = Route.useParams();
 
   return (
-    <div className="container px-4 py-6">
-      <nav className="mb-6 sticky top-0">
+    <div className="container px-4">
+      <nav className="mb-6 sticky top-16  backdrop-blur-xs py-2">
         <ul className="flex shadow-[inset_0_-1px_0_0_var(--color-border)]">
           {navigation(params.slug).map((link) => (
             <li key={link.to}>

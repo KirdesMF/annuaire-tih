@@ -17,8 +17,8 @@ function RouteComponent() {
 
   return (
     <div className="flex min-h-[calc(100svh-45px)]">
-      <aside className="sticky inset-y-0 border-e border-border px-1 py-2">
-        <nav>
+      <aside className="inset-y-0 border-e border-border">
+        <nav className="sticky top-16 py-2 px-1">
           <ul className="flex flex-col gap-2">
             <li className="flex flex-col gap-1">
               <Link

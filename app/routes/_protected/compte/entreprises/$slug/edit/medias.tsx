@@ -158,11 +158,11 @@ function RouteComponent() {
   }, [revokeAll]);
 
   return (
-    <div className="container py-6">
-      <form onSubmit={onSubmit} className="flex flex-col gap-4 items-center">
+    <div className="max-w-fit mx-auto py-6">
+      <form onSubmit={onSubmit} className="flex flex-col gap-4">
         <input type="hidden" name="companyId" value={company.id} />
 
-        <div className="flex flex-col gap-2 justify-center">
+        <div className="flex gap-2 justify-center">
           <fieldset className="border rounded-sm border-border p-4 w-max">
             <legend className="text-xs font-medium px-2">Logo</legend>
             <div className="grid gap-2">
@@ -280,12 +280,14 @@ function RouteComponent() {
           </fieldset>
         </div>
 
-        <button
-          type="submit"
-          className="text-xs font-medium text-primary-foreground bg-primary px-4 py-2 rounded-sm w-max"
-        >
-          {isPending ? <Loader className="size-5 animate-spin" /> : "Mettre à jour"}
-        </button>
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="text-xs font-medium text-primary-foreground bg-primary px-4 py-2 rounded-sm w-max"
+          >
+            {isPending ? <Loader className="size-5 animate-spin" /> : "Mettre à jour"}
+          </button>
+        </div>
       </form>
     </div>
   );

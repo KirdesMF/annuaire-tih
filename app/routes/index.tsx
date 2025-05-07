@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Separator } from "radix-ui";
 import { useState } from "react";
-// import banner from "~/assets/img/banner.png?url";
+import banner from "~/assets/img/banner.png?url";
 import {
   Command,
   CommandEmpty,
@@ -41,8 +41,16 @@ function Home() {
   const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
 
   return (
-    <main className="px-4 py-6 ">
-      <section className="flex flex-col gap-4 items-center py-24 max-w-xl mx-auto">
+    <main className="px-4 py-20">
+      <div className="max-w-5xl mx-auto h-64 border border-border rounded-sm overflow-hidden">
+        <img
+          src={banner}
+          alt="Annuaire TIH"
+          className="size-full object-cover grayscale-30 hover:grayscale-0 transition-all duration-300"
+        />
+      </div>
+
+      <section className="flex flex-col gap-4 items-center py-20 max-w-xl mx-auto">
         <div className="flex flex-col gap-6">
           <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
             <BookUser className="size-4" />
@@ -65,20 +73,20 @@ function Home() {
               to="/sign-up"
               className="text-xs px-4 py-2 bg-primary/75 ring-1 ring-primary/90 text-primary-foreground shadow-md rounded-sm flex items-center gap-2 text-nowrap focus:outline-primary focus:outline-2"
             >
-              Ajouter mon entreprise
+              Référencer mon entreprise
             </Link>
 
-            <Link
-              to="/sign-in"
+            <a
+              href="#search"
               className="text-xs px-4 py-2 ring-1 ring-border shadow-md rounded-sm flex items-center gap-2 text-nowrap focus:outline-primary focus:outline-2"
             >
               Rechercher un prestataire
-            </Link>
+            </a>
           </div>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto py-24">
+      <section className="max-w-6xl mx-auto py-20" id="search">
         <div className="flex flex-col gap-8 items-center">
           <div className="flex flex-col gap-4 items-center">
             <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">

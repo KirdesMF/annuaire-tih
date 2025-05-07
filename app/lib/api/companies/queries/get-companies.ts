@@ -24,9 +24,9 @@ export const getCompanies = createServerFn({ method: "GET" })
     }
   });
 
-export function companiesQuery(filters: GetCompaniesFilters = {}) {
+export function companiesQuery(filters?: GetCompaniesFilters) {
   return queryOptions({
-    queryKey: ["companies", filters],
+    queryKey: ["companies"],
     queryFn: () => getCompanies({ data: filters }),
   });
 }

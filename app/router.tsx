@@ -4,14 +4,7 @@ import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { routerWithQueryClient } from "@tanstack/react-router-with-query";
 import { routeTree } from "./routeTree.gen";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      gcTime: 0,
-      staleTime: Number.POSITIVE_INFINITY,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 export function createRouter() {
   return routerWithQueryClient(
@@ -19,8 +12,6 @@ export function createRouter() {
       routeTree,
       context: { queryClient },
       scrollRestoration: true,
-      defaultGcTime: 0,
-      defaultStaleTime: Number.POSITIVE_INFINITY,
     }),
     queryClient,
   );

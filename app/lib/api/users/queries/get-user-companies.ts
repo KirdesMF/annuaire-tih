@@ -59,6 +59,7 @@ export function userCompaniesQuery(userId: string) {
   return queryOptions({
     queryKey: ["user", "companies", userId],
     queryFn: () => getUserCompanies({ data: userId }),
-    staleTime: 1000 * 60 * 60 * 24,
+    refetchOnWindowFocus: false,
+    gcTime: 0,
   });
 }
