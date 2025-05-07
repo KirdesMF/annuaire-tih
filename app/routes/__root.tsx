@@ -7,6 +7,7 @@ import { getWebRequest } from "@tanstack/react-start/server";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 import { ThemeProvider, useTheme } from "~/components/providers/theme-provider";
+import { SiteFooter } from "~/components/site-footer";
 import { SiteHeader } from "~/components/site-header";
 import { auth } from "~/lib/auth/auth.server";
 import { getThemeServerFn } from "~/lib/theme";
@@ -84,6 +85,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body className="font-sans isolate bg-background text-foreground">
         <SiteHeader user={user} />
         {children}
+        <SiteFooter />
         <Toaster />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />
