@@ -11,17 +11,6 @@ export default defineConfig({
         projects: ["./tsconfig.json"],
       }),
     ],
-    build: {
-      rollupOptions: {
-        onwarn(warning, warn) {
-          // Suppress "Module level directives cause errors when bundled" warnings
-          if (warning.code === "MODULE_LEVEL_DIRECTIVE") {
-            return;
-          }
-          warn(warning);
-        },
-      },
-    },
   },
   server: {
     preset: "cloudflare-module",
