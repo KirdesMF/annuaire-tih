@@ -2,17 +2,22 @@ import { useMutation } from "@tanstack/react-query";
 import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { Loader } from "lucide-react";
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { userCguAcceptanceTable } from "~/db/schema/cgu";
 
 export const Route = createFileRoute("/_protected/accept-cgu")({
   component: RouteComponent,
 });
 
+/**
+ * @todo: check if we can use transaction here instead of calling multiple times the db
+ */
 const acceptCGUFn = createServerFn({ method: "POST" })
   .validator((data: string) => data)
   .handler(async ({ data }) => {
     try {
+      const db = getDb();
+
       const activeCGU = await db.query.cguTable.findFirst({
         where: (cgu, { eq }) => eq(cgu.isActive, true),
       });

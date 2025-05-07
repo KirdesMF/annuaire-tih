@@ -1,6 +1,5 @@
 import { eq, sql } from "drizzle-orm";
-// src/db/seed-categories.ts
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { categoriesTable } from "../schema/categories";
 
 // Predefined categories (French-friendly)
@@ -27,6 +26,7 @@ const PREDEFINED_CATEGORIES = [
 
 export async function seedCategories() {
   try {
+    const db = getDb();
     // 1. Check existing categories in a SINGLE query (optimized)
     const existingCategories = await db
       .select({ name: categoriesTable.name })

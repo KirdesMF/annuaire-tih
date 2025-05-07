@@ -2,55 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
 import { eq } from "drizzle-orm";
 import * as v from "valibot";
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { uploadImageToCloudinary } from "~/lib/cloudinary";
-import { type CreateCompanyData, CreateCompanySchema } from "~/lib/validator/company.schema";
+import { CreateCompanySchema } from "~/lib/validator/company.schema";
 import { generateUniqueSlug } from "~/utils/slug";
-
-async function uploadImages({
-  images,
-  companyId,
-  companySlug,
-  type,
-}: { images: File[]; companyId: string; companySlug: string; type: "logo" | "gallery" }) {
-  const uploadedImages: Array<{ secureUrl: string; publicId: string }> = [];
-
-  for (const image of images) {
-    const res = await uploadImageToCloudinary({
-      file: image,
-      companyId,
-      companySlug,
-      type,
-    });
-
-    if (res instanceof Error) throw res;
-
-    const { secure_url, public_id } = res;
-    uploadedImages.push({ secureUrl: secure_url, publicId: public_id });
-  }
-
-  return uploadedImages;
-}
-
-async function insertCategories(companyId: string, categories: string[]) {
-  await db.insert(companyCategoriesTable).values(
-    categories.map((category) => ({
-      company_id: companyId,
-      category_id: category,
-    })),
-  );
-}
-
-async function insertCompany(data: Omit<CreateCompanyData, "categories" | "logo" | "gallery">) {
-  const [company] = await db
-    .insert(companiesTable)
-    .values({ ...data, created_by: data.user_id, slug: generateUniqueSlug(data.name) })
-    .returning();
-
-  return company;
-}
 
 /**
  * Create a company
@@ -71,11 +28,21 @@ export const createCompany = createServerFn({ method: "POST" })
     const { logo, gallery, categories, ...rest } = data;
 
     try {
+      const db = getDb();
+
       await db.transaction(async (tx) => {
-        const company = await insertCompany(rest);
+        const [company] = await tx
+          .insert(companiesTable)
+          .values({ ...rest, created_by: data.user_id, slug: generateUniqueSlug(data.name) })
+          .returning();
 
         // Insert categories
-        await insertCategories(company.id, categories);
+        await tx.insert(companyCategoriesTable).values(
+          categories.map((category) => ({
+            company_id: company.id,
+            category_id: category,
+          })),
+        );
 
         // Upload logo
         // @todo: handle errors
@@ -120,3 +87,30 @@ export const createCompany = createServerFn({ method: "POST" })
       console.error(error);
     }
   });
+
+type UploadImages = {
+  images: File[];
+  companyId: string;
+  companySlug: string;
+  type: "logo" | "gallery";
+};
+
+async function uploadImages({ images, companyId, companySlug, type }: UploadImages) {
+  const uploadedImages: Array<{ secureUrl: string; publicId: string }> = [];
+
+  for (const image of images) {
+    const res = await uploadImageToCloudinary({
+      file: image,
+      companyId,
+      companySlug,
+      type,
+    });
+
+    if (res instanceof Error) throw res;
+
+    const { secure_url, public_id } = res;
+    uploadedImages.push({ secureUrl: secure_url, publicId: public_id });
+  }
+
+  return uploadedImages;
+}

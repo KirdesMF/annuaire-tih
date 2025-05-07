@@ -10,7 +10,7 @@ import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { userCguAcceptanceTable } from "~/db/schema/cgu";
 import { auth } from "~/lib/auth/auth.server";
 
@@ -53,13 +53,16 @@ export const signupFn = createServerFn()
   .validator(SignupSchema)
   .handler(async ({ data }) => {
     try {
-      const res = await auth.api.signUpEmail({
+      const res = await auth().api.signUpEmail({
         body: {
           email: data.email,
           password: data.password,
           name: `${data.firstName} ${data.lastName}`,
+          role: "user",
         },
       });
+
+      const db = getDb();
 
       // update user cgu acceptance
       const activeCGU = await db.query.cguTable.findFirst({
