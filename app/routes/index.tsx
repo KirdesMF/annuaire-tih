@@ -11,7 +11,8 @@ import {
 } from "lucide-react";
 import { Separator } from "radix-ui";
 import { useState } from "react";
-import banner from "~/assets/img/banner.png?url";
+import annuaire from "~/assets/img/annuaire.webp?url";
+import banner from "~/assets/img/banner.webp?url";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import {
   Command,
@@ -233,7 +234,7 @@ function Home() {
               </Link>
             </article>
 
-            <article className="flex-1 ring-1 ring-border rounded-sm p-4 shadow w-fit flex flex-col gap-4 bg-card text-card-foreground overflow-clip relative">
+            <article className="flex-1 ring-1 ring-border rounded-sm p-4 shadow w-fit flex flex-col gap-4 bg-card text-card-foreground overflow-clip relative group">
               <div className="flex flex-col gap-2">
                 <h3 className="text-lg font-bold tracking-tighter">Où nous retrouver.</h3>
                 <p className="text-sm text-muted-foreground">
@@ -258,7 +259,12 @@ function Home() {
                 <SquareArrowOutUpRight className="size-3" />
               </a>
 
-              <LinkedinIcon className="size-32 absolute -bottom-6 -end-6 text-muted -rotate-30" />
+              <LinkedinIcon className="size-32 absolute -bottom-6 -end-6 text-muted -rotate-30 group-hover:text-blue-500 transition-colors duration-300" />
+              <img
+                src={annuaire}
+                alt="Annuaire TIH"
+                className="absolute -bottom-8 end-10 h-28 group-hover:-translate-y-2 transition-transform duration-300 grayscale-50 group-hover:grayscale-0"
+              />
             </article>
           </div>
         </div>
