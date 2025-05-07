@@ -14,7 +14,12 @@ export function SiteFooter() {
             </li>
             <li>
               Rejoignez-nous sur{" "}
-              <a href="https://www.linkedin.com/groups/13011531/" className="underline">
+              <a
+                href="https://www.linkedin.com/groups/13011531/"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="underline"
+              >
                 Linkedin
               </a>
             </li>
@@ -45,7 +50,7 @@ export function SiteFooter() {
 
             <div className="space-y-2">
               <p className="text-xs font-light">Illustrations:</p>
-              <a href="mailto:contact@annuaire-tih.fr" className="underline underline-offset-2">
+              <a href="mailto:zelia.grvl@gmail.com" className="underline underline-offset-2">
                 Zélia GOURVILLE
               </a>
             </div>

@@ -1,9 +1,16 @@
 // app/routes/__root.tsx
 import { type QueryClient, queryOptions } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
+import {
+  HeadContent,
+  Link,
+  Outlet,
+  Scripts,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
+import { ArrowLeftIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 import { ThemeProvider, useTheme } from "~/components/providers/theme-provider";
@@ -58,7 +65,20 @@ export const Route = createRootRouteWithContext<RootRouterContext>()({
     return { user: session?.user };
   },
   loader: () => getThemeServerFn(),
+
   component: RootComponent,
+  notFoundComponent: () => (
+    <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold">404</h1>
+        <p className="text-muted-foreground mb-4">Page non trouvée</p>
+        <Link to="/" className="text-sm text-muted-foreground flex items-center gap-1">
+          <ArrowLeftIcon className="size-4" />
+          <span>Retour à l'accueil</span>
+        </Link>
+      </div>
+    </main>
+  ),
 });
 
 function RootComponent() {

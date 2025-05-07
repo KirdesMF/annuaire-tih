@@ -32,23 +32,26 @@ function RouteComponent() {
                 >
                   Réseautage Freelance/Travailleurs Indépendants Handicapés (TIH)
                 </a>{" "}
-                a été créé par <span className="font-bold">Freya</span> en avril 2024. Pour
-                faciliter les échanges autour de leurs métiers, les partages de services, les
-                réseaux et les autour de leurs métiers, les partages de services, les réseaux et les
-                opportunités, la réseaux et les opportunités, la suite logique a été de lancer un
-                annuaire, qui a vu le jour en octobre 2024 et a regroupé plus de 40
-                entrepreneurs·ses en quelques mois.
+                a été créé par <span className="font-bold">Freya</span> en avril 2024.
+              </p>
+
+              <p className="text-muted-foreground text-md font-light leading-relaxed">
+                Pour faciliter les échanges autour de leurs métiers, les partages de services, les
+                réseaux et les opportunités, la suite logique a été de lancer un annuaire, qui a vu
+                le jour en octobre 2024 et a regroupé plus de 40 entrepreneurs·ses en quelques mois.
                 <span className="font-bold"> Sandrine</span> propose en début d'année 2025 un
-                nouveau format en concevant bénévolement une première version de site web,
+                nouveau format en concevant bénévolement une première version de site webador,
                 permettant un meilleur accès aux profils, un classement simplifié et une visibilité
                 accrue des TIH.
               </p>
+
               <p className="text-muted-foreground text-md font-light leading-relaxed">
-                Cette nouvelle version plus accessible, voit le jour en mai 2025 grâce à un{" "}
+                En MAI 2025, grâce à un{" "}
                 <Link to="/partner" className="font-bold underline text-blue-500">
                   financement collaboratif
                 </Link>
-                .
+                , la version actuelle voit le jour sous forme de site web indépendant et plus
+                accessible.
               </p>
               <p className="text-muted-foreground text-md font-light leading-relaxed">
                 Nous croyons fermement que favoriser <span className="font-bold">la diversité</span>{" "}

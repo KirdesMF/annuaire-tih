@@ -68,7 +68,7 @@ function RouteComponent() {
             <h2 className="text-4xl font-bold tracking-tighter">Illustrations</h2>
             <p className="text-muted-foreground text-md font-light leading-relaxed">
               Toutes les illustrations ont été réalisées bénévolement par{" "}
-              <a href="mailto:contact@annuaire-tih.fr" className="underline underline-offset-2">
+              <a href="mailto:zelia.grvl@gmail.com" className="underline underline-offset-2">
                 Zelia GOURVILLE
               </a>
             </p>

@@ -49,7 +49,7 @@ function RouteComponent() {
                 to="/compte/preferences"
                 className="text-sm font-light flex ps-4 pe-8 py-1.5 select-none transition-colors data-[status=active]:text-primary data-[status=active]:font-medium"
               >
-                Preférences
+                Préférences
               </Link>
             </li>
 

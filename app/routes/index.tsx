@@ -37,18 +37,21 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const categoriesQuery = useSuspenseQuery(categoriesQueryOptions);
+  const { data: categories } = useSuspenseQuery({
+    ...categoriesQueryOptions,
+    select: (data) => data.sort((a, b) => a.name.localeCompare(b.name)),
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
   const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
 
   return (
     <main className="px-4 py-20">
-      <div className="max-w-5xl mx-auto h-64 border border-border rounded-sm overflow-hidden">
+      <div className="max-w-4xl mx-auto h-64 border border-border rounded-sm overflow-hidden">
         <img
           src={banner}
           alt="Annuaire TIH"
-          className="size-full object-cover grayscale-30 hover:grayscale-0 transition-all duration-300"
+          className="size-full object-contain grayscale-30 hover:grayscale-0 transition-all duration-300"
         />
       </div>
 
@@ -63,9 +66,9 @@ function Home() {
           </h1>
 
           <p className="text-muted-foreground text-pretty text-lg leading-relaxed">
-            Collaborez directement avec des prestataires indépendants bénéficiant du statut de{" "}
+            Collaborez directement avec des entrepreneurs·es bénéficiant du statut de{" "}
             <span className="font-bold underline underline-offset-2">
-              Travailleur Indépendant Handicapé* (TIH)
+              Travailleur Indépendant Handicapé (TIH)
             </span>{" "}
             grâce à cet annuaire spécialisé gratuit et public.
           </p>
@@ -171,12 +174,12 @@ function Home() {
           </div>
 
           <ul className="flex flex-wrap justify-center gap-2 ">
-            {categoriesQuery.data.map((category) => (
+            {categories.map((category) => (
               <li key={category.id}>
                 <Link
                   to="/categories/$slug"
                   params={{ slug: slugify(category.name) }}
-                  search={{ id: category.id }}
+                  search={{ id: category.id, name: category.name }}
                   className="text-sm px-4 py-1.5 bg-accent text-accent-foreground rounded-sm flex text-nowrap outline-none focus:ring-primary focus:ring-2"
                 >
                   {category.name}
@@ -241,7 +244,7 @@ function Home() {
                   Pour plus d'informations ou pour suivre nos activités, rejoignez nous sur{" "}
                   <a
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noreferrer noopener"
                     href="https://www.linkedin.com/groups/13011531/"
                     className="text-blue-500 border-b border-blue-500 w-max inline-flex items-center gap-1"
                   >
@@ -251,7 +254,8 @@ function Home() {
                 </p>
               </div>
               <a
-                rel="noreferrer"
+                target="_blank"
+                rel="noreferrer noopener"
                 href="https://www.linkedin.com/groups/13011531/"
                 className="mt-auto w-fit text-xs px-4 py-2 bg-primary/75 ring-1 ring-primary/90 text-primary-foreground shadow-md rounded-sm flex items-center gap-2 text-nowrap focus:outline-primary focus:outline-2"
               >
