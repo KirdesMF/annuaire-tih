@@ -13,11 +13,15 @@ export const deleteCompanyLogo = createServerFn({ method: "POST" })
     await db.update(companiesTable).set({ logo: null }).where(eq(companiesTable.id, companyId));
   });
 
+type Data = {
+  companyId: string;
+  publicId: string;
+  type: "logo" | "gallery";
+  index?: number;
+};
+
 export const deleteCompanyMedia = createServerFn({ method: "POST" })
-  .validator(
-    (data: { companyId: string; publicId: string; type: "logo" | "gallery"; index?: number }) =>
-      data,
-  )
+  .validator((data: Data) => data)
   .handler(async ({ data }) => {
     const { companyId, publicId, type, index } = data;
 

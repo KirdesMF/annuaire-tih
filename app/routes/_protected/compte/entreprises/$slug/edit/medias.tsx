@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
 import { Loader, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import * as v from "valibot";
 import { InputFile } from "~/components/input-file";
 import { Label } from "~/components/ui/label";
@@ -32,7 +33,8 @@ function RouteComponent() {
   });
 
   const { toast } = useToast();
-  const { preview, setPreview } = useAddPreviewStore();
+  const { preview, setPreview, revokeAll } = useAddPreviewStore();
+  const [deletingMedia, setDeletingMedia] = useState<string | null>(null);
 
   function onImageChange(
     e: React.ChangeEvent<HTMLInputElement>,
@@ -58,6 +60,7 @@ function RouteComponent() {
   }
 
   function onDeleteLogo({ companyId, publicId }: { companyId: string; publicId: string }) {
+    setDeletingMedia(publicId);
     deleteMedia(
       { data: { companyId, publicId, type: "logo" } },
       {
@@ -69,6 +72,7 @@ function RouteComponent() {
             button: { label: "Fermer" },
           });
         },
+        onSettled: () => setDeletingMedia(null),
       },
     );
   }
@@ -78,6 +82,7 @@ function RouteComponent() {
     publicId,
     index,
   }: { companyId: string; publicId: string; index: number }) {
+    setDeletingMedia(publicId);
     deleteMedia(
       { data: { companyId, publicId, type: "gallery", index } },
       {
@@ -89,6 +94,7 @@ function RouteComponent() {
             button: { label: "Fermer" },
           });
         },
+        onSettled: () => setDeletingMedia(null),
       },
     );
   }
@@ -98,11 +104,11 @@ function RouteComponent() {
     const formData = new FormData(e.target as HTMLFormElement);
 
     const decodedFormData = decode(formData, {
-      files: ["logo", "gallery"],
+      files: ["logo", "gallery.$"],
       arrays: ["gallery", "gallery_public_id"],
     });
 
-    console.log(decodedFormData);
+    console.log("decodedFormData", decodedFormData);
 
     const result = v.safeParse(UpdateCompanyMediaSchema, decodedFormData, {
       abortPipeEarly: true,
@@ -111,19 +117,17 @@ function RouteComponent() {
     if (!result.success) {
       toast({
         description: (
-          <div>
+          <span>
             {result.issues.map((issue, idx) => (
               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              <p key={idx}>{issue.message}</p>
+              <span key={idx}>{issue.message}</span>
             ))}
-          </div>
+          </span>
         ),
         button: { label: "Fermer" },
       });
       return;
     }
-
-    console.log(decodedFormData);
 
     mutate(
       { data: formData },
@@ -136,18 +140,7 @@ function RouteComponent() {
             button: { label: "Fermer" },
           });
 
-          if (preview.logoUrl) {
-            URL.revokeObjectURL(preview.logoUrl);
-            setPreview({ ...preview, logoUrl: undefined });
-          }
-
-          if (preview.galleryUrls) {
-            for (const url of preview.galleryUrls) {
-              URL.revokeObjectURL(url);
-            }
-            setPreview({ ...preview, galleryUrls: undefined });
-          }
-
+          revokeAll();
           navigate({ to: "/compte/entreprises" });
         },
         onError: () => {
@@ -159,6 +152,10 @@ function RouteComponent() {
       },
     );
   }
+
+  useEffect(() => {
+    return () => revokeAll();
+  }, [revokeAll]);
 
   return (
     <div className="container py-6">
@@ -174,9 +171,7 @@ function RouteComponent() {
                 <div className="w-35 h-40 border border-input rounded-sm grid place-items-center group-focus-within:border-primary">
                   <input type="hidden" name="logo_public_id" value={company.logo?.publicId || ""} />
                   <InputFile
-                    preview={
-                      preview.logo ? URL.createObjectURL(preview.logo) : company.logo?.secureUrl
-                    }
+                    preview={preview.logoUrl || company.logo?.secureUrl}
                     alt="Logo"
                     onChange={(e) => onImageChange(e, "logo")}
                     accept="image/*"
@@ -188,6 +183,7 @@ function RouteComponent() {
               <button
                 type="button"
                 className="text-xs font-medium text-primary-foreground bg-primary p-2 rounded-sm w-max"
+                disabled={isDeletingMedia}
                 onClick={() =>
                   onDeleteLogo({
                     companyId: company.id,
@@ -195,7 +191,7 @@ function RouteComponent() {
                   })
                 }
               >
-                {isDeletingMedia ? (
+                {deletingMedia === company.logo?.publicId ? (
                   <Loader className="size-5 animate-spin" />
                 ) : (
                   <Trash2 className="size-5" />
@@ -216,11 +212,7 @@ function RouteComponent() {
                     value={company.gallery?.[0]?.publicId || ""}
                   />
                   <InputFile
-                    preview={
-                      preview.gallery?.[0]
-                        ? URL.createObjectURL(preview.gallery?.[0])
-                        : company.gallery?.[0]?.secureUrl
-                    }
+                    preview={preview.galleryUrls?.[0] || company.gallery?.[0]?.secureUrl}
                     alt="Gallery 1"
                     onChange={(e) => onImageChange(e, "gallery", 0)}
                     accept="image/*"
@@ -231,6 +223,7 @@ function RouteComponent() {
                 <button
                   type="button"
                   className="text-xs font-medium text-primary-foreground bg-primary p-2 rounded-sm w-max"
+                  disabled={isDeletingMedia}
                   onClick={() =>
                     onDeleteGallery({
                       companyId: company.id,
@@ -239,7 +232,7 @@ function RouteComponent() {
                     })
                   }
                 >
-                  {isDeletingMedia ? (
+                  {deletingMedia === company.gallery?.[0]?.publicId ? (
                     <Loader className="size-5 animate-spin" />
                   ) : (
                     <Trash2 className="size-5" />
@@ -256,11 +249,7 @@ function RouteComponent() {
                     value={company.gallery?.[1]?.publicId || ""}
                   />
                   <InputFile
-                    preview={
-                      preview.gallery?.[1]
-                        ? URL.createObjectURL(preview.gallery?.[1])
-                        : company.gallery?.[1]?.secureUrl
-                    }
+                    preview={preview.galleryUrls?.[1] || company.gallery?.[1]?.secureUrl}
                     alt="Gallery 2"
                     onChange={(e) => onImageChange(e, "gallery", 1)}
                     accept="image/*"
@@ -271,6 +260,7 @@ function RouteComponent() {
                 <button
                   type="button"
                   className="text-xs font-medium text-primary-foreground bg-primary p-2 rounded-sm w-max"
+                  disabled={isDeletingMedia}
                   onClick={() =>
                     onDeleteGallery({
                       companyId: company.id,
@@ -279,7 +269,7 @@ function RouteComponent() {
                     })
                   }
                 >
-                  {isDeletingMedia ? (
+                  {deletingMedia === company.gallery?.[1]?.publicId ? (
                     <Loader className="size-5 animate-spin" />
                   ) : (
                     <Trash2 className="size-5" />

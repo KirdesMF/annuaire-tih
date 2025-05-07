@@ -22,7 +22,7 @@ const updateCompanyInDb = async (
 export const updateCompanyMedia = createServerFn({ method: "POST" })
   .validator((data: FormData) => {
     const decodedFormData = decode(data, {
-      files: ["logo", "gallery"],
+      files: ["logo", "gallery.$"],
       arrays: ["gallery", "gallery_public_id"],
     });
 

@@ -11,7 +11,6 @@ import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
-import { useUpdatePreviewStore } from "~/stores/preview.store";
 import { SocialMedias } from "../../-components/social-medias";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/infos")({
@@ -47,9 +46,6 @@ function RouteComponent() {
   const [descriptionLength, setDescriptionLength] = useState(
     company.data?.description?.length ?? 0,
   );
-
-  // hooks and stores
-  const setPreview = useUpdatePreviewStore((state) => state.setPreview);
 
   function onSelectCategory(categoryId: string) {
     setSelectedCategories((prev) => {
