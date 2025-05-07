@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
 import { desc } from "drizzle-orm";
 import * as v from "valibot";
-import { db } from "~/db";
+import { getDb } from "~/db";
 import { type CompanyStatus, companiesTable } from "~/db/schema/companies";
 
 const status: CompanyStatus[] = ["active", "rejected", "pending"];
@@ -17,7 +17,7 @@ export const getCompanies = createServerFn({ method: "GET" })
   .validator((data: unknown) => v.parse(GetCompaniesSchema, data))
   .handler(async ({ data }) => {
     try {
-      const query = db.select().from(companiesTable).orderBy(desc(companiesTable.created_at));
+      const query = getDb().select().from(companiesTable).orderBy(desc(companiesTable.created_at));
 
       return await query;
     } catch (error) {

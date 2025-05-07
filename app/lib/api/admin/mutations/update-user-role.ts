@@ -6,7 +6,7 @@ import { auth } from "~/lib/auth/auth.server";
 export const updateUserRoleFn = createServerFn({ method: "POST" })
   .validator((data: { userId: string; role: UserRole }) => data)
   .handler(async ({ data }) => {
-    await auth.api.setRole({
+    await auth().api.setRole({
       body: { userId: data.userId, role: data.role },
       headers: getWebRequest()?.headers,
     });
