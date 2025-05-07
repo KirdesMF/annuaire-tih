@@ -37,59 +37,57 @@ const DOCUMENTS = [
 function RouteComponent() {
   return (
     <main className="px-4 py-6">
-      <h1 className="sr-only">Sources</h1>
-      <section className="max-w-6xl mx-auto pt-24">
-        <div className="flex flex-col gap-2 mb-8">
-          <h2 className="text-4xl font-bold tracking-tighter">Liens utiles</h2>
-          <p className="text-muted-foreground text-md font-light leading-relaxed">
-            Voici les liens utiles pour les entreprises et les associations.
-          </p>
-        </div>
-
-        <ul className="list-disc list-inside flex flex-col gap-2">
-          {USEFUL_LINKS.map((link) => (
-            <li key={link.url}>
-              <span className="font-bold">{link.label}: </span>
-              <a
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-light underline"
-              >
-                {link.url}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <Separator.Root className="my-16 h-px w-1/3 mx-auto bg-border" />
-
-      <section className="max-w-6xl mx-auto">
-        <div className="flex flex-col gap-2 mb-8">
-          <h2 className="text-4xl font-bold tracking-tighter">Documents</h2>
-          <p className="text-muted-foreground text-md font-light leading-relaxed">
-            Voici les documents utiles pour les entreprises et les associations.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-4 items-center p-4 w-fit ">
-          <ul className="list-disc list-inside">
-            {DOCUMENTS.map((document) => (
-              <li key={document.url}>
+      <div className="py-20 max-w-4xl mx-auto">
+        <h1 className="sr-only">Sources</h1>
+        <section>
+          <div className="flex flex-col gap-2 mb-8">
+            <h2 className="text-4xl font-bold tracking-tighter">Liens utiles</h2>
+            <p className="text-muted-foreground text-md font-light leading-relaxed">
+              Voici les liens utiles pour les entreprises et les associations.
+            </p>
+          </div>
+          <ul className="list-disc list-inside flex flex-col p-4">
+            {USEFUL_LINKS.map((link) => (
+              <li key={link.url}>
+                <span className="font-bold">{link.label}: </span>
                 <a
-                  href={document.url}
+                  href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-light underline"
+                  className="font-light underline underline-offset-2"
                 >
-                  {document.label}
+                  {link.url}
                 </a>
               </li>
             ))}
           </ul>
-        </div>
-      </section>
+        </section>
+        <Separator.Root className="my-16 h-px w-1/3 mx-auto bg-border" />
+        <section>
+          <div className="flex flex-col gap-2 mb-8">
+            <h2 className="text-4xl font-bold tracking-tighter">Documents</h2>
+            <p className="text-muted-foreground text-md font-light leading-relaxed">
+              Voici les documents utiles pour les entreprises et les associations.
+            </p>
+          </div>
+          <div className="flex flex-col gap-4 items-center p-4 w-fit ">
+            <ul className="list-disc list-inside">
+              {DOCUMENTS.map((document) => (
+                <li key={document.url}>
+                  <a
+                    href={document.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-light underline underline-offset-2"
+                  >
+                    {document.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

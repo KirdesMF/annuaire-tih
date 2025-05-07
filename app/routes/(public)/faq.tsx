@@ -8,7 +8,7 @@ export const Route = createFileRoute("/(public)/faq")({
 
 function RouteComponent() {
   return (
-    <main className="px-4 py-6">
+    <main className="px-4 py-6 min-h-svh">
       <div className="max-w-4xl mx-auto pt-24">
         <h1 className="text-4xl font-bold tracking-tighter mb-12">Foire aux questions</h1>
 

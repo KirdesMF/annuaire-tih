@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
+import { desc } from "drizzle-orm";
 import * as v from "valibot";
 import { db } from "~/db";
 import { type CompanyStatus, companiesTable } from "~/db/schema/companies";
@@ -16,7 +17,7 @@ export const getCompanies = createServerFn({ method: "GET" })
   .validator((data: unknown) => v.parse(GetCompaniesSchema, data))
   .handler(async ({ data }) => {
     try {
-      const query = db.select().from(companiesTable);
+      const query = db.select().from(companiesTable).orderBy(desc(companiesTable.created_at));
 
       return await query;
     } catch (error) {
@@ -24,7 +25,7 @@ export const getCompanies = createServerFn({ method: "GET" })
     }
   });
 
-export function companiesQuery(filters?: GetCompaniesFilters) {
+export function companiesQuery(filters: GetCompaniesFilters = {}) {
   return queryOptions({
     queryKey: ["companies"],
     queryFn: () => getCompanies({ data: filters }),

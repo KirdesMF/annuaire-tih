@@ -12,6 +12,7 @@ import {
 import { Separator } from "radix-ui";
 import { useState } from "react";
 import banner from "~/assets/img/banner.png?url";
+import { LinkedinIcon } from "~/components/icons/linkedin";
 import {
   Command,
   CommandEmpty,
@@ -231,7 +232,8 @@ function Home() {
                 <MoveRightIcon className="size-3" />
               </Link>
             </article>
-            <article className="flex-1 ring-1 ring-border rounded-sm p-4 shadow w-fit flex flex-col gap-4 bg-card text-card-foreground">
+
+            <article className="flex-1 ring-1 ring-border rounded-sm p-4 shadow w-fit flex flex-col gap-4 bg-card text-card-foreground overflow-clip relative">
               <div className="flex flex-col gap-2">
                 <h3 className="text-lg font-bold tracking-tighter">Où nous retrouver.</h3>
                 <p className="text-sm text-muted-foreground">
@@ -255,6 +257,8 @@ function Home() {
                 Rejoignez nous
                 <SquareArrowOutUpRight className="size-3" />
               </a>
+
+              <LinkedinIcon className="size-32 absolute -bottom-6 -end-6 text-muted -rotate-30" />
             </article>
           </div>
         </div>

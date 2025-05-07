@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
-import { Loader, Lock, Mail } from "lucide-react";
+import { Loader, Lock, Mail, MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import { Avatar, RadioGroup, Separator } from "radix-ui";
 import { type FormEvent, useState } from "react";
 import { type Theme, useTheme } from "~/components/providers/theme-provider";
@@ -14,6 +14,7 @@ import { deleteUser } from "~/lib/api/users/mutations/delete-user";
 import { updateUserEmailFn } from "~/lib/api/users/mutations/update-user-email";
 import { updateUserInfos } from "~/lib/api/users/mutations/update-user-infos";
 import { updateUserPasswordFn } from "~/lib/api/users/mutations/update-user-password";
+import { cn } from "~/utils/cn";
 
 export const Route = createFileRoute("/_protected/compte/preferences")({
   component: RouteComponent,
@@ -98,9 +99,9 @@ function RouteComponent() {
   }
 
   return (
-    <div className="container px-4 py-6">
+    <div className="max-w-5xl mx-auto px-4 py-20">
       <header>
-        <h1 className="text-2xl font-bold">Préférences utilisateur</h1>
+        <h1 className="text-3xl font-bold tracking-tighter">Préférences utilisateur</h1>
         <p>Modifiez vos préférences utilisateur pour personnaliser votre expérience sur le site.</p>
       </header>
 
@@ -125,7 +126,7 @@ function RouteComponent() {
           <form onSubmit={onUpdateUserName}>
             <div className="flex flex-col gap-2 py-4">
               <h2 className="text-xl font-bold">Nom et prénom</h2>
-              <p className="text-sm text-pretty">
+              <p className="text-sm text-pretty mb-4">
                 Votre nom et prénom sont utilisés pour identifier votre compte. Vous pouvez le
                 modifier en cliquant sur le bouton ci-dessous.
               </p>
@@ -157,7 +158,7 @@ function RouteComponent() {
           <form onSubmit={onUpdateUserEmail}>
             <div className="flex flex-col gap-2">
               <h2 className="text-xl font-bold">Email</h2>
-              <p className="text-sm text-pretty">
+              <p className="text-sm text-pretty mb-4">
                 Un email de confirmation vous sera envoyé afin de vérifier votre identité
               </p>
               <Label>
@@ -194,7 +195,7 @@ function RouteComponent() {
         <article className="border border-border p-4 rounded-sm">
           <div className="flex flex-col gap-2">
             <h2 className="text-xl font-bold">Mot de passe</h2>
-            <p className="text-sm text-pretty">
+            <p className="text-sm text-pretty mb-4">
               Votre mot de passe est utilisé pour accéder à votre compte. Vous pouvez le modifier en
               cliquant sur le bouton ci-dessous.
             </p>
@@ -205,7 +206,7 @@ function RouteComponent() {
                 <Input
                   type="password"
                   name="password"
-                  defaultValue="password"
+                  placeholder="**************"
                   className="max-w-1/3 text-sm ps-8"
                 />
               </div>
@@ -224,25 +225,35 @@ function RouteComponent() {
             </button>
 
             <Dialog open={isModalOpenPassword} onOpenChange={setIsModalOpenPassword}>
-              <DialogContent>
+              <DialogContent className="px-6 py-4">
                 <DialogTitle>Modifier mon mot de passe</DialogTitle>
 
                 <Separator.Root className="my-4 -mx-4 h-px bg-border" />
 
-                <DialogDescription className="mb-6">
+                <DialogDescription className="mb-6 text-sm text-pretty">
                   Veuillez entrer votre mot de passe actuel et votre nouveau mot de passe.
                 </DialogDescription>
 
                 <form onSubmit={onUpdateUserPassword}>
-                  <div className="flex flex-col gap-4 mb-4">
+                  <div className="flex flex-col gap-4 mb-6">
                     <Label className="flex flex-col gap-2">
                       <span className="text-sm">Mot de passe actuel</span>
-                      <Input type="password" name="password" className="text-sm" />
+                      <Input
+                        type="password"
+                        name="password"
+                        className="text-sm"
+                        placeholder="**************"
+                      />
                     </Label>
 
                     <Label className="flex flex-col gap-2">
                       <span className="text-sm">Nouveau mot de passe</span>
-                      <Input type="password" name="newPassword" className="text-sm" />
+                      <Input
+                        type="password"
+                        name="newPassword"
+                        className="text-sm"
+                        placeholder="**************"
+                      />
                     </Label>
                   </div>
 
@@ -276,8 +287,8 @@ function RouteComponent() {
         <article className="border border-border p-4 rounded-sm">
           <div className="flex flex-col gap-2">
             <h2 className="text-xl font-bold">Thème</h2>
-            <p className="text-sm text-pretty">
-              Vous pouvez modifier le thème de votre site en selectionnant une option ci-dessous.
+            <p className="text-sm text-pretty mb-4">
+              Vous pouvez modifier le thème du site en selectionnant une option ci-dessous.
             </p>
 
             <RadioGroup.Root
@@ -287,26 +298,38 @@ function RouteComponent() {
             >
               <RadioGroup.Item
                 value="light"
-                className="bg-secondary text-secondary-foreground px-4 py-2 rounded-sm text-xs cursor-pointer"
+                className={cn(
+                  "bg-secondary text-secondary-foreground px-3 py-2 rounded-sm text-xs cursor-pointer flex items-center gap-2",
+                  theme === "light" && "bg-primary text-primary-foreground",
+                )}
               >
+                <SunIcon className="size-4" />
                 Light
               </RadioGroup.Item>
               <RadioGroup.Item
                 value="dark"
-                className="bg-secondary text-secondary-foreground px-4 py-2 rounded-sm text-xs cursor-pointer"
+                className={cn(
+                  "bg-secondary text-secondary-foreground px-3 py-2 rounded-sm text-xs cursor-pointer flex items-center gap-2",
+                  theme === "dark" && "bg-primary text-primary-foreground",
+                )}
               >
+                <MoonIcon className="size-4" />
                 Dark
               </RadioGroup.Item>
               <RadioGroup.Item
                 value="system"
-                className="bg-secondary text-secondary-foreground px-4 py-2 rounded-sm text-xs cursor-pointer"
+                className={cn(
+                  "bg-secondary text-secondary-foreground px-3 py-2 rounded-sm text-xs cursor-pointer flex items-center gap-2",
+                  theme === "system" && "bg-primary text-primary-foreground",
+                )}
               >
+                <MonitorIcon className="size-4" />
                 System
               </RadioGroup.Item>
             </RadioGroup.Root>
           </div>
         </article>
-        <Separator.Root className="my-8 h-px bg-gray-300" />
+        <Separator.Root className="my-8 h-px bg-border" />
 
         <article className="border border-destructive rounded-sm flex flex-col gap-6">
           <div className="flex flex-col gap-2 p-4">
@@ -327,14 +350,15 @@ function RouteComponent() {
             </button>
 
             <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-              <DialogContent>
+              <DialogContent className="p-4">
                 <DialogTitle>Supprimer mon compte</DialogTitle>
 
                 <Separator.Root className="my-4 -mx-4 h-px bg-border" />
 
-                <DialogDescription className="mb-6 text-sm">
+                <DialogDescription className="mb-6 text-sm text-pretty">
                   Si vous souhaitez supprimer votre compte, veuillez cliquer sur le bouton
-                  ci-dessous.
+                  ci-dessous. Les entreprises liées à votre compte seront également supprimées et ne
+                  seront plus visibles dans l'annuaire.
                 </DialogDescription>
 
                 <div className="flex justify-end gap-2 px-2">
@@ -386,8 +410,8 @@ function AvatarUser({ user }: { user: User }) {
   }
 
   return (
-    <Avatar.Root className="size-14 rounded-full border border-border flex">
-      <Avatar.Fallback className="size-full leading-1 text-2xl grid place-items-center text-primary">
+    <Avatar.Root className="size-12 rounded-full border border-border flex">
+      <Avatar.Fallback className="size-full leading-1 text-1xl grid place-items-center text-primary">
         {initials}
       </Avatar.Fallback>
     </Avatar.Root>

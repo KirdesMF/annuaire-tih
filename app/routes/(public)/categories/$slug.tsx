@@ -27,7 +27,7 @@ function RouteComponent() {
   const { data } = useSuspenseQuery(companiesByCategoryQuery({ categoryId: id, status: "active" }));
 
   return (
-    <main>
+    <main className="min-h-svh">
       <div className="max-w-5xl mx-auto px-4 py-16 grid gap-6">
         <header className="space-y-2">
           <Link to="/" className="text-sm text-muted-foreground flex items-center gap-1">
