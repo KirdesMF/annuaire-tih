@@ -1,7 +1,8 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Trash2 } from "lucide-react";
+import { LoaderIcon, Trash2 } from "lucide-react";
+import { Separator } from "radix-ui";
 import { useRef } from "react";
 import { useToast } from "~/components/ui/toast";
 import type { UserRole } from "~/db/schema/auth";
@@ -28,7 +29,7 @@ function RouteComponent() {
   const { toast } = useToast();
   const context = Route.useRouteContext();
   const { data: companies } = useSuspenseQuery(companiesQuery());
-  const { data: users } = useSuspenseQuery(usersQuery);
+  const { data: allUsers } = useSuspenseQuery(usersQuery);
   const { mutate: update } = useMutation({ mutationFn: useServerFn(updateCompanyStatus) });
   const { mutate: remove } = useMutation({ mutationFn: useServerFn(deleteCompany) });
   const { mutate: updateUserRole, isPending: isUpdatingUserRole } = useMutation({
@@ -38,6 +39,9 @@ function RouteComponent() {
   // keep track of the current user being updated
   const currentUser = useRef("");
   const currentCompany = useRef("");
+
+  const admins = allUsers?.filter((user) => user.role === "admin");
+  const users = allUsers?.filter((user) => user.role === "user");
 
   // TODO: Add confirmation dialog
   function onAction(companyId: string, action: CompanyStatus) {
@@ -90,8 +94,10 @@ function RouteComponent() {
 
   return (
     <main>
-      <div className="container px-4 py-6 grid gap-6">
+      <div className="max-w-5xl mx-auto px-4 py-20 grid gap-6">
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+
+        <Separator.Root className="my-4 h-px bg-border" />
 
         <div className="grid gap-4">
           <h2 className="text-lg font-bold">Companies</h2>
@@ -99,10 +105,16 @@ function RouteComponent() {
             {companies?.map((company) => (
               <div
                 key={company.id}
-                className="bg-card text-card-foreground shadow-md rounded-lg p-4"
+                className="bg-card text-card-foreground shadow-md rounded-lg p-4 flex justify-between items-center"
               >
-                <h2 className="text-lg font-bold">{company.name}</h2>
-                <p className="text-sm text-card-foreground">{COMPANY_STATUSES[company.status]}</p>
+                <div>
+                  <h2 className="text-lg font-bold">
+                    <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
+                      {company.name}
+                    </Link>
+                  </h2>
+                  <p className="text-sm text-card-foreground">{COMPANY_STATUSES[company.status]}</p>
+                </div>
 
                 <div className="flex gap-2">
                   <button
@@ -120,7 +132,7 @@ function RouteComponent() {
                     name="action"
                     value="reject"
                     type="button"
-                    className="bg-red-500 text-white px-4 py-2 rounded-md text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-destructive text-destructive-foreground px-4 py-2 rounded-md text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={company.status === "rejected"}
                     onClick={() => onAction(company.id, "rejected")}
                   >
@@ -135,28 +147,66 @@ function RouteComponent() {
                   >
                     En attente
                   </button>
-                </div>
 
-                <button
-                  type="button"
-                  className="text-xs text-destructive border border-destructive px-2 py-1 rounded-sm transition-colors"
-                  onClick={() => onDeleteCompany(company.id, company.slug)}
-                >
-                  <Trash2 className="size-4" />
-                </button>
+                  <button
+                    type="button"
+                    className="text-xs text-destructive border border-destructive px-2 py-1 rounded-sm transition-colors flex items-center gap-2"
+                    onClick={() => onDeleteCompany(company.id, company.slug)}
+                  >
+                    <Trash2 className="size-4" />
+                    Supprimer
+                  </button>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
+        <Separator.Root className="my-4 h-px bg-border" />
+
+        <div className="grid gap-4">
+          <h2 className="text-lg font-bold">Admins</h2>
+          <div className="grid gap-4">
+            {admins?.map((user) => (
+              <div
+                key={user.id}
+                className="bg-card text-card-foreground shadow-md rounded-lg p-4 flex justify-between items-center"
+              >
+                <div>
+                  <p className="text-lg font-bold">{user.name}</p>
+                  <p className="text-sm text-card-foreground">{user.email}</p>
+                  <p className="text-sm text-card-foreground">Role: {user.role}</p>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="text-xs text-secondary-foreground border border-secondary-foreground px-2 py-1 rounded-sm hover:bg-secondary transition-colors"
+                    onClick={() => onUpdateUserRole(user.id, "user")}
+                  >
+                    Set as user
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Separator.Root className="my-4 h-px bg-border" />
+
         <div className="grid gap-4">
           <h2 className="text-lg font-bold">Users</h2>
           <div className="grid gap-4">
             {users?.map((user) => (
-              <div key={user.id} className="bg-card text-card-foreground shadow-md rounded-lg p-4">
-                <p>{user.name}</p>
-                <p>{user.email}</p>
-                <p>{user.role}</p>
+              <div
+                key={user.id}
+                className="bg-card text-card-foreground shadow-md rounded-lg p-4 flex justify-between items-center"
+              >
+                <div>
+                  <p className="text-lg font-bold">{user.name}</p>
+                  <p className="text-sm text-card-foreground">{user.email}</p>
+                  <p className="text-sm text-card-foreground">Role: {user.role}</p>
+                </div>
 
                 <div className="flex gap-2">
                   <button
@@ -164,19 +214,13 @@ function RouteComponent() {
                     className="text-xs text-secondary-foreground border border-secondary-foreground px-2 py-1 rounded-sm hover:bg-secondary transition-colors"
                     onClick={() => onUpdateUserRole(user.id, "admin")}
                   >
-                    {isUpdatingUserRole && currentUser.current === user.id && user.role === "user"
-                      ? "Updating..."
-                      : "Set as admin"}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="text-xs text-secondary-foreground border border-secondary-foreground px-2 py-1 rounded-sm hover:bg-secondary transition-colors"
-                    onClick={() => onUpdateUserRole(user.id, "user")}
-                  >
-                    {isUpdatingUserRole && currentUser.current === user.id && user.role === "admin"
-                      ? "Updating..."
-                      : "Set as user"}
+                    {isUpdatingUserRole &&
+                    currentUser.current === user.id &&
+                    user.role === "user" ? (
+                      <LoaderIcon className="size-4 animate-spin" />
+                    ) : (
+                      "Set as admin"
+                    )}
                   </button>
                 </div>
               </div>

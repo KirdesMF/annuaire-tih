@@ -1,6 +1,7 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { inferAdditionalFields } from "better-auth/client/plugins";
 import { admin, customSession } from "better-auth/plugins";
 import { reactStartCookies } from "better-auth/react-start";
 import { Resend } from "resend";
@@ -19,6 +20,13 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    inferAdditionalFields({
+      user: {
+        role: {
+          type: "string",
+        },
+      },
+    }),
     admin({ adminRoles: ["admin", "superadmin"] }),
     customSession(async ({ user: currentUser, session }) => {
       const activeCGU = await db.query.cguTable.findFirst({
@@ -92,6 +100,11 @@ export const auth = betterAuth({
     },
     changeEmail: {
       enabled: true,
+    },
+    additionalFields: {
+      role: {
+        type: "string",
+      },
     },
   },
 });

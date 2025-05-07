@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Globe, Mail, PencilLine, Phone } from "lucide-react";
+import { CheckIcon, Globe, Mail, PencilLine, Phone } from "lucide-react";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
@@ -54,10 +54,14 @@ function RouteComponent() {
   return (
     <main className="px-4 py-8">
       <div className="grid gap-4 max-w-5xl mx-auto py-24">
-        <div className="flex justify-between gap-4 border border-border bg-card text-card-foreground p-6 rounded-sm">
-          <div className="flex flex-col gap-2">
-            <CompanyLogo url={data.logo?.secureUrl} name={data.name} size="lg" />
+        <div className="flex gap-4 ">
+          {data.logo?.secureUrl ? (
+            <div className="border border-border bg-card text-card-foreground p-6 rounded-sm">
+              <CompanyLogo url={data.logo?.secureUrl} name={data.name} size="lg" />
+            </div>
+          ) : null}
 
+          <div className="flex-1 flex flex-col gap-2 border border-border bg-card text-card-foreground p-6 rounded-sm">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">{data.name}</h1>
               <CopyButton>{data.siret}</CopyButton>
@@ -71,7 +75,18 @@ function RouteComponent() {
                   <PencilLine className="size-4" />
                 </Link>
               )}
+
+              {context.user?.role === "admin" && (
+                <button
+                  type="button"
+                  className="border border-border bg-muted text-muted-foreground px-2 py-1.5 rounded-sm text-xs h-min flex items-center gap-1"
+                >
+                  <span>Accepter</span>
+                  <CheckIcon className="size-4" />
+                </button>
+              )}
             </div>
+
             <ul className="flex flex-wrap gap-2">
               {data.categories.map((category) => (
                 <li
