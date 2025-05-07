@@ -12,86 +12,79 @@ import {
   UpdateCompanyMediaSchema,
 } from "~/lib/validator/company.schema";
 
-/**
- * @todo: check if we can use transaction here instead of calling multiple times the db
- */
-
-const updateCompanyInDb = async (
-  companyId: string,
-  data: Partial<typeof companiesTable.$inferSelect>,
-) => {
-  return getDb().update(companiesTable).set(data).where(eq(companiesTable.id, companyId));
-};
-
 export const updateCompanyMedia = createServerFn({ method: "POST" })
   .validator((data: FormData) => {
     const decodedFormData = decode(data, {
       files: ["logo", "gallery.$"],
       arrays: ["gallery", "gallery_public_id"],
     });
-
-    console.log(decodedFormData);
-
     return v.parse(UpdateCompanyMediaSchema, decodedFormData);
   })
   .handler(async ({ data }) => {
     try {
       const { logo, gallery, logo_public_id, gallery_public_id, companyId } = data;
 
-      // Get current company data once
-      const [company] = await getDb()
-        .select()
-        .from(companiesTable)
-        .where(eq(companiesTable.id, companyId));
+      return await getDb().transaction(async (tx) => {
+        const [company] = await tx
+          .select()
+          .from(companiesTable)
+          .where(eq(companiesTable.id, companyId));
 
-      // Handle logo update
-      if (logo && logo.size > 0) {
-        const logoResult = logo_public_id
-          ? await updateImageInCloudinary({
-              file: logo,
-              publicId: logo_public_id,
+        // Handle logo update
+        if (logo && logo.size > 0) {
+          const logoResult = logo_public_id
+            ? await updateImageInCloudinary({
+                file: logo,
+                publicId: logo_public_id,
+              })
+            : await uploadImageToCloudinary({
+                type: "logo",
+                file: logo,
+                companyId,
+                companySlug: company.slug,
+              });
+
+          await tx
+            .update(companiesTable)
+            .set({
+              logo: { secureUrl: logoResult.secure_url, publicId: logoResult.public_id },
             })
-          : await uploadImageToCloudinary({
-              type: "logo",
-              file: logo,
-              companyId,
-              companySlug: company.slug,
-            });
+            .where(eq(companiesTable.id, companyId));
+        }
 
-        await updateCompanyInDb(companyId, {
-          logo: { secureUrl: logoResult.secure_url, publicId: logoResult.public_id },
-        });
-      }
+        // Handle gallery updates
+        if (gallery && gallery_public_id) {
+          const updatedGallery = [...(company.gallery || [])];
 
-      // Handle gallery updates
-      if (gallery && gallery_public_id) {
-        const updatedGallery = [...(company.gallery || [])];
+          await Promise.all(
+            gallery.map(async (image, index) => {
+              if (!image.size) return;
 
-        await Promise.all(
-          gallery.map(async (image, index) => {
-            if (!image.size) return;
+              const imageResult = gallery_public_id[index]
+                ? await updateImageInCloudinary({
+                    file: image,
+                    publicId: gallery_public_id[index],
+                  })
+                : await uploadImageToCloudinary({
+                    type: "gallery",
+                    file: image,
+                    companyId,
+                    companySlug: company.slug,
+                  });
 
-            const imageResult = gallery_public_id[index]
-              ? await updateImageInCloudinary({
-                  file: image,
-                  publicId: gallery_public_id[index],
-                })
-              : await uploadImageToCloudinary({
-                  type: "gallery",
-                  file: image,
-                  companyId,
-                  companySlug: company.slug,
-                });
+              updatedGallery[index] = {
+                secureUrl: imageResult.secure_url,
+                publicId: imageResult.public_id,
+              };
+            }),
+          );
 
-            updatedGallery[index] = {
-              secureUrl: imageResult.secure_url,
-              publicId: imageResult.public_id,
-            };
-          }),
-        );
-
-        await updateCompanyInDb(companyId, { gallery: updatedGallery });
-      }
+          await tx
+            .update(companiesTable)
+            .set({ gallery: updatedGallery })
+            .where(eq(companiesTable.id, companyId));
+        }
+      });
     } catch (error) {
       console.error("Failed to update company media:", error);
       throw new Error("Failed to update company media");

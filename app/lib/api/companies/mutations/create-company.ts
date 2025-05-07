@@ -47,7 +47,6 @@ export const createCompany = createServerFn({ method: "POST" })
         // Upload logo
         // @todo: handle errors
         if (logo && logo.size > 0) {
-          console.log("logo upload", logo);
           const uploadedImage = await uploadImages({
             type: "logo",
             images: [logo],
@@ -68,7 +67,6 @@ export const createCompany = createServerFn({ method: "POST" })
           const validGalleryImages = gallery.filter((image) => image && image.size > 0);
 
           if (validGalleryImages.length > 0) {
-            console.log("gallery upload", validGalleryImages);
             const uploadedImages = await uploadImages({
               type: "gallery",
               images: validGalleryImages,

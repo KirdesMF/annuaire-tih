@@ -9,30 +9,29 @@ export const Route = createFileRoute("/_protected/accept-cgu")({
   component: RouteComponent,
 });
 
-/**
- * @todo: check if we can use transaction here instead of calling multiple times the db
- */
 const acceptCGUFn = createServerFn({ method: "POST" })
   .validator((data: string) => data)
   .handler(async ({ data }) => {
     try {
       const db = getDb();
 
-      const activeCGU = await db.query.cguTable.findFirst({
-        where: (cgu, { eq }) => eq(cgu.isActive, true),
+      return await db.transaction(async (tx) => {
+        const activeCGU = await tx.query.cguTable.findFirst({
+          where: (cgu, { eq }) => eq(cgu.isActive, true),
+        });
+
+        if (!activeCGU) {
+          throw new Error("No active CGU found");
+        }
+
+        await tx.insert(userCguAcceptanceTable).values({
+          userId: data,
+          cguId: activeCGU.id,
+          acceptedAt: new Date(),
+        });
+
+        throw redirect({ to: "/compte/entreprises" });
       });
-
-      if (!activeCGU) {
-        throw new Error("No active CGU found");
-      }
-
-      await db.insert(userCguAcceptanceTable).values({
-        userId: data,
-        cguId: activeCGU.id,
-        acceptedAt: new Date(),
-      });
-
-      throw redirect({ to: "/compte/entreprises" });
     } catch (error) {
       console.error(error);
       throw error;

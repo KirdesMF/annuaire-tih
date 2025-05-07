@@ -16,7 +16,11 @@ import { COMPANY_STATUSES } from "~/utils/constantes";
 
 export const Route = createFileRoute("/admin/dashboard")({
   component: RouteComponent,
-  pendingComponent: () => <div>Loading...</div>,
+  pendingComponent: () => (
+    <div className="min-h-svh grid place-items-center">
+      <LoaderIcon className="size-24 animate-spin" />
+    </div>
+  ),
   loader: async ({ context }) => {
     await Promise.all([
       context.queryClient.prefetchQuery(companiesQuery()),
@@ -42,6 +46,9 @@ function RouteComponent() {
 
   const admins = allUsers?.filter((user) => user.role === "admin");
   const users = allUsers?.filter((user) => user.role === "user");
+  const totalCompanies = companies?.length;
+  const totalUsers = users?.length;
+  const totalAdmins = admins?.length;
 
   // TODO: Add confirmation dialog
   function onAction(companyId: string, action: CompanyStatus) {
@@ -100,7 +107,7 @@ function RouteComponent() {
         <Separator.Root className="my-4 h-px bg-border" />
 
         <div className="grid gap-4">
-          <h2 className="text-lg font-bold">Companies</h2>
+          <h2 className="text-lg font-bold"> Companies ({totalCompanies})</h2>
           <div className="grid gap-4">
             {companies?.map((company) => (
               <div
@@ -165,7 +172,7 @@ function RouteComponent() {
         <Separator.Root className="my-4 h-px bg-border" />
 
         <div className="grid gap-4">
-          <h2 className="text-lg font-bold">Admins</h2>
+          <h2 className="text-lg font-bold">Admins ({totalAdmins})</h2>
           <div className="grid gap-4">
             {admins?.map((user) => (
               <div
@@ -195,7 +202,7 @@ function RouteComponent() {
         <Separator.Root className="my-4 h-px bg-border" />
 
         <div className="grid gap-4">
-          <h2 className="text-lg font-bold">Users</h2>
+          <h2 className="text-lg font-bold">Users ({totalUsers})</h2>
           <div className="grid gap-4">
             {users?.map((user) => (
               <div

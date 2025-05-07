@@ -6,29 +6,27 @@ import { categoriesTable } from "~/db/schema/categories";
 import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 
-/**
- * @todo: check if we can use transaction here instead of calling multiple times the db
- */
-
 export const getCompanyById = createServerFn({ method: "GET" })
   .validator((id: string) => id)
   .handler(async ({ data: id }) => {
     try {
       const db = getDb();
 
-      const company = await db
-        .select()
-        .from(companiesTable)
-        .where(eq(companiesTable.id, id))
-        .then((res) => res[0]);
+      return await db.transaction(async (tx) => {
+        const company = await tx
+          .select()
+          .from(companiesTable)
+          .where(eq(companiesTable.id, id))
+          .then((res) => res[0]);
 
-      const categories = await db
-        .select()
-        .from(companyCategoriesTable)
-        .leftJoin(categoriesTable, eq(categoriesTable.id, companyCategoriesTable.category_id))
-        .where(eq(companyCategoriesTable.company_id, company.id));
+        const categories = await tx
+          .select()
+          .from(companyCategoriesTable)
+          .leftJoin(categoriesTable, eq(categoriesTable.id, companyCategoriesTable.category_id))
+          .where(eq(companyCategoriesTable.company_id, company.id));
 
-      return { ...company, categories };
+        return { ...company, categories };
+      });
     } catch (error) {
       console.error(error);
     }

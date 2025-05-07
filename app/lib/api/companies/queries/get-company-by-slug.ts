@@ -6,31 +6,30 @@ import { categoriesTable } from "~/db/schema/categories";
 import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 
-/**
- * @todo: check if we can use transaction here instead of calling multiple times the db
- */
-
 export const getCompanyBySlug = createServerFn({ method: "GET" })
   .validator((slug: string) => slug)
   .handler(async ({ data: slug }) => {
     try {
       const db = getDb();
-      const company = await db
-        .select()
-        .from(companiesTable)
-        .where(eq(companiesTable.slug, slug))
-        .then((res) => res[0]);
 
-      const categories = await db
-        .select()
-        .from(companyCategoriesTable)
-        .leftJoin(categoriesTable, eq(categoriesTable.id, companyCategoriesTable.category_id))
-        .where(eq(companyCategoriesTable.company_id, company.id));
+      return await db.transaction(async (tx) => {
+        const company = await tx
+          .select()
+          .from(companiesTable)
+          .where(eq(companiesTable.slug, slug))
+          .then((res) => res[0]);
 
-      return {
-        ...company,
-        categories: categories.map((c) => c.categories),
-      };
+        const categories = await tx
+          .select()
+          .from(companyCategoriesTable)
+          .leftJoin(categoriesTable, eq(categoriesTable.id, companyCategoriesTable.category_id))
+          .where(eq(companyCategoriesTable.company_id, company.id));
+
+        return {
+          ...company,
+          categories: categories.map((c) => c.categories),
+        };
+      });
     } catch (error) {
       console.error(error);
       throw error;
