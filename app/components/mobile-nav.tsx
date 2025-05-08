@@ -6,8 +6,9 @@ import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } 
 const LINKS = linkOptions([
   { label: "Accueil", to: "/" },
   { label: "Qui sommes-nous ?", to: "/about" },
-  { label: "FAQ", to: "/faq" },
+  { label: "Partenaires", to: "/partners" },
   { label: "Sources", to: "/sources" },
+  { label: "FAQ", to: "/faq" },
   { label: "Se référencer", to: "/sign-up" },
   { label: "Se connecter", to: "/sign-in" },
 ]);

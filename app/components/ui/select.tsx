@@ -18,13 +18,13 @@ export function Select({
       <SelectPrimitive.Trigger
         ref={ref}
         className={cn(
-          "inline-flex items-center gap-2 justify-between border border-input rounded-sm h-9 px-3 text-sm",
-          "data-placeholder:text-xs data-placeholder:text-nowrap",
-          "focus:outline-primary focus:outline-2",
+          "flex items-center gap-2 justify-between border border-input rounded-sm h-9 px-3 text-sm",
+          "data-placeholder:text-xs data-placeholder:text-nowrap data-placeholder:truncate",
+          "focus:outline-primary focus:outline-2 [&>span]:truncate",
           className,
         )}
       >
-        <SelectPrimitive.Value placeholder={placeholder} className="text-sm" />
+        <SelectPrimitive.Value placeholder={placeholder} />
         <SelectPrimitive.Icon>
           <ChevronDownIcon className="size-4 text-muted-foreground" />
         </SelectPrimitive.Icon>
@@ -34,7 +34,7 @@ export function Select({
         <SelectPrimitive.Content
           position="popper"
           sideOffset={5}
-          className="border border-input rounded-sm bg-popover text-popover-foreground w-(--radix-select-trigger-width)"
+          className="border border-input rounded-sm bg-popover text-popover-foreground min-w-[15ch]"
         >
           <SelectPrimitive.Viewport>{children}</SelectPrimitive.Viewport>
         </SelectPrimitive.Content>
@@ -52,7 +52,7 @@ export function SelectItem({
     <SelectPrimitive.Item
       {...props}
       className={cn(
-        "flex items-center justify-between px-2 py-1 data-highlighted:bg-accent data-highlighted:text-accent-foreground",
+        "flex items-center justify-between px-2 py-1.5 data-highlighted:bg-accent data-highlighted:text-accent-foreground text-xs outline-none",
         className,
       )}
     >

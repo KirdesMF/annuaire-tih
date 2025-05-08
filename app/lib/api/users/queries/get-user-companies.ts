@@ -64,6 +64,5 @@ export function userCompaniesQuery(userId: string) {
     queryKey: ["user", "companies", userId],
     queryFn: () => getUserCompanies({ data: userId }),
     refetchOnWindowFocus: false,
-    gcTime: 0,
   });
 }

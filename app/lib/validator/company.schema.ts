@@ -15,7 +15,7 @@ export const CompanyMediaSchema = v.object({
         v.pipe(
           v.instance(File),
           v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
-          v.maxSize(1024 * 1024 * 3, "La taille du fichier doit être inférieure à 3MB"),
+          v.maxSize(1024 * 1024 * 2, "La taille du fichier doit être inférieure à 2MB"),
         ),
       ),
       v.maxLength(2, "Veuillez entrer au plus 2 images"),

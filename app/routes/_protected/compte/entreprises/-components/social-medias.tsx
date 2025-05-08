@@ -122,12 +122,12 @@ export function SocialMedias({ company }: { company?: Company }) {
       ))}
 
       {socialMedias.length < 5 && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Select
             value={selectedNetwork}
             onValueChange={(value) => setSelectedNetwork(value as SocialMediaName)}
             placeholder="Sélectionner un réseau"
-            className="w-1/3"
+            className="w-full md:max-w-[180px]"
           >
             {SOCIAL_MEDIAS.map((socialMedia) => (
               <SelectItem key={socialMedia.name} value={socialMedia.name}>
@@ -136,22 +136,24 @@ export function SocialMedias({ company }: { company?: Company }) {
             ))}
           </Select>
 
-          <Input
-            type="url"
-            placeholder={
-              SOCIAL_MEDIAS.find((socialMedia) => socialMedia.name === selectedNetwork)
-                ?.placeholder || "https://www.monentreprise.com"
-            }
-            value={newUrl}
-            onChange={handleUrlChange}
-          />
-          <button
-            type="button"
-            onClick={handleAddSocialMedia}
-            className="text-primary p-2 cursor-pointer"
-          >
-            <CirclePlusIcon className="size-4" />
-          </button>
+          <div className="flex items-center gap-2 flex-1 relative">
+            <Input
+              type="url"
+              placeholder={
+                SOCIAL_MEDIAS.find((socialMedia) => socialMedia.name === selectedNetwork)
+                  ?.placeholder || "https://www.monentreprise.com"
+              }
+              value={newUrl}
+              onChange={handleUrlChange}
+            />
+            <button
+              type="button"
+              onClick={handleAddSocialMedia}
+              className="text-primary p-2 cursor-pointer absolute end-0 md:static"
+            >
+              <CirclePlusIcon className="size-4" />
+            </button>
+          </div>
         </div>
       )}
     </fieldset>

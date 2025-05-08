@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Separator } from "radix-ui";
 import findajob from "~/assets/img/FINDAJOB.jpg?url";
 
-export const Route = createFileRoute("/(public)/partner")({
+export const Route = createFileRoute("/(public)/partners")({
   component: RouteComponent,
 });
 

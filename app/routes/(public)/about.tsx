@@ -47,7 +47,7 @@ function RouteComponent() {
 
               <p className="text-muted-foreground text-md font-light leading-relaxed">
                 En MAI 2025, grâce à un{" "}
-                <Link to="/partner" className="font-bold underline text-blue-500">
+                <Link to="/partners" className="font-bold underline text-blue-500">
                   financement collaboratif
                 </Link>
                 , la version actuelle voit le jour sous forme de site web indépendant et plus

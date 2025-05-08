@@ -18,7 +18,7 @@ import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as AdminDashboardImport } from './routes/admin/dashboard'
 import { Route as ProtectedAcceptCguImport } from './routes/_protected/accept-cgu'
 import { Route as publicSourcesImport } from './routes/(public)/sources'
-import { Route as publicPartnerImport } from './routes/(public)/partner'
+import { Route as publicPartnersImport } from './routes/(public)/partners'
 import { Route as publicFaqImport } from './routes/(public)/faq'
 import { Route as publicCguImport } from './routes/(public)/cgu'
 import { Route as publicAboutImport } from './routes/(public)/about'
@@ -83,9 +83,9 @@ const publicSourcesRoute = publicSourcesImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const publicPartnerRoute = publicPartnerImport.update({
-  id: '/(public)/partner',
-  path: '/partner',
+const publicPartnersRoute = publicPartnersImport.update({
+  id: '/(public)/partners',
+  path: '/partners',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -300,11 +300,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof publicFaqImport
       parentRoute: typeof rootRoute
     }
-    '/(public)/partner': {
-      id: '/(public)/partner'
-      path: '/partner'
-      fullPath: '/partner'
-      preLoaderRoute: typeof publicPartnerImport
+    '/(public)/partners': {
+      id: '/(public)/partners'
+      path: '/partners'
+      fullPath: '/partners'
+      preLoaderRoute: typeof publicPartnersImport
       parentRoute: typeof rootRoute
     }
     '/(public)/sources': {
@@ -512,7 +512,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof publicAboutRoute
   '/cgu': typeof publicCguRoute
   '/faq': typeof publicFaqRoute
-  '/partner': typeof publicPartnerRoute
+  '/partners': typeof publicPartnersRoute
   '/sources': typeof publicSourcesRoute
   '/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -541,7 +541,7 @@ export interface FileRoutesByTo {
   '/about': typeof publicAboutRoute
   '/cgu': typeof publicCguRoute
   '/faq': typeof publicFaqRoute
-  '/partner': typeof publicPartnerRoute
+  '/partners': typeof publicPartnersRoute
   '/sources': typeof publicSourcesRoute
   '/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -572,7 +572,7 @@ export interface FileRoutesById {
   '/(public)/about': typeof publicAboutRoute
   '/(public)/cgu': typeof publicCguRoute
   '/(public)/faq': typeof publicFaqRoute
-  '/(public)/partner': typeof publicPartnerRoute
+  '/(public)/partners': typeof publicPartnersRoute
   '/(public)/sources': typeof publicSourcesRoute
   '/_protected/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -605,7 +605,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/cgu'
     | '/faq'
-    | '/partner'
+    | '/partners'
     | '/sources'
     | '/accept-cgu'
     | '/admin/dashboard'
@@ -633,7 +633,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/cgu'
     | '/faq'
-    | '/partner'
+    | '/partners'
     | '/sources'
     | '/accept-cgu'
     | '/admin/dashboard'
@@ -662,7 +662,7 @@ export interface FileRouteTypes {
     | '/(public)/about'
     | '/(public)/cgu'
     | '/(public)/faq'
-    | '/(public)/partner'
+    | '/(public)/partners'
     | '/(public)/sources'
     | '/_protected/accept-cgu'
     | '/admin/dashboard'
@@ -693,7 +693,7 @@ export interface RootRouteChildren {
   publicAboutRoute: typeof publicAboutRoute
   publicCguRoute: typeof publicCguRoute
   publicFaqRoute: typeof publicFaqRoute
-  publicPartnerRoute: typeof publicPartnerRoute
+  publicPartnersRoute: typeof publicPartnersRoute
   publicSourcesRoute: typeof publicSourcesRoute
   publicCategoriesSlugRoute: typeof publicCategoriesSlugRoute
   publicEntreprisesSlugRoute: typeof publicEntreprisesSlugRoute
@@ -710,7 +710,7 @@ const rootRouteChildren: RootRouteChildren = {
   publicAboutRoute: publicAboutRoute,
   publicCguRoute: publicCguRoute,
   publicFaqRoute: publicFaqRoute,
-  publicPartnerRoute: publicPartnerRoute,
+  publicPartnersRoute: publicPartnersRoute,
   publicSourcesRoute: publicSourcesRoute,
   publicCategoriesSlugRoute: publicCategoriesSlugRoute,
   publicEntreprisesSlugRoute: publicEntreprisesSlugRoute,
@@ -736,7 +736,7 @@ export const routeTree = rootRoute
         "/(public)/about",
         "/(public)/cgu",
         "/(public)/faq",
-        "/(public)/partner",
+        "/(public)/partners",
         "/(public)/sources",
         "/(public)/categories/$slug",
         "/(public)/entreprises/$slug"
@@ -792,8 +792,8 @@ export const routeTree = rootRoute
     "/(public)/faq": {
       "filePath": "(public)/faq.tsx"
     },
-    "/(public)/partner": {
-      "filePath": "(public)/partner.tsx"
+    "/(public)/partners": {
+      "filePath": "(public)/partners.tsx"
     },
     "/(public)/sources": {
       "filePath": "(public)/sources.tsx"

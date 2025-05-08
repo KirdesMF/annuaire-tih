@@ -3,9 +3,9 @@ import { Link, linkOptions } from "@tanstack/react-router";
 const LINKS = linkOptions([
   { label: "Accueil", to: "/" },
   { label: "Qui sommes-nous ?", to: "/about" },
-  { label: "FAQ", to: "/faq" },
-  { label: "Partenaires ", to: "/partner" },
+  { label: "Partenaires ", to: "/partners" },
   { label: "Sources", to: "/sources" },
+  { label: "FAQ", to: "/faq" },
 ]);
 
 export function MainNav() {
