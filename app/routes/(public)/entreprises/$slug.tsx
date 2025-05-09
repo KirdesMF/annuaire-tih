@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { CheckIcon, Globe, Mail, PencilLine, Phone } from "lucide-react";
+import { Globe, Mail, PencilLine, Phone } from "lucide-react";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
