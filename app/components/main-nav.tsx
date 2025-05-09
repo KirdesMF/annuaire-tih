@@ -11,17 +11,17 @@ const LINKS = linkOptions([
 export function MainNav() {
   return (
     <nav className="hidden md:flex">
-      <ul className="flex items-center gap-3">
-        <li>
-          <Link to="/" className="flex items-center gap-2">
-            <img src={annuaire} alt="Annuaire TIH" className="h-10 drop-shadow-lg" />
+      <ul className="flex items-center gap-1">
+        <li className="shrink-0">
+          <Link to="/" className="flex items-center justify-center">
+            <img src={annuaire} alt="Annuaire TIH" className="w-10 shrink-0" />
           </Link>
         </li>
         {LINKS.map((link) => (
           <li key={link.to}>
             <Link
               to={link.to}
-              className="text-sm font-light text-nowrap focus:outline-primary focus:outline-2  px-1.5 py-1 rounded-xs data-[status=active]:text-primary data-[status=active]:font-bold"
+              className="text-sm font-light text-nowrap focus:outline-primary focus:outline-2 px-1.5 py-1 rounded-xs data-[status=active]:text-primary data-[status=active]:font-bold"
             >
               {link.label}
             </Link>

@@ -2,7 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
-import { Loader, Mail } from "lucide-react";
+import { InfoIcon, Loader, Mail } from "lucide-react";
+import { Separator } from "radix-ui";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -58,8 +59,25 @@ function RouteComponent() {
 
   return (
     <main>
-      <div className="container px-4 py-12">
-        <h1 className="text-2xl font-bold mb-6">Mot de passe oublié</h1>
+      <div className="max-w-lg mx-auto px-4 py-12 min-h-svh">
+        <h1 className="text-2xl font-bold mb-6 tracking-tighter">Mot de passe oublié</h1>
+
+        <div className="border border-blue-500 bg-blue-100 rounded-sm px-2 py-4 text-blue-500 dark:border-blue-400 dark:bg-blue-900 dark:text-blue-400 mb-6">
+          <div className="flex gap-2">
+            <InfoIcon className="size-4 shrink-0" />
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-pretty">
+                Si vous avez oublié votre mot de passe, veuillez entrer votre adresse email
+                ci-dessous. Un email vous sera envoyé avec les instructions pour réinitialiser votre
+                mot de passe.
+              </p>
+              <p className="text-xs mt-2 text-balance">
+                Si vous n'avez pas reçu d'email, veuillez vérifier vos spam ou réessayer.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
           <Label className="flex flex-col gap-2">
             Email *
@@ -71,7 +89,7 @@ function RouteComponent() {
 
           <button
             type="submit"
-            className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors p-2 rounded-sm font-medium text-sm"
+            className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors p-2 rounded-sm font-medium text-sm inline-flex items-center justify-center gap-2"
             disabled={isPending}
           >
             {isPending ? <Loader className="size-4 animate-spin" /> : "Envoyer"}

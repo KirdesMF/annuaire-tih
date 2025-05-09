@@ -66,12 +66,12 @@ function RouteComponent() {
   }
   return (
     <main>
-      <div className="container px-4 py-12">
-        <h1 className="text-2xl font-bold mb-6">Réinitialiser le mot de passe</h1>
+      <div className="max-w-lg mx-auto px-4 py-12 min-h-svh">
+        <h1 className="text-2xl font-bold mb-6 tracking-tighter">Réinitialiser le mot de passe</h1>
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
           <input type="hidden" name="token" value={searchParams.token} />
-          <Label>
-            Nouveau mot de passe *
+          <Label className="flex flex-col gap-2">
+            <span>Nouveau mot de passe *</span>
             <div className="relative">
               <Lock className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
@@ -96,7 +96,7 @@ function RouteComponent() {
 
           <button
             type="submit"
-            className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors p-2 rounded-sm font-medium text-sm"
+            className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors p-2 rounded-sm font-medium text-sm inline-flex items-center justify-center gap-2"
             disabled={isPending}
           >
             {isPending ? <Loader className="size-4 animate-spin" /> : "Réinitialiser"}
