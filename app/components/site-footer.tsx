@@ -3,9 +3,9 @@ import img from "~/assets/img/FINDAJOB.jpg?url";
 export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-accent text-accent-foreground mt-auto">
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-8 py-12">
         <div className="flex justify-between gap-4">
-          <ul className="flex flex-col gap-2 text-xs list-disc">
+          <ul className="flex flex-col gap-2 text-xs list-disc list-inside">
             <li>
               Besoin d'aide ? Des questions ?{" "}
               <a href="mailto:contact@annuaire-tih.fr" className="underline">

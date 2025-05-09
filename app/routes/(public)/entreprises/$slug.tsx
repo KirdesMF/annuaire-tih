@@ -75,16 +75,6 @@ function RouteComponent() {
                   <PencilLine className="size-4" />
                 </Link>
               )}
-
-              {context.user?.role === "admin" && (
-                <button
-                  type="button"
-                  className="border border-border bg-muted text-muted-foreground px-2 py-1.5 rounded-sm text-xs h-min flex items-center gap-1"
-                >
-                  <span>Accepter</span>
-                  <CheckIcon className="size-4" />
-                </button>
-              )}
             </div>
 
             <ul className="flex flex-wrap gap-2">

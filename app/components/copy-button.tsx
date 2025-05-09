@@ -18,12 +18,12 @@ export function CopyButton({ children, ...props }: CopyButtonProps) {
   return (
     <button
       type="button"
-      className="text-xs px-2 py-1.5 rounded-sm border border-border bg-muted text-muted-foreground flex items-center gap-1.5 cursor-pointer"
+      className="text-xs px-2 py-1 rounded-sm border border-border bg-muted text-muted-foreground flex items-center gap-1.5 cursor-pointer"
       onClick={onCopy}
       {...props}
     >
       {children}
-      <Copy className="size-4" />
+      <Copy className="size-3" />
     </button>
   );
 }

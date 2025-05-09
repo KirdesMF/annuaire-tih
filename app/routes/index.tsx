@@ -4,13 +4,18 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import {
   BookUser,
   FunnelIcon,
+  GlobeIcon,
+  HandshakeIcon,
+  MailIcon,
   MoveRightIcon,
+  PhoneIcon,
   ScanSearchIcon,
   SearchIcon,
   SquareArrowOutUpRight,
 } from "lucide-react";
 import { Separator } from "radix-ui";
 import { useState } from "react";
+import abtraining from "~/assets/img/ab-training.png";
 import annuaire from "~/assets/img/annuaire.webp?url";
 import banner from "~/assets/img/banner.webp?url";
 import { LinkedinIcon } from "~/components/icons/linkedin";
@@ -217,7 +222,7 @@ function Home() {
             </Link>
           </article>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-col sm:flex-row">
             <article className="flex-1 ring-1 ring-border rounded-sm p-4 shadow w-fit flex flex-col gap-4 bg-card text-card-foreground">
               <div className="flex flex-col gap-2">
                 <h3 className="text-lg font-bold tracking-tighter">
@@ -270,6 +275,79 @@ function Home() {
                 className="absolute -bottom-8 end-10 h-28 group-hover:-translate-y-2 transition-transform duration-300 grayscale-50 group-hover:grayscale-0"
               />
             </article>
+          </div>
+        </div>
+      </section>
+
+      <Separator.Root className="w-1/3 h-px bg-border mx-auto" />
+
+      <section className="max-w-3xl mx-auto py-20">
+        <div className="flex flex-col gap-6 items-center">
+          <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
+            <HandshakeIcon className="size-4" />
+            <span>Sponsors</span>
+          </div>
+
+          <div className="border border-border rounded-sm text-black bg-[#66C9F9] shadow-sm">
+            <div className="flex gap-4">
+              <div className="p-6 w-full sm:w-1/2 bg-white grid place-items-center rounded-s-sm">
+                <Link
+                  to="/entreprises/$slug"
+                  params={{ slug: "advice-business-training-L3v43hiQqp" }}
+                >
+                  <img src={abtraining} alt="AB Training" className="aspect-auto w-full" />
+                </Link>
+              </div>
+
+              <div className="hidden sm:grid gap-5 px-4 py-6 flex-1">
+                <div className="text-center">
+                  <p className="text-lg font-bold tracking-tighter">Notre force:</p>
+                  <p className="text-sm">cadrer, expliquer, traduire, motiver.</p>
+                </div>
+
+                <div className="text-center text-sm font-light">
+                  <p className="tracking-tighter">Accompagnement Conseil et Formation</p>
+                  <p>Administratif et Financier</p>
+                </div>
+
+                <div className="flex flex-col gap-1 text-center">
+                  <p className="text-sm font-bold">Nous joindre:</p>
+
+                  <div className="flex items-center justify-center gap-2">
+                    <a
+                      href="mailto:contact@abtraining.fr"
+                      className="text-xs flex items-center gap-1"
+                    >
+                      <MailIcon className="size-3" />
+                      contact@abtraining.fr
+                    </a>
+
+                    <Separator.Root orientation="vertical" className="h-4 w-px bg-black" />
+
+                    <a
+                      href="tel:+33683231449"
+                      className="text-xs flex items-center gap-1 text-nowrap"
+                    >
+                      <PhoneIcon className="size-3" />
+                      +33 6 83 23 14 49
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1 ">
+                  <p className="text-sm font-bold text-center">Site web:</p>
+                  <a
+                    href="https://www.abtraining.fr"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="text-xs flex items-center gap-1 justify-center"
+                  >
+                    <GlobeIcon className="size-3" />
+                    www.abtraining.fr
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
