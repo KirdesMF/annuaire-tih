@@ -15,9 +15,9 @@ import {
 } from "lucide-react";
 import { Separator } from "radix-ui";
 import { useState } from "react";
-import malette from "~/assets/font/Luciole-Regular.ttf?url";
 import abtraining from "~/assets/img/ab-training.png";
 import banner from "~/assets/img/banner.webp?url";
+import malette from "~/assets/img/malette.webp";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import {
   Command,
