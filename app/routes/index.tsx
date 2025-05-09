@@ -15,9 +15,9 @@ import {
 } from "lucide-react";
 import { Separator } from "radix-ui";
 import { useState } from "react";
+import malette from "~/assets/font/Luciole-Regular.ttf?url";
 import abtraining from "~/assets/img/ab-training.png";
 import banner from "~/assets/img/banner.webp?url";
-import malette from "~/assets/img/malette.webp?url";
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import {
   Command,
@@ -288,7 +288,7 @@ function Home() {
             <span>Sponsors</span>
           </div>
 
-          <div className="border border-border rounded-sm text-black bg-[#66C9F9] shadow-sm">
+          <div className="border border-border rounded-sm text-black bg-[#66C9F9] shadow-sm font-luciole">
             <div className="flex gap-4">
               <div className="p-6 w-full sm:w-1/2 bg-white grid place-items-center rounded-s-sm">
                 <Link
