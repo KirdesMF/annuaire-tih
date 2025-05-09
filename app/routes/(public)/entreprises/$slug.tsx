@@ -56,7 +56,7 @@ function RouteComponent() {
       <div className="grid gap-4 max-w-5xl mx-auto py-24">
         <div className="flex gap-4 ">
           {data.logo?.secureUrl ? (
-            <div className="border border-border bg-card text-card-foreground p-6 rounded-sm">
+            <div className="border border-border bg-card text-card-foreground p-6 rounded-sm grid place-items-center">
               <CompanyLogo url={data.logo?.secureUrl} name={data.name} size="lg" />
             </div>
           ) : null}
@@ -96,7 +96,7 @@ function RouteComponent() {
                   <Link
                     to="/categories/$slug"
                     params={{ slug: slugify(category?.name ?? "") }}
-                    search={{ id: category?.id ?? "" }}
+                    search={{ id: category?.id ?? "", name: category?.name ?? "" }}
                   >
                     {category?.name}
                   </Link>
@@ -107,16 +107,39 @@ function RouteComponent() {
         </div>
 
         <div className="flex gap-2 flex-wrap">
-          <div className="flex-1 flex flex-col justify-center gap-4 border border-border bg-card text-card-foreground p-6 rounded-sm">
+          <div className="flex-1 border border-border bg-card text-card-foreground p-6 rounded-sm flex flex-col gap-2">
+            <p className="text-sm text-nowrap">
+              <span className="font-bold">Entrepreneur:</span> {data.business_owner || "..."}
+            </p>
+            <p className="text-sm text-nowrap">
+              <span className="font-bold">Zone géographique:</span> {data.service_area || "..."}
+            </p>
+            <p className="text-sm text-nowrap">
+              <span className="font-bold">Mode de travail:</span>{" "}
+              {WORK_MODES[data.work_mode ?? "not_specified"]}
+            </p>
+
+            {data.rqth ? (
+              <p className="text-sm text-nowrap">
+                <span className="font-bold">RQTH:</span> Oui
+              </p>
+            ) : null}
+
+            <p className="text-sm text-nowrap">
+              <span className="font-bold">Sous domaine:</span> {data.subdomain || "..."}
+            </p>
+          </div>
+
+          <div className="flex-1 flex flex-col gap-4 border border-border bg-card text-card-foreground p-6 rounded-sm">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Mail className="size-5" />
-                <p className="text-xs text-nowrap">{data.email || "Non renseigné"}</p>
+                <p className="text-xs text-nowrap">{data.email || "..."}</p>
               </div>
 
               <div className="flex items-center gap-2">
                 <Phone className="size-5" />
-                <p className="text-xs text-nowrap">{data.phone || "Non renseigné"}</p>
+                <p className="text-xs text-nowrap">{data.phone || "..."}</p>
               </div>
 
               <div className="flex items-center gap-2">
@@ -131,7 +154,7 @@ function RouteComponent() {
                     {data.website}
                   </a>
                 ) : (
-                  <span className="text-xs text-nowrap">Non renseigné</span>
+                  <span className="text-xs text-nowrap">...</span>
                 )}
               </div>
             </div>
@@ -148,33 +171,12 @@ function RouteComponent() {
               </ul>
             ) : null}
           </div>
-
-          <div className="flex-1 border border-border bg-card text-card-foreground p-6 rounded-sm flex flex-col gap-2">
-            <p className="text-sm text-nowrap">
-              <span className="font-bold">Entrepreneur:</span>{" "}
-              {data.business_owner || "Non renseigné"}
-            </p>
-            <p className="text-sm text-nowrap">
-              <span className="font-bold">Zone géographique:</span>{" "}
-              {data.service_area || "Non renseigné"}
-            </p>
-            <p className="text-sm text-nowrap">
-              <span className="font-bold">Mode de travail:</span>{" "}
-              {WORK_MODES[data.work_mode ?? "not_specified"]}
-            </p>
-            <p className="text-sm text-nowrap">
-              <span className="font-bold">RQTH:</span> {data.rqth ? "Oui" : "Non"}
-            </p>
-            <p className="text-sm text-nowrap">
-              <span className="font-bold">Sous domaine:</span> {data.subdomain || "Non renseigné"}
-            </p>
-          </div>
         </div>
 
-        <div className="border border-border bg-card text-card-foreground p-6 rounded-sm grid gap-4">
+        <div className="border border-border bg-card text-card-foreground px-6 py-8 rounded-sm grid gap-4">
           <div className="flex flex-col gap-2">
-            <h2 className="text-lg font-bold">Description</h2>
-            <p className="text-sm text-pretty whitespace-pre-line">
+            <h2 className="text-lg font-bold tracking-tighter">Description</h2>
+            <p className="text-sm text-pretty whitespace-pre-line leading-relaxed">
               {data.description || "Non renseigné"}
             </p>
           </div>
@@ -189,7 +191,7 @@ function RouteComponent() {
 function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; publicId: string }> }) {
   return (
     <div className="border border-border bg-card text-card-foreground p-6 rounded-sm grid gap-4">
-      <h2 className="text-lg font-bold">Galerie</h2>
+      <h2 className="sr-only">Galerie</h2>
       <ul className="flex flex-wrap gap-4 items-center justify-center">
         {gallery.map((image) => {
           return (

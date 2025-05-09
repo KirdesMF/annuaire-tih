@@ -66,7 +66,7 @@ function Home() {
           </h1>
 
           <p className="text-muted-foreground text-pretty text-lg leading-relaxed">
-            Collaborez directement avec des entrepreneurs·es bénéficiant du statut de{" "}
+            Collaborez directement avec des entrepreneurs·es bénéficiant du statut de *
             <span className="font-bold underline underline-offset-2">
               Travailleur Indépendant Handicapé (TIH)
             </span>{" "}

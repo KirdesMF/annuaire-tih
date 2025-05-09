@@ -108,9 +108,9 @@ function RouteComponent() {
       <Separator.Root className="my-8 h-px bg-border" />
 
       <div className="grid gap-8">
-        <article className="border border-border p-4 rounded-sm flex justify-between">
+        <article className="border border-border p-4 rounded-sm flex justify-between opacity-50 select-none">
           <div className="flex flex-col gap-2">
-            <h2 className="text-xl font-bold">Avatar</h2>
+            <h2 className="text-xl font-bold">Avatar (bientôt disponible)</h2>
             <p className="text-sm text-pretty">
               Votre avatar est votre image de profil. Vous pouvez le modifier en cliquant sur
               l'avatar.
