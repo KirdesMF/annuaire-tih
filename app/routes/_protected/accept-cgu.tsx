@@ -15,7 +15,7 @@ const acceptCGUFn = createServerFn({ method: "POST" })
     try {
       const db = getDb();
 
-      return await db.transaction(async (tx) => {
+      await db.transaction(async (tx) => {
         const activeCGU = await tx.query.cguTable.findFirst({
           where: (cgu, { eq }) => eq(cgu.isActive, true),
         });
@@ -29,9 +29,8 @@ const acceptCGUFn = createServerFn({ method: "POST" })
           cguId: activeCGU.id,
           acceptedAt: new Date(),
         });
-
-        throw redirect({ to: "/compte/entreprises" });
       });
+      throw redirect({ to: "/compte/entreprises" });
     } catch (error) {
       console.error(error);
       throw error;
@@ -48,7 +47,7 @@ function RouteComponent() {
 
   return (
     <main className="p-4">
-      <div className="max-w-md mx-auto py-24">
+      <div className="max-w-md mx-auto py-24 min-h-svh">
         <div className="border border-border bg-accent text-accent-foreground rounded-lg p-4">
           <h1 className="text-2xl font-bold mb-6 tracking-tighter">
             Conditions générales d'utilisation
