@@ -17,14 +17,18 @@ const schema = {
 };
 
 export function getDb() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set");
+  }
+
   // for cloudflare workers, we need to create a new client for each request
   if (process.env.CLOUDFLARE_WORKER) {
-    const client = postgres(process.env.DATABASE_URL as string, { prepare: false });
+    const client = postgres(process.env.DATABASE_URL, { prepare: false });
     return drizzle({ client, schema });
   }
 
   if (!_client) {
-    _client = postgres(process.env.DATABASE_URL as string, {
+    _client = postgres(process.env.DATABASE_URL, {
       prepare: false,
       max: 10,
       idle_timeout: 30,

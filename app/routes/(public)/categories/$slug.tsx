@@ -49,11 +49,17 @@ function RouteComponent() {
             {data.companies.map((company) => (
               <li
                 key={company.id}
-                className="flex flex-col gap-2 border border-border bg-card text-card-foreground rounded-md p-4 shadow-xs"
+                className="flex items-center justify-between gap-2 border border-border bg-card text-card-foreground rounded-md p-4 shadow-xs"
               >
                 <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
                   {company.name}
                 </Link>
+
+                {company.subdomain && (
+                  <p className="text-xs text-muted-foreground border-muted border rounded-md px-2 py-1">
+                    {company.subdomain}
+                  </p>
+                )}
               </li>
             ))}
           </ul>

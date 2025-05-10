@@ -1,7 +1,6 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { inferAdditionalFields } from "better-auth/client/plugins";
 import { admin, customSession } from "better-auth/plugins";
 import { reactStartCookies } from "better-auth/react-start";
 import { Resend } from "resend";
@@ -22,6 +21,7 @@ const passwordHelpers = {
   },
 };
 
+// @todo: use relational queries instead of raw queries
 export function auth() {
   const db = getDb();
   return betterAuth({
@@ -36,15 +36,15 @@ export function auth() {
       },
     },
     plugins: [
-      inferAdditionalFields({
-        user: {
-          role: {
-            type: "string",
-          },
-        },
-      }),
       admin({ adminRoles: ["admin", "superadmin"] }),
       customSession(async ({ user: currentUser, session }) => {
+        const user = await db.query.user.findFirst({
+          where: (user, { eq }) => eq(user.id, currentUser.id),
+          columns: {
+            role: true,
+          },
+        });
+
         const activeCGU = await db.query.cguTable.findFirst({
           where: (cgu, { eq }) => eq(cgu.isActive, true),
         });
@@ -52,7 +52,7 @@ export function auth() {
         if (!activeCGU) {
           return {
             session,
-            user: { ...currentUser, cgu: false },
+            user: { ...currentUser, cgu: false, role: user?.role },
           };
         }
 
@@ -68,7 +68,7 @@ export function auth() {
 
         return {
           session,
-          user: { ...currentUser, cgu: hasAcceptedCGU },
+          user: { ...currentUser, cgu: hasAcceptedCGU, role: user?.role },
         };
       }),
       reactStartCookies(),
