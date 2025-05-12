@@ -22,7 +22,7 @@ const SOCIAL_MEDIAS = [
   },
   {
     name: "linkedin",
-    placeholder: "https://www.linkedin.com/company/monentreprise",
+    placeholder: "https://www.linkedin.com/monentreprise",
     icon: LinkedinIcon,
   },
   { name: "calendly", placeholder: "https://calendly.com/monentreprise", icon: CalendlyIcon },

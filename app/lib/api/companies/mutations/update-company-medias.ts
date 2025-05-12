@@ -58,7 +58,7 @@ export const updateCompanyMedia = createServerFn({ method: "POST" })
 
           await Promise.all(
             gallery.map(async (image, index) => {
-              if (!image.size) return;
+              if (!image?.size) return;
 
               const imageResult = gallery_public_id[index]
                 ? await updateImageInCloudinary({

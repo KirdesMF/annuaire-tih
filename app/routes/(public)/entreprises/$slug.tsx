@@ -99,13 +99,13 @@ function RouteComponent() {
         <div className="flex gap-2 flex-wrap">
           <div className="flex-1 border border-border bg-card text-card-foreground p-6 rounded-sm flex flex-col gap-2">
             <p className="text-sm text-nowrap">
-              <span className="font-bold">Entrepreneur:</span> {data.business_owner || "..."}
+              <span className="font-bold">Entrepreneur·euse :</span> {data.business_owner || "..."}
             </p>
             <p className="text-sm text-nowrap">
-              <span className="font-bold">Zone géographique:</span> {data.service_area || "..."}
+              <span className="font-bold">Zone géographique :</span> {data.service_area || "..."}
             </p>
             <p className="text-sm text-nowrap">
-              <span className="font-bold">Mode de travail:</span>{" "}
+              <span className="font-bold">Mode de travail :</span>{" "}
               {WORK_MODES[data.work_mode ?? "not_specified"]}
             </p>
 
@@ -116,7 +116,7 @@ function RouteComponent() {
             ) : null}
 
             <p className="text-sm text-nowrap">
-              <span className="font-bold">Sous domaine:</span> {data.subdomain || "..."}
+              <span className="font-bold">Sous domaine :</span> {data.subdomain || "..."}
             </p>
           </div>
 

@@ -40,12 +40,7 @@ function RouteComponent() {
       <div className="py-20 max-w-4xl mx-auto">
         <h1 className="sr-only">Sources</h1>
         <section>
-          <div className="flex flex-col gap-2 mb-8">
-            <h2 className="text-4xl font-bold tracking-tighter">Liens utiles</h2>
-            <p className="text-muted-foreground text-md font-light leading-relaxed">
-              Voici les liens utiles pour les entreprises et les associations.
-            </p>
-          </div>
+          <h2 className="text-4xl font-bold tracking-tighter">Liens utiles</h2>
           <ul className="list-disc list-inside flex flex-col p-4">
             {USEFUL_LINKS.map((link) => (
               <li key={link.url}>
@@ -64,12 +59,7 @@ function RouteComponent() {
         </section>
         <Separator.Root className="my-16 h-px w-1/3 mx-auto bg-border" />
         <section>
-          <div className="flex flex-col gap-2 mb-8">
-            <h2 className="text-4xl font-bold tracking-tighter">Documents</h2>
-            <p className="text-muted-foreground text-md font-light leading-relaxed">
-              Voici les documents utiles pour les entreprises et les associations.
-            </p>
-          </div>
+          <h2 className="text-4xl font-bold tracking-tighter">Documents</h2>
           <div className="flex flex-col gap-4 items-center p-4 w-fit ">
             <ul className="list-disc list-inside">
               {DOCUMENTS.map((document) => (

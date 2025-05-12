@@ -425,7 +425,7 @@ function RouteComponent() {
                   defaultChecked={!preview?.rqth}
                   className="size-4 accent-primary"
                 />
-                <span className="text-xs">Non</span>
+                <span className="text-xs">Ne souhaite pas répondre</span>
               </Label>
             </fieldset>
           </div>

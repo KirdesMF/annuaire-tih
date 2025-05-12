@@ -54,7 +54,7 @@ function RouteComponent() {
       setPreview({
         ...preview,
         gallery: currentGallery,
-        galleryUrls: currentGallery.map((image) => URL.createObjectURL(image)),
+        galleryUrls: currentGallery.map((image) => URL.createObjectURL(image ?? new Blob())),
       });
     }
   }
@@ -107,8 +107,6 @@ function RouteComponent() {
       files: ["logo", "gallery.$"],
       arrays: ["gallery", "gallery_public_id"],
     });
-
-    console.log("decodedFormData", decodedFormData);
 
     const result = v.safeParse(UpdateCompanyMediaSchema, decodedFormData, {
       abortPipeEarly: true,

@@ -12,10 +12,12 @@ export const CompanyMediaSchema = v.object({
   gallery: v.optional(
     v.pipe(
       v.array(
-        v.pipe(
-          v.instance(File),
-          v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
-          v.maxSize(1024 * 1024 * 2, "La taille du fichier doit être inférieure à 2MB"),
+        v.optional(
+          v.pipe(
+            v.instance(File),
+            v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
+            v.maxSize(1024 * 1024 * 2, "La taille du fichier doit être inférieure à 2MB"),
+          ),
         ),
       ),
       v.maxLength(2, "Veuillez entrer au plus 2 images"),
@@ -77,7 +79,10 @@ export const CompanyInfosSchema = v.object({
       v.maxLength(1500, "La description de l'entreprise doit contenir au plus 1500 caractères"),
     ),
   ]),
-  website: v.union([v.literal(""), v.pipe(v.string(), v.url("Veuillez entrer une url valide"))]),
+  website: v.union([
+    v.literal(""),
+    v.pipe(v.string(), v.url("Veuillez entrer une url de site web valide")),
+  ]),
   location: v.optional(
     v.union([
       v.literal(""),
@@ -110,57 +115,57 @@ export const CompanyInfosSchema = v.object({
       facebook: v.optional(
         v.pipe(
           v.string(),
-          v.url("Veuillez entrer une url valide"),
-          v.startsWith("https://www.facebook.com/", "Veuillez entrer une url facebook valide"),
+          v.url("Veuillez entrer une url facebook valide"),
+          v.includes("facebook", "Veuillez entrer une url facebook valide"),
         ),
       ),
       instagram: v.optional(
         v.pipe(
           v.string(),
-          v.url("Veuillez entrer une url valide"),
-          v.startsWith("https://www.instagram.com/", "Veuillez entrer une url instagram valide"),
+          v.url("Veuillez entrer une url instagram valide"),
+          v.includes("instagram", "Veuillez entrer une url instagram valide"),
         ),
       ),
       linkedin: v.optional(
         v.pipe(
           v.string(),
-          v.url("Veuillez entrer une url valide"),
-          v.startsWith("https://www.linkedin.com/", "Veuillez entrer une url linkedin valide"),
+          v.url("Veuillez entrer une url linkedin valide"),
+          v.includes("linkedin", "Veuillez entrer une url linkedin valide"),
         ),
       ),
       calendly: v.optional(
         v.pipe(
           v.string(),
-          v.url("Veuillez entrer une url valide"),
-          v.startsWith("https://calendly.com/", "Veuillez entrer une url calendly valide"),
+          v.url("Veuillez entrer une url calendly valide"),
+          v.includes("calendly", "Veuillez entrer une url calendly valide"),
         ),
       ),
       youtube: v.optional(
         v.pipe(
           v.string(),
-          v.url("Veuillez entrer une url valide"),
-          v.startsWith("https://www.youtube.com/", "Veuillez entrer une url youtube valide"),
+          v.url("Veuillez entrer une url youtube valide"),
+          v.includes("youtube", "Veuillez entrer une url youtube valide"),
         ),
       ),
       tiktok: v.optional(
         v.pipe(
           v.string(),
-          v.url("Veuillez entrer une url valide"),
-          v.startsWith("https://www.tiktok.com/", "Veuillez entrer une url tiktok valide"),
+          v.url("Veuillez entrer une url tiktok valide"),
+          v.includes("tiktok", "Veuillez entrer une url tiktok valide"),
         ),
       ),
       twitter: v.optional(
         v.pipe(
           v.string(),
           v.url("Veuillez entrer une url valide"),
-          v.startsWith("https://twitter.com/", "Veuillez entrer une url twitter valide"),
+          v.includes("twitter", "Veuillez entrer une url twitter valide"),
         ),
       ),
       spotify: v.optional(
         v.pipe(
           v.string(),
           v.url("Veuillez entrer une url valide"),
-          v.startsWith("https://open.spotify.com/", "Veuillez entrer une url spotify valide"),
+          v.includes("spotify", "Veuillez entrer une url spotify valide"),
         ),
       ),
     }),

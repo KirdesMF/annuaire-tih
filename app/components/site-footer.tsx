@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Separator } from "radix-ui";
 import img from "~/assets/img/FINDAJOB.jpg?url";
 export function SiteFooter() {
   return (
@@ -56,6 +57,17 @@ export function SiteFooter() {
             </div>
           </div>
         </div>
+
+        <Separator.Root className="my-8 h-px bg-border" />
+
+        <p className="text-xs font-light">
+          Si vous n'arrivez pas à accéder à un contenu ou à un service, et pour être orienté vers
+          une alternative accessible ou obtenir le contenu sous une autre forme, vous pouvez
+          contacter{" "}
+          <a href="mailto:annuairetih@gmail.com" className="underline">
+            annuairetih@gmail.com
+          </a>
+        </p>
       </div>
     </footer>
   );
