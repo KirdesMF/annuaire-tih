@@ -69,7 +69,7 @@ function RouteComponent() {
                 <Link
                   to={"/compte/entreprises/$slug/edit/infos"}
                   params={{ slug: params.slug }}
-                  className="border border-border bg-muted text-muted-foreground px-2 py-1.5 rounded-sm text-xs h-min flex items-center gap-1"
+                  className="border border-border bg-muted text-muted-foreground px-2 py-1 rounded-sm text-xs h-min flex items-center gap-1"
                 >
                   <span>Modifier</span>
                   <PencilLine className="size-4" />
@@ -101,7 +101,7 @@ function RouteComponent() {
             <p className="text-sm text-nowrap">
               <span className="font-bold">Entrepreneur·euse :</span> {data.business_owner || "..."}
             </p>
-            <p className="text-sm text-nowrap">
+            <p className="text-sm">
               <span className="font-bold">Zone géographique :</span> {data.service_area || "..."}
             </p>
             <p className="text-sm text-nowrap">
@@ -115,7 +115,7 @@ function RouteComponent() {
               </p>
             ) : null}
 
-            <p className="text-sm text-nowrap">
+            <p className="text-sm">
               <span className="font-bold">Sous domaine :</span> {data.subdomain || "..."}
             </p>
           </div>
