@@ -32,6 +32,9 @@ export const loginFn = createServerFn({ method: "POST" })
   });
 
 export const Route = createFileRoute("/(auth)/sign-in")({
+  head: () => ({
+    meta: [{ title: "Sign in" }],
+  }),
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
     if (context.user) {

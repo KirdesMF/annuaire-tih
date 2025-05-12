@@ -106,6 +106,9 @@ export const signupFn = createServerFn()
   });
 
 export const Route = createFileRoute("/(auth)/sign-up")({
+  head: () => ({
+    meta: [{ title: "Créer un compte" }],
+  }),
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
     if (context.user) {

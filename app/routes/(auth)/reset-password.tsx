@@ -30,6 +30,9 @@ const resetPasswordFn = createServerFn({ method: "POST" })
   });
 
 export const Route = createFileRoute("/(auth)/reset-password")({
+  head: () => ({
+    meta: [{ title: "Réinitialiser votre mot de passe" }],
+  }),
   validateSearch: (search) => v.parse(SearchParamsSchema, search),
   component: RouteComponent,
 });

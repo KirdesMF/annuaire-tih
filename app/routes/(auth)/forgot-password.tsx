@@ -26,6 +26,9 @@ export const forgotPasswordFn = createServerFn({ method: "POST" })
   });
 
 export const Route = createFileRoute("/(auth)/forgot-password")({
+  head: () => ({
+    meta: [{ title: "Mot de passe oublié" }],
+  }),
   component: RouteComponent,
 });
 
