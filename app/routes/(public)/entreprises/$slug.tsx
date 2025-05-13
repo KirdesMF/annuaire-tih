@@ -12,7 +12,13 @@ import { SpotifyIcon } from "~/components/icons/spotify";
 import { TiktokIcon } from "~/components/icons/tiktok";
 import { TwitterIcon } from "~/components/icons/twitter";
 import { YoutubeIcon } from "~/components/icons/youtube";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import { cn } from "~/utils/cn";
 import { slugify } from "~/utils/slug";
@@ -204,7 +210,7 @@ function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; public
                     <img
                       src={image.secureUrl}
                       alt={image.publicId}
-                      className="object-cover aspect-square rounded-sm"
+                      className="object-contain aspect-square rounded-sm"
                     />
                   </button>
                 </DialogTrigger>
@@ -214,11 +220,15 @@ function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; public
                     {gallery[currentImageIndex].publicId}
                   </DialogTitle>
 
-                  <div className="flex gap-4 justify-between items-center">
+                  <DialogDescription className="sr-only">
+                    Galerie d'image de l'entreprise
+                  </DialogDescription>
+
+                  <div className="flex gap-8 justify-between items-center">
                     <button
                       type="button"
                       className={cn(
-                        "bg-secondary/80 text-secondary-foreground rounded-full p-2 hover:bg-secondary/90 size-12 grid place-items-center cursor-pointer",
+                        "bg-secondary/80 text-secondary-foreground rounded-full p-2 hover:bg-secondary/90 size-8 grid place-items-center cursor-pointer",
                         gallery.length <= 1 && "hidden",
                       )}
                       onClick={() =>
@@ -226,19 +236,19 @@ function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; public
                       }
                       aria-label="Previous image"
                     >
-                      <ChevronLeftIcon className="size-6" />
+                      <ChevronLeftIcon className="size-4" />
                     </button>
 
                     <img
                       src={gallery[currentImageIndex].secureUrl}
                       alt={gallery[currentImageIndex].publicId}
-                      className="w-[25vw]  max-w-full object-contain"
+                      className="w-[25vw] max-w-full object-contain"
                     />
 
                     <button
                       type="button"
                       className={cn(
-                        "bg-secondary/80 text-secondary-foreground rounded-full p-2 hover:bg-secondary/90 size-12 grid place-items-center cursor-pointer",
+                        "bg-secondary/80 text-secondary-foreground rounded-full p-2 hover:bg-secondary/90 size-8 grid place-items-center cursor-pointer",
                         gallery.length <= 1 && "hidden",
                       )}
                       onClick={() =>
@@ -246,7 +256,7 @@ function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; public
                       }
                       aria-label="Next image"
                     >
-                      <ChevronRightIcon className="size-6" />
+                      <ChevronRightIcon className="size-4" />
                     </button>
                   </div>
                 </DialogContent>

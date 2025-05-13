@@ -46,9 +46,14 @@ function Home() {
     ...categoriesQueryOptions,
     select: (data) => data.sort((a, b) => a.name.localeCompare(b.name)),
   });
+  const navigate = Route.useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
   const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
+
+  function onNavigate(path: string, slug: string) {
+    navigate({ to: path, params: { slug } });
+  }
 
   return (
     <main className="px-4 py-20">
@@ -145,10 +150,11 @@ function Home() {
                       <CommandEmpty>Aucune entreprise trouvée</CommandEmpty>
                     )}
                     {companies?.map((company) => (
-                      <CommandItem key={company.id} asChild>
-                        <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
-                          {company.name}
-                        </Link>
+                      <CommandItem
+                        key={company.id}
+                        onSelect={() => onNavigate("/entreprises/$slug", company.slug)}
+                      >
+                        {company.name}
                       </CommandItem>
                     ))}
                   </CommandList>

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import type { User } from "better-auth";
 import { Monitor, Moon, SearchIcon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -29,10 +29,16 @@ import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-
 import { type Theme, useTheme } from "./providers/theme-provider";
 
 export function SiteHeader({ user }: { user: User | undefined }) {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
   const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  function onNavigate(path: string, slug: string) {
+    setIsDialogOpen(false);
+    navigate({ to: path, params: { slug } });
+  }
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -88,14 +94,11 @@ export function SiteHeader({ user }: { user: User | undefined }) {
                   )}
 
                   {companies?.map((company) => (
-                    <CommandItem key={company.id} asChild>
-                      <Link
-                        to="/entreprises/$slug"
-                        params={{ slug: company.slug }}
-                        onClick={() => setIsDialogOpen(false)}
-                      >
-                        {company.name}
-                      </Link>
+                    <CommandItem
+                      key={company.id}
+                      onSelect={() => onNavigate("/entreprises/$slug", company.slug)}
+                    >
+                      {company.name}
                     </CommandItem>
                   ))}
                 </CommandList>
