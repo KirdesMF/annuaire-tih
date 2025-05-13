@@ -9,8 +9,8 @@ export function SiteFooter() {
           <ul className="flex flex-col gap-2 text-xs list-disc list-inside">
             <li>
               Besoin d'aide ? Des questions ?{" "}
-              <a href="mailto:contact@annuaire-tih.fr" className="underline">
-                contact@annuaire-tih.fr
+              <a href="mailto:annuairetih@gmail.com" className="underline">
+                annuairetih@gmail.com
               </a>
             </li>
             <li>
