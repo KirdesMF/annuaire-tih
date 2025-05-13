@@ -188,11 +188,11 @@ function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; public
             <li key={image.publicId}>
               <Dialog>
                 <DialogTrigger asChild>
-                  <button type="button" className="grid place-items-center cursor-pointer size-64">
+                  <button type="button" className="grid place-items-center size-64 cursor-zoom-in">
                     <img
                       src={image.secureUrl}
                       alt={image.publicId}
-                      className="object-contain rounded-sm"
+                      className="object-cover aspect-square rounded-sm"
                     />
                   </button>
                 </DialogTrigger>
