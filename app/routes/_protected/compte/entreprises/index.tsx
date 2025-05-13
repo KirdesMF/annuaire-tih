@@ -1,9 +1,7 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { LoaderIcon, Plus } from "lucide-react";
-import { Separator } from "radix-ui";
 import { useState } from "react";
-import { CompanyLogo } from "~/components/company-logo";
 import {
   Dialog,
   DialogClose,
@@ -117,7 +115,10 @@ function RouteComponent() {
                       <Link
                         to="/categories/$slug"
                         params={{ slug: slugify(category.category_name ?? "") }}
-                        search={{ id: category.category_id ?? "" }}
+                        search={{
+                          id: category.category_id ?? "",
+                          name: category.category_name ?? "",
+                        }}
                       >
                         {category.category_name}
                       </Link>
