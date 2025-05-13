@@ -133,13 +133,34 @@ function RouteComponent() {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
-    revokeAll();
+    const decodedFormData = decode(formData, {
+      files: ["logo", "gallery.$"],
+      arrays: ["categories", "gallery"],
+      booleans: ["rqth"],
+    });
+
+    const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortEarly: true });
+
+    if (!result.success) {
+      return toast({
+        description: (
+          <span>
+            {result.issues.map((issue, idx) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+              <span key={idx}>{issue.message}</span>
+            ))}
+          </span>
+        ),
+        button: { label: "Fermer" },
+      });
+    }
 
     mutate(
       { data: formData },
       {
         onSuccess: () => {
-          console.log("invalidating user companies", context.user.id);
+          revokeAll();
+
           context.queryClient.invalidateQueries({
             queryKey: ["user", "companies", context.user.id],
           });
@@ -150,7 +171,8 @@ function RouteComponent() {
           });
           navigate({ to: "/compte/entreprises" });
         },
-        onError: () => {
+        onError: (error) => {
+          console.log(error);
           toast({
             description: "Une erreur est survenue lors de la création de l'entreprise",
             button: { label: "Fermer" },

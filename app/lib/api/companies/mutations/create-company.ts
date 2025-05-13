@@ -64,7 +64,9 @@ export const createCompany = createServerFn({ method: "POST" })
         // @todo: handle errors
         if (gallery?.length) {
           // Filter out empty files
-          const validGalleryImages = gallery.filter((image) => image && image.size > 0);
+          const validGalleryImages = gallery.filter(
+            (image): image is File => image !== undefined && image.size > 0,
+          );
 
           if (validGalleryImages.length > 0) {
             const uploadedImages = await uploadImages({

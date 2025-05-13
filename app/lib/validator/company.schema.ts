@@ -1,30 +1,6 @@
 import * as v from "valibot";
 import { COMPANY_WORK_MODES } from "~/db/schema/companies";
 
-export const CompanyMediaSchema = v.object({
-  logo: v.optional(
-    v.pipe(
-      v.instance(File),
-      v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
-      v.maxSize(1024 * 1024 * 3, "La taille du fichier doit être inférieure à 3MB"),
-    ),
-  ),
-  gallery: v.optional(
-    v.pipe(
-      v.array(
-        v.optional(
-          v.pipe(
-            v.instance(File),
-            v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
-            v.maxSize(1024 * 1024 * 2, "La taille du fichier doit être inférieure à 2MB"),
-          ),
-        ),
-      ),
-      v.maxLength(2, "Veuillez entrer au plus 2 images"),
-    ),
-  ),
-});
-
 export const LogoCompanySchema = v.object({
   companyId: v.string(),
   logo_public_id: v.optional(v.string()),
@@ -169,6 +145,30 @@ export const CompanyInfosSchema = v.object({
         ),
       ),
     }),
+  ),
+});
+
+export const CompanyMediaSchema = v.object({
+  logo: v.optional(
+    v.pipe(
+      v.instance(File),
+      v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
+      v.maxSize(1024 * 1024 * 3, "La taille du fichier doit être inférieure à 3MB"),
+    ),
+  ),
+  gallery: v.optional(
+    v.pipe(
+      v.array(
+        v.optional(
+          v.pipe(
+            v.instance(File),
+            v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
+            v.maxSize(1024 * 1024 * 2, "La taille du fichier doit être inférieure à 2MB"),
+          ),
+        ),
+      ),
+      v.maxLength(2, "Veuillez entrer au plus 2 images"),
+    ),
   ),
 });
 
