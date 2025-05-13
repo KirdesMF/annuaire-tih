@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Globe, Mail, PencilLine, Phone } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon, Globe, Mail, PencilLine, Phone } from "lucide-react";
+import { useState } from "react";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
@@ -13,6 +14,7 @@ import { TwitterIcon } from "~/components/icons/twitter";
 import { YoutubeIcon } from "~/components/icons/youtube";
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { cn } from "~/utils/cn";
 import { slugify } from "~/utils/slug";
 
 export const Route = createFileRoute("/(public)/entreprises/$slug")({
@@ -124,12 +126,16 @@ function RouteComponent() {
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Mail className="size-5" />
-                <p className="text-xs text-nowrap">{data.email || "..."}</p>
+                <a href={`mailto:${data.email}`} className="text-xs text-nowrap">
+                  {data.email || "..."}
+                </a>
               </div>
 
               <div className="flex items-center gap-2">
                 <Phone className="size-5" />
-                <p className="text-xs text-nowrap">{data.phone || "..."}</p>
+                <a href={`tel:${data.phone}`} className="text-xs text-nowrap">
+                  {data.phone || "..."}
+                </a>
               </div>
 
               <div className="flex items-center gap-2">
@@ -179,16 +185,22 @@ function RouteComponent() {
 }
 
 function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; publicId: string }> }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   return (
     <div className="border border-border bg-card text-card-foreground p-6 rounded-sm grid gap-4">
       <h2 className="sr-only">Galerie</h2>
       <ul className="flex flex-wrap gap-4 items-center justify-center">
-        {gallery.map((image) => {
+        {gallery.map((image, index) => {
           return (
             <li key={image.publicId}>
               <Dialog>
                 <DialogTrigger asChild>
-                  <button type="button" className="grid place-items-center size-64 cursor-zoom-in">
+                  <button
+                    type="button"
+                    className="grid place-items-center size-64 cursor-zoom-in"
+                    onClick={() => setCurrentImageIndex(index)}
+                  >
                     <img
                       src={image.secureUrl}
                       alt={image.publicId}
@@ -196,14 +208,46 @@ function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; public
                     />
                   </button>
                 </DialogTrigger>
-                <DialogContent className="w-auto p-16">
-                  <DialogTitle className="sr-only">{image.publicId}</DialogTitle>
-                  <div className="grid place-items-center">
+
+                <DialogContent className="w-auto px-8 py-16">
+                  <DialogTitle className="sr-only">
+                    {gallery[currentImageIndex].publicId}
+                  </DialogTitle>
+
+                  <div className="flex gap-4 justify-between items-center">
+                    <button
+                      type="button"
+                      className={cn(
+                        "bg-secondary/80 text-secondary-foreground rounded-full p-2 hover:bg-secondary/90 size-12 grid place-items-center cursor-pointer",
+                        gallery.length <= 1 && "hidden",
+                      )}
+                      onClick={() =>
+                        setCurrentImageIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1))
+                      }
+                      aria-label="Previous image"
+                    >
+                      <ChevronLeftIcon className="size-6" />
+                    </button>
+
                     <img
-                      src={image.secureUrl}
-                      alt={image.publicId}
-                      className="max-h-[70vh] max-w-full object-contain"
+                      src={gallery[currentImageIndex].secureUrl}
+                      alt={gallery[currentImageIndex].publicId}
+                      className="w-[25vw]  max-w-full object-contain"
                     />
+
+                    <button
+                      type="button"
+                      className={cn(
+                        "bg-secondary/80 text-secondary-foreground rounded-full p-2 hover:bg-secondary/90 size-12 grid place-items-center cursor-pointer",
+                        gallery.length <= 1 && "hidden",
+                      )}
+                      onClick={() =>
+                        setCurrentImageIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1))
+                      }
+                      aria-label="Next image"
+                    >
+                      <ChevronRightIcon className="size-6" />
+                    </button>
                   </div>
                 </DialogContent>
               </Dialog>
