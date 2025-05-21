@@ -207,12 +207,6 @@ function Home() {
       <Separator.Root className="w-1/3 h-px bg-border mx-auto" />
 
       <section className="max-w-7xl mx-auto py-20 relative">
-        <div className="absolute top-1/2 -translate-y-1/2 hidden xl:block">
-          <a href="https://www.en-dautres-mots.fr" target="_blank" rel="noreferrer noopener">
-            <img src={edmDesktop} alt="" className="w-44 object-cover" />
-          </a>
-        </div>
-
         <div className="grid gap-4 max-w-3xl mx-auto">
           <article className="ring-1 ring-border rounded-sm p-4 shadow grid gap-4 bg-card text-card-foreground w-full">
             <div className="flex flex-col gap-1">
