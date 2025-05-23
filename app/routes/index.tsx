@@ -59,12 +59,12 @@ function Home() {
   }
 
   return (
-    <main className="px-16 py-20">
+    <main className="px-4 md:px-16 py-20">
       <div className="max-w-4xl mx-auto h-64 border border-border rounded-sm overflow-hidden">
         <img
           src={banner}
           alt="Annuaire TIH"
-          className="size-full object-contain grayscale-30 hover:grayscale-0 transition-all duration-300"
+          className="size-full object-cover md:object-contain grayscale-30 hover:grayscale-0 transition-all duration-300"
         />
       </div>
 
@@ -179,7 +179,7 @@ function Home() {
         </div>
       </section>
 
-      <Separator.Root className="w-96 h-px bg-border mx-auto" />
+      <HomeSeparator />
 
       <section className="max-w-3xl py-20 mx-auto ">
         <div className="flex flex-col gap-8 items-center">
@@ -215,7 +215,7 @@ function Home() {
         </div>
       </section>
 
-      <Separator.Root className="w-96 h-px bg-border mx-auto" />
+      <HomeSeparator />
 
       <section className="py-20 max-w-3xl mx-auto xl:hidden ">
         <div className="flex flex-col gap-4 items-center">
@@ -229,7 +229,7 @@ function Home() {
         </div>
       </section>
 
-      <Separator.Root className="w-96 h-px bg-border mx-auto" />
+      <HomeSeparator />
 
       <section className="max-w-7xl mx-auto py-20 relative">
         <div className="grid gap-4 max-w-3xl mx-auto">
@@ -313,7 +313,7 @@ function Home() {
         </div>
       </section>
 
-      <Separator.Root className="w-96 h-px bg-border mx-auto" />
+      <HomeSeparator />
 
       <section className="max-w-3xl mx-auto py-20">
         <div className="flex flex-col gap-6 items-center">
@@ -379,4 +379,8 @@ function Home() {
       </section>
     </main>
   );
+}
+
+function HomeSeparator() {
+  return <Separator.Root className="w-50 md:w-96 h-px bg-border mx-auto" />;
 }
