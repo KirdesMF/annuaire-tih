@@ -59,7 +59,7 @@ function Home() {
   }
 
   return (
-    <main className="px-4 py-20">
+    <main className="px-16 py-20">
       <div className="max-w-4xl mx-auto h-64 border border-border rounded-sm overflow-hidden">
         <img
           src={banner}
@@ -104,8 +104,19 @@ function Home() {
         </div>
       </section>
 
-      <section className="max-w-3xl mx-auto py-20" id="search">
-        <div className="flex flex-col gap-8 items-center">
+      <section className="max-w-7xl mx-auto py-20 relative" id="search">
+        <div className="absolute top-20 start-0 hidden xl:flex">
+          <a
+            href="https://www.en-dautres-mots.fr"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="w-1/2"
+          >
+            <img src={edmDesktop} alt="" className="w-full object-cover" />
+          </a>
+        </div>
+
+        <div className="flex flex-col gap-8 items-center max-w-3xl mx-auto">
           <div className="flex flex-col gap-4 items-center">
             <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
               <ScanSearchIcon className="size-4" />
@@ -168,7 +179,7 @@ function Home() {
         </div>
       </section>
 
-      <Separator.Root className="w-1/3 h-px bg-border mx-auto" />
+      <Separator.Root className="w-96 h-px bg-border mx-auto" />
 
       <section className="max-w-3xl py-20 mx-auto ">
         <div className="flex flex-col gap-8 items-center">
@@ -204,7 +215,21 @@ function Home() {
         </div>
       </section>
 
-      <Separator.Root className="w-1/3 h-px bg-border mx-auto" />
+      <Separator.Root className="w-96 h-px bg-border mx-auto" />
+
+      <section className="py-20 max-w-3xl mx-auto xl:hidden ">
+        <div className="flex flex-col gap-4 items-center">
+          <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
+            <HandshakeIcon className="size-4" />
+            <span>Sponsors</span>
+          </div>
+          <a href="https://www.en-dautres-mots.fr" target="_blank" rel="noreferrer noopener">
+            <img src={edmMobile} alt="" className="size-full object-fit" />
+          </a>
+        </div>
+      </section>
+
+      <Separator.Root className="w-96 h-px bg-border mx-auto" />
 
       <section className="max-w-7xl mx-auto py-20 relative">
         <div className="grid gap-4 max-w-3xl mx-auto">
@@ -288,7 +313,7 @@ function Home() {
         </div>
       </section>
 
-      <Separator.Root className="w-1/3 h-px bg-border mx-auto" />
+      <Separator.Root className="w-96 h-px bg-border mx-auto" />
 
       <section className="max-w-3xl mx-auto py-20">
         <div className="flex flex-col gap-6 items-center">
@@ -348,11 +373,6 @@ function Home() {
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="xl:hidden">
-              <a href="https://www.en-dautres-mots.fr" target="_blank" rel="noreferrer noopener">
-                <img src={edmMobile} alt="" className="size-full object-fit" />
-              </a>
             </div>
           </div>
         </div>
