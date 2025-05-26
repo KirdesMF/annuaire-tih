@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { getDb } from "~/db";
 import { categoriesTable } from "../schema/categories";
 

@@ -8,7 +8,14 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["app/routeTree.gen.ts", ".output/*", ".vinxi/*", ".wrangler/*"]
+    "ignore": [
+      "app/routeTree.gen.ts",
+      ".output/*",
+      ".vinxi/*",
+      ".wrangler/*",
+      "node_modules/*",
+      "app/styles/*"
+    ]
   },
   "formatter": {
     "enabled": true,
