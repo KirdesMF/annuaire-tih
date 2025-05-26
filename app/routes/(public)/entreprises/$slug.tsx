@@ -59,6 +59,9 @@ function RouteComponent() {
 
   const hasSocialMedia = Object.keys(data.social_media).length > 0;
 
+  const isOwner = context.user?.id === data.user_id;
+  const isAdmin = context.user?.role === "admin";
+
   return (
     <main className="px-4 py-8">
       <div className="grid gap-4 max-w-5xl mx-auto py-24">
@@ -73,16 +76,18 @@ function RouteComponent() {
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">{data.name}</h1>
               <CopyButton>{data.siret}</CopyButton>
-              {context.user?.id === data.user_id && (
-                <Link
-                  to={"/compte/entreprises/$slug/edit/infos"}
-                  params={{ slug: params.slug }}
-                  className="border border-border bg-muted text-muted-foreground px-2 py-1 rounded-sm text-xs h-min flex items-center gap-1"
-                >
-                  <span>Modifier</span>
-                  <PencilLine className="size-4" />
-                </Link>
-              )}
+              {isOwner ||
+                (isAdmin && (
+                  <Link
+                    to={"/compte/entreprises/$slug/edit/infos"}
+                    params={{ slug: params.slug }}
+                    search={{ id: context?.user?.id ?? "" }}
+                    className="border border-border bg-muted text-muted-foreground px-2 py-1 rounded-sm text-xs h-min flex items-center gap-1"
+                  >
+                    <span>Modifier</span>
+                    <PencilLine className="size-4" />
+                  </Link>
+                ))}
             </div>
 
             <ul className="flex flex-wrap gap-2">
