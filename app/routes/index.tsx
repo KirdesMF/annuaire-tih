@@ -105,12 +105,12 @@ function Home() {
       </section>
 
       <section className="max-w-7xl mx-auto py-20 relative" id="search">
-        <div className="absolute top-20 start-0 hidden xl:flex">
+        <div className="absolute top-20 start-0 hidden xl:grid w-2/9">
           <a
             href="https://www.en-dautres-mots.fr"
             target="_blank"
             rel="noreferrer noopener"
-            className="w-1/2"
+            className="w-full"
           >
             <img src={edmDesktop} alt="" className="w-full object-cover" />
           </a>

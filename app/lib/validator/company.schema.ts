@@ -52,7 +52,7 @@ export const CompanyInfosSchema = v.object({
     v.literal(""),
     v.pipe(
       v.string(),
-      v.maxLength(1500, "La description de l'entreprise doit contenir au plus 1500 caractères"),
+      v.maxLength(2000, "La description de l'entreprise doit contenir au plus 2000 caractères"),
     ),
   ]),
   website: v.union([

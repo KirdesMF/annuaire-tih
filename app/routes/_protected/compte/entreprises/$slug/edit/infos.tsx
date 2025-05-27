@@ -11,6 +11,7 @@ import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { cn } from "~/utils/cn";
 import { SocialMedias } from "../../-components/social-medias";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/infos")({
@@ -205,7 +206,14 @@ function RouteComponent() {
                 defaultValue={company.data?.description ?? ""}
               />
             </Label>
-            <span className="text-xs justify-self-end">{descriptionLength}/1500</span>
+            <span
+              className={cn(
+                "text-xs mt-1 justify-self-end px-2 py-0.5 rounded-xs bg-muted text-muted-foreground transition-colors",
+                descriptionLength > 2000 && "text-destructive-foreground bg-destructive",
+              )}
+            >
+              {descriptionLength}/2000
+            </span>
           </div>
 
           <Separator.Root className="h-px bg-border my-4" />

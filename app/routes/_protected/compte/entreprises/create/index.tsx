@@ -295,10 +295,10 @@ function RouteComponent() {
             <span
               className={cn(
                 "text-xs mt-1 justify-self-end px-2 py-0.5 rounded-xs bg-muted text-muted-foreground transition-colors",
-                descriptionLength > 1500 && "text-destructive-foreground bg-destructive",
+                descriptionLength > 2000 && "text-destructive-foreground bg-destructive",
               )}
             >
-              {descriptionLength}/1500
+              {descriptionLength}/2000
             </span>
           </div>
 
