@@ -65,9 +65,9 @@ function RouteComponent() {
   return (
     <main className="px-4 py-8">
       <div className="grid gap-4 max-w-5xl mx-auto py-24">
-        <div className="flex gap-4 ">
+        <div className="flex flex-col md:flex-row gap-4">
           {data.logo?.secureUrl ? (
-            <div className="border border-border bg-card text-card-foreground p-6 rounded-sm grid place-items-center">
+            <div className="border border-border bg-card p-6 rounded-sm grid place-items-center">
               <CompanyLogo url={data.logo?.secureUrl} name={data.name} size="lg" />
             </div>
           ) : null}
