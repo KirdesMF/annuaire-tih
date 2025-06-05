@@ -137,6 +137,9 @@ function RouteComponent() {
                   <Link
                     to="/compte/entreprises/$slug/edit/infos"
                     params={{ slug: company.slug }}
+                    search={{
+                      id: context.user.id,
+                    }}
                     className="text-xs px-2 py-1 rounded-sm border border-secondary-foreground text-secondary-foreground"
                   >
                     Modifier
