@@ -20,7 +20,7 @@ const USEFUL_LINKS = [
 
 const DOCUMENTS = [
   {
-    label: "GUIDE de l'OETH Obligation d'Emploi des Travailleurs Handicapés de l'URSSAFF",
+    label: "GUIDE de l'OETH Obligation d'Emploi des Travailleurs Handicapés de l'URSSAF",
     url: "https://www.urssaf.fr/files/live/sites/urssaffr/files/outils-documentation/guides/Guide-OETH.pdf",
   },
   {
