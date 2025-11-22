@@ -129,7 +129,7 @@ function RouteComponent() {
             ) : null}
 
             <p className="text-sm">
-              <span className="font-bold">Sous domaine :</span> {data.subdomain || "..."}
+              <span className="font-bold">Activités :</span> {data.subdomain || "..."}
             </p>
           </div>
 

@@ -315,7 +315,7 @@ function RouteComponent() {
           </Label>
 
           <Label className="flex flex-col gap-1">
-            <span className="text-xs font-medium">Sous-domaine</span>
+            <span className="text-xs font-medium">Activités</span>
             <Input
               type="text"
               name="subdomain"
