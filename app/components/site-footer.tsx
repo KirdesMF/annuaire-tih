@@ -45,7 +45,7 @@ export function SiteFooter() {
 
           <div className="flex flex-col gap-6 text-xs">
             <div className="space-y-2">
-              <p className="text-xs font-light">Partenaire:</p>
+              <p className="text-xs font-light">Partenaires:</p>
               <div className="w-24">
                 <img src={img} alt="logo" className="size-full object-contain" />
               </div>
