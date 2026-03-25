@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Separator } from "radix-ui";
 import img from "~/assets/img/FINDAJOB.jpg?url";
+import logoTIHM from "~/assets/img/logoTIHM.png?url";
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-accent text-accent-foreground mt-auto">
@@ -46,6 +48,12 @@ export function SiteFooter() {
               <p className="text-xs font-light">Partenaire:</p>
               <div className="w-24">
                 <img src={img} alt="logo" className="size-full object-contain" />
+              </div>
+
+              <div className="w-24">
+                <a href="https://www.tihm.urssaf.fr/" target="_blank" rel="noopener noreferrer">
+                  <img src={logoTIHM} alt="logo TIHM" className="size-full object-contain" />
+                </a>
               </div>
             </div>
 

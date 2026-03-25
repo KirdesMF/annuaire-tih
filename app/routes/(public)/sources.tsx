@@ -16,6 +16,10 @@ const USEFUL_LINKS = [
   { label: "Cap Emploi", url: "https://www.capemploi.info/" },
   { label: "H'up entrepreneurs", url: "https://h-up.fr/" },
   { label: "Plateforme TIH-LEARNING", url: "https://bs.linklusion.fr/tih-learning.fr/" },
+  {
+    label: "Portail TIHm, partenaire des Travailleurs Indépendants Handicapés",
+    url: "https://www.tihm.urssaf.fr/",
+  },
 ];
 
 const DOCUMENTS = [

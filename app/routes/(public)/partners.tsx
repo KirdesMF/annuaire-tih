@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Separator } from "radix-ui";
 import findajob from "~/assets/img/FINDAJOB.jpg?url";
+import logoTIHM from "~/assets/img/Logo_TIHM.svg?url";
 
 export const Route = createFileRoute("/(public)/partners")({
   component: RouteComponent,
@@ -46,23 +47,58 @@ function RouteComponent() {
           <div className="flex flex-col gap-8 mb-8">
             <div className="flex flex-col gap-2">
               <h2 className="text-4xl font-bold tracking-tighter">Partenariats</h2>
-              <p className="text-muted-foreground text-md font-light leading-relaxed">
-                L'association{" "}
-                <span className="font-bold">"Les Rencontres Handicap Sport & Emploi"</span> promeut
-                l'annuaire-tih.fr lors des évènements <span className="font-bold">FindaJob</span> et{" "}
-                <span className="font-bold">Le Relais-Universel</span> !
-              </p>
             </div>
-            <div className="border border-border rounded-sm w-1/2">
-              <img
-                src={findajob}
-                alt="FindaJob"
-                className="w-full h-full object-cover rounded-sm dark:brightness-85"
-              />
+
+            <div className="flex flex-col gap-12">
+              <div className="flex flex-col gap-4">
+                <p className="text-muted-foreground text-md font-light leading-relaxed">
+                  L'association{" "}
+                  <span className="font-bold">"Les Rencontres Handicap Sport & Emploi"</span>{" "}
+                  promeut l'annuaire-tih.fr lors des évènements{" "}
+                  <span className="font-bold">FindaJob</span> et{" "}
+                  <span className="font-bold">Le Relais-Universel</span> !
+                </p>
+
+                <div className="border border-border rounded-sm w-full max-w-md">
+                  <img
+                    src={findajob}
+                    alt="FindaJob"
+                    className="w-full h-full object-cover rounded-sm dark:brightness-85"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <p className="text-muted-foreground text-md font-light leading-relaxed">
+                  En tant que partenaire de ce projet, nous sommes heureux de vous faire découvrir
+                  le portail{" "}
+                  <a
+                    href="https://www.tihm.urssaf.fr/"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="font-bold underline underline-offset-2"
+                  >
+                    TIHm
+                  </a>{" "}
+                  dédié aux Travailleurs Indépendants en situation de Handicap (TIH) !
+                </p>
+
+                <div className="border border-border rounded-sm w-full max-w-sm bg-white p-4">
+                  <a href="https://www.tihm.urssaf.fr/" target="_blank" rel="noreferrer noopener">
+                    <img
+                      src={logoTIHM}
+                      alt="TIHm, le messager des TIH"
+                      className="w-full h-auto object-contain rounded-sm"
+                    />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>
+
         <Separator.Root className="my-16 h-px w-1/3 mx-auto bg-border" />
+
         <section>
           <div className="flex flex-col gap-2 mb-8">
             <h2 className="text-4xl font-bold tracking-tighter">Illustrations</h2>
