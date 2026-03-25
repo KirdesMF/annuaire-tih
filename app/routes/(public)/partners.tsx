@@ -80,7 +80,7 @@ function RouteComponent() {
                   >
                     TIHm
                   </a>{" "}
-                  dédié aux Travailleurs Indépendants en situation de Handicap (TIH) !
+                  dédié aux Travailleurs Indépendants en situation de Handicap (TIH)!
                 </p>
 
                 <div className="border border-border rounded-sm w-full max-w-sm bg-white p-4">
