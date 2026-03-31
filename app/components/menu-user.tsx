@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import type { User } from "better-auth";
 import { BriefcaseBusiness, DiamondPlus, LayoutDashboard, LogOut, UserCog } from "lucide-react";
 import { Avatar } from "radix-ui";
 import {
@@ -16,15 +15,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { useAdminRole } from "~/hooks/use-admin-role";
+import { isValidRole } from "~/db/schema/auth";
 import { signOutFn } from "~/lib/api/auth/sign-out";
+import type { AuthUser } from "~/lib/auth/auth.server";
 import { type Theme, useTheme } from "./providers/theme-provider";
 import { useToast } from "./ui/toast";
 
-export function MenuUser({ user }: { user: User | undefined }) {
-  const { isAdmin } = useAdminRole();
+export function MenuUser({ user }: { user: AuthUser | undefined }) {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
+  const role = user?.role;
+  const isAdmin = isValidRole(role) && (role === "admin" || role === "superadmin");
 
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
@@ -76,7 +77,15 @@ export function MenuUser({ user }: { user: User | undefined }) {
 
           {isAdmin ? (
             <DropdownMenuItem asChild>
-              <Link to="/admin/dashboard">
+              <Link
+                to="/admin/dashboard"
+                search={{
+                  view: "all",
+                  q: "",
+                  companyStatus: "all",
+                  userRole: "all",
+                }}
+              >
                 <LayoutDashboard className="size-4" />
                 <span className="text-xs">Admin dashboard</span>
               </Link>
@@ -129,7 +138,7 @@ export function MenuUser({ user }: { user: User | undefined }) {
   );
 }
 
-function AvatarUser({ user }: { user: User }) {
+function AvatarUser({ user }: { user: AuthUser }) {
   const initials = user.name
     ?.split(" ")
     .map((name) => name[0])

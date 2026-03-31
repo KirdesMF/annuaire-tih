@@ -5,6 +5,7 @@ import { admin, customSession } from "better-auth/plugins";
 import { reactStartCookies } from "better-auth/react-start";
 import { Resend } from "resend";
 import { getDb } from "~/db";
+import type { UserRole } from "~/db/schema/auth";
 import { account, session, user, verification } from "~/db/schema/auth";
 
 const passwordHelpers = {
@@ -110,3 +111,14 @@ export function auth() {
 }
 
 export type AuthSession = Awaited<ReturnType<typeof auth>>["$Infer"]["Session"];
+export type AuthUser = {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  image?: string | null;
+  cgu?: boolean;
+  role?: UserRole;
+};

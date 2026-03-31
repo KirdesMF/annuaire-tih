@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 import * as v from "valibot";
 import { auth } from "~/lib/auth/auth.server";
 
@@ -9,7 +9,7 @@ const UpdateUserPasswordSchema = v.object({
 });
 
 export const updateUserPasswordFn = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     return v.parse(UpdateUserPasswordSchema, {
       password: data.get("password"),
       newPassword: data.get("newPassword"),
@@ -24,6 +24,6 @@ export const updateUserPasswordFn = createServerFn({ method: "POST" })
         newPassword,
         revokeOtherSessions: true,
       },
-      headers: getWebRequest()?.headers,
+      headers: getRequest().headers,
     });
   });

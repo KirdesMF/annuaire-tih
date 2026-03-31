@@ -8,7 +8,7 @@ import { companyCategoriesTable } from "~/db/schema/company-categories";
 import { UpdateCompanyInfosSchema } from "~/lib/validator/company.schema";
 
 export const updateCompanyInfos = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     const decodedFormData = decode(data, {
       arrays: ["categories"],
       booleans: ["rqth"],

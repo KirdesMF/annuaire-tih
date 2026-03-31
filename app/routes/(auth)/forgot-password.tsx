@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 import { InfoIcon, Loader, Mail } from "lucide-react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
@@ -14,14 +14,14 @@ const ForgotPasswordSchema = v.object({
 });
 
 export const forgotPasswordFn = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     const formObject = Object.fromEntries(data.entries());
     return v.parse(ForgotPasswordSchema, formObject);
   })
   .handler(async ({ data }) => {
     await auth().api.forgetPassword({
       body: { email: data.email, redirectTo: "/reset-password" },
-      headers: getWebRequest()?.headers,
+      headers: getRequest().headers,
     });
   });
 

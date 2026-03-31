@@ -23,10 +23,9 @@ export const Route = createFileRoute("/_protected/compte/entreprises/create/prev
   component: RouteComponent,
   beforeLoad: () => {
     const preview = useAddPreviewStore.getState().preview;
-    if (!preview) {
+    if (!preview.name || !preview.siret || preview.categories.length === 0) {
       throw redirect({ to: "/compte/entreprises/create" });
     }
-    return { preview };
   },
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(categoriesQueryOptions);
@@ -52,8 +51,9 @@ const SOCIAL_MEDIA_ICONS = {
 } as const;
 
 function RouteComponent() {
-  const { preview, queryClient } = Route.useRouteContext();
+  const { queryClient } = Route.useRouteContext();
   const navigate = Route.useNavigate();
+  const preview = useAddPreviewStore((state) => state.preview);
 
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
@@ -73,6 +73,10 @@ function RouteComponent() {
 
   const hasSocialMedia = Object.keys(socialMedia).length > 0;
 
+  if (!preview.name || !preview.siret || preview.categories.length === 0) {
+    return null;
+  }
+
   function onValidate() {
     const formData = new FormData();
     for (const [key, value] of Object.entries(preview)) {
@@ -91,7 +95,9 @@ function RouteComponent() {
 
     if (preview.gallery) {
       for (const image of preview.gallery) {
-        formData.append("gallery", image);
+        if (image) {
+          formData.append("gallery", image);
+        }
       }
     }
 

@@ -5,7 +5,7 @@ import { companiesTable } from "~/db/schema/companies";
 import { deleteImageFromCloudinary } from "~/lib/cloudinary";
 
 export const deleteCompanyLogo = createServerFn({ method: "POST" })
-  .validator((data: { companyId: string; publicId: string }) => data)
+  .inputValidator((data: { companyId: string; publicId: string }) => data)
   .handler(async ({ data }) => {
     const { companyId, publicId } = data;
 
@@ -24,7 +24,7 @@ type Data = {
 };
 
 export const deleteCompanyMedia = createServerFn({ method: "POST" })
-  .validator((data: Data) => data)
+  .inputValidator((data: Data) => data)
   .handler(async ({ data }) => {
     const { companyId, publicId, type, index } = data;
     const db = getDb();

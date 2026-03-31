@@ -14,7 +14,7 @@ const GetCompaniesByCategorySchema = v.object({
 type GetCompaniesByCategoryData = v.InferOutput<typeof GetCompaniesByCategorySchema>;
 
 export const getCompaniesByCategory = createServerFn({ method: "GET" })
-  .validator((data: unknown) => v.parse(GetCompaniesByCategorySchema, data))
+  .inputValidator((data: unknown) => v.parse(GetCompaniesByCategorySchema, data))
   .handler(async ({ data: { categoryId, status = "active" } }) => {
     const query = await getDb()
       .select()

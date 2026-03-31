@@ -21,12 +21,15 @@ import type { Entries } from "~/utils/types";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/preview")({
   component: RouteComponent,
-  beforeLoad: ({ params }) => {
+  beforeLoad: ({ params, search }) => {
     const preview = useUpdatePreviewStore.getState().preview;
     if (!preview) {
-      throw redirect({ to: "/compte/entreprises/$slug/edit/infos", params });
+      throw redirect({
+        to: "/compte/entreprises/$slug/edit/infos",
+        params,
+        search,
+      });
     }
-    return { preview };
   },
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(categoriesQueryOptions);
@@ -53,25 +56,36 @@ const SOCIAL_MEDIA_ICONS = {
 
 function RouteComponent() {
   const { toast } = useToast();
-  const { preview, queryClient } = Route.useRouteContext();
+  const { queryClient } = Route.useRouteContext();
   const params = Route.useParams();
+  const search = Route.useSearch();
   const navigate = Route.useNavigate();
+  const previewData = useUpdatePreviewStore((state) => state.preview);
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
 
   const { mutate, isPending } = useMutation({
     mutationFn: useServerFn(updateCompanyInfos),
   });
 
+  if (!previewData) {
+    return null;
+  }
+
   const socialMedia = {
-    facebook: preview.social_media?.facebook,
-    instagram: preview.social_media?.instagram,
-    linkedin: preview.social_media?.linkedin,
-    calendly: preview.social_media?.calendly,
+    facebook: previewData.social_media?.facebook,
+    instagram: previewData.social_media?.instagram,
+    linkedin: previewData.social_media?.linkedin,
+    calendly: previewData.social_media?.calendly,
   };
 
   const isSocialMediaEmpty = Object.values(socialMedia).every((value) => value === "");
 
   function onValidate() {
+    if (!previewData) {
+      return;
+    }
+
+    const preview = previewData;
     const formData = new FormData();
     for (const [key, value] of Object.entries(preview)) {
       if (typeof value === "string") {
@@ -79,7 +93,7 @@ function RouteComponent() {
       }
     }
 
-    for (const categoryId of preview?.categories ?? []) {
+    for (const categoryId of preview.categories) {
       formData.append("categories", categoryId);
     }
 
@@ -89,7 +103,9 @@ function RouteComponent() {
 
     if (preview.gallery) {
       for (const image of preview.gallery) {
-        formData.append("gallery", image);
+        if (image) {
+          formData.append("gallery", image);
+        }
       }
     }
 
@@ -116,6 +132,7 @@ function RouteComponent() {
       <Link
         to="/compte/entreprises/$slug/edit/infos"
         params={{ slug: params.slug }}
+        search={search}
         className="text-sm text-gray-500"
       >
         Retour
@@ -124,18 +141,18 @@ function RouteComponent() {
       <div className="container flex justify-between gap-4 border border-border p-6 rounded-sm">
         <div className="flex flex-col gap-2">
           <CompanyLogo
-            url={preview.logo ? URL.createObjectURL(preview.logo) : undefined}
-            name={preview.name ?? ""}
+            url={previewData.logo ? URL.createObjectURL(previewData.logo) : undefined}
+            name={previewData.name ?? ""}
             size="lg"
           />
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">{preview.name}</h1>
-            <CopyButton>{preview.siret}</CopyButton>
+            <h1 className="text-2xl font-bold">{previewData.name}</h1>
+            <CopyButton>{previewData.siret}</CopyButton>
           </div>
 
-          {preview.categories?.length ? (
+          {previewData.categories?.length ? (
             <ul className="flex flex-wrap gap-2">
-              {preview.categories?.map((categoryId) => {
+              {previewData.categories?.map((categoryId) => {
                 const category = categories.find((category) => category.id === categoryId);
                 if (!category) return null;
                 return (
@@ -157,24 +174,24 @@ function RouteComponent() {
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Mail className="size-5" />
-              <p className="text-xs text-gray-500">{preview.email || "Non renseigné"}</p>
+              <p className="text-xs text-gray-500">{previewData.email || "Non renseigné"}</p>
             </div>
 
             <div className="flex items-center gap-2">
               <Phone className="size-5" />
-              <p className="text-xs text-gray-500">{preview.phone || "Non renseigné"}</p>
+              <p className="text-xs text-gray-500">{previewData.phone || "Non renseigné"}</p>
             </div>
 
             <div className="flex items-center gap-2">
               <Globe className="size-5" />
-              {preview.website ? (
+              {previewData.website ? (
                 <a
-                  href={preview.website}
+                  href={previewData.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-gray-500"
                 >
-                  {preview.website}
+                  {previewData.website}
                 </a>
               ) : (
                 <span className="text-xs text-gray-500">Non renseigné</span>
@@ -198,21 +215,22 @@ function RouteComponent() {
         <div className="flex-1 border border-border p-6 rounded-sm flex flex-col gap-2">
           <p className="text-sm">
             <span className="font-bold">Entrepreneur:</span>{" "}
-            {preview.business_owner || "Non renseigné"}
+            {previewData.business_owner || "Non renseigné"}
           </p>
           <p className="text-sm">
             <span className="font-bold">Zone géographique:</span>{" "}
-            {preview.service_area || "Non renseigné"}
+            {previewData.service_area || "Non renseigné"}
           </p>
           <p className="text-sm">
             <span className="font-bold">Mode de travail:</span>{" "}
-            {WORK_MODES[preview.work_mode ?? "not_specified"]}
+            {WORK_MODES[previewData.work_mode ?? "not_specified"]}
           </p>
           <p className="text-sm">
-            <span className="font-bold">RQTH:</span> {preview.rqth ? "Oui" : "Non"}
+            <span className="font-bold">RQTH:</span> {previewData.rqth ? "Oui" : "Non"}
           </p>
           <p className="text-sm">
-            <span className="font-bold">Sous domaine:</span> {preview.subdomain || "Non renseigné"}
+            <span className="font-bold">Sous domaine:</span>{" "}
+            {previewData.subdomain || "Non renseigné"}
           </p>
         </div>
       </div>
@@ -220,24 +238,24 @@ function RouteComponent() {
       <div className="container border border-border p-6 rounded-sm grid gap-4">
         <div className="flex flex-col gap-2">
           <h2 className="text-lg font-bold">Description</h2>
-          <p className="text-sm text-pretty">{preview.description || "Non renseigné"}</p>
+          <p className="text-sm text-pretty">{previewData.description || "Non renseigné"}</p>
         </div>
 
-        {preview.gallery?.length ? (
+        {previewData.gallery?.length ? (
           <>
             <Separator.Root className="h-px bg-border my-4" />
 
             <ul className="flex flex-wrap gap-2">
-              {preview.gallery.map((image, index) => (
+              {previewData.gallery.map((image, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                 <li key={index}>
                   <img
                     src={
-                      preview.gallery?.[index]
-                        ? URL.createObjectURL(preview.gallery?.[index])
+                      previewData.gallery?.[index]
+                        ? URL.createObjectURL(previewData.gallery?.[index])
                         : undefined
                     }
-                    alt={preview.name}
+                    alt={previewData.name}
                     className="size-16 aspect-square rounded-sm"
                   />
                 </li>

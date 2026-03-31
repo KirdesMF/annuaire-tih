@@ -14,7 +14,7 @@ const GetCompaniesSchema = v.object({
 type GetCompaniesFilters = v.InferOutput<typeof GetCompaniesSchema>;
 
 export const getCompanies = createServerFn({ method: "GET" })
-  .validator((data: unknown) => v.parse(GetCompaniesSchema, data))
+  .inputValidator((data: unknown) => v.parse(GetCompaniesSchema, data))
   .handler(async ({ data }) => {
     try {
       const query = getDb().select().from(companiesTable).orderBy(desc(companiesTable.created_at));

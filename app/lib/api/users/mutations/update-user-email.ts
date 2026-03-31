@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 import * as v from "valibot";
 import { auth } from "~/lib/auth/auth.server";
 
@@ -8,7 +8,7 @@ const UpdateUserEmailSchema = v.object({
 });
 
 export const updateUserEmailFn = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     return v.parse(UpdateUserEmailSchema, {
       email: data.get("email"),
     });
@@ -16,6 +16,6 @@ export const updateUserEmailFn = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await auth().api.changeEmail({
       body: { newEmail: data.email },
-      headers: getWebRequest()?.headers,
+      headers: getRequest().headers,
     });
   });

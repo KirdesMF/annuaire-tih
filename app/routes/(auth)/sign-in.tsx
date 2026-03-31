@@ -19,7 +19,7 @@ const LoginSchema = v.object({
 });
 
 export const loginFn = createServerFn({ method: "POST" })
-  .validator(LoginSchema)
+  .inputValidator(LoginSchema)
   .handler(async ({ data }) => {
     await auth().api.signInEmail({
       body: {

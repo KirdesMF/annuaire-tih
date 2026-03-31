@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 import * as v from "valibot";
 import { auth } from "~/lib/auth/auth.server";
 
@@ -8,16 +8,14 @@ const UserInfosSchema = v.object({
 });
 
 export const updateUserInfos = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     return v.parse(UserInfosSchema, {
       name: data.get("name"),
       image: data.get("image"),
     });
   })
   .handler(async ({ data }) => {
-    const request = getWebRequest();
-
-    if (!request) throw new Error("Request not found");
+    const request = getRequest();
 
     await auth().api.updateUser({ headers: request.headers, body: { ...data } });
   });

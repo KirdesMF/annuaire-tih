@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_protected/accept-cgu")({
 });
 
 const acceptCGUFn = createServerFn({ method: "POST" })
-  .validator((data: string) => data)
+  .inputValidator((data: string) => data)
   .handler(async ({ data }) => {
     try {
       const db = getDb();

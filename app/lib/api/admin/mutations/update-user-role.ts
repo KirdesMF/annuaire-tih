@@ -1,13 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
-import type { UserRole } from "~/db/schema/auth";
+import { getRequest } from "@tanstack/react-start/server";
 import { auth } from "~/lib/auth/auth.server";
 
 export const updateUserRoleFn = createServerFn({ method: "POST" })
-  .validator((data: { userId: string; role: UserRole }) => data)
+  .inputValidator((data: { userId: string; role: "admin" | "user" }) => data)
   .handler(async ({ data }) => {
     await auth().api.setRole({
       body: { userId: data.userId, role: data.role },
-      headers: getWebRequest()?.headers,
+      headers: getRequest().headers,
     });
   });

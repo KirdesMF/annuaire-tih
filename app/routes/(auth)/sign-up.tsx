@@ -50,7 +50,7 @@ const SignupSchema = v.pipe(
 );
 
 export const signupFn = createServerFn()
-  .validator(SignupSchema)
+  .inputValidator(SignupSchema)
   .handler(async ({ data }) => {
     try {
       const res = await auth().api.signUpEmail({

@@ -5,7 +5,7 @@ import { companiesTable } from "~/db/schema/companies";
 import { deleteCompanyFromCloudinary } from "~/lib/cloudinary";
 
 export const deleteCompany = createServerFn({ method: "POST" })
-  .validator((data: { companyId: string; companySlug: string }) => data)
+  .inputValidator((data: { companyId: string; companySlug: string }) => data)
   .handler(async ({ data: { companyId, companySlug } }) => {
     try {
       await getDb().delete(companiesTable).where(eq(companiesTable.id, companyId));

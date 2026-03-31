@@ -19,7 +19,7 @@ const ResetPasswordSchema = v.object({
 });
 
 const resetPasswordFn = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     const formObject = Object.fromEntries(data.entries());
     return v.parse(ResetPasswordSchema, formObject);
   })

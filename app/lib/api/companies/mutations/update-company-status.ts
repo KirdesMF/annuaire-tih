@@ -4,7 +4,7 @@ import { getDb } from "~/db";
 import { type CompanyStatus, companiesTable } from "~/db/schema/companies";
 
 export const updateCompanyStatus = createServerFn({ method: "POST" })
-  .validator((data: { companyId: string; status: CompanyStatus }) => data)
+  .inputValidator((data: { companyId: string; status: CompanyStatus }) => data)
   .handler(async ({ data: { companyId, status } }) => {
     try {
       await getDb().update(companiesTable).set({ status }).where(eq(companiesTable.id, companyId));

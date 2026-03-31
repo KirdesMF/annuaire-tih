@@ -8,421 +8,596 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
+import { Route as ProtectedAcceptCguRouteImport } from './routes/_protected/accept-cgu'
+import { Route as publicSourcesRouteImport } from './routes/(public)/sources'
+import { Route as publicPartnersRouteImport } from './routes/(public)/partners'
+import { Route as publicFaqRouteImport } from './routes/(public)/faq'
+import { Route as publicCguRouteImport } from './routes/(public)/cgu'
+import { Route as publicAboutRouteImport } from './routes/(public)/about'
+import { Route as authSignUpRouteImport } from './routes/(auth)/sign-up'
+import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
+import { Route as authResetPasswordRouteImport } from './routes/(auth)/reset-password'
+import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
+import { Route as ProtectedCompteRouteRouteImport } from './routes/_protected/compte/route'
+import { Route as ProtectedCompteIndexRouteImport } from './routes/_protected/compte/index'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ProtectedComptePreferencesRouteImport } from './routes/_protected/compte/preferences'
+import { Route as publicEntreprisesSlugRouteImport } from './routes/(public)/entreprises/$slug'
+import { Route as publicCategoriesSlugRouteImport } from './routes/(public)/categories/$slug'
+import { Route as ProtectedCompteEntreprisesIndexRouteImport } from './routes/_protected/compte/entreprises/index'
+import { Route as ProtectedCompteEntreprisesCreateIndexRouteImport } from './routes/_protected/compte/entreprises/create/index'
+import { Route as ProtectedCompteEntreprisesCreatePreviewRouteImport } from './routes/_protected/compte/entreprises/create/preview'
+import { Route as ProtectedCompteEntreprisesSlugEditRouteRouteImport } from './routes/_protected/compte/entreprises/$slug/edit/route'
+import { Route as ProtectedCompteEntreprisesSlugEditIndexRouteImport } from './routes/_protected/compte/entreprises/$slug/edit/index'
+import { Route as ProtectedCompteEntreprisesSlugEditPreviewRouteImport } from './routes/_protected/compte/entreprises/$slug/edit/preview'
+import { Route as ProtectedCompteEntreprisesSlugEditMediasRouteImport } from './routes/_protected/compte/entreprises/$slug/edit/medias'
+import { Route as ProtectedCompteEntreprisesSlugEditInfosRouteImport } from './routes/_protected/compte/entreprises/$slug/edit/infos'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as AdminRouteImport } from './routes/admin/route'
-import { Route as ProtectedRouteImport } from './routes/_protected/route'
-import { Route as IndexImport } from './routes/index'
-import { Route as AdminIndexImport } from './routes/admin/index'
-import { Route as AdminDashboardImport } from './routes/admin/dashboard'
-import { Route as ProtectedAcceptCguImport } from './routes/_protected/accept-cgu'
-import { Route as publicSourcesImport } from './routes/(public)/sources'
-import { Route as publicPartnersImport } from './routes/(public)/partners'
-import { Route as publicFaqImport } from './routes/(public)/faq'
-import { Route as publicCguImport } from './routes/(public)/cgu'
-import { Route as publicAboutImport } from './routes/(public)/about'
-import { Route as authSignUpImport } from './routes/(auth)/sign-up'
-import { Route as authSignInImport } from './routes/(auth)/sign-in'
-import { Route as authResetPasswordImport } from './routes/(auth)/reset-password'
-import { Route as authForgotPasswordImport } from './routes/(auth)/forgot-password'
-import { Route as ProtectedCompteRouteImport } from './routes/_protected/compte/route'
-import { Route as ProtectedCompteIndexImport } from './routes/_protected/compte/index'
-import { Route as ProtectedComptePreferencesImport } from './routes/_protected/compte/preferences'
-import { Route as publicEntreprisesSlugImport } from './routes/(public)/entreprises/$slug'
-import { Route as publicCategoriesSlugImport } from './routes/(public)/categories/$slug'
-import { Route as ProtectedCompteEntreprisesIndexImport } from './routes/_protected/compte/entreprises/index'
-import { Route as ProtectedCompteEntreprisesCreateIndexImport } from './routes/_protected/compte/entreprises/create/index'
-import { Route as ProtectedCompteEntreprisesCreatePreviewImport } from './routes/_protected/compte/entreprises/create/preview'
-import { Route as ProtectedCompteEntreprisesSlugEditRouteImport } from './routes/_protected/compte/entreprises/$slug/edit/route'
-import { Route as ProtectedCompteEntreprisesSlugEditIndexImport } from './routes/_protected/compte/entreprises/$slug/edit/index'
-import { Route as ProtectedCompteEntreprisesSlugEditPreviewImport } from './routes/_protected/compte/entreprises/$slug/edit/preview'
-import { Route as ProtectedCompteEntreprisesSlugEditMediasImport } from './routes/_protected/compte/entreprises/$slug/edit/medias'
-import { Route as ProtectedCompteEntreprisesSlugEditInfosImport } from './routes/_protected/compte/entreprises/$slug/edit/infos'
-
-// Create/Update Routes
-
-const AdminRouteRoute = AdminRouteImport.update({
+const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ProtectedRouteRoute = ProtectedRouteImport.update({
+const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
   id: '/_protected',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AdminIndexRoute = AdminIndexImport.update({
+const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const AdminDashboardRoute = AdminDashboardImport.update({
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const ProtectedAcceptCguRoute = ProtectedAcceptCguImport.update({
+const ProtectedAcceptCguRoute = ProtectedAcceptCguRouteImport.update({
   id: '/accept-cgu',
   path: '/accept-cgu',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
-
-const publicSourcesRoute = publicSourcesImport.update({
+const publicSourcesRoute = publicSourcesRouteImport.update({
   id: '/(public)/sources',
   path: '/sources',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const publicPartnersRoute = publicPartnersImport.update({
+const publicPartnersRoute = publicPartnersRouteImport.update({
   id: '/(public)/partners',
   path: '/partners',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const publicFaqRoute = publicFaqImport.update({
+const publicFaqRoute = publicFaqRouteImport.update({
   id: '/(public)/faq',
   path: '/faq',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const publicCguRoute = publicCguImport.update({
+const publicCguRoute = publicCguRouteImport.update({
   id: '/(public)/cgu',
   path: '/cgu',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const publicAboutRoute = publicAboutImport.update({
+const publicAboutRoute = publicAboutRouteImport.update({
   id: '/(public)/about',
   path: '/about',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const authSignUpRoute = authSignUpImport.update({
+const authSignUpRoute = authSignUpRouteImport.update({
   id: '/(auth)/sign-up',
   path: '/sign-up',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const authSignInRoute = authSignInImport.update({
+const authSignInRoute = authSignInRouteImport.update({
   id: '/(auth)/sign-in',
   path: '/sign-in',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const authResetPasswordRoute = authResetPasswordImport.update({
+const authResetPasswordRoute = authResetPasswordRouteImport.update({
   id: '/(auth)/reset-password',
   path: '/reset-password',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const authForgotPasswordRoute = authForgotPasswordImport.update({
+const authForgotPasswordRoute = authForgotPasswordRouteImport.update({
   id: '/(auth)/forgot-password',
   path: '/forgot-password',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ProtectedCompteRouteRoute = ProtectedCompteRouteImport.update({
+const ProtectedCompteRouteRoute = ProtectedCompteRouteRouteImport.update({
   id: '/compte',
   path: '/compte',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
-
-const ProtectedCompteIndexRoute = ProtectedCompteIndexImport.update({
+const ProtectedCompteIndexRoute = ProtectedCompteIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => ProtectedCompteRouteRoute,
 } as any)
-
-const ProtectedComptePreferencesRoute = ProtectedComptePreferencesImport.update(
-  {
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedComptePreferencesRoute =
+  ProtectedComptePreferencesRouteImport.update({
     id: '/preferences',
     path: '/preferences',
     getParentRoute: () => ProtectedCompteRouteRoute,
-  } as any,
-)
-
-const publicEntreprisesSlugRoute = publicEntreprisesSlugImport.update({
+  } as any)
+const publicEntreprisesSlugRoute = publicEntreprisesSlugRouteImport.update({
   id: '/(public)/entreprises/$slug',
   path: '/entreprises/$slug',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const publicCategoriesSlugRoute = publicCategoriesSlugImport.update({
+const publicCategoriesSlugRoute = publicCategoriesSlugRouteImport.update({
   id: '/(public)/categories/$slug',
   path: '/categories/$slug',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
 const ProtectedCompteEntreprisesIndexRoute =
-  ProtectedCompteEntreprisesIndexImport.update({
+  ProtectedCompteEntreprisesIndexRouteImport.update({
     id: '/entreprises/',
     path: '/entreprises/',
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
-
 const ProtectedCompteEntreprisesCreateIndexRoute =
-  ProtectedCompteEntreprisesCreateIndexImport.update({
+  ProtectedCompteEntreprisesCreateIndexRouteImport.update({
     id: '/entreprises/create/',
     path: '/entreprises/create/',
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
-
 const ProtectedCompteEntreprisesCreatePreviewRoute =
-  ProtectedCompteEntreprisesCreatePreviewImport.update({
+  ProtectedCompteEntreprisesCreatePreviewRouteImport.update({
     id: '/entreprises/create/preview',
     path: '/entreprises/create/preview',
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
-
 const ProtectedCompteEntreprisesSlugEditRouteRoute =
-  ProtectedCompteEntreprisesSlugEditRouteImport.update({
+  ProtectedCompteEntreprisesSlugEditRouteRouteImport.update({
     id: '/entreprises/$slug/edit',
     path: '/entreprises/$slug/edit',
     getParentRoute: () => ProtectedCompteRouteRoute,
   } as any)
-
 const ProtectedCompteEntreprisesSlugEditIndexRoute =
-  ProtectedCompteEntreprisesSlugEditIndexImport.update({
+  ProtectedCompteEntreprisesSlugEditIndexRouteImport.update({
     id: '/',
     path: '/',
     getParentRoute: () => ProtectedCompteEntreprisesSlugEditRouteRoute,
   } as any)
-
 const ProtectedCompteEntreprisesSlugEditPreviewRoute =
-  ProtectedCompteEntreprisesSlugEditPreviewImport.update({
+  ProtectedCompteEntreprisesSlugEditPreviewRouteImport.update({
     id: '/preview',
     path: '/preview',
     getParentRoute: () => ProtectedCompteEntreprisesSlugEditRouteRoute,
   } as any)
-
 const ProtectedCompteEntreprisesSlugEditMediasRoute =
-  ProtectedCompteEntreprisesSlugEditMediasImport.update({
+  ProtectedCompteEntreprisesSlugEditMediasRouteImport.update({
     id: '/medias',
     path: '/medias',
     getParentRoute: () => ProtectedCompteEntreprisesSlugEditRouteRoute,
   } as any)
-
 const ProtectedCompteEntreprisesSlugEditInfosRoute =
-  ProtectedCompteEntreprisesSlugEditInfosImport.update({
+  ProtectedCompteEntreprisesSlugEditInfosRouteImport.update({
     id: '/infos',
     path: '/infos',
     getParentRoute: () => ProtectedCompteEntreprisesSlugEditRouteRoute,
   } as any)
 
-// Populate the FileRoutesByPath interface
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/compte': typeof ProtectedCompteRouteRouteWithChildren
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/reset-password': typeof authResetPasswordRoute
+  '/sign-in': typeof authSignInRoute
+  '/sign-up': typeof authSignUpRoute
+  '/about': typeof publicAboutRoute
+  '/cgu': typeof publicCguRoute
+  '/faq': typeof publicFaqRoute
+  '/partners': typeof publicPartnersRoute
+  '/sources': typeof publicSourcesRoute
+  '/accept-cgu': typeof ProtectedAcceptCguRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/': typeof AdminIndexRoute
+  '/categories/$slug': typeof publicCategoriesSlugRoute
+  '/entreprises/$slug': typeof publicEntreprisesSlugRoute
+  '/compte/preferences': typeof ProtectedComptePreferencesRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/compte/': typeof ProtectedCompteIndexRoute
+  '/compte/entreprises/': typeof ProtectedCompteEntreprisesIndexRoute
+  '/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren
+  '/compte/entreprises/create/preview': typeof ProtectedCompteEntreprisesCreatePreviewRoute
+  '/compte/entreprises/create/': typeof ProtectedCompteEntreprisesCreateIndexRoute
+  '/compte/entreprises/$slug/edit/infos': typeof ProtectedCompteEntreprisesSlugEditInfosRoute
+  '/compte/entreprises/$slug/edit/medias': typeof ProtectedCompteEntreprisesSlugEditMediasRoute
+  '/compte/entreprises/$slug/edit/preview': typeof ProtectedCompteEntreprisesSlugEditPreviewRoute
+  '/compte/entreprises/$slug/edit/': typeof ProtectedCompteEntreprisesSlugEditIndexRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/forgot-password': typeof authForgotPasswordRoute
+  '/reset-password': typeof authResetPasswordRoute
+  '/sign-in': typeof authSignInRoute
+  '/sign-up': typeof authSignUpRoute
+  '/about': typeof publicAboutRoute
+  '/cgu': typeof publicCguRoute
+  '/faq': typeof publicFaqRoute
+  '/partners': typeof publicPartnersRoute
+  '/sources': typeof publicSourcesRoute
+  '/accept-cgu': typeof ProtectedAcceptCguRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin': typeof AdminIndexRoute
+  '/categories/$slug': typeof publicCategoriesSlugRoute
+  '/entreprises/$slug': typeof publicEntreprisesSlugRoute
+  '/compte/preferences': typeof ProtectedComptePreferencesRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/compte': typeof ProtectedCompteIndexRoute
+  '/compte/entreprises': typeof ProtectedCompteEntreprisesIndexRoute
+  '/compte/entreprises/create/preview': typeof ProtectedCompteEntreprisesCreatePreviewRoute
+  '/compte/entreprises/create': typeof ProtectedCompteEntreprisesCreateIndexRoute
+  '/compte/entreprises/$slug/edit/infos': typeof ProtectedCompteEntreprisesSlugEditInfosRoute
+  '/compte/entreprises/$slug/edit/medias': typeof ProtectedCompteEntreprisesSlugEditMediasRoute
+  '/compte/entreprises/$slug/edit/preview': typeof ProtectedCompteEntreprisesSlugEditPreviewRoute
+  '/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditIndexRoute
+}
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/_protected': typeof ProtectedRouteRouteWithChildren
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/_protected/compte': typeof ProtectedCompteRouteRouteWithChildren
+  '/(auth)/forgot-password': typeof authForgotPasswordRoute
+  '/(auth)/reset-password': typeof authResetPasswordRoute
+  '/(auth)/sign-in': typeof authSignInRoute
+  '/(auth)/sign-up': typeof authSignUpRoute
+  '/(public)/about': typeof publicAboutRoute
+  '/(public)/cgu': typeof publicCguRoute
+  '/(public)/faq': typeof publicFaqRoute
+  '/(public)/partners': typeof publicPartnersRoute
+  '/(public)/sources': typeof publicSourcesRoute
+  '/_protected/accept-cgu': typeof ProtectedAcceptCguRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/': typeof AdminIndexRoute
+  '/(public)/categories/$slug': typeof publicCategoriesSlugRoute
+  '/(public)/entreprises/$slug': typeof publicEntreprisesSlugRoute
+  '/_protected/compte/preferences': typeof ProtectedComptePreferencesRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/_protected/compte/': typeof ProtectedCompteIndexRoute
+  '/_protected/compte/entreprises/': typeof ProtectedCompteEntreprisesIndexRoute
+  '/_protected/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren
+  '/_protected/compte/entreprises/create/preview': typeof ProtectedCompteEntreprisesCreatePreviewRoute
+  '/_protected/compte/entreprises/create/': typeof ProtectedCompteEntreprisesCreateIndexRoute
+  '/_protected/compte/entreprises/$slug/edit/infos': typeof ProtectedCompteEntreprisesSlugEditInfosRoute
+  '/_protected/compte/entreprises/$slug/edit/medias': typeof ProtectedCompteEntreprisesSlugEditMediasRoute
+  '/_protected/compte/entreprises/$slug/edit/preview': typeof ProtectedCompteEntreprisesSlugEditPreviewRoute
+  '/_protected/compte/entreprises/$slug/edit/': typeof ProtectedCompteEntreprisesSlugEditIndexRoute
+}
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/compte'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/about'
+    | '/cgu'
+    | '/faq'
+    | '/partners'
+    | '/sources'
+    | '/accept-cgu'
+    | '/admin/dashboard'
+    | '/admin/'
+    | '/categories/$slug'
+    | '/entreprises/$slug'
+    | '/compte/preferences'
+    | '/api/auth/$'
+    | '/compte/'
+    | '/compte/entreprises/'
+    | '/compte/entreprises/$slug/edit'
+    | '/compte/entreprises/create/preview'
+    | '/compte/entreprises/create/'
+    | '/compte/entreprises/$slug/edit/infos'
+    | '/compte/entreprises/$slug/edit/medias'
+    | '/compte/entreprises/$slug/edit/preview'
+    | '/compte/entreprises/$slug/edit/'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/forgot-password'
+    | '/reset-password'
+    | '/sign-in'
+    | '/sign-up'
+    | '/about'
+    | '/cgu'
+    | '/faq'
+    | '/partners'
+    | '/sources'
+    | '/accept-cgu'
+    | '/admin/dashboard'
+    | '/admin'
+    | '/categories/$slug'
+    | '/entreprises/$slug'
+    | '/compte/preferences'
+    | '/api/auth/$'
+    | '/compte'
+    | '/compte/entreprises'
+    | '/compte/entreprises/create/preview'
+    | '/compte/entreprises/create'
+    | '/compte/entreprises/$slug/edit/infos'
+    | '/compte/entreprises/$slug/edit/medias'
+    | '/compte/entreprises/$slug/edit/preview'
+    | '/compte/entreprises/$slug/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/_protected'
+    | '/admin'
+    | '/_protected/compte'
+    | '/(auth)/forgot-password'
+    | '/(auth)/reset-password'
+    | '/(auth)/sign-in'
+    | '/(auth)/sign-up'
+    | '/(public)/about'
+    | '/(public)/cgu'
+    | '/(public)/faq'
+    | '/(public)/partners'
+    | '/(public)/sources'
+    | '/_protected/accept-cgu'
+    | '/admin/dashboard'
+    | '/admin/'
+    | '/(public)/categories/$slug'
+    | '/(public)/entreprises/$slug'
+    | '/_protected/compte/preferences'
+    | '/api/auth/$'
+    | '/_protected/compte/'
+    | '/_protected/compte/entreprises/'
+    | '/_protected/compte/entreprises/$slug/edit'
+    | '/_protected/compte/entreprises/create/preview'
+    | '/_protected/compte/entreprises/create/'
+    | '/_protected/compte/entreprises/$slug/edit/infos'
+    | '/_protected/compte/entreprises/$slug/edit/medias'
+    | '/_protected/compte/entreprises/$slug/edit/preview'
+    | '/_protected/compte/entreprises/$slug/edit/'
+  fileRoutesById: FileRoutesById
+}
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  authForgotPasswordRoute: typeof authForgotPasswordRoute
+  authResetPasswordRoute: typeof authResetPasswordRoute
+  authSignInRoute: typeof authSignInRoute
+  authSignUpRoute: typeof authSignUpRoute
+  publicAboutRoute: typeof publicAboutRoute
+  publicCguRoute: typeof publicCguRoute
+  publicFaqRoute: typeof publicFaqRoute
+  publicPartnersRoute: typeof publicPartnersRoute
+  publicSourcesRoute: typeof publicSourcesRoute
+  publicCategoriesSlugRoute: typeof publicCategoriesSlugRoute
+  publicEntreprisesSlugRoute: typeof publicEntreprisesSlugRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+}
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/_protected': {
-      id: '/_protected'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof ProtectedRouteImport
-      parentRoute: typeof rootRoute
-    }
     '/admin': {
       id: '/admin'
       path: '/admin'
       fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRoute
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_protected/compte': {
-      id: '/_protected/compte'
-      path: '/compte'
-      fullPath: '/compte'
-      preLoaderRoute: typeof ProtectedCompteRouteImport
-      parentRoute: typeof ProtectedRouteImport
+    '/_protected': {
+      id: '/_protected'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ProtectedRouteRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/(auth)/forgot-password': {
-      id: '/(auth)/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof authForgotPasswordImport
-      parentRoute: typeof rootRoute
-    }
-    '/(auth)/reset-password': {
-      id: '/(auth)/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof authResetPasswordImport
-      parentRoute: typeof rootRoute
-    }
-    '/(auth)/sign-in': {
-      id: '/(auth)/sign-in'
-      path: '/sign-in'
-      fullPath: '/sign-in'
-      preLoaderRoute: typeof authSignInImport
-      parentRoute: typeof rootRoute
-    }
-    '/(auth)/sign-up': {
-      id: '/(auth)/sign-up'
-      path: '/sign-up'
-      fullPath: '/sign-up'
-      preLoaderRoute: typeof authSignUpImport
-      parentRoute: typeof rootRoute
-    }
-    '/(public)/about': {
-      id: '/(public)/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof publicAboutImport
-      parentRoute: typeof rootRoute
-    }
-    '/(public)/cgu': {
-      id: '/(public)/cgu'
-      path: '/cgu'
-      fullPath: '/cgu'
-      preLoaderRoute: typeof publicCguImport
-      parentRoute: typeof rootRoute
-    }
-    '/(public)/faq': {
-      id: '/(public)/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof publicFaqImport
-      parentRoute: typeof rootRoute
-    }
-    '/(public)/partners': {
-      id: '/(public)/partners'
-      path: '/partners'
-      fullPath: '/partners'
-      preLoaderRoute: typeof publicPartnersImport
-      parentRoute: typeof rootRoute
-    }
-    '/(public)/sources': {
-      id: '/(public)/sources'
-      path: '/sources'
-      fullPath: '/sources'
-      preLoaderRoute: typeof publicSourcesImport
-      parentRoute: typeof rootRoute
-    }
-    '/_protected/accept-cgu': {
-      id: '/_protected/accept-cgu'
-      path: '/accept-cgu'
-      fullPath: '/accept-cgu'
-      preLoaderRoute: typeof ProtectedAcceptCguImport
-      parentRoute: typeof ProtectedRouteImport
-    }
-    '/admin/dashboard': {
-      id: '/admin/dashboard'
-      path: '/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminDashboardImport
-      parentRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexImport
-      parentRoute: typeof AdminRouteImport
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
-    '/(public)/categories/$slug': {
-      id: '/(public)/categories/$slug'
-      path: '/categories/$slug'
-      fullPath: '/categories/$slug'
-      preLoaderRoute: typeof publicCategoriesSlugImport
-      parentRoute: typeof rootRoute
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
-    '/(public)/entreprises/$slug': {
-      id: '/(public)/entreprises/$slug'
-      path: '/entreprises/$slug'
-      fullPath: '/entreprises/$slug'
-      preLoaderRoute: typeof publicEntreprisesSlugImport
-      parentRoute: typeof rootRoute
+    '/_protected/accept-cgu': {
+      id: '/_protected/accept-cgu'
+      path: '/accept-cgu'
+      fullPath: '/accept-cgu'
+      preLoaderRoute: typeof ProtectedAcceptCguRouteImport
+      parentRoute: typeof ProtectedRouteRoute
     }
-    '/_protected/compte/preferences': {
-      id: '/_protected/compte/preferences'
-      path: '/preferences'
-      fullPath: '/compte/preferences'
-      preLoaderRoute: typeof ProtectedComptePreferencesImport
-      parentRoute: typeof ProtectedCompteRouteImport
+    '/(public)/sources': {
+      id: '/(public)/sources'
+      path: '/sources'
+      fullPath: '/sources'
+      preLoaderRoute: typeof publicSourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/partners': {
+      id: '/(public)/partners'
+      path: '/partners'
+      fullPath: '/partners'
+      preLoaderRoute: typeof publicPartnersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/faq': {
+      id: '/(public)/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof publicFaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/cgu': {
+      id: '/(public)/cgu'
+      path: '/cgu'
+      fullPath: '/cgu'
+      preLoaderRoute: typeof publicCguRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/about': {
+      id: '/(public)/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof publicAboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/sign-up': {
+      id: '/(auth)/sign-up'
+      path: '/sign-up'
+      fullPath: '/sign-up'
+      preLoaderRoute: typeof authSignUpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/sign-in': {
+      id: '/(auth)/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof authSignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/reset-password': {
+      id: '/(auth)/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof authResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/forgot-password': {
+      id: '/(auth)/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof authForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_protected/compte': {
+      id: '/_protected/compte'
+      path: '/compte'
+      fullPath: '/compte'
+      preLoaderRoute: typeof ProtectedCompteRouteRouteImport
+      parentRoute: typeof ProtectedRouteRoute
     }
     '/_protected/compte/': {
       id: '/_protected/compte/'
       path: '/'
       fullPath: '/compte/'
-      preLoaderRoute: typeof ProtectedCompteIndexImport
-      parentRoute: typeof ProtectedCompteRouteImport
+      preLoaderRoute: typeof ProtectedCompteIndexRouteImport
+      parentRoute: typeof ProtectedCompteRouteRoute
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_protected/compte/preferences': {
+      id: '/_protected/compte/preferences'
+      path: '/preferences'
+      fullPath: '/compte/preferences'
+      preLoaderRoute: typeof ProtectedComptePreferencesRouteImport
+      parentRoute: typeof ProtectedCompteRouteRoute
+    }
+    '/(public)/entreprises/$slug': {
+      id: '/(public)/entreprises/$slug'
+      path: '/entreprises/$slug'
+      fullPath: '/entreprises/$slug'
+      preLoaderRoute: typeof publicEntreprisesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/categories/$slug': {
+      id: '/(public)/categories/$slug'
+      path: '/categories/$slug'
+      fullPath: '/categories/$slug'
+      preLoaderRoute: typeof publicCategoriesSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_protected/compte/entreprises/': {
       id: '/_protected/compte/entreprises/'
       path: '/entreprises'
-      fullPath: '/compte/entreprises'
-      preLoaderRoute: typeof ProtectedCompteEntreprisesIndexImport
-      parentRoute: typeof ProtectedCompteRouteImport
+      fullPath: '/compte/entreprises/'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesIndexRouteImport
+      parentRoute: typeof ProtectedCompteRouteRoute
     }
-    '/_protected/compte/entreprises/$slug/edit': {
-      id: '/_protected/compte/entreprises/$slug/edit'
-      path: '/entreprises/$slug/edit'
-      fullPath: '/compte/entreprises/$slug/edit'
-      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditRouteImport
-      parentRoute: typeof ProtectedCompteRouteImport
+    '/_protected/compte/entreprises/create/': {
+      id: '/_protected/compte/entreprises/create/'
+      path: '/entreprises/create'
+      fullPath: '/compte/entreprises/create/'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesCreateIndexRouteImport
+      parentRoute: typeof ProtectedCompteRouteRoute
     }
     '/_protected/compte/entreprises/create/preview': {
       id: '/_protected/compte/entreprises/create/preview'
       path: '/entreprises/create/preview'
       fullPath: '/compte/entreprises/create/preview'
-      preLoaderRoute: typeof ProtectedCompteEntreprisesCreatePreviewImport
-      parentRoute: typeof ProtectedCompteRouteImport
+      preLoaderRoute: typeof ProtectedCompteEntreprisesCreatePreviewRouteImport
+      parentRoute: typeof ProtectedCompteRouteRoute
     }
-    '/_protected/compte/entreprises/create/': {
-      id: '/_protected/compte/entreprises/create/'
-      path: '/entreprises/create'
-      fullPath: '/compte/entreprises/create'
-      preLoaderRoute: typeof ProtectedCompteEntreprisesCreateIndexImport
-      parentRoute: typeof ProtectedCompteRouteImport
-    }
-    '/_protected/compte/entreprises/$slug/edit/infos': {
-      id: '/_protected/compte/entreprises/$slug/edit/infos'
-      path: '/infos'
-      fullPath: '/compte/entreprises/$slug/edit/infos'
-      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditInfosImport
-      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteImport
-    }
-    '/_protected/compte/entreprises/$slug/edit/medias': {
-      id: '/_protected/compte/entreprises/$slug/edit/medias'
-      path: '/medias'
-      fullPath: '/compte/entreprises/$slug/edit/medias'
-      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditMediasImport
-      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteImport
-    }
-    '/_protected/compte/entreprises/$slug/edit/preview': {
-      id: '/_protected/compte/entreprises/$slug/edit/preview'
-      path: '/preview'
-      fullPath: '/compte/entreprises/$slug/edit/preview'
-      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditPreviewImport
-      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteImport
+    '/_protected/compte/entreprises/$slug/edit': {
+      id: '/_protected/compte/entreprises/$slug/edit'
+      path: '/entreprises/$slug/edit'
+      fullPath: '/compte/entreprises/$slug/edit'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditRouteRouteImport
+      parentRoute: typeof ProtectedCompteRouteRoute
     }
     '/_protected/compte/entreprises/$slug/edit/': {
       id: '/_protected/compte/entreprises/$slug/edit/'
       path: '/'
       fullPath: '/compte/entreprises/$slug/edit/'
-      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditIndexImport
-      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteImport
+      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditIndexRouteImport
+      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteRoute
+    }
+    '/_protected/compte/entreprises/$slug/edit/preview': {
+      id: '/_protected/compte/entreprises/$slug/edit/preview'
+      path: '/preview'
+      fullPath: '/compte/entreprises/$slug/edit/preview'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditPreviewRouteImport
+      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteRoute
+    }
+    '/_protected/compte/entreprises/$slug/edit/medias': {
+      id: '/_protected/compte/entreprises/$slug/edit/medias'
+      path: '/medias'
+      fullPath: '/compte/entreprises/$slug/edit/medias'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditMediasRouteImport
+      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteRoute
+    }
+    '/_protected/compte/entreprises/$slug/edit/infos': {
+      id: '/_protected/compte/entreprises/$slug/edit/infos'
+      path: '/infos'
+      fullPath: '/compte/entreprises/$slug/edit/infos'
+      preLoaderRoute: typeof ProtectedCompteEntreprisesSlugEditInfosRouteImport
+      parentRoute: typeof ProtectedCompteEntreprisesSlugEditRouteRoute
     }
   }
 }
-
-// Create and export the route tree
 
 interface ProtectedCompteEntreprisesSlugEditRouteRouteChildren {
   ProtectedCompteEntreprisesSlugEditInfosRoute: typeof ProtectedCompteEntreprisesSlugEditInfosRoute
@@ -500,205 +675,6 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
-export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '': typeof ProtectedRouteRouteWithChildren
-  '/admin': typeof AdminRouteRouteWithChildren
-  '/compte': typeof ProtectedCompteRouteRouteWithChildren
-  '/forgot-password': typeof authForgotPasswordRoute
-  '/reset-password': typeof authResetPasswordRoute
-  '/sign-in': typeof authSignInRoute
-  '/sign-up': typeof authSignUpRoute
-  '/about': typeof publicAboutRoute
-  '/cgu': typeof publicCguRoute
-  '/faq': typeof publicFaqRoute
-  '/partners': typeof publicPartnersRoute
-  '/sources': typeof publicSourcesRoute
-  '/accept-cgu': typeof ProtectedAcceptCguRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/': typeof AdminIndexRoute
-  '/categories/$slug': typeof publicCategoriesSlugRoute
-  '/entreprises/$slug': typeof publicEntreprisesSlugRoute
-  '/compte/preferences': typeof ProtectedComptePreferencesRoute
-  '/compte/': typeof ProtectedCompteIndexRoute
-  '/compte/entreprises': typeof ProtectedCompteEntreprisesIndexRoute
-  '/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren
-  '/compte/entreprises/create/preview': typeof ProtectedCompteEntreprisesCreatePreviewRoute
-  '/compte/entreprises/create': typeof ProtectedCompteEntreprisesCreateIndexRoute
-  '/compte/entreprises/$slug/edit/infos': typeof ProtectedCompteEntreprisesSlugEditInfosRoute
-  '/compte/entreprises/$slug/edit/medias': typeof ProtectedCompteEntreprisesSlugEditMediasRoute
-  '/compte/entreprises/$slug/edit/preview': typeof ProtectedCompteEntreprisesSlugEditPreviewRoute
-  '/compte/entreprises/$slug/edit/': typeof ProtectedCompteEntreprisesSlugEditIndexRoute
-}
-
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '': typeof ProtectedRouteRouteWithChildren
-  '/forgot-password': typeof authForgotPasswordRoute
-  '/reset-password': typeof authResetPasswordRoute
-  '/sign-in': typeof authSignInRoute
-  '/sign-up': typeof authSignUpRoute
-  '/about': typeof publicAboutRoute
-  '/cgu': typeof publicCguRoute
-  '/faq': typeof publicFaqRoute
-  '/partners': typeof publicPartnersRoute
-  '/sources': typeof publicSourcesRoute
-  '/accept-cgu': typeof ProtectedAcceptCguRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin': typeof AdminIndexRoute
-  '/categories/$slug': typeof publicCategoriesSlugRoute
-  '/entreprises/$slug': typeof publicEntreprisesSlugRoute
-  '/compte/preferences': typeof ProtectedComptePreferencesRoute
-  '/compte': typeof ProtectedCompteIndexRoute
-  '/compte/entreprises': typeof ProtectedCompteEntreprisesIndexRoute
-  '/compte/entreprises/create/preview': typeof ProtectedCompteEntreprisesCreatePreviewRoute
-  '/compte/entreprises/create': typeof ProtectedCompteEntreprisesCreateIndexRoute
-  '/compte/entreprises/$slug/edit/infos': typeof ProtectedCompteEntreprisesSlugEditInfosRoute
-  '/compte/entreprises/$slug/edit/medias': typeof ProtectedCompteEntreprisesSlugEditMediasRoute
-  '/compte/entreprises/$slug/edit/preview': typeof ProtectedCompteEntreprisesSlugEditPreviewRoute
-  '/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditIndexRoute
-}
-
-export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/_protected': typeof ProtectedRouteRouteWithChildren
-  '/admin': typeof AdminRouteRouteWithChildren
-  '/_protected/compte': typeof ProtectedCompteRouteRouteWithChildren
-  '/(auth)/forgot-password': typeof authForgotPasswordRoute
-  '/(auth)/reset-password': typeof authResetPasswordRoute
-  '/(auth)/sign-in': typeof authSignInRoute
-  '/(auth)/sign-up': typeof authSignUpRoute
-  '/(public)/about': typeof publicAboutRoute
-  '/(public)/cgu': typeof publicCguRoute
-  '/(public)/faq': typeof publicFaqRoute
-  '/(public)/partners': typeof publicPartnersRoute
-  '/(public)/sources': typeof publicSourcesRoute
-  '/_protected/accept-cgu': typeof ProtectedAcceptCguRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/': typeof AdminIndexRoute
-  '/(public)/categories/$slug': typeof publicCategoriesSlugRoute
-  '/(public)/entreprises/$slug': typeof publicEntreprisesSlugRoute
-  '/_protected/compte/preferences': typeof ProtectedComptePreferencesRoute
-  '/_protected/compte/': typeof ProtectedCompteIndexRoute
-  '/_protected/compte/entreprises/': typeof ProtectedCompteEntreprisesIndexRoute
-  '/_protected/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren
-  '/_protected/compte/entreprises/create/preview': typeof ProtectedCompteEntreprisesCreatePreviewRoute
-  '/_protected/compte/entreprises/create/': typeof ProtectedCompteEntreprisesCreateIndexRoute
-  '/_protected/compte/entreprises/$slug/edit/infos': typeof ProtectedCompteEntreprisesSlugEditInfosRoute
-  '/_protected/compte/entreprises/$slug/edit/medias': typeof ProtectedCompteEntreprisesSlugEditMediasRoute
-  '/_protected/compte/entreprises/$slug/edit/preview': typeof ProtectedCompteEntreprisesSlugEditPreviewRoute
-  '/_protected/compte/entreprises/$slug/edit/': typeof ProtectedCompteEntreprisesSlugEditIndexRoute
-}
-
-export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | ''
-    | '/admin'
-    | '/compte'
-    | '/forgot-password'
-    | '/reset-password'
-    | '/sign-in'
-    | '/sign-up'
-    | '/about'
-    | '/cgu'
-    | '/faq'
-    | '/partners'
-    | '/sources'
-    | '/accept-cgu'
-    | '/admin/dashboard'
-    | '/admin/'
-    | '/categories/$slug'
-    | '/entreprises/$slug'
-    | '/compte/preferences'
-    | '/compte/'
-    | '/compte/entreprises'
-    | '/compte/entreprises/$slug/edit'
-    | '/compte/entreprises/create/preview'
-    | '/compte/entreprises/create'
-    | '/compte/entreprises/$slug/edit/infos'
-    | '/compte/entreprises/$slug/edit/medias'
-    | '/compte/entreprises/$slug/edit/preview'
-    | '/compte/entreprises/$slug/edit/'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | ''
-    | '/forgot-password'
-    | '/reset-password'
-    | '/sign-in'
-    | '/sign-up'
-    | '/about'
-    | '/cgu'
-    | '/faq'
-    | '/partners'
-    | '/sources'
-    | '/accept-cgu'
-    | '/admin/dashboard'
-    | '/admin'
-    | '/categories/$slug'
-    | '/entreprises/$slug'
-    | '/compte/preferences'
-    | '/compte'
-    | '/compte/entreprises'
-    | '/compte/entreprises/create/preview'
-    | '/compte/entreprises/create'
-    | '/compte/entreprises/$slug/edit/infos'
-    | '/compte/entreprises/$slug/edit/medias'
-    | '/compte/entreprises/$slug/edit/preview'
-    | '/compte/entreprises/$slug/edit'
-  id:
-    | '__root__'
-    | '/'
-    | '/_protected'
-    | '/admin'
-    | '/_protected/compte'
-    | '/(auth)/forgot-password'
-    | '/(auth)/reset-password'
-    | '/(auth)/sign-in'
-    | '/(auth)/sign-up'
-    | '/(public)/about'
-    | '/(public)/cgu'
-    | '/(public)/faq'
-    | '/(public)/partners'
-    | '/(public)/sources'
-    | '/_protected/accept-cgu'
-    | '/admin/dashboard'
-    | '/admin/'
-    | '/(public)/categories/$slug'
-    | '/(public)/entreprises/$slug'
-    | '/_protected/compte/preferences'
-    | '/_protected/compte/'
-    | '/_protected/compte/entreprises/'
-    | '/_protected/compte/entreprises/$slug/edit'
-    | '/_protected/compte/entreprises/create/preview'
-    | '/_protected/compte/entreprises/create/'
-    | '/_protected/compte/entreprises/$slug/edit/infos'
-    | '/_protected/compte/entreprises/$slug/edit/medias'
-    | '/_protected/compte/entreprises/$slug/edit/preview'
-    | '/_protected/compte/entreprises/$slug/edit/'
-  fileRoutesById: FileRoutesById
-}
-
-export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
-  AdminRouteRoute: typeof AdminRouteRouteWithChildren
-  authForgotPasswordRoute: typeof authForgotPasswordRoute
-  authResetPasswordRoute: typeof authResetPasswordRoute
-  authSignInRoute: typeof authSignInRoute
-  authSignUpRoute: typeof authSignUpRoute
-  publicAboutRoute: typeof publicAboutRoute
-  publicCguRoute: typeof publicCguRoute
-  publicFaqRoute: typeof publicFaqRoute
-  publicPartnersRoute: typeof publicPartnersRoute
-  publicSourcesRoute: typeof publicSourcesRoute
-  publicCategoriesSlugRoute: typeof publicCategoriesSlugRoute
-  publicEntreprisesSlugRoute: typeof publicEntreprisesSlugRoute
-}
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
@@ -714,154 +690,17 @@ const rootRouteChildren: RootRouteChildren = {
   publicSourcesRoute: publicSourcesRoute,
   publicCategoriesSlugRoute: publicCategoriesSlugRoute,
   publicEntreprisesSlugRoute: publicEntreprisesSlugRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/_protected",
-        "/admin",
-        "/(auth)/forgot-password",
-        "/(auth)/reset-password",
-        "/(auth)/sign-in",
-        "/(auth)/sign-up",
-        "/(public)/about",
-        "/(public)/cgu",
-        "/(public)/faq",
-        "/(public)/partners",
-        "/(public)/sources",
-        "/(public)/categories/$slug",
-        "/(public)/entreprises/$slug"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/_protected": {
-      "filePath": "_protected/route.tsx",
-      "children": [
-        "/_protected/compte",
-        "/_protected/accept-cgu"
-      ]
-    },
-    "/admin": {
-      "filePath": "admin/route.tsx",
-      "children": [
-        "/admin/dashboard",
-        "/admin/"
-      ]
-    },
-    "/_protected/compte": {
-      "filePath": "_protected/compte/route.tsx",
-      "parent": "/_protected",
-      "children": [
-        "/_protected/compte/preferences",
-        "/_protected/compte/",
-        "/_protected/compte/entreprises/",
-        "/_protected/compte/entreprises/$slug/edit",
-        "/_protected/compte/entreprises/create/preview",
-        "/_protected/compte/entreprises/create/"
-      ]
-    },
-    "/(auth)/forgot-password": {
-      "filePath": "(auth)/forgot-password.tsx"
-    },
-    "/(auth)/reset-password": {
-      "filePath": "(auth)/reset-password.tsx"
-    },
-    "/(auth)/sign-in": {
-      "filePath": "(auth)/sign-in.tsx"
-    },
-    "/(auth)/sign-up": {
-      "filePath": "(auth)/sign-up.tsx"
-    },
-    "/(public)/about": {
-      "filePath": "(public)/about.tsx"
-    },
-    "/(public)/cgu": {
-      "filePath": "(public)/cgu.tsx"
-    },
-    "/(public)/faq": {
-      "filePath": "(public)/faq.tsx"
-    },
-    "/(public)/partners": {
-      "filePath": "(public)/partners.tsx"
-    },
-    "/(public)/sources": {
-      "filePath": "(public)/sources.tsx"
-    },
-    "/_protected/accept-cgu": {
-      "filePath": "_protected/accept-cgu.tsx",
-      "parent": "/_protected"
-    },
-    "/admin/dashboard": {
-      "filePath": "admin/dashboard.tsx",
-      "parent": "/admin"
-    },
-    "/admin/": {
-      "filePath": "admin/index.tsx",
-      "parent": "/admin"
-    },
-    "/(public)/categories/$slug": {
-      "filePath": "(public)/categories/$slug.tsx"
-    },
-    "/(public)/entreprises/$slug": {
-      "filePath": "(public)/entreprises/$slug.tsx"
-    },
-    "/_protected/compte/preferences": {
-      "filePath": "_protected/compte/preferences.tsx",
-      "parent": "/_protected/compte"
-    },
-    "/_protected/compte/": {
-      "filePath": "_protected/compte/index.tsx",
-      "parent": "/_protected/compte"
-    },
-    "/_protected/compte/entreprises/": {
-      "filePath": "_protected/compte/entreprises/index.tsx",
-      "parent": "/_protected/compte"
-    },
-    "/_protected/compte/entreprises/$slug/edit": {
-      "filePath": "_protected/compte/entreprises/$slug/edit/route.tsx",
-      "parent": "/_protected/compte",
-      "children": [
-        "/_protected/compte/entreprises/$slug/edit/infos",
-        "/_protected/compte/entreprises/$slug/edit/medias",
-        "/_protected/compte/entreprises/$slug/edit/preview",
-        "/_protected/compte/entreprises/$slug/edit/"
-      ]
-    },
-    "/_protected/compte/entreprises/create/preview": {
-      "filePath": "_protected/compte/entreprises/create/preview.tsx",
-      "parent": "/_protected/compte"
-    },
-    "/_protected/compte/entreprises/create/": {
-      "filePath": "_protected/compte/entreprises/create/index.tsx",
-      "parent": "/_protected/compte"
-    },
-    "/_protected/compte/entreprises/$slug/edit/infos": {
-      "filePath": "_protected/compte/entreprises/$slug/edit/infos.tsx",
-      "parent": "/_protected/compte/entreprises/$slug/edit"
-    },
-    "/_protected/compte/entreprises/$slug/edit/medias": {
-      "filePath": "_protected/compte/entreprises/$slug/edit/medias.tsx",
-      "parent": "/_protected/compte/entreprises/$slug/edit"
-    },
-    "/_protected/compte/entreprises/$slug/edit/preview": {
-      "filePath": "_protected/compte/entreprises/$slug/edit/preview.tsx",
-      "parent": "/_protected/compte/entreprises/$slug/edit"
-    },
-    "/_protected/compte/entreprises/$slug/edit/": {
-      "filePath": "_protected/compte/entreprises/$slug/edit/index.tsx",
-      "parent": "/_protected/compte/entreprises/$slug/edit"
-    }
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
   }
 }
-ROUTE_MANIFEST_END */

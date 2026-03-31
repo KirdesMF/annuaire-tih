@@ -13,7 +13,7 @@ import {
 } from "~/lib/validator/company.schema";
 
 export const updateCompanyMedia = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     const decodedFormData = decode(data, {
       files: ["logo", "gallery.$"],
       arrays: ["gallery", "gallery_public_id"],
@@ -92,7 +92,7 @@ export const updateCompanyMedia = createServerFn({ method: "POST" })
   });
 
 export const updateCompanyLogo = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     const decodedFormData = decode(data, {
       files: ["logo"],
     });
@@ -130,7 +130,7 @@ export const updateCompanyLogo = createServerFn({ method: "POST" })
   });
 
 export const updateCompanyGallery = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     const decodedFormData = decode(data, {
       files: ["gallery"],
       arrays: ["gallery", "gallery_public_id"],

@@ -7,7 +7,7 @@ import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 
 export const getCompanyBySlug = createServerFn({ method: "GET" })
-  .validator((slug: string) => slug)
+  .inputValidator((slug: string) => slug)
   .handler(async ({ data: slug }) => {
     try {
       const db = getDb();

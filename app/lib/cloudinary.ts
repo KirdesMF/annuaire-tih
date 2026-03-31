@@ -10,11 +10,21 @@ type UploadImageToCloudinaryProps = {
   companySlug: string;
 };
 
-const options = {
-  name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-};
+function getCloudinaryOptions() {
+  const name = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  if (!name || !apiKey || !apiSecret) {
+    throw new Error("Cloudinary credentials are not set");
+  }
+
+  return {
+    name,
+    api_key: apiKey,
+    api_secret: apiSecret,
+  };
+}
 
 // generate signature for cloudinary upload
 async function generateSignature(params: Record<string, unknown>, secret: string) {
@@ -39,9 +49,7 @@ export async function uploadImageToCloudinary({
   companyId,
   companySlug,
 }: UploadImageToCloudinaryProps): Promise<UploadApiResponse> {
-  if (!options.name || !options.api_key || !options.api_secret) {
-    throw new Error("Cloudinary credentials are not set");
-  }
+  const options = getCloudinaryOptions();
 
   const publicId = `${companyId}-${Date.now()}`;
   const path =
@@ -95,9 +103,7 @@ export async function updateImageInCloudinary({
   file,
   publicId,
 }: { file: File; publicId: string }) {
-  if (!options.name || !options.api_key || !options.api_secret) {
-    throw new Error("Cloudinary credentials are not set");
-  }
+  const options = getCloudinaryOptions();
 
   try {
     const formData = new FormData();
@@ -146,9 +152,7 @@ export async function updateImageInCloudinary({
 }
 
 export async function deleteImageFromCloudinary(publicId: string) {
-  if (!options.name || !options.api_key || !options.api_secret) {
-    throw new Error("Cloudinary credentials are not set");
-  }
+  const options = getCloudinaryOptions();
 
   try {
     const timestamp = Math.floor(Date.now() / 1000);
@@ -189,9 +193,7 @@ export async function deleteImageFromCloudinary(publicId: string) {
 }
 
 export async function deleteCompanyFromCloudinary(slug: string) {
-  if (!options.name || !options.api_key || !options.api_secret) {
-    throw new Error("Cloudinary credentials are not set");
-  }
+  const options = getCloudinaryOptions();
 
   try {
     const path = `companies/${slug}`;

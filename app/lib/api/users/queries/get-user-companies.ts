@@ -7,7 +7,7 @@ import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 
 export const getUserCompanies = createServerFn({ method: "GET" })
-  .validator((userId: string) => userId)
+  .inputValidator((userId: string) => userId)
   .handler(async ({ data }) => {
     const db = getDb();
 

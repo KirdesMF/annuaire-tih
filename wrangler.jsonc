@@ -1,19 +1,16 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "annuaire-tih",
   "compatibility_flags": ["nodejs_compat"],
-  "compatibility_date": "2025-04-02",
-  "main": ".output/server/index.mjs",
-  "assets": {
-    "directory": "./.output/public/",
-    "binding": "ASSETS"
-  },
+  "compatibility_date": "2025-09-24",
+  "main": "@tanstack/react-start/server-entry",
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
-      "id": "5073119ffaa4492e868e15e8205d3629"
-    }
-  ]
+      "id": "5073119ffaa4492e868e15e8205d3629",
+    },
+  ],
 }

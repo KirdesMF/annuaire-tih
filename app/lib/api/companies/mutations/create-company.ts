@@ -15,7 +15,7 @@ import { generateUniqueSlug } from "~/utils/slug";
  * @todo: get user id from form data
  */
 export const createCompany = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     const decodedFormData = decode(data, {
       files: ["logo", "gallery.$"],
       arrays: ["categories", "gallery"],

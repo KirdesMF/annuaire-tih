@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import type { User } from "better-auth";
 import { Monitor, Moon, SearchIcon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { MainNav } from "~/components/main-nav";
@@ -25,10 +24,11 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { useDebounce } from "~/hooks/use-debounce";
+import type { AuthUser } from "~/lib/auth/auth.server";
 import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
 import { type Theme, useTheme } from "./providers/theme-provider";
 
-export function SiteHeader({ user }: { user: User | undefined }) {
+export function SiteHeader({ user }: { user: AuthUser | undefined }) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
@@ -124,7 +124,7 @@ export function SiteHeader({ user }: { user: User | undefined }) {
   );
 }
 
-function RegisterLink({ user }: { user: User | undefined }) {
+function RegisterLink({ user }: { user: AuthUser | undefined }) {
   return (
     <Link
       to={user ? "/compte/entreprises/create" : "/sign-up"}
@@ -135,7 +135,7 @@ function RegisterLink({ user }: { user: User | undefined }) {
   );
 }
 
-function LoginButton({ user }: { user: User | undefined }) {
+function LoginButton({ user }: { user: AuthUser | undefined }) {
   if (user) return null;
 
   return (

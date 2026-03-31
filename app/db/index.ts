@@ -38,7 +38,7 @@ export function getDb() {
   return drizzle({ client: _client, schema });
 }
 
-if (typeof process !== "undefined" && !process.env.CLOUDFLARE_WORKER) {
+if (typeof process !== "undefined") {
   process.on("SIGINT", () => {
     if (_client) {
       console.log("🔒 closing database connection");
