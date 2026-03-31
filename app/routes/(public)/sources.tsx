@@ -20,6 +20,10 @@ const USEFUL_LINKS = [
     label: "Portail TIHm, partenaire des Travailleurs Indépendants Handicapés",
     url: "https://www.tihm.urssaf.fr/",
   },
+  {
+    label: "Simulateur de déduction sur votre taxe AGEFIPH (par Next Impact Digital)",
+    url: "https://www.next-impact.digital/avantage-oeth",
+  },
 ];
 
 const DOCUMENTS = [
