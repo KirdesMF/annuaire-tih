@@ -111,7 +111,7 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 
 ### New likely files
 - `app/routes/sitemap[.]xml.ts` or equivalent
-- `app/routes/robots[.]txt.ts` or equivalent
+- `public/robots.txt`
 - optional accessibility tool/test helper files
 
 ## 6. Step-by-step plan
@@ -182,6 +182,7 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 
 11. **SEO baseline pass**
    - add strong metadata to root and public routes: title, description, canonical, OG/Twitter if useful
+   - note follow-up: improve category route SEO by replacing `?id=&name=` search-param dependency with canonical slug-based data loading, so `/categories/$slug` can generate dynamic title/description from category data safely
    - ensure heading hierarchy, landmark structure, meaningful alt text, and no empty labels
    - review focus states, skip paths, and keyboard access
    - fix obvious accessibility gaps on public pages first
@@ -190,7 +191,8 @@ Rule: do not start next branch before previous phase is merged or at least stabi
    - expose public static URLs
    - include dynamic category and company pages from DB queries
    - keep sitemap generation server-side and cacheable
-   - add `robots.txt` pointing to sitemap
+   - use short browser cache and longer Cloudflare edge cache for sitemap responses
+   - add static `public/robots.txt` pointing to sitemap
    - ensure unpublished/private records never leak into sitemap
 
 13. **Feature phase**
