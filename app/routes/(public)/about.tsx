@@ -1,7 +1,15 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Separator } from "~/components/ui/separator";
+import { seo } from "~/lib/seo";
 
 export const Route = createFileRoute("/(public)/about")({
+  head: () =>
+    seo({
+      title: "À propos",
+      description:
+        "Découvrez la mission de l'Annuaire TIH : rendre visibles les travailleurs indépendants handicapés et entreprises TIH.",
+      path: "/about",
+    }),
   component: RouteComponent,
 });
 

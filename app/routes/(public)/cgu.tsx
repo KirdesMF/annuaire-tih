@@ -1,7 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { seo } from "~/lib/seo";
 import { cn } from "~/utils/cn";
 
 export const Route = createFileRoute("/(public)/cgu")({
+  head: () =>
+    seo({
+      title: "Conditions générales d'utilisation",
+      description:
+        "Conditions générales d'utilisation de l'Annuaire TIH et informations sur la gestion des données publiques.",
+      path: "/cgu",
+    }),
   component: RouteComponent,
 });
 

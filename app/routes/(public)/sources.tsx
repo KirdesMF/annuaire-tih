@@ -1,7 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Separator } from "~/components/ui/separator";
+import { seo } from "~/lib/seo";
 
 export const Route = createFileRoute("/(public)/sources")({
+  head: () =>
+    seo({
+      title: "Sources et liens utiles",
+      description:
+        "Ressources, documents et liens utiles sur le statut TIH, l'OETH, la RQTH et l'entrepreneuriat en situation de handicap.",
+      path: "/sources",
+    }),
   component: RouteComponent,
 });
 

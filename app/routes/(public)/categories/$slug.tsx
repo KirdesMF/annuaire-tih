@@ -4,6 +4,7 @@ import { ArrowLeftIcon, SearchXIcon } from "lucide-react";
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "~/components/ui/empty";
 import * as v from "valibot";
 import { companiesByCategoryQuery } from "~/lib/api/companies/queries/get-companies-by-category";
+import { seo } from "~/lib/seo";
 
 const SearchSchema = v.object({
   id: v.string(),
@@ -15,7 +16,8 @@ export const Route = createFileRoute("/(public)/categories/$slug")({
   loaderDeps: ({ search }) => ({
     categoryId: search.id,
   }),
-  loader: async ({ context, deps: { categoryId } }) => {
+  loader: async ({ context, deps }) => {
+    const { categoryId } = deps;
     await context.queryClient.ensureQueryData(
       companiesByCategoryQuery({ categoryId, status: "active" }),
     );

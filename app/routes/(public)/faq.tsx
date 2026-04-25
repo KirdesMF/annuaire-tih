@@ -1,7 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "~/components/ui/accordion";
+import { seo } from "~/lib/seo";
 
 export const Route = createFileRoute("/(public)/faq")({
+  head: () =>
+    seo({
+      title: "Foire aux questions",
+      description:
+        "Questions fréquentes sur le statut TIH, la RQTH, l'annuaire et les démarches pour les travailleurs indépendants handicapés.",
+      path: "/faq",
+    }),
   component: RouteComponent,
 });
 

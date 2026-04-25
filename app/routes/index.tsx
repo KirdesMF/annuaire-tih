@@ -35,9 +35,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover
 import { useDebounce } from "~/hooks/use-debounce";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
+import { seo } from "~/lib/seo";
 import { slugify } from "~/utils/slug";
 
 export const Route = createFileRoute("/")({
+  head: () => seo(),
   component: Home,
   loader: async ({ context }) => {
     await context.queryClient.ensureQueryData(categoriesQueryOptions);

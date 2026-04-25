@@ -19,6 +19,7 @@ import { TooltipProvider } from "~/components/ui/tooltip";
 import { SiteFooter } from "~/components/site-footer";
 import { SiteHeader } from "~/components/site-header";
 import { auth } from "~/lib/auth/auth.server";
+import { DEFAULT_DESCRIPTION, SITE_NAME } from "~/lib/seo";
 import { getThemeServerFn } from "~/lib/theme";
 import appCSS from "~/styles/app.css?url";
 
@@ -42,7 +43,11 @@ export const Route = createRootRouteWithContext<RootRouterContext>()({
         name: "viewport",
         content: "width=device-width, initial-scale=1",
       },
-      { title: "Annuaire TIH" },
+      { title: SITE_NAME },
+      { name: "description", content: DEFAULT_DESCRIPTION },
+      { property: "og:site_name", content: SITE_NAME },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
     links: [
       { rel: "stylesheet", href: appCSS },

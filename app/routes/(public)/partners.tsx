@@ -2,8 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Separator } from "~/components/ui/separator";
 import findajob from "~/assets/img/FINDAJOB.jpg?url";
 import logoTIHM from "~/assets/img/Logo_TIHM.svg?url";
+import { seo } from "~/lib/seo";
 
 export const Route = createFileRoute("/(public)/partners")({
+  head: () =>
+    seo({
+      title: "Partenaires",
+      description:
+        "Partenaires et remerciements de l'Annuaire TIH, projet dédié à la visibilité des entrepreneur·euses en situation de handicap.",
+      path: "/partners",
+    }),
   component: RouteComponent,
 });
 

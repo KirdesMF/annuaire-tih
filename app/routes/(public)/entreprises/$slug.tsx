@@ -20,10 +20,18 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { seo } from "~/lib/seo";
 import { cn } from "~/utils/cn";
 import { slugify } from "~/utils/slug";
 
 export const Route = createFileRoute("/(public)/entreprises/$slug")({
+  head: ({ params }) =>
+    seo({
+      title: params.slug,
+      description:
+        "Fiche entreprise TIH : activité, coordonnées, zone géographique et informations professionnelles.",
+      path: `/entreprises/${params.slug}`,
+    }),
   component: RouteComponent,
   pendingComponent: () => <div>Loading...</div>,
   errorComponent: () => <div>Error</div>,
