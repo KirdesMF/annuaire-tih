@@ -16,3 +16,4 @@ export function CompanyLogo({
     <img src={url} alt={name} className={cn("rounded-sm object-contain size-full", SIZES[size])} />
   );
 }
+

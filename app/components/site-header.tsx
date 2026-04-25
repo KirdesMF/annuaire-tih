@@ -24,8 +24,8 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { useDebounce } from "~/hooks/use-debounce";
-import type { AuthUser } from "~/lib/auth/auth.server";
 import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
+import type { AuthUser } from "~/lib/auth/auth.server";
 import { type Theme, useTheme } from "./providers/theme-provider";
 
 export function SiteHeader({ user }: { user: AuthUser | undefined }) {
@@ -105,15 +105,6 @@ export function SiteHeader({ user }: { user: AuthUser | undefined }) {
               </Command>
             </DialogContent>
           </Dialog>
-
-          {/* <a
-            href="https://linkedin.com/groups/13011531"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-blue-700 transition-colors"
-          >
-            <LinkedinIcon className="size-5" />
-          </a> */}
 
           <RegisterLink user={user} />
           <LoginButton user={user} />
