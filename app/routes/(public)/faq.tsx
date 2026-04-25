@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronDown } from "lucide-react";
-import { Accordion } from "radix-ui";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "~/components/ui/accordion";
 
 export const Route = createFileRoute("/(public)/faq")({
   component: RouteComponent,
@@ -12,17 +11,14 @@ function RouteComponent() {
       <div className="max-w-4xl mx-auto pt-24">
         <h1 className="text-4xl font-bold tracking-tighter mb-12">Foire aux questions</h1>
 
-        <Accordion.Root collapsible type="single" className="rounded-sm border border-border">
-          <Accordion.Item value="item-1" className="border-b border-border">
-            <Accordion.Header asChild>
-              <h2>
-                <Accordion.Trigger className="px-2 py-1.5 text-lg font-bold text-start flex items-center justify-between w-full group">
+        <Accordion defaultValue={[]} className="rounded-sm border border-border">
+          <AccordionItem value="item-1" className="border-b border-border">
+            <h2>
+              <AccordionTrigger className="px-2 py-1.5 text-start text-lg font-bold">
                   <span>Qu'est ce qu'un·e travailleur·se indépendant·e handicapé·e (TIH) ?</span>
-                  <ChevronDown className="size-4 group-data-[state=open]:rotate-180 transition-transform duration-300" />
-                </Accordion.Trigger>
-              </h2>
-            </Accordion.Header>
-            <Accordion.Content className="px-3 py-2 space-y-2 data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up overflow-hidden">
+              </AccordionTrigger>
+            </h2>
+            <AccordionContent className="flex flex-col gap-2 px-3 py-2">
               <p className="text-muted-foreground text-md font-light leading-relaxed text-pretty">
                 Le statut de Travailleur Indépendant Handicapé (TIH), statut reconnu dans la loi
                 depuis 2015-2016 avec la loi dite Macron, concerne tous les entrepreneurs·ses en nom
@@ -41,19 +37,16 @@ function RouteComponent() {
                 La demande d'une Reconnaissance de la Qualité de Travailleur·se Handicapé·e (RQTH)
                 se fait auprès de votre MDPH (maison départementale des personnes handicapées).
               </p>
-            </Accordion.Content>
-          </Accordion.Item>
+            </AccordionContent>
+          </AccordionItem>
 
-          <Accordion.Item value="item-2" className="border-b border-border">
-            <Accordion.Header asChild>
-              <h2>
-                <Accordion.Trigger className="px-2 py-1.5 text-lg font-bold text-start flex items-center justify-between w-full group">
+          <AccordionItem value="item-2" className="border-b border-border">
+            <h2>
+              <AccordionTrigger className="px-2 py-1.5 text-start text-lg font-bold">
                   <span>Pourquoi un référencement des tih ?</span>
-                  <ChevronDown className="size-4 group-data-[state=open]:rotate-180 transition-transform duration-300" />
-                </Accordion.Trigger>
-              </h2>
-            </Accordion.Header>
-            <Accordion.Content className="px-2 pb-3 space-y-2 data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up overflow-hidden">
+              </AccordionTrigger>
+            </h2>
+            <AccordionContent className="flex flex-col gap-2 px-2 pb-3">
               <p className="text-muted-foreground text-md font-light leading-relaxed text-pretty">
                 Notre annuaire de référencement gratuit et public est conçu pour booster la
                 visibilité et le réseau professionnel des TIH.
@@ -81,37 +74,31 @@ function RouteComponent() {
                   </li>
                 </ul>
               </figure>
-            </Accordion.Content>
-          </Accordion.Item>
+            </AccordionContent>
+          </AccordionItem>
 
-          <Accordion.Item value="item-3" className="border-b border-border">
-            <Accordion.Header asChild>
-              <h2>
-                <Accordion.Trigger className="px-2 py-1.5 text-lg font-bold text-start flex items-center justify-between w-full group">
+          <AccordionItem value="item-3" className="border-b border-border">
+            <h2>
+              <AccordionTrigger className="px-2 py-1.5 text-start text-lg font-bold">
                   <span>Quelles cibles pour cet annuaire tih ?</span>
-                  <ChevronDown className="size-4 group-data-[state=open]:rotate-180 transition-transform duration-300" />
-                </Accordion.Trigger>
-              </h2>
-            </Accordion.Header>
-            <Accordion.Content className="px-2 pb-3 space-y-2 data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up overflow-hidden">
+              </AccordionTrigger>
+            </h2>
+            <AccordionContent className="flex flex-col gap-2 px-2 pb-3">
               <p className="text-muted-foreground text-md font-light leading-relaxed text-pretty">
                 Nous ciblons une large gamme d'entreprises engagées dans l'inclusion des
                 travailleurs·ses handicapé·e·s, de tous secteurs d'activité, mais pas seulement: de
                 nombreux TIH proposent leurs services aux particuliers également.
               </p>
-            </Accordion.Content>
-          </Accordion.Item>
+            </AccordionContent>
+          </AccordionItem>
 
-          <Accordion.Item value="item-4" className="border-b border-border">
-            <Accordion.Header asChild>
-              <h2>
-                <Accordion.Trigger className="px-2 py-1.5 text-lg font-bold text-start flex items-center justify-between w-full group">
+          <AccordionItem value="item-4" className="border-b border-border">
+            <h2>
+              <AccordionTrigger className="px-2 py-1.5 text-start text-lg font-bold">
                   <span>Sous-traiter avec un TIH permet-il de réduire la contribution OETH ?</span>
-                  <ChevronDown className="size-4 group-data-[state=open]:rotate-180 transition-transform duration-300" />
-                </Accordion.Trigger>
-              </h2>
-            </Accordion.Header>
-            <Accordion.Content className="px-2 pb-3 space-y-2 data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up overflow-hidden">
+              </AccordionTrigger>
+            </h2>
+            <AccordionContent className="flex flex-col gap-2 px-2 pb-3">
               <p className="text-muted-foreground text-md font-light leading-relaxed text-pretty">
                 Sous-traiter avec un TIH c'est sous-traiter auprès du secteur protégé/adapté:
               </p>
@@ -134,22 +121,19 @@ function RouteComponent() {
                 Lien vers la fiche explicative de l'AGEFIPH sur la déclaration de ces déductions sur
                 la contribution OETH
               </a>
-            </Accordion.Content>
-          </Accordion.Item>
+            </AccordionContent>
+          </AccordionItem>
 
-          <Accordion.Item value="item-5">
-            <Accordion.Header asChild>
-              <h2>
-                <Accordion.Trigger className="px-2 py-1.5 text-lg font-bold text-start flex items-center justify-between w-full group">
+          <AccordionItem value="item-5">
+            <h2>
+              <AccordionTrigger className="px-2 py-1.5 text-start text-lg font-bold">
                   <span>
                     Quelles sont les démarches à effectuer par le TIH afin que l'entreprise cliente
                     puisse bénéficier d'une déduction ?
                   </span>
-                  <ChevronDown className="size-4 group-data-[state=open]:rotate-180 transition-transform duration-300" />
-                </Accordion.Trigger>
-              </h2>
-            </Accordion.Header>
-            <Accordion.Content className="px-2 pb-3 space-y-2 data-[state=open]:animate-slide-down data-[state=closed]:animate-slide-up overflow-hidden">
+              </AccordionTrigger>
+            </h2>
+            <AccordionContent className="flex flex-col gap-2 px-2 pb-3">
               <p className="text-muted-foreground text-md font-light leading-relaxed text-pretty">
                 Lors de l'emploi de vos services par une entreprise de plus de 20 salariés, vous
                 devez leur fournir, une fois par an, et pour chaque entreprise cliente, une
@@ -176,9 +160,9 @@ function RouteComponent() {
               >
                 Lien vers l'arreté qui définit le modèle à utiliser.
               </a>
-            </Accordion.Content>
-          </Accordion.Item>
-        </Accordion.Root>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </div>
     </main>
   );

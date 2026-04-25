@@ -3,12 +3,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
 import { Loader, Lock, Mail, MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
-import { RadioGroup } from "radix-ui";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Separator } from "~/components/ui/separator";
 import { type FormEvent, useState } from "react";
 import { type Theme, useTheme } from "~/components/providers/theme-provider";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "~/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
@@ -293,12 +293,12 @@ function RouteComponent() {
               Vous pouvez modifier le thème du site en selectionnant une option ci-dessous.
             </p>
 
-            <RadioGroup.Root
-              defaultValue={theme}
+            <RadioGroup
+              value={theme}
               onValueChange={(value) => setTheme(value as Theme)}
               className="flex gap-2"
             >
-              <RadioGroup.Item
+              <RadioGroupItem
                 value="light"
                 className={cn(
                   "bg-secondary text-secondary-foreground px-3 py-2 rounded-sm text-xs cursor-pointer flex items-center gap-2",
@@ -307,8 +307,8 @@ function RouteComponent() {
               >
                 <SunIcon className="size-4" />
                 Light
-              </RadioGroup.Item>
-              <RadioGroup.Item
+              </RadioGroupItem>
+              <RadioGroupItem
                 value="dark"
                 className={cn(
                   "bg-secondary text-secondary-foreground px-3 py-2 rounded-sm text-xs cursor-pointer flex items-center gap-2",
@@ -317,8 +317,8 @@ function RouteComponent() {
               >
                 <MoonIcon className="size-4" />
                 Dark
-              </RadioGroup.Item>
-              <RadioGroup.Item
+              </RadioGroupItem>
+              <RadioGroupItem
                 value="system"
                 className={cn(
                   "bg-secondary text-secondary-foreground px-3 py-2 rounded-sm text-xs cursor-pointer flex items-center gap-2",
@@ -327,8 +327,8 @@ function RouteComponent() {
               >
                 <MonitorIcon className="size-4" />
                 System
-              </RadioGroup.Item>
-            </RadioGroup.Root>
+              </RadioGroupItem>
+            </RadioGroup>
           </div>
         </article>
         <Separator className="my-8 h-px bg-border" />
