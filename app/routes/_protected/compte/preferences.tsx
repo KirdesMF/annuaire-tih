@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import type { User } from "better-auth";
 import { Loader, Lock, Mail, MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
-import { Avatar, RadioGroup, Separator } from "radix-ui";
+import { RadioGroup } from "radix-ui";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Separator } from "~/components/ui/separator";
 import { type FormEvent, useState } from "react";
 import { type Theme, useTheme } from "~/components/providers/theme-provider";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "~/components/ui/dialog";
@@ -105,7 +107,7 @@ function RouteComponent() {
         <p>Modifiez vos préférences utilisateur pour personnaliser votre expérience sur le site.</p>
       </header>
 
-      <Separator.Root className="my-8 h-px bg-border" />
+      <Separator className="my-8 h-px bg-border" />
 
       <div className="grid gap-8">
         <article className="border border-border p-4 rounded-sm flex justify-between opacity-50 select-none">
@@ -136,7 +138,7 @@ function RouteComponent() {
               </Label>
             </div>
 
-            <Separator.Root className="my-4 -mx-4 h-px bg-border" />
+            <Separator className="my-4 -mx-4 h-px bg-border" />
 
             <div className="flex gap-2 justify-end">
               <button
@@ -174,7 +176,7 @@ function RouteComponent() {
               </Label>
             </div>
 
-            <Separator.Root className="my-4 -mx-4 h-px bg-border" />
+            <Separator className="my-4 -mx-4 h-px bg-border" />
 
             <div className="flex gap-2 justify-end">
               <button
@@ -213,7 +215,7 @@ function RouteComponent() {
             </Label>
           </div>
 
-          <Separator.Root className="my-4 -mx-4 h-px bg-border" />
+          <Separator className="my-4 -mx-4 h-px bg-border" />
 
           <div className="flex gap-2 justify-end">
             <button
@@ -228,7 +230,7 @@ function RouteComponent() {
               <DialogContent className="px-6 py-4">
                 <DialogTitle>Modifier mon mot de passe</DialogTitle>
 
-                <Separator.Root className="my-4 -mx-4 h-px bg-border" />
+                <Separator className="my-4 -mx-4 h-px bg-border" />
 
                 <DialogDescription className="mb-6 text-sm text-pretty">
                   Veuillez entrer votre mot de passe actuel et votre nouveau mot de passe.
@@ -329,7 +331,7 @@ function RouteComponent() {
             </RadioGroup.Root>
           </div>
         </article>
-        <Separator.Root className="my-8 h-px bg-border" />
+        <Separator className="my-8 h-px bg-border" />
 
         <article className="border border-destructive rounded-sm flex flex-col gap-6">
           <div className="flex flex-col gap-2 p-4">
@@ -353,7 +355,7 @@ function RouteComponent() {
               <DialogContent className="p-4">
                 <DialogTitle>Supprimer mon compte</DialogTitle>
 
-                <Separator.Root className="my-4 -mx-4 h-px bg-border" />
+                <Separator className="my-4 -mx-4 h-px bg-border" />
 
                 <DialogDescription className="mb-6 text-sm text-pretty">
                   Si vous souhaitez supprimer votre compte, veuillez cliquer sur le bouton
@@ -402,18 +404,16 @@ function AvatarUser({ user }: { user: User }) {
 
   if (user.image) {
     return (
-      <Avatar.Root className="size-14 rounded-full">
-        <Avatar.Image src={user.image} alt={user.name} className="size-full rounded-full" />
-        <Avatar.Fallback className="size-full leading-1">{initials}</Avatar.Fallback>
-      </Avatar.Root>
+      <Avatar size="lg">
+        <AvatarImage src={user.image} alt={user.name} />
+        <AvatarFallback>{initials}</AvatarFallback>
+      </Avatar>
     );
   }
 
   return (
-    <Avatar.Root className="size-12 rounded-full border border-border flex">
-      <Avatar.Fallback className="size-full leading-1 text-1xl grid place-items-center text-primary">
-        {initials}
-      </Avatar.Fallback>
-    </Avatar.Root>
+    <Avatar size="lg">
+      <AvatarFallback>{initials}</AvatarFallback>
+    </Avatar>
   );
 }

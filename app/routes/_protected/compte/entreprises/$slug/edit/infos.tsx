@@ -3,7 +3,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Command } from "cmdk";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
-import { Popover, Separator } from "radix-ui";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Separator } from "~/components/ui/separator";
 import { useRef, useState } from "react";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -131,41 +132,36 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Catégories * (max. 3)</span>
-            <Popover.Root>
-              <Popover.Trigger className="h-9 cursor-pointer border rounded-sm border-input px-2 py-1 text-xs flex items-center justify-between gap-2 shadow-2xs">
-                <span className="rounded-sm text-xs flex items-center gap-2 text-muted-foreground">
+            <Popover>
+              <PopoverTrigger className="flex h-9 cursor-pointer items-center justify-between gap-2 rounded-sm border border-input px-2 py-1 text-xs shadow-2xs">
+                <span className="flex items-center gap-2 rounded-sm text-xs text-muted-foreground">
                   Ajouter une catégorie
                 </span>
                 <ChevronDown className="size-4 text-muted-foreground" />
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Content
-                  className="bg-popover w-(--radix-popper-anchor-width)"
-                  sideOffset={5}
-                >
-                  <Command className="border rounded-sm border-input">
-                    <Command.Input
-                      placeholder="Rechercher une catégorie"
-                      className="w-full h-9 px-2 outline-none placeholder:text-sm placeholder:font-light"
-                    />
-                    <Command.Separator className="h-px bg-border" />
-                    <Command.List className="max-h-60 overflow-y-auto">
-                      {categories.data?.map((category) => (
-                        <Command.Item
-                          key={category.id}
-                          value={category.name}
-                          disabled={selectedCategories.has(category.id)}
-                          className="cursor-pointer py-1.5 px-2 aria-selected:bg-muted text-sm font-light aria-disabled:opacity-20"
-                          onSelect={() => onSelectCategory(category.id)}
-                        >
-                          {category.name}
-                        </Command.Item>
-                      ))}
-                    </Command.List>
-                  </Command>
-                </Popover.Content>
-              </Popover.Portal>
-            </Popover.Root>
+              </PopoverTrigger>
+              <PopoverContent className="w-(--anchor-width) bg-popover" sideOffset={5}>
+                <Command className="rounded-sm border border-input">
+                  <Command.Input
+                    placeholder="Rechercher une catégorie"
+                    className="h-9 w-full px-2 outline-none placeholder:text-sm placeholder:font-light"
+                  />
+                  <Command.Separator className="h-px bg-border" />
+                  <Command.List className="max-h-60 overflow-y-auto">
+                    {categories.data?.map((category) => (
+                      <Command.Item
+                        key={category.id}
+                        value={category.name}
+                        disabled={selectedCategories.has(category.id)}
+                        className="cursor-pointer px-2 py-1.5 text-sm font-light aria-selected:bg-muted aria-disabled:opacity-20"
+                        onSelect={() => onSelectCategory(category.id)}
+                      >
+                        {category.name}
+                      </Command.Item>
+                    ))}
+                  </Command.List>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </Label>
 
           {selectedCategories.size ? (
@@ -216,7 +212,7 @@ function RouteComponent() {
             </span>
           </div>
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Entrepreneur</span>
@@ -294,7 +290,7 @@ function RouteComponent() {
             </div>
           </Label>
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <div className="grid gap-8">
             <fieldset className="flex gap-4">
@@ -366,11 +362,11 @@ function RouteComponent() {
             </fieldset>
           </div>
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <SocialMedias company={company.data} />
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <div className="flex gap-2 justify-end">
             <button

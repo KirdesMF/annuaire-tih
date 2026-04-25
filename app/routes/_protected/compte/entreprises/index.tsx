@@ -149,14 +149,16 @@ function RouteComponent() {
                     open={isDialogOpen && companyId === company.id}
                     onOpenChange={setIsDialogOpen}
                   >
-                    <DialogTrigger asChild>
-                      <button
-                        type="button"
-                        className="text-xs px-2 py-1 rounded-sm border border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                        onClick={() => setCompanyId(company.id)}
-                      >
-                        Supprimer
-                      </button>
+                    <DialogTrigger
+                      render={
+                        <button
+                          type="button"
+                          className="rounded-sm border border-destructive px-2 py-1 text-xs text-destructive transition-colors hover:bg-destructive hover:text-destructive-foreground"
+                          onClick={() => setCompanyId(company.id)}
+                        />
+                      }
+                    >
+                      Supprimer
                     </DialogTrigger>
 
                     <DialogContent className="grid gap-4 p-4">
@@ -173,13 +175,15 @@ function RouteComponent() {
                         </p>
                       </div>
                       <div className="grid grid-flow-col gap-2 place-content-end">
-                        <DialogClose asChild>
-                          <button
-                            type="button"
-                            className="text-xs px-2 py-1 rounded-sm border border-gray-400 text-gray-400 hover:bg-gray-400 hover:text-white transition-colors"
-                          >
-                            Annuler
-                          </button>
+                        <DialogClose
+                          render={
+                            <button
+                              type="button"
+                              className="rounded-sm border border-muted-foreground px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                            />
+                          }
+                        >
+                          Annuler
                         </DialogClose>
                         <form onSubmit={onDeleteCompany}>
                           <input type="hidden" name="companyId" value={company.id} />

@@ -61,19 +61,21 @@ export function SiteHeader({ user }: { user: AuthUser | undefined }) {
 
         <div className="flex-1 md:flex-none flex items-center gap-3">
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <button
-                type="button"
-                className="flex h-8 w-full items-center gap-2 text-nowrap rounded-lg border border-input px-2.5 text-xs font-light shadow-2xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:w-auto"
-              >
-                <SearchIcon className="size-4 text-muted-foreground" />
-                <span className="hidden lg:block">Rechercher un nom ou une activité...</span>
-                <span className="block lg:hidden">Rechercher...</span>
-                <kbd className="pointer-events-none hidden gap-1 rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs lg:flex">
-                  <span>⌘</span>
-                  <span>K</span>
-                </kbd>
-              </button>
+            <DialogTrigger
+              render={
+                <button
+                  type="button"
+                  className="flex h-8 w-full items-center gap-2 text-nowrap rounded-lg border border-input px-2.5 text-xs font-light shadow-2xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:w-auto"
+                />
+              }
+            >
+              <SearchIcon className="size-4 text-muted-foreground" />
+              <span className="hidden lg:block">Rechercher un nom ou une activité...</span>
+              <span className="block lg:hidden">Rechercher...</span>
+              <kbd className="pointer-events-none hidden gap-1 rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs lg:flex">
+                <span>⌘</span>
+                <span>K</span>
+              </kbd>
             </DialogTrigger>
 
             <DialogContent>
@@ -153,11 +155,9 @@ function ThemeToggle() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button type="button" variant="outline" size="icon">
-          <TriggerIcon data-icon="inline-start" />
-          <span className="sr-only">Modifier le thème</span>
-        </Button>
+      <DropdownMenuTrigger render={<Button type="button" variant="outline" size="icon" />}>
+        <TriggerIcon data-icon="inline-start" />
+        <span className="sr-only">Modifier le thème</span>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent sideOffset={5} align="end" className="min-w-32">

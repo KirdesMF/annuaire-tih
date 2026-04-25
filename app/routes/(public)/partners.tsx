@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Separator } from "radix-ui";
+import { Separator } from "~/components/ui/separator";
 import findajob from "~/assets/img/FINDAJOB.jpg?url";
 import logoTIHM from "~/assets/img/Logo_TIHM.svg?url";
 
@@ -42,7 +42,7 @@ function RouteComponent() {
             </ul>
           </div>
         </section>
-        <Separator.Root className="my-16 h-px w-1/3 mx-auto bg-border" />
+        <Separator className="my-16 h-px w-1/3 mx-auto bg-border" />
         <section>
           <div className="flex flex-col gap-8 mb-8">
             <div className="flex flex-col gap-2">
@@ -97,7 +97,7 @@ function RouteComponent() {
           </div>
         </section>
 
-        <Separator.Root className="my-16 h-px w-1/3 mx-auto bg-border" />
+        <Separator className="my-16 h-px w-1/3 mx-auto bg-border" />
 
         <section>
           <div className="flex flex-col gap-2 mb-8">

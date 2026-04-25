@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
-import { Separator } from "radix-ui";
+import { Separator } from "~/components/ui/separator";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 
 export const Route = createFileRoute("/_protected/compte")({
@@ -42,7 +42,7 @@ function RouteComponent() {
               </ul>
             </li>
 
-            <Separator.Root orientation="horizontal" decorative className="h-px bg-border -mx-1" />
+            <Separator orientation="horizontal" className="-mx-1 h-px bg-border" />
 
             <li>
               <Link
@@ -53,7 +53,7 @@ function RouteComponent() {
               </Link>
             </li>
 
-            <Separator.Root orientation="horizontal" decorative className="h-px bg-border -mx-1" />
+            <Separator orientation="horizontal" className="-mx-1 h-px bg-border" />
           </ul>
         </nav>
       </aside>

@@ -8,7 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuItemIndicator,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -54,41 +53,37 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
         <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link to="/compte/entreprises/create">
-              <DiamondPlus data-icon="inline-start" />
-              <span className="text-xs">Référencer</span>
-            </Link>
+          <DropdownMenuItem render={<Link to="/compte/entreprises/create" />}>
+            <DiamondPlus data-icon="inline-start" />
+            <span className="text-xs">Référencer</span>
           </DropdownMenuItem>
 
-          <DropdownMenuItem asChild>
-            <Link to="/compte/entreprises">
-              <BriefcaseBusiness data-icon="inline-start" />
-              <span className="text-xs">Mes entreprises</span>
-            </Link>
+          <DropdownMenuItem render={<Link to="/compte/entreprises" />}>
+            <BriefcaseBusiness data-icon="inline-start" />
+            <span className="text-xs">Mes entreprises</span>
           </DropdownMenuItem>
 
-          <DropdownMenuItem asChild>
-            <Link to="/compte/preferences">
-              <UserCog data-icon="inline-start" />
-              <span className="text-xs">Mon compte</span>
-            </Link>
+          <DropdownMenuItem render={<Link to="/compte/preferences" />}>
+            <UserCog data-icon="inline-start" />
+            <span className="text-xs">Mon compte</span>
           </DropdownMenuItem>
 
           {isAdmin ? (
-            <DropdownMenuItem asChild>
-              <Link
-                to="/admin/dashboard"
-                search={{
-                  view: "all",
-                  q: "",
-                  companyStatus: "all",
-                  userRole: "all",
-                }}
-              >
-                <LayoutDashboard data-icon="inline-start" />
-                <span className="text-xs">Admin dashboard</span>
-              </Link>
+            <DropdownMenuItem
+              render={
+                <Link
+                  to="/admin/dashboard"
+                  search={{
+                    view: "all",
+                    q: "",
+                    companyStatus: "all",
+                    userRole: "all",
+                  }}
+                />
+              }
+            >
+              <LayoutDashboard data-icon="inline-start" />
+              <span className="text-xs">Admin dashboard</span>
             </DropdownMenuItem>
           ) : null}
         </DropdownMenuGroup>
@@ -100,37 +95,20 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
           <DropdownMenuLabel className="text-sm font-light px-2 py-1.5">Thème</DropdownMenuLabel>
 
           <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as Theme)}>
-            <DropdownMenuRadioItem value="light" className="relative ps-8 ">
-              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
-                <span className="size-2 rounded-full flex bg-accent-foreground" />
-              </DropdownMenuItemIndicator>
-              Light
-            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
 
-            <DropdownMenuRadioItem value="dark" className="relative ps-8">
-              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
-                <span className="size-2 rounded-full flex bg-accent-foreground" />
-              </DropdownMenuItemIndicator>
-              Dark
-            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
 
-            <DropdownMenuRadioItem value="system" className="relative ps-8">
-              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
-                <span className="size-2 rounded-full flex bg-accent-foreground" />
-              </DropdownMenuItemIndicator>
-              System
-            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <button type="button" onClick={() => signOut(undefined)}>
-              <LogOut data-icon="inline-start" />
-              <span>Se déconnecter</span>
-            </button>
+          <DropdownMenuItem render={<button type="button" onClick={() => signOut(undefined)} />}>
+            <LogOut data-icon="inline-start" />
+            <span>Se déconnecter</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

@@ -16,7 +16,7 @@ import {
 import { useDeferredValue, useRef } from "react";
 import { Input } from "~/components/ui/input";
 import { useToast } from "~/components/ui/toast";
-import { Tooltip } from "~/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 import { isValidRole, type UserRole } from "~/db/schema/auth";
 import { isValidCompanyStatus, type Company, type CompanyStatus } from "~/db/schema/companies";
 import { updateUserRoleFn } from "~/lib/api/admin/mutations/update-user-role";
@@ -802,23 +802,29 @@ function IconActionButton({
   } as const;
 
   return (
-    <Tooltip
-      content={label}
-      side="top"
-      className="rounded-sm border border-black/10 bg-white px-2 py-1 text-[11px] text-black shadow-none dark:border-white/10 dark:bg-black dark:text-white"
-    >
-      <button
-        type="button"
-        onClick={onClick}
-        disabled={disabled}
-        aria-label={label}
-        className={[
-          "inline-flex size-8 items-center justify-center rounded-sm border transition-colors disabled:cursor-not-allowed disabled:opacity-50",
-          tones[tone],
-        ].join(" ")}
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <button
+            type="button"
+            onClick={onClick}
+            disabled={disabled}
+            aria-label={label}
+            className={[
+              "inline-flex size-8 items-center justify-center rounded-sm border transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+              tones[tone],
+            ].join(" ")}
+          />
+        }
       >
         {icon}
-      </button>
+      </TooltipTrigger>
+      <TooltipContent
+        side="top"
+        className="rounded-sm border border-black/10 bg-white px-2 py-1 text-[11px] text-black shadow-none dark:border-white/10 dark:bg-black dark:text-white"
+      >
+        {label}
+      </TooltipContent>
     </Tooltip>
   );
 }

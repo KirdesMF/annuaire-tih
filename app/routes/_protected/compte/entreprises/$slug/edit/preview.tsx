@@ -2,7 +2,7 @@ import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Globe, Mail, Phone } from "lucide-react";
-import { Separator } from "radix-ui";
+import { Separator } from "~/components/ui/separator";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
@@ -243,7 +243,7 @@ function RouteComponent() {
 
         {previewData.gallery?.length ? (
           <>
-            <Separator.Root className="h-px bg-border my-4" />
+            <Separator className="h-px bg-border my-4" />
 
             <ul className="flex flex-wrap gap-2">
               {previewData.gallery.map((image, index) => (

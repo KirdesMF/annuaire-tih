@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Separator } from "radix-ui";
+import { Separator } from "~/components/ui/separator";
 
 export const Route = createFileRoute("/(public)/sources")({
   component: RouteComponent,
@@ -61,7 +61,7 @@ function RouteComponent() {
             ))}
           </ul>
         </section>
-        <Separator.Root className="my-16 h-px w-1/3 mx-auto bg-border" />
+        <Separator className="my-16 h-px w-1/3 mx-auto bg-border" />
         <section>
           <h2 className="text-4xl font-bold tracking-tighter">Documents</h2>
           <div className="flex flex-col gap-4 items-center p-4 w-fit ">

@@ -206,18 +206,20 @@ function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; public
           return (
             <li key={image.publicId}>
               <Dialog>
-                <DialogTrigger asChild>
-                  <button
-                    type="button"
-                    className="grid place-items-center size-64 cursor-zoom-in"
-                    onClick={() => setCurrentImageIndex(index)}
-                  >
-                    <img
-                      src={image.secureUrl}
-                      alt={image.publicId}
-                      className="object-contain aspect-square rounded-sm"
+                <DialogTrigger
+                  render={
+                    <button
+                      type="button"
+                      className="grid size-64 cursor-zoom-in place-items-center"
+                      onClick={() => setCurrentImageIndex(index)}
                     />
-                  </button>
+                  }
+                >
+                  <img
+                    src={image.secureUrl}
+                    alt={image.publicId}
+                    className="aspect-square rounded-sm object-contain"
+                  />
                 </DialogTrigger>
 
                 <DialogContent className="w-auto px-8 py-16">

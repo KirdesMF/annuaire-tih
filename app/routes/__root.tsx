@@ -15,6 +15,7 @@ import { ArrowLeftIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 import { ThemeProvider, useTheme } from "~/components/providers/theme-provider";
+import { TooltipProvider } from "~/components/ui/tooltip";
 import { SiteFooter } from "~/components/site-footer";
 import { SiteHeader } from "~/components/site-header";
 import { auth } from "~/lib/auth/auth.server";
@@ -103,9 +104,11 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
 
       <body className="font-sans isolate bg-background text-foreground">
-        <SiteHeader user={user} />
-        {children}
-        <SiteFooter />
+        <TooltipProvider>
+          <SiteHeader user={user} />
+          {children}
+          <SiteFooter />
+        </TooltipProvider>
         <Toaster />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <Scripts />

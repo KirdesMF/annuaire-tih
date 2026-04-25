@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Separator } from "radix-ui";
+import { Separator } from "~/components/ui/separator";
 
 export const Route = createFileRoute("/(public)/about")({
   component: RouteComponent,
@@ -62,7 +62,7 @@ function RouteComponent() {
             </div>
           </div>
         </section>
-        <Separator.Root className="my-16 h-px w-1/3 mx-auto bg-border" />
+        <Separator className="my-16 h-px w-1/3 mx-auto bg-border" />
         <div className="border border-border bg-card text-card-foreground rounded-sm max-w-2xl mx-auto p-6">
           <p className="text-md font-bold text-center">
             Un grand merci à tous·tes les participant·e·s et aux membres du groupe LinkedIn

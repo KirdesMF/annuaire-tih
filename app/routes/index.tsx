@@ -13,7 +13,7 @@ import {
   SearchIcon,
   SquareArrowOutUpRight,
 } from "lucide-react";
-import { Separator } from "radix-ui";
+import { Separator } from "~/components/ui/separator";
 import { useState } from "react";
 import abtraining from "~/assets/img/ab-training.png?url";
 import banner from "~/assets/img/banner.webp?url";
@@ -134,20 +134,22 @@ function Home() {
 
           <div className="flex flex-col gap-4 items-center max-w-lg w-full">
             <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  type="button"
-                  className="flex items-center justify-between text-start text-nowrap truncate text-sm font-light px-4 ring-1 ring-input/50 shadow-2xs rounded-sm w-full h-12 focus:outline-2 focus:outline-primary cursor-pointer"
-                >
-                  <span className="flex items-center gap-2">
-                    <SearchIcon className="size-4 text-muted-foreground font-thin" />
-                    <span>Taper votre recherche...</span>
-                  </span>
-                  <kbd className="text-xs px-1.5 py-0.5 rounded-sm bg-muted pointer-events-none hidden lg:flex gap-1 font-mono">
-                    <span>⌘</span>
-                    <span>K</span>
-                  </kbd>
-                </button>
+              <PopoverTrigger
+                render={
+                  <button
+                    type="button"
+                    className="flex h-12 w-full cursor-pointer items-center justify-between truncate text-nowrap rounded-sm px-4 text-start text-sm font-light shadow-2xs ring-1 ring-input/50 focus:outline-2 focus:outline-primary"
+                  />
+                }
+              >
+                <span className="flex items-center gap-2">
+                  <SearchIcon className="size-4 font-thin text-muted-foreground" />
+                  <span>Taper votre recherche...</span>
+                </span>
+                <kbd className="pointer-events-none hidden gap-1 rounded-sm bg-muted px-1.5 py-0.5 font-mono text-xs lg:flex">
+                  <span>⌘</span>
+                  <span>K</span>
+                </kbd>
               </PopoverTrigger>
               <PopoverContent>
                 <Command shouldFilter={false} className="py-2">
@@ -349,7 +351,7 @@ function Home() {
                         <MailIcon className="size-3" />
                         contact@abtraining.fr
                       </a>
-                      <Separator.Root orientation="vertical" className="h-4 w-px bg-black" />
+                      <Separator orientation="vertical" className="h-4 w-px bg-black" />
                       <a
                         href="tel:+33683231449"
                         className="text-xs flex items-center gap-1 text-nowrap"
@@ -382,5 +384,5 @@ function Home() {
 }
 
 function HomeSeparator() {
-  return <Separator.Root className="w-50 md:w-96 h-px bg-border mx-auto" />;
+  return <Separator className="w-50 md:w-96 h-px bg-border mx-auto" />;
 }
