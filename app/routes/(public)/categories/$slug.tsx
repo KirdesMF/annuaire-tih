@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, SearchXIcon } from "lucide-react";
+import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "~/components/ui/empty";
 import * as v from "valibot";
 import { companiesByCategoryQuery } from "~/lib/api/companies/queries/get-companies-by-category";
 
@@ -43,7 +44,17 @@ function RouteComponent() {
         </header>
 
         {data.companies.length === 0 ? (
-          <div>Aucune entreprise trouvée</div>
+          <Empty>
+            <EmptyMedia variant="icon">
+              <SearchXIcon />
+            </EmptyMedia>
+            <EmptyHeader>
+              <EmptyTitle>Aucune entreprise trouvée</EmptyTitle>
+              <EmptyDescription>
+                Aucune entreprise active ne correspond encore à cette catégorie.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
           <ul className="grid gap-2">
             {data.companies.map((company) => (

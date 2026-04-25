@@ -16,6 +16,7 @@ import {
 import { useDeferredValue, useRef } from "react";
 import { Input } from "~/components/ui/input";
 import { useToast } from "~/components/ui/toast";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 import { isValidRole, type UserRole } from "~/db/schema/auth";
 import { isValidCompanyStatus, type Company, type CompanyStatus } from "~/db/schema/companies";
@@ -831,12 +832,12 @@ function IconActionButton({
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <div className="rounded-sm border border-dashed border-black/10 bg-black/[0.02] p-5 dark:border-white/10 dark:bg-white/[0.03]">
-      <div className="grid gap-1">
-        <p className="text-sm font-medium">{title}</p>
-        <p className="text-sm leading-6 text-black/58 dark:text-white/58">{description}</p>
-      </div>
-    </div>
+    <Empty className="rounded-sm border border-dashed border-black/10 bg-black/[0.02] p-5 text-left dark:border-white/10 dark:bg-white/[0.03]">
+      <EmptyHeader className="items-start gap-1">
+        <EmptyTitle>{title}</EmptyTitle>
+        <EmptyDescription className="text-black/58 dark:text-white/58">{description}</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
   );
 }
 
