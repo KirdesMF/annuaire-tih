@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { BriefcaseBusiness, DiamondPlus, LayoutDashboard, LogOut, UserCog } from "lucide-react";
-import { Avatar } from "radix-ui";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,7 +41,7 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full cursor-pointer focus:outline-primary focus:outline-2">
+      <DropdownMenuTrigger className="rounded-full cursor-pointer focus:outline-2 focus:outline-ring focus:outline-offset-2">
         <AvatarUser user={user} />
       </DropdownMenuTrigger>
 
@@ -56,21 +56,21 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link to="/compte/entreprises/create">
-              <DiamondPlus className="size-4" />
+              <DiamondPlus data-icon="inline-start" />
               <span className="text-xs">Référencer</span>
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild>
             <Link to="/compte/entreprises">
-              <BriefcaseBusiness className="size-4" />
+              <BriefcaseBusiness data-icon="inline-start" />
               <span className="text-xs">Mes entreprises</span>
             </Link>
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild>
             <Link to="/compte/preferences">
-              <UserCog className="size-4" />
+              <UserCog data-icon="inline-start" />
               <span className="text-xs">Mon compte</span>
             </Link>
           </DropdownMenuItem>
@@ -86,7 +86,7 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
                   userRole: "all",
                 }}
               >
-                <LayoutDashboard className="size-4" />
+                <LayoutDashboard data-icon="inline-start" />
                 <span className="text-xs">Admin dashboard</span>
               </Link>
             </DropdownMenuItem>
@@ -128,7 +128,7 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <button type="button" onClick={() => signOut(undefined)}>
-              <LogOut className="size-4" />
+              <LogOut data-icon="inline-start" />
               <span>Se déconnecter</span>
             </button>
           </DropdownMenuItem>
@@ -148,18 +148,16 @@ function AvatarUser({ user }: { user: AuthUser }) {
 
   if (user.image) {
     return (
-      <Avatar.Root className="size-8 rounded-full">
-        <Avatar.Image src={user.image} alt={user.name} className="size-full rounded-full" />
-        <Avatar.Fallback className="size-full leading-1">{initials}</Avatar.Fallback>
-      </Avatar.Root>
+      <Avatar>
+        <AvatarImage src={user.image} alt={user.name} />
+        <AvatarFallback>{initials}</AvatarFallback>
+      </Avatar>
     );
   }
 
   return (
-    <Avatar.Root className="size-8 rounded-full bg-secondary flex">
-      <Avatar.Fallback className="size-full leading-1 text-xs grid place-items-center text-secondary-foreground">
-        {initials}
-      </Avatar.Fallback>
-    </Avatar.Root>
+    <Avatar>
+      <AvatarFallback>{initials}</AvatarFallback>
+    </Avatar>
   );
 }

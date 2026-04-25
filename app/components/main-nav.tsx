@@ -10,18 +10,18 @@ const LINKS = linkOptions([
 
 export function MainNav() {
   return (
-    <nav className="hidden md:flex">
+    <nav className="hidden md:flex" aria-label="Navigation principale">
       <ul className="flex items-center gap-1">
         <li className="shrink-0">
-          <Link to="/" className="flex items-center justify-center">
-            <img src={annuaire} alt="Annuaire TIH" className="w-10 shrink-0" />
+          <Link to="/" className="flex items-center justify-center rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+            <img src={annuaire} alt="Annuaire TIH" className="size-10 shrink-0 rounded-md" />
           </Link>
         </li>
         {LINKS.map((link) => (
           <li key={link.to}>
             <Link
               to={link.to}
-              className="text-sm font-light text-nowrap focus:outline-primary focus:outline-2 px-1.5 py-1 rounded-xs data-[status=active]:text-primary data-[status=active]:font-bold"
+              className="rounded-md px-2 py-1 text-nowrap text-sm font-light transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[status=active]:font-bold data-[status=active]:text-primary"
             >
               {link.label}
             </Link>

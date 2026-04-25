@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Monitor, Moon, SearchIcon, Sun } from "lucide-react";
+import { Button } from "~/components/ui/button";
 import { useEffect, useState } from "react";
 import { MainNav } from "~/components/main-nav";
 import { MenuUser } from "~/components/menu-user";
@@ -53,8 +54,8 @@ export function SiteHeader({ user }: { user: AuthUser | undefined }) {
   }, []);
 
   return (
-    <header className="px-4 md:px-8 py-3 border-b-[0.5px] border-border backdrop-blur-sm sticky top-0 z-50 w-full h-16 flex items-center">
-      <div className="flex items-center gap-2 justify-between flex-1">
+    <header className="sticky top-0 z-50 flex h-16 w-full items-center border-b border-border bg-background/85 px-4 py-3 backdrop-blur-md md:px-8">
+      <div className="flex flex-1 items-center justify-between gap-3">
         <MainNav />
         <MobileNav />
 
@@ -63,12 +64,12 @@ export function SiteHeader({ user }: { user: AuthUser | undefined }) {
             <DialogTrigger asChild>
               <button
                 type="button"
-                className="flex w-full md:w-auto items-center gap-2 text-xs text-nowrap font-light px-2.5 h-8 rounded-sm ring-1 ring-input/50 shadow-2xs focus:outline-primary focus:outline-2"
+                className="flex h-8 w-full items-center gap-2 text-nowrap rounded-lg border border-input px-2.5 text-xs font-light shadow-2xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:w-auto"
               >
                 <SearchIcon className="size-4 text-muted-foreground" />
                 <span className="hidden lg:block">Rechercher un nom ou une activité...</span>
                 <span className="block lg:hidden">Rechercher...</span>
-                <kbd className="text-xs px-1.5 py-0.5 rounded-sm bg-muted pointer-events-none hidden lg:flex gap-1 font-mono">
+                <kbd className="pointer-events-none hidden gap-1 rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs lg:flex">
                   <span>⌘</span>
                   <span>K</span>
                 </kbd>
@@ -119,7 +120,7 @@ function RegisterLink({ user }: { user: AuthUser | undefined }) {
   return (
     <Link
       to={user ? "/compte/entreprises/create" : "/sign-up"}
-      className="text-xs px-2 py-1 h-8 items-center rounded-sm ring-1 ring-border text-nowrap hidden md:inline-flex focus:outline-primary focus:outline-2"
+      className="hidden h-8 items-center text-nowrap rounded-lg border border-border px-2.5 text-xs transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
     >
       Se référencer
     </Link>
@@ -132,7 +133,7 @@ function LoginButton({ user }: { user: AuthUser | undefined }) {
   return (
     <Link
       to="/sign-in"
-      className="text-xs px-2 py-1 h-8 hidden md:inline-flex items-center rounded-sm text-nowrap bg-primary text-primary-foreground focus:outline-primary focus:outline-1"
+      className="hidden h-8 items-center text-nowrap rounded-lg bg-primary px-2.5 text-xs text-primary-foreground transition-colors hover:bg-primary/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
     >
       Se connecter
     </Link>
@@ -153,13 +154,10 @@ function ThemeToggle() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="text-xs px-2 py-1 h-8 inline-flex items-center rounded-sm border border-border text-nowrap cursor-pointer"
-        >
-          <TriggerIcon className="size-4" />
+        <Button type="button" variant="outline" size="icon">
+          <TriggerIcon data-icon="inline-start" />
           <span className="sr-only">Modifier le thème</span>
-        </button>
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent sideOffset={5} align="end" className="min-w-32">

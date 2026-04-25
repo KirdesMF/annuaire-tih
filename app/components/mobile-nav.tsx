@@ -1,6 +1,7 @@
 import { Link, linkOptions } from "@tanstack/react-router";
 import { AlignLeft } from "lucide-react";
 import { useState } from "react";
+import { Button } from "~/components/ui/button";
 import { Drawer, DrawerContent, DrawerDescription, DrawerTitle, DrawerTrigger } from "./ui/drawer";
 
 const LINKS = linkOptions([
@@ -19,9 +20,10 @@ export function MobileNav() {
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>
-        <button type="button" className="md:hidden grid place-items-center cursor-pointer">
-          <AlignLeft />
-        </button>
+        <Button type="button" variant="ghost" size="icon" className="md:hidden">
+          <AlignLeft data-icon="inline-start" />
+          <span className="sr-only">Ouvrir le menu</span>
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>
@@ -33,7 +35,7 @@ export function MobileNav() {
               <li key={link.to}>
                 <Link
                   to={link.to}
-                  className="text-sm font-light text-nowrap px-4 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 inline-flex w-full"
+                  className="inline-flex w-full text-nowrap rounded-md px-4 py-2 text-sm font-light hover:bg-muted hover:text-foreground"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.label}
