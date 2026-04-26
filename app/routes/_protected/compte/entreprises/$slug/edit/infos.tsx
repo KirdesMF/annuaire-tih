@@ -80,6 +80,43 @@ function RouteComponent() {
     setDescriptionLength(e.target.value.length);
   }
 
+  function formatValidationIssues(
+    issues: Array<{ path?: Array<{ key?: unknown }>; message: string }>,
+  ) {
+    return issues
+      .map((issue) => {
+        const field = issue.path?.[0]?.key;
+
+        if (field === "categories") {
+          return `Catégories: ${issue.message}`;
+        }
+
+        if (field === "description") {
+          return `Description: ${issue.message}`;
+        }
+
+        return issue.message;
+      })
+      .join("\n");
+  }
+
+  async function copyErrorMessage(message: string) {
+    try {
+      await navigator.clipboard.writeText(message);
+      toast({
+        status: "success",
+        description: "Message d'erreur copié",
+        button: { label: "Fermer" },
+      });
+    } catch {
+      toast({
+        status: "error",
+        description: "Impossible de copier le message d'erreur",
+        button: { label: "Fermer" },
+      });
+    }
+  }
+
   function onPreview() {
     const formData = new FormData(formRef.current as HTMLFormElement);
     const decodedFormData = decode(formData, {
@@ -92,16 +129,16 @@ function RouteComponent() {
     });
 
     if (!result.success) {
+      const errorMessage = formatValidationIssues(result.issues);
+
       return toast({
-        description: (
-          <span>
-            {(result?.issues ?? []).map((issue, idx) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: preview validation list
-              <span key={idx}>{issue.message}</span>
-            ))}
-          </span>
-        ),
-        button: { label: "Fermer" },
+        status: "error",
+        title: "Prévisualisation impossible",
+        description: <span className="whitespace-pre-line">{errorMessage}</span>,
+        button: {
+          label: "Copier",
+          onClick: () => void copyErrorMessage(errorMessage),
+        },
       });
     }
 
@@ -137,8 +174,13 @@ function RouteComponent() {
         },
         onError: (error) => {
           toast({
+            status: "error",
+            title: "Mise à jour impossible",
             description: error.message,
-            button: { label: "Fermer" },
+            button: {
+              label: "Copier",
+              onClick: () => void copyErrorMessage(error.message),
+            },
           });
         },
       },
