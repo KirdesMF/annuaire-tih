@@ -219,7 +219,7 @@ function RouteComponent() {
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Catégories * (max. 3)</span>
             <Popover>
-              <PopoverTrigger className="flex h-9 cursor-pointer items-center justify-between gap-2 rounded-sm border border-input px-2 py-1 text-xs shadow-2xs">
+              <PopoverTrigger className="flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-sm border border-input px-2 py-1 text-xs shadow-2xs">
                 <span className="flex items-center gap-2 rounded-sm text-xs text-muted-foreground">
                   Ajouter une catégorie
                 </span>
@@ -281,7 +281,7 @@ function RouteComponent() {
               <span className="text-xs font-medium">Description</span>
               <textarea
                 name="description"
-                className="border rounded-sm p-2 border-input placeholder:text-xs focus-visible:outline-primary"
+                className="w-full border rounded-sm p-2 border-input placeholder:text-xs focus-visible:outline-primary"
                 rows={6}
                 placeholder="Entrer une description de mon entreprise..."
                 onChange={onDescriptionChange}
@@ -322,7 +322,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Perimètre d'intervention</span>
-            <div className="relative">
+            <div className="relative w-full">
               <MapPinned className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="text"
@@ -336,7 +336,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Email</span>
-            <div className="relative">
+            <div className="relative w-full">
               <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="email"
@@ -350,7 +350,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Numéro de téléphone</span>
-            <div className="relative">
+            <div className="relative w-full">
               <Phone className="size-4 text-muted-foregound absolute start-2 top-2.5" />
               <Input
                 type="tel"
@@ -364,7 +364,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Site web</span>
-            <div className="relative">
+            <div className="relative w-full">
               <Globe className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="text"

@@ -16,10 +16,7 @@ import {
 import { Separator } from "~/components/ui/separator";
 import { useState } from "react";
 import abtraining from "~/assets/img/ab-training.png?url";
-import banner from "~/assets/img/banner.webp?url";
-import edmDesktop from "~/assets/img/edm-desktop.webp?url";
 import edmMobile from "~/assets/img/edm-mobile.webp?url";
-import malette from "~/assets/img/malette.webp?url";
 
 import { LinkedinIcon } from "~/components/icons/linkedin";
 import {
@@ -35,6 +32,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover
 import { useDebounce } from "~/hooks/use-debounce";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
+import { companiesQuery } from "~/lib/api/companies/queries/get-companies";
 import { seo } from "~/lib/seo";
 import { slugify } from "~/utils/slug";
 
@@ -42,7 +40,10 @@ export const Route = createFileRoute("/")({
   head: () => seo(),
   component: Home,
   loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(categoriesQueryOptions);
+    await Promise.all([
+      context.queryClient.ensureQueryData(categoriesQueryOptions),
+      context.queryClient.ensureQueryData(companiesQuery()),
+    ]);
   },
 });
 
@@ -51,6 +52,7 @@ function Home() {
     ...categoriesQueryOptions,
     select: (data) => data.sort((a, b) => a.name.localeCompare(b.name)),
   });
+  const { data: allCompanies } = useSuspenseQuery(companiesQuery());
   const navigate = Route.useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
@@ -62,14 +64,6 @@ function Home() {
 
   return (
     <main className="px-4 md:px-16 py-20">
-      <div className="max-w-4xl mx-auto h-64 border border-border rounded-sm overflow-hidden">
-        <img
-          src={banner}
-          alt="Annuaire TIH"
-          className="size-full object-cover md:object-contain grayscale-30 hover:grayscale-0 transition-all duration-300"
-        />
-      </div>
-
       <section className="flex flex-col gap-4 items-center py-20 max-w-xl mx-auto">
         <div className="flex flex-col gap-6">
           <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
@@ -106,22 +100,14 @@ function Home() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto py-20 relative" id="search">
-        <div className="absolute top-20 start-0 hidden xl:grid w-2/9">
-          <a
-            href="https://www.en-dautres-mots.fr"
-            target="_blank"
-            rel="noreferrer noopener"
-            className="w-full"
-          >
-            <img
-              src={edmDesktop}
-              alt="En d'autres mots, accompagnement administratif"
-              className="w-full object-cover"
-            />
-          </a>
+      <section className="max-w-4xl mx-auto py-10">
+        <div className="rounded-sm border border-border bg-card px-6 py-8 text-center shadow-sm">
+          <p className="text-sm text-muted-foreground">Entreprises référencées</p>
+          <p className="mt-2 text-4xl font-bold tracking-tight text-primary">{allCompanies?.length ?? 0}</p>
         </div>
+      </section>
 
+      <section className="max-w-7xl mx-auto py-20 relative" id="search">
         <div className="flex flex-col gap-8 items-center max-w-3xl mx-auto">
           <div className="flex flex-col gap-4 items-center">
             <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
@@ -226,24 +212,6 @@ function Home() {
 
       <HomeSeparator />
 
-      <section className="py-20 max-w-3xl mx-auto xl:hidden ">
-        <div className="flex flex-col gap-4 items-center">
-          <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
-            <HandshakeIcon className="size-4" />
-            <span>Sponsors</span>
-          </div>
-          <a href="https://www.en-dautres-mots.fr" target="_blank" rel="noreferrer noopener">
-            <img
-              src={edmMobile}
-              alt="En d'autres mots, accompagnement administratif"
-              className="size-full object-fit"
-            />
-          </a>
-        </div>
-      </section>
-
-      <HomeSeparator />
-
       <section className="max-w-7xl mx-auto py-20 relative">
         <div className="grid gap-4 max-w-3xl mx-auto">
           <article className="ring-1 ring-border rounded-sm p-4 shadow grid gap-4 bg-card text-card-foreground w-full">
@@ -289,7 +257,7 @@ function Home() {
               </Link>
             </article>
 
-            <article className="flex-1 ring-1 ring-border rounded-sm p-4 shadow w-fit flex flex-col gap-4 bg-card text-card-foreground overflow-clip relative group">
+            <article className="flex-1 ring-1 ring-border rounded-sm p-4 shadow w-fit flex flex-col gap-4 bg-card text-card-foreground">
               <div className="flex flex-col gap-2">
                 <h3 className="text-lg font-bold tracking-tighter">Où nous retrouver.</h3>
                 <p className="text-sm text-muted-foreground">
@@ -315,12 +283,7 @@ function Home() {
                 <SquareArrowOutUpRight className="size-3" />
               </a>
 
-              <LinkedinIcon className="size-32 absolute -bottom-6 -end-6 text-muted -rotate-30 group-hover:text-blue-500 transition-colors duration-300" />
-              <img
-                src={malette}
-                alt="Malette du groupe Linkedin"
-                className="absolute -bottom-12 end-10 h-28 group-hover:-translate-y-6 transition-transform duration-300 grayscale-50 group-hover:grayscale-0"
-              />
+              <LinkedinIcon className="size-32 self-end text-muted transition-colors duration-300 hover:text-blue-500" />
             </article>
           </div>
         </div>
@@ -335,8 +298,23 @@ function Home() {
             <span>Sponsors</span>
           </div>
 
-          <div className="flex flex-col gap-8">
-            <div className="border border-border rounded-sm text-black bg-[#66C9F9] shadow-sm font-luciole">
+          <div className="flex flex-col gap-8 w-full">
+            <div className="border border-border rounded-sm overflow-hidden bg-card text-card-foreground shadow-sm">
+              <a
+                href="https://www.en-dautres-mots.fr"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="block"
+              >
+                <img
+                  src={edmMobile}
+                  alt="En d'autres mots, accompagnement administratif"
+                  className="w-full object-cover"
+                />
+              </a>
+            </div>
+
+            <div className="border border-border rounded-sm text-black bg-[#66C9F9] shadow-sm font-luciole overflow-hidden">
               <div className="flex gap-4">
                 <div className="p-6 w-full sm:w-1/2 bg-white grid place-items-center rounded-s-sm">
                   <a href="https://www.abtraining.fr" target="_blank" rel="noreferrer noopener">
