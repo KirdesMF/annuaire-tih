@@ -95,18 +95,17 @@ function RouteComponent() {
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">{data.name}</h1>
               <CopyButton>{data.siret}</CopyButton>
-              {isOwner ||
-                (isAdmin && (
-                  <Link
-                    to={"/compte/entreprises/$slug/edit/infos"}
-                    params={{ slug: params.slug }}
-                    search={{ id: context?.user?.id ?? "" }}
-                    className="border border-border bg-muted text-muted-foreground px-2 py-1 rounded-sm text-xs h-min flex items-center gap-1"
-                  >
-                    <span>Modifier</span>
-                    <PencilLine className="size-4" />
-                  </Link>
-                ))}
+              {(isOwner || isAdmin) && context.user ? (
+                <Link
+                  to={"/compte/entreprises/$slug/edit/infos"}
+                  params={{ slug: params.slug }}
+                  search={{ id: context.user.id }}
+                  className="border border-border bg-muted text-muted-foreground px-2 py-1 rounded-sm text-xs h-min flex items-center gap-1"
+                >
+                  <span>Modifier</span>
+                  <PencilLine className="size-4" />
+                </Link>
+              ) : null}
             </div>
 
             <ul className="flex flex-wrap gap-2">
