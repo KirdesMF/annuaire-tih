@@ -109,7 +109,7 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
         <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem render={<button type="button" onClick={() => signOut(undefined)} />}>
+          <DropdownMenuItem onClick={() => signOut(undefined)}>
             <LogOut data-icon="inline-start" />
             <span>Se déconnecter</span>
           </DropdownMenuItem>
