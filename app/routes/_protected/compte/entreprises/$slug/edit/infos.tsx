@@ -1,5 +1,5 @@
 import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Command } from "cmdk";
 import { decode } from "decode-formdata";
@@ -446,6 +446,26 @@ function RouteComponent() {
                 <span className="text-xs">Ne souhaite pas répondre</span>
               </Label>
             </fieldset>
+          </div>
+
+          <Separator className="h-px bg-border my-4" />
+
+          <div className="flex items-center justify-between gap-3 rounded-sm border border-border bg-card px-4 py-3">
+            <div className="grid gap-1">
+              <p className="text-sm font-medium">Images entreprise</p>
+              <p className="text-xs text-muted-foreground">
+                Logo et galerie se modifient dans onglet média.
+              </p>
+            </div>
+
+            <Link
+              to="/compte/entreprises/$slug/edit/medias"
+              params={{ slug: params.slug }}
+              search={search}
+              className="rounded-sm border border-border bg-muted px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-muted/80"
+            >
+              Gérer les images
+            </Link>
           </div>
 
           <Separator className="h-px bg-border my-4" />
