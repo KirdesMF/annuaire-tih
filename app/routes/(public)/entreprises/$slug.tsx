@@ -58,6 +58,17 @@ const SOCIAL_MEDIA_ICONS = {
   spotify: <SpotifyIcon className="size-5" />,
 } as const;
 
+const SOCIAL_MEDIA_LABELS = {
+  facebook: "Facebook",
+  instagram: "Instagram",
+  linkedin: "LinkedIn",
+  calendly: "Calendly",
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  twitter: "X / Twitter",
+  spotify: "Spotify",
+} as const;
+
 function RouteComponent() {
   const params = Route.useParams();
   const context = Route.useRouteContext();
@@ -175,14 +186,24 @@ function RouteComponent() {
             </div>
 
             {hasSocialMedia ? (
-              <ul className="flex gap-2">
-                {Object.entries(data.social_media).map(([key, value]) => (
-                  <li key={key}>
-                    <a href={value} target="_blank" rel="noopener noreferrer">
-                      {SOCIAL_MEDIA_ICONS[key as keyof typeof SOCIAL_MEDIA_ICONS]}
-                    </a>
-                  </li>
-                ))}
+              <ul className="flex gap-2" aria-label="Réseaux sociaux">
+                {Object.entries(data.social_media).map(([key, value]) => {
+                  const mediaKey = key as keyof typeof SOCIAL_MEDIA_ICONS;
+
+                  return (
+                    <li key={key}>
+                      <a
+                        href={value}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${SOCIAL_MEDIA_LABELS[mediaKey]} de ${data.name}`}
+                        className="inline-flex size-8 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {SOCIAL_MEDIA_ICONS[mediaKey]}
+                      </a>
+                    </li>
+                  );
+                })}
               </ul>
             ) : null}
           </div>

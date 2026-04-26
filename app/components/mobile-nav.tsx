@@ -35,7 +35,7 @@ export function MobileNav() {
               <li key={link.to}>
                 <Link
                   to={link.to}
-                  className="inline-flex w-full text-nowrap rounded-md px-4 py-2 text-sm font-light hover:bg-muted hover:text-foreground"
+                  className="inline-flex w-full text-nowrap rounded-md px-4 py-2 text-sm font-light outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.label}

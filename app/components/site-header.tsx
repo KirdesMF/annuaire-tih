@@ -65,6 +65,7 @@ export function SiteHeader({ user }: { user: AuthUser | undefined }) {
               render={
                 <button
                   type="button"
+                  aria-label="Ouvrir la recherche"
                   className="flex h-8 w-full items-center gap-2 text-nowrap rounded-lg border border-input px-2.5 text-xs font-light shadow-2xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:w-auto"
                 />
               }

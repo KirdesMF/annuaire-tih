@@ -40,7 +40,10 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full cursor-pointer focus:outline-2 focus:outline-ring focus:outline-offset-2">
+      <DropdownMenuTrigger
+        aria-label="Ouvrir le menu utilisateur"
+        className="rounded-full cursor-pointer focus:outline-2 focus:outline-ring focus:outline-offset-2"
+      >
         <AvatarUser user={user} />
       </DropdownMenuTrigger>
 
