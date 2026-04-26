@@ -6,7 +6,7 @@ import { decode } from "decode-formdata";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Separator } from "~/components/ui/separator";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as v from "valibot";
 import { InputFile } from "~/components/input-file";
 import { Input } from "~/components/ui/input";
@@ -42,7 +42,7 @@ function RouteComponent() {
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
 
-  const { preview, setPreview, revokeAll } = useAddPreviewStore();
+  const { preview, setPreview, revokeAll, reset } = useAddPreviewStore();
   const { toast } = useToast();
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -99,34 +99,109 @@ function RouteComponent() {
     }
   }
 
+  function sanitizeDecodedCompanyData(decodedFormData: unknown) {
+    if (!decodedFormData || typeof decodedFormData !== "object") {
+      return decodedFormData;
+    }
+
+    const data = { ...decodedFormData } as Record<string, unknown>;
+
+    if (data.logo instanceof File && data.logo.size === 0) {
+      data.logo = undefined;
+    }
+
+    if (Array.isArray(data.gallery)) {
+      data.gallery = data.gallery.filter(
+        (file) => !(file instanceof File && file.size === 0),
+      );
+    }
+
+    return data;
+  }
+
+  function formatValidationIssues(
+    issues: Array<{ path?: Array<{ key?: unknown }>; message: string }>,
+  ) {
+    return issues
+      .map((issue) => {
+        const field = issue.path?.[0]?.key;
+
+        if (field === "logo") {
+          return `Logo: ${issue.message}`;
+        }
+
+        if (field === "gallery") {
+          return `Galerie: ${issue.message}`;
+        }
+
+        return issue.message;
+      })
+      .join("\n");
+  }
+
+  async function copyErrorMessage(message: string) {
+    try {
+      await navigator.clipboard.writeText(message);
+      toast({
+        status: "success",
+        description: "Message d'erreur copié",
+        button: { label: "Fermer" },
+      });
+    } catch {
+      toast({
+        status: "error",
+        description: "Impossible de copier le message d'erreur",
+        button: { label: "Fermer" },
+      });
+    }
+  }
+
   function onPreview() {
     const formData = new FormData(formRef.current as HTMLFormElement);
 
-    // decode the form data
-    const decodedFormData = decode(formData, {
-      files: ["logo", "gallery"],
-      arrays: ["categories", "gallery"],
-      booleans: ["rqth"],
-    });
+    const decodedFormData = sanitizeDecodedCompanyData(
+      decode(formData, {
+        files: ["logo", "gallery"],
+        arrays: ["categories", "gallery"],
+        booleans: ["rqth"],
+      }),
+    );
 
     const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortPipeEarly: true });
 
     if (!result.success) {
+      const errorMessage = formatValidationIssues(result.issues);
+
       toast({
+        status: "error",
+        title: "Prévisualisation impossible",
         description: (
-          <div>
-            {result.issues.map((issue, idx) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              <p key={idx}>{issue.message}</p>
-            ))}
+          <div className="grid gap-1 whitespace-pre-line">
+            {errorMessage}
           </div>
         ),
-        button: { label: "Fermer" },
+        button: {
+          label: "Copier",
+          onClick: () => void copyErrorMessage(errorMessage),
+        },
       });
       return;
     }
 
-    setPreview({ ...preview, ...result.output });
+    setPreview({
+      ...preview,
+      ...result.output,
+      logo: result.output.logo ?? preview.logo,
+      logoUrl: result.output.logo ? preview.logoUrl : preview.logoUrl,
+      gallery:
+        result.output.gallery && result.output.gallery.length > 0
+          ? result.output.gallery
+          : preview.gallery,
+      galleryUrls:
+        result.output.gallery && result.output.gallery.length > 0
+          ? preview.galleryUrls
+          : preview.galleryUrls,
+    });
     navigate({ to: "/compte/entreprises/create/preview" });
   }
 
@@ -134,25 +209,27 @@ function RouteComponent() {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
-    const decodedFormData = decode(formData, {
-      files: ["logo", "gallery.$"],
-      arrays: ["categories", "gallery"],
-      booleans: ["rqth"],
-    });
+    const decodedFormData = sanitizeDecodedCompanyData(
+      decode(formData, {
+        files: ["logo", "gallery.$"],
+        arrays: ["categories", "gallery"],
+        booleans: ["rqth"],
+      }),
+    );
 
     const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortEarly: true });
 
     if (!result.success) {
+      const errorMessage = formatValidationIssues(result.issues);
+
       return toast({
-        description: (
-          <span>
-            {result.issues.map((issue, idx) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              <span key={idx}>{issue.message}</span>
-            ))}
-          </span>
-        ),
-        button: { label: "Fermer" },
+        status: "error",
+        title: "Création impossible",
+        description: <span className="whitespace-pre-line">{errorMessage}</span>,
+        button: {
+          label: "Copier",
+          onClick: () => void copyErrorMessage(errorMessage),
+        },
       });
     }
 
@@ -170,6 +247,7 @@ function RouteComponent() {
             description: "Entreprise créée avec succès",
             button: { label: "Fermer" },
           });
+          reset();
           navigate({ to: "/compte/entreprises" });
         },
         onError: (error) => {
@@ -182,10 +260,6 @@ function RouteComponent() {
       },
     );
   }
-
-  useEffect(() => {
-    return () => revokeAll();
-  }, [revokeAll]);
 
   return (
     <div className="container px-4 py-6">
@@ -496,13 +570,13 @@ function RouteComponent() {
           <Separator className="h-px bg-border my-4" />
 
           <div className="flex gap-2 justify-end">
-            {/* <button
+            <button
               type="button"
               className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer hover:bg-secondary/90 transition-colors"
               onClick={onPreview}
             >
               Prévisualiser
-            </button> */}
+            </button>
 
             <button
               type="submit"

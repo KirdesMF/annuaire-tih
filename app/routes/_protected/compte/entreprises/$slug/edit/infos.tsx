@@ -1,17 +1,21 @@
 import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Command } from "cmdk";
+import { decode } from "decode-formdata";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Separator } from "~/components/ui/separator";
 import { useRef, useState } from "react";
+import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { UpdateCompanyInfosSchema } from "~/lib/validator/company.schema";
+import { useUpdatePreviewStore } from "~/stores/preview.store";
 import { cn } from "~/utils/cn";
 import { SocialMedias } from "../../-components/social-medias";
 
@@ -32,9 +36,11 @@ function RouteComponent() {
   const context = Route.useRouteContext();
   const params = Route.useParams();
   const navigate = Route.useNavigate();
+  const search = Route.useSearch();
   const { toast } = useToast();
 
   const formRef = useRef<HTMLFormElement>(null);
+  const { setPreview } = useUpdatePreviewStore();
   const [categories, company] = useSuspenseQueries({
     queries: [categoriesQueryOptions, companyBySlugQuery(params.slug)],
   });
@@ -74,6 +80,81 @@ function RouteComponent() {
     setDescriptionLength(e.target.value.length);
   }
 
+  function formatValidationIssues(
+    issues: Array<{ path?: Array<{ key?: unknown }>; message: string }>,
+  ) {
+    return issues
+      .map((issue) => {
+        const field = issue.path?.[0]?.key;
+
+        if (field === "categories") {
+          return `Catégories: ${issue.message}`;
+        }
+
+        if (field === "description") {
+          return `Description: ${issue.message}`;
+        }
+
+        return issue.message;
+      })
+      .join("\n");
+  }
+
+  async function copyErrorMessage(message: string) {
+    try {
+      await navigator.clipboard.writeText(message);
+      toast({
+        status: "success",
+        description: "Message d'erreur copié",
+        button: { label: "Fermer" },
+      });
+    } catch {
+      toast({
+        status: "error",
+        description: "Impossible de copier le message d'erreur",
+        button: { label: "Fermer" },
+      });
+    }
+  }
+
+  function onPreview() {
+    const formData = new FormData(formRef.current as HTMLFormElement);
+    const decodedFormData = decode(formData, {
+      arrays: ["categories"],
+      booleans: ["rqth"],
+    });
+
+    const result = v.safeParse(UpdateCompanyInfosSchema, decodedFormData, {
+      abortPipeEarly: true,
+    });
+
+    if (!result.success) {
+      const errorMessage = formatValidationIssues(result.issues);
+
+      return toast({
+        status: "error",
+        title: "Prévisualisation impossible",
+        description: <span className="whitespace-pre-line">{errorMessage}</span>,
+        button: {
+          label: "Copier",
+          onClick: () => void copyErrorMessage(errorMessage),
+        },
+      });
+    }
+
+    setPreview({
+      ...result.output,
+      logoUrl: company.data?.logo?.secureUrl,
+      galleryUrls: company.data?.gallery?.map((image) => image.secureUrl) ?? [],
+    });
+
+    navigate({
+      to: "/compte/entreprises/$slug/edit/preview",
+      params: { slug: params.slug },
+      search,
+    });
+  }
+
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
@@ -93,8 +174,13 @@ function RouteComponent() {
         },
         onError: (error) => {
           toast({
+            status: "error",
+            title: "Mise à jour impossible",
             description: error.message,
-            button: { label: "Fermer" },
+            button: {
+              label: "Copier",
+              onClick: () => void copyErrorMessage(error.message),
+            },
           });
         },
       },
@@ -364,11 +450,38 @@ function RouteComponent() {
 
           <Separator className="h-px bg-border my-4" />
 
+          <div className="flex items-center justify-between gap-3 rounded-sm border border-border bg-card px-4 py-3">
+            <div className="grid gap-1">
+              <p className="text-sm font-medium">Images entreprise</p>
+              <p className="text-xs text-muted-foreground">
+                Logo et galerie se modifient dans onglet média.
+              </p>
+            </div>
+
+            <Link
+              to="/compte/entreprises/$slug/edit/medias"
+              params={{ slug: params.slug }}
+              search={search}
+              className="rounded-sm border border-border bg-muted px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-muted/80"
+            >
+              Gérer les images
+            </Link>
+          </div>
+
+          <Separator className="h-px bg-border my-4" />
+
           <SocialMedias company={company.data} />
 
           <Separator className="h-px bg-border my-4" />
 
           <div className="flex gap-2 justify-end">
+            <button
+              type="button"
+              className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs hover:bg-secondary/90"
+              onClick={onPreview}
+            >
+              Prévisualiser
+            </button>
             <button
               type="submit"
               className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs"

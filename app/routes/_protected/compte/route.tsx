@@ -29,6 +29,19 @@ function RouteComponent() {
               </Link>
 
               <ul className="ms-4">
+                {companies.data?.map((company) => (
+                  <li key={company.id}>
+                    <Link
+                      to="/compte/entreprises/$slug/edit/infos"
+                      params={{ slug: company.slug }}
+                      search={{ id: context.user.id }}
+                      className="text-xs font-light flex items-center px-4 py-1.5 text-muted-foreground transition-colors hover:text-foreground data-[status=active]:text-primary data-[status=active]:font-medium"
+                    >
+                      {company.name}
+                    </Link>
+                  </li>
+                ))}
+
                 <li>
                   <Link
                     to="/compte/entreprises/create"
