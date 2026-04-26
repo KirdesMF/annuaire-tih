@@ -1,7 +1,6 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect } from "react";
 import { CompanyPreview } from "~/routes/_protected/compte/entreprises/-components/company-preview";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
@@ -25,16 +24,10 @@ function RouteComponent() {
   const { queryClient } = Route.useRouteContext();
   const navigate = Route.useNavigate();
   const preview = useAddPreviewStore((state) => state.preview);
-  const { revokeAll, reset } = useAddPreviewStore();
+  const { reset } = useAddPreviewStore();
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
   const { toast } = useToast();
-
-  useEffect(() => {
-    return () => {
-      revokeAll();
-    };
-  }, [revokeAll]);
 
   if (!preview.name || !preview.siret || preview.categories.length === 0) {
     return null;
