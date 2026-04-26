@@ -4,18 +4,25 @@ import * as v from "valibot";
 import { auth } from "~/lib/auth/auth.server";
 import { uploadImageToCloudinary } from "~/lib/cloudinary";
 
+const AvatarSchema = v.pipe(
+  v.instance(File, "Veuillez sélectionner une image"),
+  v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
+  v.maxSize(1024 * 1024 * 2, "La taille du fichier doit être inférieure à 2MB"),
+);
+
 const UpdateUserAvatarSchema = v.object({
-  avatar: v.pipe(
-    v.instance(File),
-    v.mimeType(["image/png", "image/jpeg", "image/jpg", "image/webp"]),
-    v.maxSize(1024 * 1024 * 2, "La taille du fichier doit être inférieure à 2MB"),
-  ),
+  avatar: AvatarSchema,
 });
 
 export const updateUserAvatar = createServerFn({ method: "POST" })
   .inputValidator((data: FormData) => {
+    const avatar = data.get("avatar");
+
     return v.parse(UpdateUserAvatarSchema, {
-      avatar: data.get("avatar"),
+      avatar:
+        avatar instanceof File && avatar.size > 0
+          ? avatar
+          : "",
     });
   })
   .handler(async ({ data }) => {

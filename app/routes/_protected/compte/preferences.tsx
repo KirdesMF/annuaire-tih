@@ -132,6 +132,17 @@ function RouteComponent() {
   function onUpdateUserAvatar(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const avatar = formData.get("avatar");
+
+    if (!(avatar instanceof File) || avatar.size === 0) {
+      toast({
+        status: "error",
+        title: "Mise à jour impossible",
+        description: "Veuillez sélectionner une image",
+        button: { label: "Fermer" },
+      });
+      return;
+    }
 
     updateAvatarMutation(
       { data: formData },
