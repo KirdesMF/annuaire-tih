@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 // app/routes/__root.tsx
-import { type QueryClient, queryOptions } from "@tanstack/react-query";
+import { type QueryClient, queryOptions, useQuery } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   HeadContent,
@@ -100,6 +100,7 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const { user } = Route.useRouteContext();
+  const { data: session } = useQuery(sessionQueryOptions);
   const { theme } = useTheme();
 
   return (
@@ -116,7 +117,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           Aller au contenu principal
         </a>
         <TooltipProvider>
-          <SiteHeader user={user} />
+          <SiteHeader user={session?.user ?? user} />
           <div id="main-content" tabIndex={-1}>
             {children}
           </div>
