@@ -6,7 +6,7 @@ import { decode } from "decode-formdata";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Separator } from "~/components/ui/separator";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as v from "valibot";
 import { InputFile } from "~/components/input-file";
 import { Input } from "~/components/ui/input";
@@ -99,15 +99,36 @@ function RouteComponent() {
     }
   }
 
+  function sanitizeDecodedCompanyData(decodedFormData: unknown) {
+    if (!decodedFormData || typeof decodedFormData !== "object") {
+      return decodedFormData;
+    }
+
+    const data = { ...decodedFormData } as Record<string, unknown>;
+
+    if (data.logo instanceof File && data.logo.size === 0) {
+      data.logo = undefined;
+    }
+
+    if (Array.isArray(data.gallery)) {
+      data.gallery = data.gallery.filter(
+        (file) => !(file instanceof File && file.size === 0),
+      );
+    }
+
+    return data;
+  }
+
   function onPreview() {
     const formData = new FormData(formRef.current as HTMLFormElement);
 
-    // decode the form data
-    const decodedFormData = decode(formData, {
-      files: ["logo", "gallery"],
-      arrays: ["categories", "gallery"],
-      booleans: ["rqth"],
-    });
+    const decodedFormData = sanitizeDecodedCompanyData(
+      decode(formData, {
+        files: ["logo", "gallery"],
+        arrays: ["categories", "gallery"],
+        booleans: ["rqth"],
+      }),
+    );
 
     const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortPipeEarly: true });
 
@@ -126,7 +147,20 @@ function RouteComponent() {
       return;
     }
 
-    setPreview({ ...preview, ...result.output });
+    setPreview({
+      ...preview,
+      ...result.output,
+      logo: result.output.logo ?? preview.logo,
+      logoUrl: result.output.logo ? preview.logoUrl : preview.logoUrl,
+      gallery:
+        result.output.gallery && result.output.gallery.length > 0
+          ? result.output.gallery
+          : preview.gallery,
+      galleryUrls:
+        result.output.gallery && result.output.gallery.length > 0
+          ? preview.galleryUrls
+          : preview.galleryUrls,
+    });
     navigate({ to: "/compte/entreprises/create/preview" });
   }
 
@@ -134,11 +168,13 @@ function RouteComponent() {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
-    const decodedFormData = decode(formData, {
-      files: ["logo", "gallery.$"],
-      arrays: ["categories", "gallery"],
-      booleans: ["rqth"],
-    });
+    const decodedFormData = sanitizeDecodedCompanyData(
+      decode(formData, {
+        files: ["logo", "gallery.$"],
+        arrays: ["categories", "gallery"],
+        booleans: ["rqth"],
+      }),
+    );
 
     const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortEarly: true });
 
@@ -183,10 +219,6 @@ function RouteComponent() {
       },
     );
   }
-
-  useEffect(() => {
-    return () => revokeAll();
-  }, [revokeAll]);
 
   return (
     <div className="container px-4 py-6">
