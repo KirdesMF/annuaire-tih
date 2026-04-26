@@ -3,12 +3,18 @@ type UploadApiResponse = {
   public_id: string;
 };
 
-type UploadImageToCloudinaryProps = {
-  type: "logo" | "gallery";
-  file: File;
-  companyId: string;
-  companySlug: string;
-};
+type UploadImageToCloudinaryProps =
+  | {
+      type: "logo" | "gallery";
+      file: File;
+      companyId: string;
+      companySlug: string;
+    }
+  | {
+      type: "avatar";
+      file: File;
+      userId: string;
+    };
 
 function getCloudinaryOptions() {
   const name = process.env.CLOUDINARY_CLOUD_NAME;
@@ -43,17 +49,18 @@ async function generateSignature(params: Record<string, unknown>, secret: string
     .join("");
 }
 
-export async function uploadImageToCloudinary({
-  type,
-  file,
-  companyId,
-  companySlug,
-}: UploadImageToCloudinaryProps): Promise<UploadApiResponse> {
+export async function uploadImageToCloudinary(props: UploadImageToCloudinaryProps): Promise<UploadApiResponse> {
+  const { type, file } = props;
   const options = getCloudinaryOptions();
 
-  const publicId = `${companyId}-${Date.now()}`;
+  const publicId =
+    type === "avatar" ? `${props.userId}-${Date.now()}` : `${props.companyId}-${Date.now()}`;
   const path =
-    type === "logo" ? `companies/${companySlug}/logo` : `companies/${companySlug}/gallery`;
+    type === "avatar"
+      ? `users/${props.userId}/avatar`
+      : type === "logo"
+        ? `companies/${props.companySlug}/logo`
+        : `companies/${props.companySlug}/gallery`;
 
   try {
     const formData = new FormData();
