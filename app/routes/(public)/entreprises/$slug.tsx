@@ -197,13 +197,19 @@ function RouteComponent() {
           </div>
         </div>
 
-        {data.gallery?.length ? <GalleryImages gallery={data.gallery} /> : null}
+        {data.gallery?.length ? <GalleryImages gallery={data.gallery} companyName={data.name} /> : null}
       </div>
     </main>
   );
 }
 
-function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; publicId: string }> }) {
+function GalleryImages({
+  gallery,
+  companyName,
+}: {
+  gallery: Array<{ secureUrl: string; publicId: string }>;
+  companyName: string;
+}) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   return (
@@ -225,7 +231,7 @@ function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; public
                 >
                   <img
                     src={image.secureUrl}
-                    alt={image.publicId}
+                    alt={`Image ${index + 1} de la galerie de ${companyName}`}
                     className="aspect-square rounded-sm object-contain"
                   />
                 </DialogTrigger>
@@ -249,14 +255,14 @@ function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; public
                       onClick={() =>
                         setCurrentImageIndex((prev) => (prev === 0 ? gallery.length - 1 : prev - 1))
                       }
-                      aria-label="Previous image"
+                      aria-label="Image précédente"
                     >
                       <ChevronLeftIcon className="size-4" />
                     </button>
 
                     <img
                       src={gallery[currentImageIndex].secureUrl}
-                      alt={gallery[currentImageIndex].publicId}
+                      alt={`Image ${currentImageIndex + 1} de la galerie de ${companyName}`}
                       className="w-[25vw] max-w-full object-contain"
                     />
 
@@ -269,7 +275,7 @@ function GalleryImages({ gallery }: { gallery: Array<{ secureUrl: string; public
                       onClick={() =>
                         setCurrentImageIndex((prev) => (prev === gallery.length - 1 ? 0 : prev + 1))
                       }
-                      aria-label="Next image"
+                      aria-label="Image suivante"
                     >
                       <ChevronRightIcon className="size-4" />
                     </button>

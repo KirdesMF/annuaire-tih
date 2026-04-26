@@ -109,9 +109,17 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
 
       <body className="font-sans isolate bg-background text-foreground">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-sm focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:ring-2 focus:ring-ring"
+        >
+          Aller au contenu principal
+        </a>
         <TooltipProvider>
           <SiteHeader user={user} />
-          {children}
+          <div id="main-content" tabIndex={-1}>
+            {children}
+          </div>
           <SiteFooter />
         </TooltipProvider>
         <Toaster />

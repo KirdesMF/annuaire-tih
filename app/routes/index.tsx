@@ -114,7 +114,11 @@ function Home() {
             rel="noreferrer noopener"
             className="w-full"
           >
-            <img src={edmDesktop} alt="" className="w-full object-cover" />
+            <img
+              src={edmDesktop}
+              alt="En d'autres mots, accompagnement administratif"
+              className="w-full object-cover"
+            />
           </a>
         </div>
 
@@ -140,6 +144,7 @@ function Home() {
                 render={
                   <button
                     type="button"
+                    aria-label="Ouvrir la recherche de prestataires"
                     className="flex h-12 w-full cursor-pointer items-center justify-between truncate text-nowrap rounded-sm px-4 text-start text-sm font-light shadow-2xs ring-1 ring-input/50 focus:outline-2 focus:outline-primary"
                   />
                 }
@@ -228,7 +233,11 @@ function Home() {
             <span>Sponsors</span>
           </div>
           <a href="https://www.en-dautres-mots.fr" target="_blank" rel="noreferrer noopener">
-            <img src={edmMobile} alt="" className="size-full object-fit" />
+            <img
+              src={edmMobile}
+              alt="En d'autres mots, accompagnement administratif"
+              className="size-full object-fit"
+            />
           </a>
         </div>
       </section>
