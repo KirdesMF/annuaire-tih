@@ -119,6 +119,43 @@ function RouteComponent() {
     return data;
   }
 
+  function formatValidationIssues(
+    issues: Array<{ path?: Array<{ key?: unknown }>; message: string }>,
+  ) {
+    return issues
+      .map((issue) => {
+        const field = issue.path?.[0]?.key;
+
+        if (field === "logo") {
+          return `Logo: ${issue.message}`;
+        }
+
+        if (field === "gallery") {
+          return `Galerie: ${issue.message}`;
+        }
+
+        return issue.message;
+      })
+      .join("\n");
+  }
+
+  async function copyErrorMessage(message: string) {
+    try {
+      await navigator.clipboard.writeText(message);
+      toast({
+        status: "success",
+        description: "Message d'erreur copié",
+        button: { label: "Fermer" },
+      });
+    } catch {
+      toast({
+        status: "error",
+        description: "Impossible de copier le message d'erreur",
+        button: { label: "Fermer" },
+      });
+    }
+  }
+
   function onPreview() {
     const formData = new FormData(formRef.current as HTMLFormElement);
 
@@ -133,16 +170,20 @@ function RouteComponent() {
     const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortPipeEarly: true });
 
     if (!result.success) {
+      const errorMessage = formatValidationIssues(result.issues);
+
       toast({
+        status: "error",
+        title: "Prévisualisation impossible",
         description: (
-          <div>
-            {result.issues.map((issue, idx) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              <p key={idx}>{issue.message}</p>
-            ))}
+          <div className="grid gap-1 whitespace-pre-line">
+            {errorMessage}
           </div>
         ),
-        button: { label: "Fermer" },
+        button: {
+          label: "Copier",
+          onClick: () => void copyErrorMessage(errorMessage),
+        },
       });
       return;
     }
@@ -179,16 +220,16 @@ function RouteComponent() {
     const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortEarly: true });
 
     if (!result.success) {
+      const errorMessage = formatValidationIssues(result.issues);
+
       return toast({
-        description: (
-          <span>
-            {result.issues.map((issue, idx) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              <span key={idx}>{issue.message}</span>
-            ))}
-          </span>
-        ),
-        button: { label: "Fermer" },
+        status: "error",
+        title: "Création impossible",
+        description: <span className="whitespace-pre-line">{errorMessage}</span>,
+        button: {
+          label: "Copier",
+          onClick: () => void copyErrorMessage(errorMessage),
+        },
       });
     }
 
