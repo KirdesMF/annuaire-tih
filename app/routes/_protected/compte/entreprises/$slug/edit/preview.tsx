@@ -6,6 +6,7 @@ import { CompanyPreview } from "~/routes/_protected/compte/entreprises/-componen
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
+import { updateCompanyMedia } from "~/lib/api/companies/mutations/update-company-medias";
 import { useUpdatePreviewStore } from "~/stores/preview.store";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/preview")({
@@ -35,8 +36,11 @@ function RouteComponent() {
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const { revokeAll, reset } = useUpdatePreviewStore();
 
-  const { mutate, isPending } = useMutation({
+  const { mutate: mutateInfos, isPending: isInfosPending } = useMutation({
     mutationFn: useServerFn(updateCompanyInfos),
+  });
+  const { mutate: mutateMedia, isPending: isMediaPending } = useMutation({
+    mutationFn: useServerFn(updateCompanyMedia),
   });
 
   useEffect(() => {
@@ -52,30 +56,57 @@ function RouteComponent() {
   const previewData = preview;
 
   function onValidate() {
-    const formData = new FormData();
+    const infosFormData = new FormData();
+    const mediaFormData = new FormData();
 
     for (const [key, value] of Object.entries(previewData)) {
       if (typeof value === "string") {
-        formData.append(key, value);
+        infosFormData.append(key, value);
+        mediaFormData.append(key, value);
       }
     }
 
     for (const categoryId of previewData.categories) {
-      formData.append("categories", categoryId);
+      infosFormData.append("categories", categoryId);
     }
 
-    mutate(
-      { data: formData },
+    if (previewData.logo instanceof File) {
+      mediaFormData.append("logo", previewData.logo);
+    }
+
+    if (previewData.logo_public_id) {
+      mediaFormData.append("logo_public_id", previewData.logo_public_id);
+    }
+
+    previewData.gallery?.forEach((image, index) => {
+      if (image instanceof File) {
+        mediaFormData.append(`gallery.${index}`, image);
+      }
+    });
+
+    previewData.gallery_public_id?.forEach((publicId, index) => {
+      mediaFormData.append(`gallery_public_id[${index}]`, publicId);
+    });
+
+    mutateInfos(
+      { data: infosFormData },
       {
         onSuccess: () => {
-          toast({
-            description: "Entreprise mise à jour avec succès",
-            button: { label: "Fermer" },
-          });
-          queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
-          queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
-          reset();
-          navigate({ to: "/compte/entreprises" });
+          mutateMedia(
+            { data: mediaFormData },
+            {
+              onSuccess: () => {
+                toast({
+                  description: "Entreprise mise à jour avec succès",
+                  button: { label: "Fermer" },
+                });
+                queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
+                queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
+                reset();
+                navigate({ to: "/compte/entreprises" });
+              },
+            },
+          );
         },
       },
     );
@@ -89,7 +120,7 @@ function RouteComponent() {
       backSearch={search}
       submitLabel="Valider"
       pendingLabel="Validation en cours..."
-      isPending={isPending}
+      isPending={isInfosPending || isMediaPending}
       onConfirm={onValidate}
       preview={previewData}
       categories={categories}

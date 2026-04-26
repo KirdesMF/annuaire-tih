@@ -8,13 +8,15 @@ import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover
 import { Separator } from "~/components/ui/separator";
 import { useRef, useState } from "react";
 import * as v from "valibot";
+import { InputFile } from "~/components/input-file";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
+import { updateCompanyMedia } from "~/lib/api/companies/mutations/update-company-medias";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
-import { UpdateCompanyInfosSchema } from "~/lib/validator/company.schema";
+import { UpdateCompanyInfosSchema, UpdateCompanyMediaSchema } from "~/lib/validator/company.schema";
 import { useUpdatePreviewStore } from "~/stores/preview.store";
 import { cn } from "~/utils/cn";
 import { SocialMedias } from "../../-components/social-medias";
@@ -40,12 +42,17 @@ function RouteComponent() {
   const { toast } = useToast();
 
   const formRef = useRef<HTMLFormElement>(null);
-  const { setPreview } = useUpdatePreviewStore();
+  const { preview, setPreview } = useUpdatePreviewStore();
   const [categories, company] = useSuspenseQueries({
     queries: [categoriesQueryOptions, companyBySlugQuery(params.slug)],
   });
 
-  const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompanyInfos) });
+  const { mutate: mutateInfos, isPending: isInfosPending } = useMutation({
+    mutationFn: useServerFn(updateCompanyInfos),
+  });
+  const { mutate: mutateMedia, isPending: isMediaPending } = useMutation({
+    mutationFn: useServerFn(updateCompanyMedia),
+  });
 
   // states
   const [selectedCategories, setSelectedCategories] = useState(
@@ -80,6 +87,93 @@ function RouteComponent() {
     setDescriptionLength(e.target.value.length);
   }
 
+  function getBasePreview() {
+    return {
+      companyId: company.data.id,
+      name: company.data.name,
+      siret: company.data.siret,
+      categories: company.data.categories.map((category) => category?.id ?? ""),
+      business_owner: company.data.business_owner ?? "",
+      description: company.data.description ?? "",
+      website: company.data.website ?? "",
+      service_area: company.data.service_area ?? "",
+      subdomain: company.data.subdomain ?? "",
+      email: company.data.email ?? "",
+      phone: company.data.phone ?? "",
+      location: company.data.location ?? "",
+      work_mode: company.data.work_mode,
+      rqth: company.data.rqth ?? false,
+      social_media: company.data.social_media ?? {},
+      logo_public_id: company.data.logo?.publicId,
+      logo: undefined,
+      logoUrl: company.data.logo?.secureUrl,
+      gallery_public_id: company.data.gallery?.map((image) => image.publicId) ?? [],
+      gallery: [],
+      galleryUrls: company.data.gallery?.map((image) => image.secureUrl) ?? [],
+    };
+  }
+
+  function onImageChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "logo" | "gallery",
+    index?: number,
+  ) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const currentPreview = preview ?? getBasePreview();
+
+    if (type === "logo") {
+      if (currentPreview.logoUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(currentPreview.logoUrl);
+      }
+
+      setPreview({
+        ...currentPreview,
+        logo: file,
+        logoUrl: URL.createObjectURL(file),
+      });
+    }
+
+    if (type === "gallery" && index !== undefined) {
+      const currentGallery = [...(currentPreview.gallery ?? [])];
+      const currentGalleryUrls = [...(currentPreview.galleryUrls ?? [])];
+
+      if (currentGalleryUrls[index]?.startsWith("blob:")) {
+        URL.revokeObjectURL(currentGalleryUrls[index]);
+      }
+
+      currentGallery[index] = file;
+      currentGalleryUrls[index] = URL.createObjectURL(file);
+
+      setPreview({
+        ...currentPreview,
+        gallery: currentGallery,
+        galleryUrls: currentGalleryUrls,
+      });
+    }
+  }
+
+  function sanitizeDecodedCompanyData(decodedFormData: unknown) {
+    if (!decodedFormData || typeof decodedFormData !== "object") {
+      return decodedFormData;
+    }
+
+    const data = { ...decodedFormData } as Record<string, unknown>;
+
+    if (data.logo instanceof File && data.logo.size === 0) {
+      data.logo = undefined;
+    }
+
+    if (Array.isArray(data.gallery)) {
+      data.gallery = data.gallery.filter(
+        (file) => !(file instanceof File && file.size === 0),
+      );
+    }
+
+    return data;
+  }
+
   function formatValidationIssues(
     issues: Array<{ path?: Array<{ key?: unknown }>; message: string }>,
   ) {
@@ -93,6 +187,14 @@ function RouteComponent() {
 
         if (field === "description") {
           return `Description: ${issue.message}`;
+        }
+
+        if (field === "logo") {
+          return `Logo: ${issue.message}`;
+        }
+
+        if (field === "gallery") {
+          return `Galerie: ${issue.message}`;
         }
 
         return issue.message;
@@ -119,17 +221,29 @@ function RouteComponent() {
 
   function onPreview() {
     const formData = new FormData(formRef.current as HTMLFormElement);
-    const decodedFormData = decode(formData, {
+    const decodedInfosFormData = decode(formData, {
       arrays: ["categories"],
       booleans: ["rqth"],
     });
+    const decodedMediaFormData = sanitizeDecodedCompanyData(
+      decode(formData, {
+        files: ["logo", "gallery.$"],
+        arrays: ["gallery", "gallery_public_id"],
+      }),
+    );
 
-    const result = v.safeParse(UpdateCompanyInfosSchema, decodedFormData, {
+    const infosResult = v.safeParse(UpdateCompanyInfosSchema, decodedInfosFormData, {
+      abortPipeEarly: true,
+    });
+    const mediaResult = v.safeParse(UpdateCompanyMediaSchema, decodedMediaFormData, {
       abortPipeEarly: true,
     });
 
-    if (!result.success) {
-      const errorMessage = formatValidationIssues(result.issues);
+    if (!infosResult.success || !mediaResult.success) {
+      const errorMessage = formatValidationIssues([
+        ...(infosResult.success ? [] : infosResult.issues),
+        ...(mediaResult.success ? [] : mediaResult.issues),
+      ]);
 
       return toast({
         status: "error",
@@ -143,9 +257,13 @@ function RouteComponent() {
     }
 
     setPreview({
-      ...result.output,
-      logoUrl: company.data?.logo?.secureUrl,
-      galleryUrls: company.data?.gallery?.map((image) => image.secureUrl) ?? [],
+      ...infosResult.output,
+      ...mediaResult.output,
+      logoUrl: mediaResult.output.logo ? preview?.logoUrl : company.data?.logo?.secureUrl,
+      galleryUrls:
+        mediaResult.output.gallery && mediaResult.output.gallery.length > 0
+          ? (preview?.galleryUrls ?? [])
+          : (company.data?.gallery?.map((image) => image.secureUrl) ?? []),
     });
 
     navigate({
@@ -159,18 +277,71 @@ function RouteComponent() {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
-    mutate(
+    const decodedInfosFormData = decode(formData, {
+      arrays: ["categories"],
+      booleans: ["rqth"],
+    });
+    const decodedMediaFormData = sanitizeDecodedCompanyData(
+      decode(formData, {
+        files: ["logo", "gallery.$"],
+        arrays: ["gallery", "gallery_public_id"],
+      }),
+    );
+
+    const infosResult = v.safeParse(UpdateCompanyInfosSchema, decodedInfosFormData, {
+      abortPipeEarly: true,
+    });
+    const mediaResult = v.safeParse(UpdateCompanyMediaSchema, decodedMediaFormData, {
+      abortPipeEarly: true,
+    });
+
+    if (!infosResult.success || !mediaResult.success) {
+      const errorMessage = formatValidationIssues([
+        ...(infosResult.success ? [] : infosResult.issues),
+        ...(mediaResult.success ? [] : mediaResult.issues),
+      ]);
+
+      return toast({
+        status: "error",
+        title: "Mise à jour impossible",
+        description: <span className="whitespace-pre-line">{errorMessage}</span>,
+        button: {
+          label: "Copier",
+          onClick: () => void copyErrorMessage(errorMessage),
+        },
+      });
+    }
+
+    mutateInfos(
       { data: formData },
       {
         onSuccess: () => {
-          context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
-          context.queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
+          mutateMedia(
+            { data: formData },
+            {
+              onSuccess: () => {
+                context.queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
+                context.queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
 
-          toast({
-            description: "Entreprise mise à jour avec succès",
-            button: { label: "Fermer" },
-          });
-          navigate({ to: "/compte/entreprises" });
+                toast({
+                  description: "Entreprise mise à jour avec succès",
+                  button: { label: "Fermer" },
+                });
+                navigate({ to: "/compte/entreprises" });
+              },
+              onError: (error) => {
+                toast({
+                  status: "error",
+                  title: "Mise à jour impossible",
+                  description: error.message,
+                  button: {
+                    label: "Copier",
+                    onClick: () => void copyErrorMessage(error.message),
+                  },
+                });
+              },
+            },
+          );
         },
         onError: (error) => {
           toast({
@@ -450,6 +621,59 @@ function RouteComponent() {
 
           <Separator className="h-px bg-border my-4" />
 
+          <fieldset className="border rounded-sm border-border p-4">
+            <legend className="text-sm font-medium px-2">Images</legend>
+
+            <input type="hidden" name="logo_public_id" value={company.data?.logo?.publicId ?? ""} />
+            <input
+              type="hidden"
+              name="gallery_public_id[0]"
+              value={company.data?.gallery?.[0]?.publicId ?? ""}
+            />
+            <input
+              type="hidden"
+              name="gallery_public_id[1]"
+              value={company.data?.gallery?.[1]?.publicId ?? ""}
+            />
+
+            <div className="flex gap-2 justify-center">
+              <Label className="relative flex flex-col gap-1 outline-none group">
+                <span className="text-xs font-medium">Logo (max. 3MB)</span>
+                <InputFile
+                  preview={preview?.logoUrl ?? company.data?.logo?.secureUrl}
+                  alt="Logo"
+                  name="logo"
+                  onChange={(e) => onImageChange(e, "logo")}
+                  accept="image/*"
+                />
+              </Label>
+
+              <Label className="relative flex flex-col gap-1 outline-none group">
+                <span className="text-xs font-medium">Image 1 (max. 2MB)</span>
+                <InputFile
+                  preview={preview?.galleryUrls?.[0] ?? company.data?.gallery?.[0]?.secureUrl}
+                  alt="Galerie 1"
+                  name="gallery.0"
+                  onChange={(e) => onImageChange(e, "gallery", 0)}
+                  accept="image/*"
+                />
+              </Label>
+
+              <Label className="relative flex flex-col gap-1 outline-none group">
+                <span className="text-xs font-medium">Image 2 (max. 2MB)</span>
+                <InputFile
+                  preview={preview?.galleryUrls?.[1] ?? company.data?.gallery?.[1]?.secureUrl}
+                  alt="Galerie 2"
+                  name="gallery.1"
+                  onChange={(e) => onImageChange(e, "gallery", 1)}
+                  accept="image/*"
+                />
+              </Label>
+            </div>
+          </fieldset>
+
+          <Separator className="h-px bg-border my-4" />
+
           <SocialMedias company={company.data} />
 
           <Separator className="h-px bg-border my-4" />
@@ -465,9 +689,13 @@ function RouteComponent() {
             <button
               type="submit"
               className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs"
-              disabled={isPending}
+              disabled={isInfosPending || isMediaPending}
             >
-              {isPending ? <Loader className="size-4 animate-spin" /> : "Mettre à jour"}
+              {isInfosPending || isMediaPending ? (
+                <Loader className="size-4 animate-spin" />
+              ) : (
+                "Mettre à jour"
+              )}
             </button>
           </div>
         </form>
