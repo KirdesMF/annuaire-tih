@@ -32,8 +32,10 @@ Create branches in this order, each one built on last merged phase so conflict s
 5. `chore/v2-shadcn-base-ui` → migrate one primitive/component slice at time to shadcn/Base UI, only after shell and tokens stable.
 6. `chore/v2-seo-sitemap` → SEO meta, dynamic sitemap, robots, accessibility baseline, after public routes are stable.
 7. `chore/v2-feature-phase` → a11y tool, preview company page during register/update, profile picture.
-8. `chore/v2-vertical-refactor` → domain re-org / colocation pass, only after UI + SEO work settle.
-9. `chore/v2-improvement-audit` → infra/provider decisions and form flow audit at end.
+8. `chore/v2-ui-dashboard-refresh` → dashboard and related UI modifications aligned with new design, beyond tokens only.
+9. `chore/v2-analytics-dashboard` → add traffic custom events and web analytics surfaced in dashboard, after UI/dashboard refresh settles.
+10. `chore/v2-vertical-refactor` → domain re-org / colocation pass, only after UI + SEO work settle.
+11. `chore/v2-improvement-audit` → infra/provider decisions and form flow audit at end.
 
 Rule: do not start next branch before previous phase is merged or at least stabilized. That avoids parallel edits on same shell/components files and keeps conflicts small.
 
@@ -48,9 +50,11 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - **PR 8**: SEO/meta + dynamic sitemap + robots.
 - **PR 9**: public/auth-page a11y pass + optional a11y tooling; company create/update form a11y deferred to feature/form improvement phase.
 - **PR 10**: feature phase: preview company page, profile picture, a11y tool.
-- **PR 11**: vertical codebase refactor, domain by domain.
-- **PR 12**: improvement audit: Supabase vs Cloudflare D1, Cloudinary vs Cloudflare R2, register/update form flow.
-- **PR 13**: dependency cleanup + final build/lint/typecheck.
+- **PR 11**: UI/dashboard refresh phase: align dashboard and related screens with new design/UI modifications, not tokens only.
+- **PR 12**: analytics/dashboard phase: traffic custom events + web analytics surfaced in dashboard.
+- **PR 13**: vertical codebase refactor, domain by domain.
+- **PR 14**: improvement audit: Supabase vs Cloudflare D1, Cloudinary vs Cloudflare R2, register/update form flow.
+- **PR 15**: dependency cleanup + final build/lint/typecheck.
 
 ## 5. Files likely involved
 ### Core shell / theme / global style
@@ -200,22 +204,32 @@ Rule: do not start next branch before previous phase is merged or at least stabi
    - build a11y tool
    - add preview company page during register/update
    - add profile picture support
+   - follow-up: add hover/focus overlay on profile picture in `Préférences` to make avatar upload affordance obvious
    - keep each feature separate if it can ship alone
 
-14. **Refactor toward vertical codebase**
+14. **UI/dashboard refresh phase**
+   - align dashboard and related account/admin UI with new design
+   - go beyond token changes: real screen/layout/component modifications and presentation updates
+   - stabilize dashboard UX before analytics work lands
+
+15. **Analytics/dashboard phase**
+   - add traffic custom events so dashboard can expose web analytics
+   - build analytics on top of refreshed dashboard UI
+
+16. **Refactor toward vertical codebase**
    - regroup code by domain / ownership, not by technical type
    - co-locate route-specific data, UI, and helpers near routes/domains they serve
    - keep truly generic UI in a reusable design-system area
    - keep shared business logic in a shared area, infrastructure separate
    - move in small batches with import fixes and test coverage after each batch
 
-15. **Improvement audit at end**
+17. **Improvement audit at end**
    - compare Supabase vs Cloudflare D1
    - compare Cloudinary vs Cloudflare R2
    - review register/update form flow and data model
    - only decide here after main UI/SEO/feature work settled
 
-16. **Verification and cleanup**
+18. **Verification and cleanup**
    - run typecheck, lint, build
    - test public routes, auth flows, search, dialogs, mobile nav, theme toggle
    - confirm sitemap/robots response content
