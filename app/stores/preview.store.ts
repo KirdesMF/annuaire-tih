@@ -62,12 +62,36 @@ export const useAddPreviewStore = create<AddPreviewStore>((set) => ({
   reset: () => set({ preview: INITIAL_PREVIEW }),
 }));
 
+type Update = UpdateCompanyInfosData &
+  Partial<UpdateCompanyMediaData> & { logoUrl?: string; galleryUrls?: string[] };
+
 type UpdatePreviewStore = {
-  preview: (UpdateCompanyInfosData & UpdateCompanyMediaData) | null;
-  setPreview: (preview: UpdateCompanyInfosData & UpdateCompanyMediaData) => void;
+  preview: Update | null;
+  setPreview: (preview: Update) => void;
+  revokeAll: () => void;
+  reset: () => void;
 };
 
 export const useUpdatePreviewStore = create<UpdatePreviewStore>((set) => ({
   preview: null,
   setPreview: (preview) => set({ preview }),
+  revokeAll: () =>
+    set((state) => {
+      if (state.preview?.logoUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(state.preview.logoUrl);
+        state.preview.logoUrl = undefined;
+      }
+
+      if (state.preview?.galleryUrls) {
+        for (const url of state.preview.galleryUrls) {
+          if (url.startsWith("blob:")) {
+            URL.revokeObjectURL(url);
+          }
+        }
+        state.preview.galleryUrls = [];
+      }
+
+      return state;
+    }),
+  reset: () => set({ preview: null }),
 }));

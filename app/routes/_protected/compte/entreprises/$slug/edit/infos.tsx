@@ -2,16 +2,20 @@ import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Command } from "cmdk";
+import { decode } from "decode-formdata";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Separator } from "~/components/ui/separator";
 import { useRef, useState } from "react";
+import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { UpdateCompanyInfosSchema } from "~/lib/validator/company.schema";
+import { useUpdatePreviewStore } from "~/stores/preview.store";
 import { cn } from "~/utils/cn";
 import { SocialMedias } from "../../-components/social-medias";
 
@@ -32,9 +36,11 @@ function RouteComponent() {
   const context = Route.useRouteContext();
   const params = Route.useParams();
   const navigate = Route.useNavigate();
+  const search = Route.useSearch();
   const { toast } = useToast();
 
   const formRef = useRef<HTMLFormElement>(null);
+  const { setPreview } = useUpdatePreviewStore();
   const [categories, company] = useSuspenseQueries({
     queries: [categoriesQueryOptions, companyBySlugQuery(params.slug)],
   });
@@ -72,6 +78,44 @@ function RouteComponent() {
 
   function onDescriptionChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setDescriptionLength(e.target.value.length);
+  }
+
+  function onPreview() {
+    const formData = new FormData(formRef.current as HTMLFormElement);
+    const decodedFormData = decode(formData, {
+      arrays: ["categories"],
+      booleans: ["rqth"],
+    });
+
+    const result = v.safeParse(UpdateCompanyInfosSchema, decodedFormData, {
+      abortPipeEarly: true,
+    });
+
+    if (!result.success) {
+      return toast({
+        description: (
+          <span>
+            {(result?.issues ?? []).map((issue, idx) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: preview validation list
+              <span key={idx}>{issue.message}</span>
+            ))}
+          </span>
+        ),
+        button: { label: "Fermer" },
+      });
+    }
+
+    setPreview({
+      ...result.output,
+      logoUrl: company.data?.logo?.secureUrl,
+      galleryUrls: company.data?.gallery?.map((image) => image.secureUrl) ?? [],
+    });
+
+    navigate({
+      to: "/compte/entreprises/$slug/edit/preview",
+      params: { slug: params.slug },
+      search,
+    });
   }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -369,6 +413,13 @@ function RouteComponent() {
           <Separator className="h-px bg-border my-4" />
 
           <div className="flex gap-2 justify-end">
+            <button
+              type="button"
+              className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs hover:bg-secondary/90"
+              onClick={onPreview}
+            >
+              Prévisualiser
+            </button>
             <button
               type="submit"
               className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs"

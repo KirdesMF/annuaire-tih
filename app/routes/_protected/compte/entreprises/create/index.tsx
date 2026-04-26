@@ -42,7 +42,7 @@ function RouteComponent() {
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
 
-  const { preview, setPreview, revokeAll } = useAddPreviewStore();
+  const { preview, setPreview, revokeAll, reset } = useAddPreviewStore();
   const { toast } = useToast();
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -170,6 +170,7 @@ function RouteComponent() {
             description: "Entreprise créée avec succès",
             button: { label: "Fermer" },
           });
+          reset();
           navigate({ to: "/compte/entreprises" });
         },
         onError: (error) => {
@@ -496,13 +497,13 @@ function RouteComponent() {
           <Separator className="h-px bg-border my-4" />
 
           <div className="flex gap-2 justify-end">
-            {/* <button
+            <button
               type="button"
               className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer hover:bg-secondary/90 transition-colors"
               onClick={onPreview}
             >
               Prévisualiser
-            </button> */}
+            </button>
 
             <button
               type="submit"

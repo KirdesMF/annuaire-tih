@@ -1,23 +1,12 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { Link, createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Globe, Mail, Phone } from "lucide-react";
-import { Separator } from "~/components/ui/separator";
-import { CompanyLogo } from "~/components/company-logo";
-import { CopyButton } from "~/components/copy-button";
-import { CalendlyIcon } from "~/components/icons/calendly";
-import { FacebookIcon } from "~/components/icons/facebook";
-import { InstagramIcon } from "~/components/icons/instagram";
-import { LinkedinIcon } from "~/components/icons/linkedin";
-import { SpotifyIcon } from "~/components/icons/spotify";
-import { TiktokIcon } from "~/components/icons/tiktok";
-import { TwitterIcon } from "~/components/icons/twitter";
-import { YoutubeIcon } from "~/components/icons/youtube";
+import { useEffect } from "react";
+import { CompanyPreview } from "~/routes/_protected/compte/entreprises/-components/company-preview";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
 import { useUpdatePreviewStore } from "~/stores/preview.store";
-import type { Entries } from "~/utils/types";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/preview")({
   component: RouteComponent,
@@ -36,80 +25,44 @@ export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/
   },
 });
 
-const WORK_MODES = {
-  remote: "À distance",
-  hybrid: "Hybride",
-  onsite: "Sur site",
-  not_specified: "Non spécifié",
-} as const;
-
-const SOCIAL_MEDIA_ICONS = {
-  facebook: <FacebookIcon className="size-5" />,
-  instagram: <InstagramIcon className="size-5" />,
-  linkedin: <LinkedinIcon className="size-5" />,
-  calendly: <CalendlyIcon className="size-5" />,
-  youtube: <YoutubeIcon className="size-5" />,
-  tiktok: <TiktokIcon className="size-5" />,
-  twitter: <TwitterIcon className="size-5" />,
-  spotify: <SpotifyIcon className="size-5" />,
-} as const;
-
 function RouteComponent() {
   const { toast } = useToast();
   const { queryClient } = Route.useRouteContext();
   const params = Route.useParams();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
-  const previewData = useUpdatePreviewStore((state) => state.preview);
+  const preview = useUpdatePreviewStore((state) => state.preview);
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
+  const { revokeAll, reset } = useUpdatePreviewStore();
 
   const { mutate, isPending } = useMutation({
     mutationFn: useServerFn(updateCompanyInfos),
   });
 
-  if (!previewData) {
+  useEffect(() => {
+    return () => {
+      revokeAll();
+    };
+  }, [revokeAll]);
+
+  if (!preview) {
     return null;
   }
 
-  const socialMedia = {
-    facebook: previewData.social_media?.facebook,
-    instagram: previewData.social_media?.instagram,
-    linkedin: previewData.social_media?.linkedin,
-    calendly: previewData.social_media?.calendly,
-  };
-
-  const isSocialMediaEmpty = Object.values(socialMedia).every((value) => value === "");
+  const previewData = preview;
 
   function onValidate() {
-    if (!previewData) {
-      return;
-    }
-
-    const preview = previewData;
     const formData = new FormData();
-    for (const [key, value] of Object.entries(preview)) {
+
+    for (const [key, value] of Object.entries(previewData)) {
       if (typeof value === "string") {
         formData.append(key, value);
       }
     }
 
-    for (const categoryId of preview.categories) {
+    for (const categoryId of previewData.categories) {
       formData.append("categories", categoryId);
     }
-
-    if (preview.logo) {
-      formData.append("logo", preview.logo);
-    }
-
-    if (preview.gallery) {
-      for (const image of preview.gallery) {
-        if (image) {
-          formData.append("gallery", image);
-        }
-      }
-    }
-
-    console.log(Object.fromEntries(formData.entries()));
 
     mutate(
       { data: formData },
@@ -121,6 +74,7 @@ function RouteComponent() {
           });
           queryClient.invalidateQueries({ queryKey: ["user", "companies"] });
           queryClient.invalidateQueries({ queryKey: ["company", params.slug] });
+          reset();
           navigate({ to: "/compte/entreprises" });
         },
       },
@@ -128,153 +82,19 @@ function RouteComponent() {
   }
 
   return (
-    <main className="px-4 py-8 grid gap-4">
-      <Link
-        to="/compte/entreprises/$slug/edit/infos"
-        params={{ slug: params.slug }}
-        search={search}
-        className="text-sm text-gray-500"
-      >
-        Retour
-      </Link>
-
-      <div className="container flex justify-between gap-4 border border-border p-6 rounded-sm">
-        <div className="flex flex-col gap-2">
-          <CompanyLogo
-            url={previewData.logo ? URL.createObjectURL(previewData.logo) : undefined}
-            name={previewData.name ?? ""}
-            size="lg"
-          />
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">{previewData.name}</h1>
-            <CopyButton>{previewData.siret}</CopyButton>
-          </div>
-
-          {previewData.categories?.length ? (
-            <ul className="flex flex-wrap gap-2">
-              {previewData.categories?.map((categoryId) => {
-                const category = categories.find((category) => category.id === categoryId);
-                if (!category) return null;
-                return (
-                  <li
-                    key={category.id}
-                    className="bg-secondary text-secondary-foreground px-2 py-1 rounded-sm text-xs"
-                  >
-                    <span className="max-w-[30ch] truncate">{category.name}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="container flex gap-2">
-        <div className="flex-1 flex flex-col justify-center gap-4 border border-gray-300 p-6 rounded-sm">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Mail className="size-5" />
-              <p className="text-xs text-gray-500">{previewData.email || "Non renseigné"}</p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Phone className="size-5" />
-              <p className="text-xs text-gray-500">{previewData.phone || "Non renseigné"}</p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Globe className="size-5" />
-              {previewData.website ? (
-                <a
-                  href={previewData.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-gray-500"
-                >
-                  {previewData.website}
-                </a>
-              ) : (
-                <span className="text-xs text-gray-500">Non renseigné</span>
-              )}
-            </div>
-          </div>
-
-          {!isSocialMediaEmpty ? (
-            <ul className="flex gap-2">
-              {(Object.entries(socialMedia) as Entries<typeof socialMedia>).map(([key, value]) => (
-                <li key={key}>
-                  <a href={value} target="_blank" rel="noopener noreferrer">
-                    {SOCIAL_MEDIA_ICONS[key]}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : null}
-        </div>
-
-        <div className="flex-1 border border-border p-6 rounded-sm flex flex-col gap-2">
-          <p className="text-sm">
-            <span className="font-bold">Entrepreneur:</span>{" "}
-            {previewData.business_owner || "Non renseigné"}
-          </p>
-          <p className="text-sm">
-            <span className="font-bold">Zone géographique:</span>{" "}
-            {previewData.service_area || "Non renseigné"}
-          </p>
-          <p className="text-sm">
-            <span className="font-bold">Mode de travail:</span>{" "}
-            {WORK_MODES[previewData.work_mode ?? "not_specified"]}
-          </p>
-          <p className="text-sm">
-            <span className="font-bold">RQTH:</span> {previewData.rqth ? "Oui" : "Non"}
-          </p>
-          <p className="text-sm">
-            <span className="font-bold">Sous domaine:</span>{" "}
-            {previewData.subdomain || "Non renseigné"}
-          </p>
-        </div>
-      </div>
-
-      <div className="container border border-border p-6 rounded-sm grid gap-4">
-        <div className="flex flex-col gap-2">
-          <h2 className="text-lg font-bold">Description</h2>
-          <p className="text-sm text-pretty">{previewData.description || "Non renseigné"}</p>
-        </div>
-
-        {previewData.gallery?.length ? (
-          <>
-            <Separator className="h-px bg-border my-4" />
-
-            <ul className="flex flex-wrap gap-2">
-              {previewData.gallery.map((image, index) => (
-                // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                <li key={index}>
-                  <img
-                    src={
-                      previewData.gallery?.[index]
-                        ? URL.createObjectURL(previewData.gallery?.[index])
-                        : undefined
-                    }
-                    alt={previewData.name}
-                    className="size-16 aspect-square rounded-sm"
-                  />
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : null}
-      </div>
-
-      <div className="container flex justify-end gap-2">
-        <button
-          type="submit"
-          className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs"
-          onClick={onValidate}
-          disabled={isPending}
-        >
-          {isPending ? "Validation en cours..." : "Valider"}
-        </button>
-      </div>
-    </main>
+    <CompanyPreview
+      title="Prévisualisation avant mise à jour"
+      backTo="/compte/entreprises/$slug/edit/infos"
+      backParams={{ slug: params.slug }}
+      backSearch={search}
+      submitLabel="Valider"
+      pendingLabel="Validation en cours..."
+      isPending={isPending}
+      onConfirm={onValidate}
+      preview={previewData}
+      categories={categories}
+      logoUrl={previewData.logoUrl}
+      galleryUrls={previewData.galleryUrls}
+    />
   );
 }
