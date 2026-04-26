@@ -33,7 +33,7 @@ Create branches in this order, each one built on last merged phase so conflict s
 6. `chore/v2-seo-sitemap` → SEO meta, dynamic sitemap, robots, accessibility baseline, after public routes are stable.
 7. `chore/v2-feature-phase` → a11y tool, preview company page during register/update, profile picture.
 8. `chore/v2-app-ui-refresh` → full app UI refresh aligned with new design: replace images/logo assets and review/update all pages beyond token changes.
-9. `chore/v2-analytics-dashboard` → add traffic custom events and web analytics surfaced in dashboard, after full app UI refresh settles.
+9. `chore/v2-analytics-dashboard` → analytics audit/design first, then later add traffic custom events and web analytics surfaced in dashboard, after full app UI refresh settles.
 10. `chore/v2-vertical-refactor` → domain re-org / colocation pass, only after UI + SEO work settle.
 11. `chore/v2-improvement-audit` → infra/provider decisions and form flow audit at end.
 
@@ -51,10 +51,11 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - **PR 9**: public/auth-page a11y pass + optional a11y tooling; company create/update form a11y deferred to feature/form improvement phase.
 - **PR 10**: feature phase: preview company page, profile picture, a11y tool.
 - **PR 11**: full app UI refresh phase: replace images/logo assets and review/update all pages to match new design, not tokens only.
-- **PR 12**: analytics/dashboard phase: traffic custom events + web analytics surfaced in dashboard.
-- **PR 13**: vertical codebase refactor, domain by domain.
-- **PR 14**: improvement audit: Supabase vs Cloudflare D1, Cloudinary vs Cloudflare R2, register/update form flow.
-- **PR 15**: dependency cleanup + final build/lint/typecheck.
+- **PR 12**: analytics/dashboard audit + design phase: define events, provider/storage direction, KPI scope, and dashboard slice plan. No analytics implementation yet.
+- **PR 13**: analytics implementation phase: traffic custom events + web analytics surfaced in dashboard.
+- **PR 14**: vertical codebase refactor, domain by domain.
+- **PR 15**: improvement audit: Supabase vs Cloudflare D1, Cloudinary vs Cloudflare R2, register/update form flow.
+- **PR 16**: dependency cleanup + final build/lint/typecheck.
 
 ## 5. Files likely involved
 ### Core shell / theme / global style
@@ -213,25 +214,32 @@ Rule: do not start next branch before previous phase is merged or at least stabi
    - go beyond token changes: real screen/layout/component modifications and presentation updates
    - stabilize refreshed app UI before analytics work lands
 
-15. **Analytics/dashboard phase**
-   - surface analytics in dashboard after full app UI refresh settles
+15. **Analytics/dashboard audit phase**
+   - inspect current dashboard and data flow
+   - define tracked event list and privacy-safe payload shape
+   - decide provider/storage direction before implementation
+   - define smallest KPI/dashboard slice
+   - no analytics runtime implementation yet
+
+16. **Analytics/dashboard implementation phase**
+   - surface analytics in dashboard after audit/design settles
    - add traffic custom events so dashboard can expose web analytics
    - build analytics on top of refreshed dashboard UI
 
-16. **Refactor toward vertical codebase**
+17. **Refactor toward vertical codebase**
    - regroup code by domain / ownership, not by technical type
    - co-locate route-specific data, UI, and helpers near routes/domains they serve
    - keep truly generic UI in a reusable design-system area
    - keep shared business logic in a shared area, infrastructure separate
    - move in small batches with import fixes and test coverage after each batch
 
-17. **Improvement audit at end**
+18. **Improvement audit at end**
    - compare Supabase vs Cloudflare D1
    - compare Cloudinary vs Cloudflare R2
    - review register/update form flow and data model
    - only decide here after main UI/SEO/feature work settled
 
-18. **Verification and cleanup**
+19. **Verification and cleanup**
    - run typecheck, lint, build
    - test public routes, auth flows, search, dialogs, mobile nav, theme toggle
    - confirm sitemap/robots response content
