@@ -97,11 +97,13 @@ function RouteComponent() {
           <div className="flex flex-col gap-1">
             <Label htmlFor="email">Email *</Label>
             <div className="relative">
-              <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" aria-hidden />
               <Input
                 type="email"
                 name="email"
                 id="email"
+                autoComplete="email"
+                required
                 placeholder="email@example.com"
                 className="ps-8"
               />
@@ -111,17 +113,21 @@ function RouteComponent() {
           <div className="flex flex-col gap-1">
             <Label htmlFor="password">Mot de passe *</Label>
             <div className="relative">
-              <LockKeyhole className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <LockKeyhole className="size-4 text-muted-foreground absolute start-2 top-2.5" aria-hidden />
               <Input
                 type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
+                autoComplete="current-password"
+                required
                 placeholder="••••••••••••••••"
                 className="ps-8"
               />
               <button
                 type="button"
-                className="absolute end-2 top-2.5"
+                className="absolute end-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                aria-pressed={showPassword}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -145,7 +151,10 @@ function RouteComponent() {
             disabled={isPending}
           >
             {isPending ? (
-              <LoaderCircle className="size-5 animate-spin" />
+              <>
+                <LoaderCircle className="size-5 animate-spin" aria-hidden />
+                <span className="sr-only">Connexion en cours</span>
+              </>
             ) : (
               <span>Se connecter</span>
             )}

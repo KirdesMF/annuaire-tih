@@ -46,7 +46,7 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - **PR 6**: shadcn/Base UI migration slice 2: select, drawer/sheet, accordion, command, toast/forms.
 - **PR 7**: replace custom markup with shadcn patterns: Card, FieldGroup/Field, Alert, Empty, Badge, Skeleton where applicable.
 - **PR 8**: SEO/meta + dynamic sitemap + robots.
-- **PR 9**: public-page a11y pass + optional a11y tooling.
+- **PR 9**: public/auth-page a11y pass + optional a11y tooling; company create/update form a11y deferred to feature/form improvement phase.
 - **PR 10**: feature phase: preview company page, profile picture, a11y tool.
 - **PR 11**: vertical codebase refactor, domain by domain.
 - **PR 12**: improvement audit: Supabase vs Cloudflare D1, Cloudinary vs Cloudflare R2, register/update form flow.
@@ -180,12 +180,13 @@ Rule: do not start next branch before previous phase is merged or at least stabi
    - keep packages only if still referenced by production code
    - re-run build/lint after each removal
 
-11. **SEO baseline pass**
+11. **SEO and accessibility baseline pass**
    - add strong metadata to root and public routes: title, description, canonical, OG/Twitter if useful
    - note follow-up: improve category route SEO by replacing `?id=&name=` search-param dependency with canonical slug-based data loading, so `/categories/$slug` can generate dynamic title/description from category data safely
    - ensure heading hierarchy, landmark structure, meaningful alt text, and no empty labels
    - review focus states, skip paths, and keyboard access
-   - fix obvious accessibility gaps on public pages first
+   - fix obvious accessibility gaps on public and auth pages first
+   - defer company create/update form accessibility details to the feature/form improvement phase where those forms will be redesigned
 
 12. **Add dynamic sitemap**
    - expose public static URLs

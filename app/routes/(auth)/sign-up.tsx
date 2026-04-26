@@ -158,38 +158,65 @@ function RouteComponent() {
 
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
           <div className="grid gap-4">
-            <Label className="flex flex-col gap-1">
+            <Label className="flex flex-col gap-1" htmlFor="lastName">
               <span>Nom*</span>
-              <Input name="lastName" type="text" placeholder="Entrez votre nom" />
+              <Input
+                id="lastName"
+                name="lastName"
+                type="text"
+                autoComplete="family-name"
+                required
+                placeholder="Entrez votre nom"
+              />
             </Label>
 
-            <Label className="flex flex-col gap-1">
+            <Label className="flex flex-col gap-1" htmlFor="firstName">
               <span>Prénom*</span>
-              <Input name="firstName" type="text" placeholder="Entrez votre prénom" />
+              <Input
+                id="firstName"
+                name="firstName"
+                type="text"
+                autoComplete="given-name"
+                required
+                placeholder="Entrez votre prénom"
+              />
             </Label>
 
-            <Label className="flex flex-col gap-1">
+            <Label className="flex flex-col gap-1" htmlFor="signup-email">
               <span>Email*</span>
               <div className="relative">
-                <Mail className="absolute start-2 top-2.5 size-4 text-muted-foreground" />
-                <Input name="email" type="email" placeholder="exemple@email.com" className="ps-8" />
+                <Mail className="absolute start-2 top-2.5 size-4 text-muted-foreground" aria-hidden />
+                <Input
+                  id="signup-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  placeholder="exemple@email.com"
+                  className="ps-8"
+                />
               </div>
             </Label>
 
-            <Label className="flex flex-col gap-1">
+            <Label className="flex flex-col gap-1" htmlFor="signup-password">
               <span>Mot de passe*</span>
               <div className="relative">
-                <Lock className="absolute start-2 top-2.5 size-4 text-muted-foreground" />
+                <Lock className="absolute start-2 top-2.5 size-4 text-muted-foreground" aria-hidden />
                 <Input
+                  id="signup-password"
                   name="password"
                   type={showPassword.password ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
                   placeholder="••••••••••••••••"
                   className="ps-8"
                 />
                 <button
                   type="button"
-                  tabIndex={-1}
-                  className="absolute end-2 top-2.5"
+                  className="absolute end-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-label={showPassword.password ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                  aria-pressed={showPassword.password}
                   onClick={() =>
                     setShowPassword({ ...showPassword, password: !showPassword.password })
                   }
@@ -203,20 +230,29 @@ function RouteComponent() {
               </div>
             </Label>
 
-            <Label className="flex flex-col gap-1">
+            <Label className="flex flex-col gap-1" htmlFor="confirmPassword">
               <span>Confirmation du mot de passe*</span>
               <div className="relative">
-                <Lock className="absolute start-2 top-2.5 size-4 text-muted-foreground" />
+                <Lock className="absolute start-2 top-2.5 size-4 text-muted-foreground" aria-hidden />
                 <Input
+                  id="confirmPassword"
                   name="confirmPassword"
                   type={showPassword.confirmPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  minLength={8}
                   placeholder="••••••••••••••••"
                   className="ps-8"
                 />
                 <button
                   type="button"
-                  tabIndex={-1}
-                  className="absolute end-2 top-2.5"
+                  className="absolute end-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-label={
+                    showPassword.confirmPassword
+                      ? "Masquer la confirmation du mot de passe"
+                      : "Afficher la confirmation du mot de passe"
+                  }
+                  aria-pressed={showPassword.confirmPassword}
                   onClick={() =>
                     setShowPassword({
                       ...showPassword,
@@ -233,8 +269,8 @@ function RouteComponent() {
               </div>
             </Label>
 
-            <Label className="flex gap-2 items-center">
-              <input name="cgu" type="checkbox" className="accent-primary" />
+            <Label className="flex gap-2 items-center" htmlFor="cgu">
+              <input id="cgu" name="cgu" type="checkbox" required className="accent-primary" />
               <span className="text-xs">
                 Je reconnais avoir pris connaissance et j'accepte les{" "}
                 <Link to="/cgu" className="text-blue-500 underline">

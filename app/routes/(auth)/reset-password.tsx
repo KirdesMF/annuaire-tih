@@ -73,19 +73,25 @@ function RouteComponent() {
         <h1 className="text-2xl font-bold mb-6 tracking-tighter">Réinitialiser le mot de passe</h1>
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
           <input type="hidden" name="token" value={searchParams.token} />
-          <Label className="flex flex-col gap-2">
+          <Label className="flex flex-col gap-2" htmlFor="newPassword">
             <span>Nouveau mot de passe *</span>
             <div className="relative">
-              <Lock className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+              <Lock className="size-4 text-muted-foreground absolute start-2 top-2.5" aria-hidden />
               <Input
+                id="newPassword"
                 type={showPassword ? "text" : "password"}
                 name="newPassword"
+                autoComplete="new-password"
+                required
+                minLength={8}
                 placeholder="••••••••••••••••"
                 className="ps-8"
               />
               <button
                 type="button"
-                className="absolute end-2 top-2.5"
+                className="absolute end-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                aria-pressed={showPassword}
                 onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
@@ -102,7 +108,14 @@ function RouteComponent() {
             className="border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors p-2 rounded-sm font-medium text-sm inline-flex items-center justify-center gap-2"
             disabled={isPending}
           >
-            {isPending ? <Loader className="size-4 animate-spin" /> : "Réinitialiser"}
+            {isPending ? (
+              <>
+                <Loader className="size-4 animate-spin" aria-hidden />
+                <span className="sr-only">Réinitialisation en cours</span>
+              </>
+            ) : (
+              "Réinitialiser"
+            )}
           </button>
         </form>
       </div>
