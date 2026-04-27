@@ -1,9 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import type { User } from "better-auth";
-import { Loader, Lock, Mail, MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Camera, Loader, Lock, Mail, MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import { InputFile } from "~/components/input-file";
 import { Separator } from "~/components/ui/separator";
 import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
@@ -198,6 +196,15 @@ function RouteComponent() {
                   name="avatar"
                   accept="image/png,image/jpeg,image/jpg,image/webp"
                   onChange={onAvatarChange}
+                  previewClassName="object-cover"
+                  overlay={
+                    <div className="flex h-full flex-col items-center justify-end bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 text-white opacity-100 transition-opacity md:opacity-0 md:group-hover/input-file:opacity-100 md:group-focus-within/input-file:opacity-100">
+                      <div className="inline-flex items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 text-[11px] font-medium backdrop-blur-sm">
+                        <Camera className="size-3.5" />
+                        <span>Changer photo</span>
+                      </div>
+                    </div>
+                  }
                 />
               </div>
             </div>
@@ -486,26 +493,3 @@ function RouteComponent() {
   );
 }
 
-function AvatarUser({ user }: { user: User }) {
-  if (!user) return null;
-
-  const initials = user.name
-    ?.split(" ")
-    .map((name) => name[0])
-    .join("");
-
-  if (user.image) {
-    return (
-      <Avatar size="lg">
-        <AvatarImage src={user.image} alt={user.name} />
-        <AvatarFallback>{initials}</AvatarFallback>
-      </Avatar>
-    );
-  }
-
-  return (
-    <Avatar size="lg">
-      <AvatarFallback>{initials}</AvatarFallback>
-    </Avatar>
-  );
-}
