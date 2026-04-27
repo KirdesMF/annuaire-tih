@@ -54,7 +54,7 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - **PR 12**: analytics/dashboard audit + design phase: define events, provider/storage direction, KPI scope, and dashboard slice plan. No analytics implementation yet.
 - **PR 13**: analytics implementation phase: traffic custom events + web analytics surfaced in dashboard.
 - **PR 14**: vertical codebase refactor, domain by domain.
-- **PR 15**: improvement audit: Supabase vs Cloudflare D1, Cloudinary vs Cloudflare R2, register/update form flow.
+- **PR 15**: improvement audit: Supabase vs Cloudflare D1, Cloudinary vs Cloudflare R2, register/update form flow, and public search/filter data model (including future region filter).
 - **PR 16**: dependency cleanup + final build/lint/typecheck.
 
 ## 5. Files likely involved
@@ -100,6 +100,7 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - `app/routes/(public)/categories/$slug.tsx`
 - `app/routes/(public)/entreprises/$slug.tsx`
 - `app/routes/(auth)/*` only if global meta / accessibility patterns are shared
+- future public search/filter follow-up likely touches homepage/public search UI and company search queries
 
 ### Data sources for sitemap
 - `app/lib/api/categories/queries/get-categories.ts`
@@ -107,6 +108,13 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - `app/lib/api/companies/queries/get-company-by-slug.ts`
 - `app/db/schema/categories.ts`
 - `app/db/schema/companies.ts`
+
+### Future public search/filter follow-up
+- `app/routes/index.tsx`
+- `app/lib/api/companies/queries/get-companies-by-term.ts`
+- `app/lib/api/companies/queries/get-companies.ts`
+- `app/db/schema/companies.ts`
+- company create/update forms where structured `region` choice may replace or complement current area field
 
 ### Refactor / vertical codebase phase
 - `app/components/*` when regrouping by domain or by true shared UI
@@ -237,6 +245,9 @@ Rule: do not start next branch before previous phase is merged or at least stabi
    - compare Supabase vs Cloudflare D1
    - compare Cloudinary vs Cloudflare R2
    - review register/update form flow and data model
+   - review public search improvements, especially structured filters for companies
+   - plan future company `region` field from controlled list so public search can filter by area/region
+   - decide whether current free-text `service_area` field stays as complementary info or should be replaced/migrated toward structured region data
    - only decide here after main UI/SEO/feature work settled
 
 19. **Verification and cleanup**
