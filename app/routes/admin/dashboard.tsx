@@ -21,6 +21,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip
 import { isValidRole, type UserRole } from "~/db/schema/auth";
 import { isValidCompanyStatus, type Company, type CompanyStatus } from "~/db/schema/companies";
 import { updateUserRoleFn } from "~/lib/api/admin/mutations/update-user-role";
+import { dashboardAnalyticsQuery } from "~/lib/api/analytics/queries/get-dashboard-analytics";
 import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
 import { updateCompanyStatus } from "~/lib/api/companies/mutations/update-company-status";
 import { companiesQuery } from "~/lib/api/companies/queries/get-companies";
@@ -48,6 +49,7 @@ export const Route = createFileRoute("/admin/dashboard")({
     await Promise.all([
       context.queryClient.prefetchQuery(companiesQuery()),
       context.queryClient.prefetchQuery(usersQuery),
+      context.queryClient.prefetchQuery(dashboardAnalyticsQuery),
     ]);
   },
 });
@@ -81,6 +83,7 @@ function RouteComponent() {
   const navigate = useNavigate({ from: Route.fullPath });
   const { data: companies = [] } = useSuspenseQuery(companiesQuery());
   const { data: allUsers = [] } = useSuspenseQuery(usersQuery);
+  const { data: analytics } = useSuspenseQuery(dashboardAnalyticsQuery);
   const deferredQuery = useDeferredValue(search.q);
 
   const {
@@ -261,7 +264,19 @@ function RouteComponent() {
             </div>
           </section>
 
-          <section className="grid gap-px overflow-hidden rounded-sm border border-black/10 bg-black/10 md:grid-cols-2 xl:grid-cols-5 dark:border-white/10 dark:bg-white/10">
+          <section className="grid gap-px overflow-hidden rounded-sm border border-black/10 bg-black/10 md:grid-cols-2 xl:grid-cols-7 dark:border-white/10 dark:bg-white/10">
+            <MetricCard
+              icon={<ArrowUpRight className="size-4" />}
+              label="Vues publiques"
+              value={analytics.totalEvents}
+              hint={`${analytics.companyViews} vues entreprise, ${analytics.categoryClicks} clics categorie`}
+            />
+            <MetricCard
+              icon={<Users className="size-4" />}
+              label="Visiteurs uniques"
+              value={analytics.uniqueVisitors}
+              hint={`${analytics.signupClicks} clics inscription, ${analytics.websiteClicks} clics site`}
+            />
             <MetricCard
               icon={<Building2 className="size-4" />}
               label="Entreprises"
