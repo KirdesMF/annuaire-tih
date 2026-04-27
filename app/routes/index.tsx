@@ -35,9 +35,6 @@ import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-
 import { companiesQuery } from "~/lib/api/companies/queries/get-companies";
 import { seo } from "~/lib/seo";
 import { slugify } from "~/utils/slug";
-import { useServerFn } from "@tanstack/react-start";
-import { trackAnalyticsEvent } from "~/lib/api/analytics/mutations/track-analytics-event";
-import { createTrackedEvent } from "~/lib/analytics";
 
 export const Route = createFileRoute("/")({
   head: () => seo(),
@@ -56,7 +53,6 @@ function Home() {
     select: (data) => data.sort((a, b) => a.name.localeCompare(b.name)),
   });
   const { data: allCompanies } = useSuspenseQuery(companiesQuery());
-  const trackEvent = useServerFn(trackAnalyticsEvent);
   const navigate = Route.useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
@@ -64,25 +60,6 @@ function Home() {
 
   function onNavigate(path: string, slug: string) {
     navigate({ to: path, params: { slug } });
-  }
-
-  function onTrackSignupClick(source: string) {
-    void trackEvent({
-      data: createTrackedEvent({
-        name: "signup_cta_clicked",
-        source,
-      }),
-    });
-  }
-
-  function onTrackCategoryClick(categorySlug: string) {
-    void trackEvent({
-      data: createTrackedEvent({
-        name: "category_clicked",
-        categorySlug,
-        source: "homepage_category_list",
-      }),
-    });
   }
 
   return (
@@ -108,7 +85,6 @@ function Home() {
           <div className="flex gap-4">
             <Link
               to="/sign-up"
-              onClick={() => onTrackSignupClick("homepage_hero")}
               className="text-xs px-4 py-2 bg-primary/75 ring-1 ring-primary/90 text-primary-foreground shadow-md rounded-sm flex items-center gap-2 text-nowrap focus:outline-primary focus:outline-2"
             >
               Référencer mon entreprise
@@ -224,7 +200,6 @@ function Home() {
                   to="/categories/$slug"
                   params={{ slug: slugify(category.name) }}
                   search={{ id: category.id, name: category.name }}
-                  onClick={() => onTrackCategoryClick(slugify(category.name))}
                   className="text-sm px-4 py-1.5 bg-accent text-accent-foreground rounded-sm flex text-nowrap outline-none focus:ring-primary focus:ring-2"
                 >
                   {category.name}
@@ -275,7 +250,6 @@ function Home() {
               </div>
               <Link
                 to="/sign-up"
-                onClick={() => onTrackSignupClick("homepage_entrepreneur_card")}
                 className="w-fit text-xs px-4 py-2 bg-primary/75 ring-1 ring-primary/90 text-primary-foreground shadow-md rounded-sm flex items-center gap-2 text-nowrap focus:outline-primary focus:outline-2"
               >
                 Créer un compte
