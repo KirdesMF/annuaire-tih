@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { ChevronLeftIcon, ChevronRightIcon, Globe, Mail, PencilLine, Phone } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
@@ -20,6 +21,8 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { trackAnalyticsEvent } from "~/lib/api/analytics/mutations/track-analytics-event";
+import { createTrackedEvent } from "~/lib/analytics";
 import { seo } from "~/lib/seo";
 import { cn } from "~/utils/cn";
 import { slugify } from "~/utils/slug";
@@ -72,6 +75,7 @@ const SOCIAL_MEDIA_LABELS = {
 function RouteComponent() {
   const params = Route.useParams();
   const context = Route.useRouteContext();
+  const trackEvent = useServerFn(trackAnalyticsEvent);
   const { data } = useSuspenseQuery(companyBySlugQuery(params.slug));
 
   if (!data) return <div>Company not found</div>;
@@ -80,6 +84,25 @@ function RouteComponent() {
 
   const isOwner = context.user?.id === data.user_id;
   const isAdmin = context.user?.role === "admin";
+
+  useEffect(() => {
+    void trackEvent({
+      data: createTrackedEvent({
+        name: "company_viewed",
+        companySlug: params.slug,
+      }),
+    });
+  }, [params.slug, trackEvent]);
+
+  function onTrackWebsiteClick() {
+    void trackEvent({
+      data: createTrackedEvent({
+        name: "company_website_clicked",
+        companySlug: params.slug,
+        source: "company_public_page",
+      }),
+    });
+  }
 
   return (
     <main className="px-4 py-8">
@@ -174,6 +197,7 @@ function RouteComponent() {
                     href={data.website}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={onTrackWebsiteClick}
                     className="text-xs text-nowrap"
                   >
                     {data.website}

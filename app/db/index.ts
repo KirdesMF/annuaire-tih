@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import * as analyticsSchema from "./schema/analytics";
 import * as authSchema from "./schema/auth";
 import * as categoriesSchema from "./schema/categories";
 import * as cguSchema from "./schema/cgu";
@@ -9,6 +10,7 @@ import * as companyCategoriesSchema from "./schema/company-categories";
 let _client: postgres.Sql | undefined;
 
 const schema = {
+  ...analyticsSchema,
   ...authSchema,
   ...cguSchema,
   ...companyCategoriesSchema,
