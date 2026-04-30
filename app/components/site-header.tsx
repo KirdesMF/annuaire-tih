@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Monitor, Moon, SearchIcon, Sun } from "lucide-react";
-import { Button } from "~/components/ui/button";
 import { useEffect, useState } from "react";
+import logo from "~/assets/img/Logo vecto_png.png?url";
 import { MainNav } from "~/components/main-nav";
 import { MenuUser } from "~/components/menu-user";
 import { MobileNav } from "~/components/mobile-nav";
+import { Button } from "~/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -54,66 +55,76 @@ export function SiteHeader({ user }: { user: AuthUser | undefined }) {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 flex h-16 w-full items-center border-b border-border bg-background/85 px-4 py-3 backdrop-blur-md md:px-8">
-      <div className="flex flex-1 items-center justify-between gap-3">
-        <MainNav />
-        <MobileNav />
+    <header className="sticky top-0 z-50 w-full bg-secondary text-secondary-foreground">
+      <div className="flex h-20 items-stretch justify-between gap-4 px-4 md:h-24 md:px-10 lg:px-20">
+        <div className="flex items-stretch gap-5">
+          <Link
+            to="/"
+            className="flex shrink-0 items-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            aria-label="Accueil Annuaire TIH"
+          >
+            <img src={logo} alt="Annuaire TIH" className="h-14 w-auto md:h-20" />
+          </Link>
+          <MainNav />
+          <MobileNav />
+        </div>
 
-        <div className="flex-1 md:flex-none flex items-center gap-3">
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger
-              render={
-                <button
-                  type="button"
-                  aria-label="Ouvrir la recherche"
-                  className="flex h-8 w-full items-center gap-2 text-nowrap rounded-lg border border-input px-2.5 text-xs font-light shadow-2xs outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:w-auto"
-                />
-              }
-            >
-              <SearchIcon className="size-4 text-muted-foreground" />
-              <span className="hidden lg:block">Rechercher un nom ou une activité...</span>
-              <span className="block lg:hidden">Rechercher...</span>
-              <kbd className="pointer-events-none hidden gap-1 rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs lg:flex">
-                <span>⌘</span>
-                <span>K</span>
-              </kbd>
-            </DialogTrigger>
-
-            <DialogContent>
-              <DialogTitle className="sr-only">Rechercher une entreprise</DialogTitle>
-              <Command shouldFilter={false} className="py-2">
-                <CommandInput
-                  value={searchTerm}
-                  onValueChange={setSearchTerm}
-                  placeholder="Entrez un nom ou une activité..."
-                />
-
-                <CommandSeparator alwaysRender />
-
-                <CommandList>
-                  {!searchTerm && <CommandEmpty>Entrez au moins 3 caractères...</CommandEmpty>}
-                  {searchTerm && isFetching && <CommandLoading>Loading...</CommandLoading>}
-                  {searchTerm.length >= 3 && !isFetching && (
-                    <CommandEmpty>Aucune entreprise trouvée</CommandEmpty>
-                  )}
-
-                  {companies?.map((company) => (
-                    <CommandItem
-                      key={company.id}
-                      onSelect={() => onNavigate("/entreprises/$slug", company.slug)}
-                    >
-                      {company.name}
-                    </CommandItem>
-                  ))}
-                </CommandList>
-              </Command>
-            </DialogContent>
-          </Dialog>
-
+        <div className="flex items-center gap-4">
           <RegisterLink user={user} />
           <LoginButton user={user} />
           {user ? <MenuUser user={user} /> : <ThemeToggle />}
         </div>
+      </div>
+
+      <div className="flex justify-center bg-muted px-4 py-4 md:py-8">
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger
+            render={
+              <button
+                type="button"
+                aria-label="Ouvrir la recherche"
+                className="flex h-12 w-full max-w-xl items-center gap-4 bg-input px-3 text-start text-lg font-light text-foreground shadow-2xs outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50"
+              />
+            }
+          >
+            <SearchIcon className="size-9 shrink-0 text-foreground" strokeWidth={1.8} />
+            <span>Rechercher un nom ou une activité</span>
+            <kbd className="pointer-events-none ml-auto hidden gap-1 bg-muted px-1.5 py-0.5 font-mono text-xs lg:flex">
+              <span>⌘</span>
+              <span>K</span>
+            </kbd>
+          </DialogTrigger>
+
+          <DialogContent>
+            <DialogTitle className="sr-only">Rechercher une entreprise</DialogTitle>
+            <Command shouldFilter={false} className="py-2">
+              <CommandInput
+                value={searchTerm}
+                onValueChange={setSearchTerm}
+                placeholder="Entrez un nom ou une activité..."
+              />
+
+              <CommandSeparator alwaysRender />
+
+              <CommandList>
+                {!searchTerm && <CommandEmpty>Entrez au moins 3 caractères...</CommandEmpty>}
+                {searchTerm && isFetching && <CommandLoading>Loading...</CommandLoading>}
+                {searchTerm.length >= 3 && !isFetching && (
+                  <CommandEmpty>Aucune entreprise trouvée</CommandEmpty>
+                )}
+
+                {companies?.map((company) => (
+                  <CommandItem
+                    key={company.id}
+                    onSelect={() => onNavigate("/entreprises/$slug", company.slug)}
+                  >
+                    {company.name}
+                  </CommandItem>
+                ))}
+              </CommandList>
+            </Command>
+          </DialogContent>
+        </Dialog>
       </div>
     </header>
   );
@@ -123,7 +134,7 @@ function RegisterLink({ user }: { user: AuthUser | undefined }) {
   return (
     <Link
       to={user ? "/compte/entreprises/create" : "/sign-up"}
-      className="hidden h-8 items-center text-nowrap rounded-lg border border-border px-2.5 text-xs transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
+      className="hidden h-12 items-center bg-card px-8 text-nowrap text-lg text-card-foreground transition-colors hover:bg-card/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
     >
       Se référencer
     </Link>
@@ -136,7 +147,7 @@ function LoginButton({ user }: { user: AuthUser | undefined }) {
   return (
     <Link
       to="/sign-in"
-      className="hidden h-8 items-center text-nowrap rounded-lg bg-primary px-2.5 text-xs text-primary-foreground transition-colors hover:bg-primary/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
+      className="hidden h-12 items-center bg-card px-8 text-nowrap text-lg text-card-foreground transition-colors hover:bg-card/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
     >
       Se connecter
     </Link>
@@ -156,8 +167,17 @@ function ThemeToggle() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button type="button" variant="outline" size="icon" />}>
-        <TriggerIcon data-icon="inline-start" />
+      <DropdownMenuTrigger
+        render={
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="size-12 border-0 bg-card text-card-foreground hover:bg-card/90"
+          />
+        }
+      >
+        <TriggerIcon data-icon="inline-start" className="size-7" />
         <span className="sr-only">Modifier le thème</span>
       </DropdownMenuTrigger>
 

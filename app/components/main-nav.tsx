@@ -1,8 +1,8 @@
 import { Link, linkOptions } from "@tanstack/react-router";
 
 const LINKS = linkOptions([
-  { label: "Qui sommes-nous ?", to: "/about" },
-  { label: "Partenaires ", to: "/partners" },
+  { label: "À propos", to: "/about" },
+  { label: "Partenaires", to: "/partners" },
   { label: "Sources", to: "/sources" },
   { label: "FAQ", to: "/faq" },
 ]);
@@ -10,20 +10,13 @@ const LINKS = linkOptions([
 export function MainNav() {
   return (
     <nav className="hidden md:flex" aria-label="Navigation principale">
-      <ul className="flex items-center gap-1">
-        <li className="shrink-0">
-          <Link
-            to="/"
-            className="flex items-center justify-center rounded-md px-2 py-1 text-sm font-semibold tracking-tight transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            Annuaire TIH
-          </Link>
-        </li>
+      <ul className="flex items-stretch gap-0 self-stretch">
         {LINKS.map((link) => (
-          <li key={link.to}>
+          <li key={link.to} className="flex">
             <Link
               to={link.to}
-              className="rounded-md px-2 py-1 text-nowrap text-sm font-light transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[status=active]:font-bold data-[status=active]:text-primary"
+              activeOptions={{ exact: true }}
+              className="flex items-center px-5 text-nowrap text-sm font-extrabold uppercase tracking-tight transition-colors hover:bg-primary/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[status=active]:bg-primary lg:px-7 lg:text-base"
             >
               {link.label}
             </Link>

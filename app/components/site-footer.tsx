@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Separator } from "~/components/ui/separator";
 import img from "~/assets/img/FINDAJOB.jpg?url";
 import logoTIHM from "~/assets/img/logoTIHM.png?url";
+import { Separator } from "~/components/ui/separator";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-auto border-t border-border bg-card text-card-foreground">
+    <footer className="mt-auto border-t border-border bg-background text-foreground">
       <div className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-10 md:px-8 md:py-12">
         <div className="flex flex-col justify-between gap-8 md:flex-row">
           <ul className="flex flex-col gap-2 text-xs list-disc list-inside">
