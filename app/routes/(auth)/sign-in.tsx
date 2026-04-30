@@ -1,9 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
-import { Link, createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { EyeIcon, EyeOffIcon, LoaderCircle, LockKeyhole, LogIn, Mail } from "lucide-react";
+import { EyeIcon, EyeOffIcon, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import * as v from "valibot";
+import banner from "~/assets/img/banniere.png?url";
+import logo from "~/assets/img/Logo vecto_png.png?url";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
@@ -80,94 +82,100 @@ function RouteComponent() {
   }
 
   return (
-    <main className="min-h-[calc(100dvh-60px)] flex items-center justify-center px-4">
-      <div className="w-full max-w-md mx-auto border border-border bg-card text-card-foreground px-8 py-10 rounded-md shadow-xs">
-        <div className="flex items-center justify-center mb-6">
-          <div className="shadow-xs p-2 rounded-sm bg-card text-primary">
-            <LogIn className="size-8" aria-hidden />
+    <main className="bg-background text-foreground">
+      <section className="pt-16 text-center md:pt-24">
+        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pb-10 md:pb-12">
+          <img src={logo} alt="Annuaire TIH" className="mb-8 h-32 w-auto md:h-44" />
+          <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">Annuaire - TIH</h1>
+          <p className="mt-5 text-2xl font-light md:text-4xl">
+            Votre réseau de prestataires indépendants TIH*.
+          </p>
+        </div>
+
+        <img
+          src={banner}
+          alt="Illustration Annuaire TIH"
+          className="h-40 w-full object-cover object-center md:h-72"
+        />
+      </section>
+
+      <section className="px-6 py-20 md:py-24">
+        <div className="mx-auto w-full max-w-3xl bg-primary px-10 py-10 text-primary-foreground md:px-12">
+          <div className="mb-10 flex flex-col gap-6 text-center">
+            <h2 className="text-2xl font-extrabold uppercase tracking-tight">Bienvenue</h2>
+            <p className="text-sm">Connectez-vous pour accéder à votre compte.</p>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-1 mb-6">
-          <h1 className="text-2xl font-bold text-center">Bienvenue</h1>
-          <p className="text-sm text-center">Connectez-vous pour accéder à votre compte.</p>
-        </div>
-
-        <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-          <div className="flex flex-col gap-1">
-            <Label htmlFor="email">Email *</Label>
-            <div className="relative">
-              <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" aria-hidden />
+          <form className="mx-auto flex max-w-2xl flex-col gap-8" onSubmit={onSubmit}>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="email">Email *</Label>
               <Input
                 type="email"
                 name="email"
                 id="email"
                 autoComplete="email"
                 required
-                placeholder="email@example.com"
-                className="ps-8"
+                className="h-12 bg-input text-foreground"
               />
             </div>
-          </div>
 
-          <div className="flex flex-col gap-1">
-            <Label htmlFor="password">Mot de passe *</Label>
-            <div className="relative">
-              <LockKeyhole className="size-4 text-muted-foreground absolute start-2 top-2.5" aria-hidden />
-              <Input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                id="password"
-                autoComplete="current-password"
-                required
-                placeholder="••••••••••••••••"
-                className="ps-8"
-              />
-              <button
-                type="button"
-                className="absolute end-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-                aria-pressed={showPassword}
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeIcon className="size-4 text-muted-foreground" />
-                ) : (
-                  <EyeOffIcon className="size-4 text-muted-foreground" />
-                )}
-              </button>
+            <div className="flex flex-col gap-3">
+              <Label htmlFor="password">Mot de passe *</Label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  id="password"
+                  autoComplete="current-password"
+                  required
+                  className="h-12 bg-input pe-10 text-foreground"
+                />
+                <button
+                  type="button"
+                  className="absolute end-3 top-3 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                  aria-pressed={showPassword}
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeIcon className="size-5" aria-hidden="true" />
+                  ) : (
+                    <EyeOffIcon className="size-5" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+
+              <div className="flex justify-end">
+                <Link className="text-xs underline underline-offset-2" to="/forgot-password">
+                  Mot de passe oublié ?
+                </Link>
+              </div>
             </div>
 
-            <div className="flex justify-end mt-1">
-              <Link className="text-xs text-muted-foreground" to="/forgot-password">
-                Mot de passe oublié ?
-              </Link>
-            </div>
+            <button
+              type="submit"
+              className="mx-auto flex h-14 min-w-72 items-center justify-center gap-2 bg-secondary px-8 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              disabled={isPending}
+            >
+              {isPending ? (
+                <>
+                  <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
+                  <span className="sr-only">Connexion en cours</span>
+                </>
+              ) : (
+                <span>Se connecter</span>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-8 flex items-center justify-center gap-1 text-sm">
+            <p>Pas encore inscrit ?</p>
+            <Link className="underline underline-offset-2" to="/sign-up">
+              Créer un compte
+            </Link>
           </div>
-
-          <button
-            type="submit"
-            className="transition-colors px-2 py-3 rounded-sm font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1"
-            disabled={isPending}
-          >
-            {isPending ? (
-              <>
-                <LoaderCircle className="size-5 animate-spin" aria-hidden />
-                <span className="sr-only">Connexion en cours</span>
-              </>
-            ) : (
-              <span>Se connecter</span>
-            )}
-          </button>
-        </form>
-
-        <div className="flex items-center justify-center gap-1 mt-3">
-          <p className="text-sm">Pas encore inscrit ?</p>
-          <Link className="text-sm text-muted-foreground" to="/sign-up">
-            Créer un compte
-          </Link>
         </div>
-      </div>
+      </section>
     </main>
   );
 }
