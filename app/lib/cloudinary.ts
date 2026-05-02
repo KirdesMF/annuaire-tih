@@ -101,7 +101,6 @@ export async function uploadImageToCloudinary(props: UploadImageToCloudinaryProp
       public_id: result.public_id,
     };
   } catch (error) {
-    console.error(error);
     throw new Error("Failed to upload image to Cloudinary", { cause: error });
   }
 }
@@ -153,7 +152,6 @@ export async function updateImageInCloudinary({
       public_id: result.public_id,
     };
   } catch (error) {
-    console.error(error);
     throw new Error("Failed to update image in Cloudinary", { cause: error });
   }
 }
@@ -194,7 +192,6 @@ export async function deleteImageFromCloudinary(publicId: string) {
       success: true,
     };
   } catch (error) {
-    console.error(error);
     throw new Error("Failed to delete image from Cloudinary", { cause: error });
   }
 }
@@ -244,8 +241,7 @@ export async function deleteCompanyFromCloudinary(slug: string) {
         );
       }
 
-      const result = await response.json();
-      console.log("Deleted resources:", result);
+      await response.json();
     }
 
     // delete the folder
@@ -263,8 +259,6 @@ export async function deleteCompanyFromCloudinary(slug: string) {
           },
         });
 
-        console.log("Deleted folder:", folder);
-
         // if the folder is not found, it's ok
         if (!response.ok && response.status !== 404) {
           const errorData = await response.json();
@@ -275,7 +269,6 @@ export async function deleteCompanyFromCloudinary(slug: string) {
       }),
     );
   } catch (error) {
-    console.error("Failed to delete images from Cloudinary", { cause: error });
     throw new Error("Failed to delete images from Cloudinary", { cause: error });
   }
 }

@@ -49,7 +49,7 @@ const SignupSchema = v.pipe(
   ),
 );
 
-export const signupFn = createServerFn()
+export const signupFn = createServerFn({ method: "POST" })
   .inputValidator(SignupSchema)
   .handler(async ({ data }) => {
     try {
@@ -82,11 +82,13 @@ export const signupFn = createServerFn()
       if (error instanceof APIError) {
         return { status: "error", message: error.message };
       }
+
+      throw error;
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const { data: emailData, error } = await resend.emails.send({
+    await resend.emails.send({
       from: "noreply@annuaire-tih.fr",
       to: data.email,
       subject: "Bienvenue sur l'annuaire Tih",
@@ -97,10 +99,6 @@ export const signupFn = createServerFn()
         </div>
       ),
     });
-
-    if (error) {
-      console.error(error);
-    }
 
     throw redirect({ to: "/compte/entreprises" });
   });

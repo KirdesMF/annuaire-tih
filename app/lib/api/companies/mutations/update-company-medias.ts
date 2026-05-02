@@ -5,6 +5,7 @@ import { decode } from "decode-formdata";
 import * as v from "valibot";
 import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
+import { requireCompanyManager } from "~/lib/auth/permissions.server";
 import { updateImageInCloudinary, uploadImageToCloudinary } from "~/lib/cloudinary";
 import {
   GalleryCompanySchema,
@@ -23,6 +24,7 @@ export const updateCompanyMedia = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     try {
       const { logo, gallery, logo_public_id, gallery_public_id, companyId } = data;
+      await requireCompanyManager(companyId);
 
       return await getDb().transaction(async (tx) => {
         const [company] = await tx
@@ -30,8 +32,14 @@ export const updateCompanyMedia = createServerFn({ method: "POST" })
           .from(companiesTable)
           .where(eq(companiesTable.id, companyId));
 
+        if (!company) throw new Error("Company not found");
+
         // Handle logo update
         if (logo && logo.size > 0) {
+          if (logo_public_id && company.logo?.publicId !== logo_public_id) {
+            throw new Error("Accès non autorisé");
+          }
+
           const logoResult = logo_public_id
             ? await updateImageInCloudinary({
                 file: logo,
@@ -60,6 +68,13 @@ export const updateCompanyMedia = createServerFn({ method: "POST" })
             gallery.map(async (image, index) => {
               if (!image?.size) return;
 
+              if (
+                gallery_public_id[index] &&
+                company.gallery[index]?.publicId !== gallery_public_id[index]
+              ) {
+                throw new Error("Accès non autorisé");
+              }
+
               const imageResult = gallery_public_id[index]
                 ? await updateImageInCloudinary({
                     file: image,
@@ -86,8 +101,7 @@ export const updateCompanyMedia = createServerFn({ method: "POST" })
         }
       });
     } catch (error) {
-      console.error("Failed to update company media:", error);
-      throw new Error("Failed to update company media");
+      throw new Error("Failed to update company media", { cause: error });
     }
   });
 
@@ -100,6 +114,7 @@ export const updateCompanyLogo = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const { logo, logo_public_id, companyId } = data;
+    await requireCompanyManager(companyId);
 
     if (!logo?.size) throw new Error("Aucune image de logo fournie");
     const db = getDb();
@@ -108,6 +123,12 @@ export const updateCompanyLogo = createServerFn({ method: "POST" })
       .select()
       .from(companiesTable)
       .where(eq(companiesTable.id, companyId));
+
+    if (!company) throw new Error("Company not found");
+
+    if (logo_public_id && company.logo?.publicId !== logo_public_id) {
+      throw new Error("Accès non autorisé");
+    }
 
     const { secure_url, public_id } = logo_public_id
       ? await updateImageInCloudinary({
@@ -139,6 +160,7 @@ export const updateCompanyGallery = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const { gallery, gallery_public_id, companyId } = data;
+    await requireCompanyManager(companyId);
 
     if (!gallery) throw new Error("Aucune image de galerie fournie");
 
@@ -149,11 +171,17 @@ export const updateCompanyGallery = createServerFn({ method: "POST" })
       .from(companiesTable)
       .where(eq(companiesTable.id, companyId));
 
+    if (!company) throw new Error("Company not found");
+
     const updatedGallery = [...(company.gallery || [])];
 
     await Promise.all(
       gallery.map(async (image, index) => {
         if (!image.size) return;
+
+        if (gallery_public_id?.[index] && company.gallery[index]?.publicId !== gallery_public_id[index]) {
+          throw new Error("Accès non autorisé");
+        }
 
         // Handle both new uploads and updates
         const imageResult = gallery_public_id?.[index]

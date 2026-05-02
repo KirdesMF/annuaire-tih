@@ -2,12 +2,23 @@ import { createServerFn } from "@tanstack/react-start";
 import { eq } from "drizzle-orm";
 import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
+import { requireCompanyManager } from "~/lib/auth/permissions.server";
 import { deleteImageFromCloudinary } from "~/lib/cloudinary";
 
 export const deleteCompanyLogo = createServerFn({ method: "POST" })
   .inputValidator((data: { companyId: string; publicId: string }) => data)
   .handler(async ({ data }) => {
     const { companyId, publicId } = data;
+    await requireCompanyManager(companyId);
+
+    const [company] = await getDb()
+      .select({ logo: companiesTable.logo })
+      .from(companiesTable)
+      .where(eq(companiesTable.id, companyId));
+
+    if (company?.logo?.publicId !== publicId) {
+      throw new Error("Accès non autorisé");
+    }
 
     await deleteImageFromCloudinary(publicId);
     await getDb()
@@ -27,6 +38,8 @@ export const deleteCompanyMedia = createServerFn({ method: "POST" })
   .inputValidator((data: Data) => data)
   .handler(async ({ data }) => {
     const { companyId, publicId, type, index } = data;
+    await requireCompanyManager(companyId);
+
     const db = getDb();
 
     if (type === "logo") {
@@ -42,7 +55,11 @@ export const deleteCompanyMedia = createServerFn({ method: "POST" })
 
       if (!company) throw new Error("Company not found");
 
-      const gallery = company.gallery.filter((image, i) => i !== index);
+      if (typeof index !== "number" || company.gallery[index]?.publicId !== publicId) {
+        throw new Error("Accès non autorisé");
+      }
+
+      const gallery = company.gallery.filter((_, i) => i !== index);
 
       await deleteImageFromCloudinary(publicId);
       await db.update(companiesTable).set({ gallery }).where(eq(companiesTable.id, companyId));

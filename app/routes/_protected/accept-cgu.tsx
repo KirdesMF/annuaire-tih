@@ -4,18 +4,17 @@ import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { Loader } from "lucide-react";
 import { getDb } from "~/db";
 import { userCguAcceptanceTable } from "~/db/schema/cgu";
+import { requireCurrentUser } from "~/lib/auth/permissions.server";
 
 export const Route = createFileRoute("/_protected/accept-cgu")({
   component: RouteComponent,
 });
 
-const acceptCGUFn = createServerFn({ method: "POST" })
-  .inputValidator((data: string) => data)
-  .handler(async ({ data }) => {
-    try {
-      const db = getDb();
+const acceptCGUFn = createServerFn({ method: "POST" }).handler(async () => {
+  const user = await requireCurrentUser();
+  const db = getDb();
 
-      await db.transaction(async (tx) => {
+  await db.transaction(async (tx) => {
         const activeCGU = await tx.query.cguTable.findFirst({
           where: (cgu, { eq }) => eq(cgu.isActive, true),
         });
@@ -24,25 +23,21 @@ const acceptCGUFn = createServerFn({ method: "POST" })
           throw new Error("No active CGU found");
         }
 
-        await tx.insert(userCguAcceptanceTable).values({
-          userId: data,
-          cguId: activeCGU.id,
-          acceptedAt: new Date(),
-        });
-      });
-      throw redirect({ to: "/compte/entreprises" });
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
+    await tx.insert(userCguAcceptanceTable).values({
+      userId: user.id,
+      cguId: activeCGU.id,
+      acceptedAt: new Date(),
+    });
   });
 
+  throw redirect({ to: "/compte/entreprises" });
+});
+
 function RouteComponent() {
-  const context = Route.useRouteContext();
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(acceptCGUFn) });
 
   function onAccept() {
-    mutate({ data: context.user.id });
+    mutate({});
   }
 
   return (

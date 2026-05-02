@@ -1,5 +1,5 @@
 import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowUpRight, Building2, Check, Clock3, LoaderIcon, Search, Shield, Trash2, Users, X } from "lucide-react";
 import { useDeferredValue, useRef } from "react";
@@ -14,7 +14,6 @@ import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
 import { updateCompanyStatus } from "~/lib/api/companies/mutations/update-company-status";
 import { companiesQuery } from "~/lib/api/companies/queries/get-companies";
 import { usersQuery } from "~/lib/api/users/queries/get-users";
-import { COMPANY_STATUSES } from "~/utils/constantes";
 
 export const Route = createFileRoute("/admin/dashboard")({
   validateSearch: (search) => ({
@@ -28,6 +27,14 @@ export const Route = createFileRoute("/admin/dashboard")({
       : defaultDashboardSearch.userRole,
   }),
   component: RouteComponent,
+  beforeLoad: async ({ context }) => {
+    const role = context.user?.role;
+    const isAdmin = isValidRole(role) && (role === "admin" || role === "superadmin");
+
+    if (!context.user || !isAdmin) {
+      throw redirect({ to: "/" });
+    }
+  },
   pendingComponent: () => (
     <div className="min-h-svh grid place-items-center">
       <LoaderIcon className="size-24 animate-spin" />
@@ -35,7 +42,7 @@ export const Route = createFileRoute("/admin/dashboard")({
   ),
   loader: async ({ context }) => {
     await Promise.all([
-      context.queryClient.prefetchQuery(companiesQuery()),
+      context.queryClient.prefetchQuery(companiesQuery({ status: "all" })),
       context.queryClient.prefetchQuery(usersQuery),
     ]);
   },
@@ -68,7 +75,7 @@ function RouteComponent() {
   const context = Route.useRouteContext();
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const { data: companies = [] } = useSuspenseQuery(companiesQuery());
+  const { data: companies = [] } = useSuspenseQuery(companiesQuery({ status: "all" }));
   const { data: allUsers = [] } = useSuspenseQuery(usersQuery);
   const deferredQuery = useDeferredValue(search.q);
 

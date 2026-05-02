@@ -3,8 +3,11 @@ import { createServerFn } from "@tanstack/react-start";
 import { desc } from "drizzle-orm";
 import { getDb } from "~/db";
 import { analyticsEventsTable } from "~/db/schema/analytics";
+import { requireAdminUser } from "~/lib/auth/permissions.server";
 
 export const getDashboardAnalytics = createServerFn({ method: "GET" }).handler(async () => {
+  await requireAdminUser();
+
   const events = await getDb()
     .select()
     .from(analyticsEventsTable)

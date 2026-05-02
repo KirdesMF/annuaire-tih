@@ -28,7 +28,7 @@ export const trackAnalyticsEvent = createServerFn({ method: "POST" })
         visitorId: data.visitorId,
         metadata: data.metadata ?? null,
       });
-    } catch (error) {
-      console.error("Failed to track analytics event:", error);
+    } catch {
+      // Analytics failures must not break user-facing flows.
     }
   });

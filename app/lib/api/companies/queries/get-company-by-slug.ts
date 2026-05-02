@@ -5,35 +5,42 @@ import { getDb } from "~/db";
 import { categoriesTable } from "~/db/schema/categories";
 import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
+import { getCurrentUser, isAdminRole } from "~/lib/auth/permissions.server";
 
 export const getCompanyBySlug = createServerFn({ method: "GET" })
   .inputValidator((slug: string) => slug)
   .handler(async ({ data: slug }) => {
-    try {
-      const db = getDb();
+    const db = getDb();
 
-      return await db.transaction(async (tx) => {
-        const company = await tx
-          .select()
-          .from(companiesTable)
-          .where(eq(companiesTable.slug, slug))
-          .then((res) => res[0]);
+    return await db.transaction(async (tx) => {
+      const company = await tx
+        .select()
+        .from(companiesTable)
+        .where(eq(companiesTable.slug, slug))
+        .then((res) => res[0]);
 
-        const categories = await tx
-          .select()
-          .from(companyCategoriesTable)
-          .leftJoin(categoriesTable, eq(categoriesTable.id, companyCategoriesTable.category_id))
-          .where(eq(companyCategoriesTable.company_id, company.id));
+      if (!company) {
+        throw new Error("Company not found");
+      }
 
-        return {
-          ...company,
-          categories: categories.map((c) => c.categories),
-        };
-      });
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
+      if (company.status !== "active") {
+        const user = await getCurrentUser();
+        if (!user || (company.user_id !== user.id && !isAdminRole(user.role))) {
+          throw new Error("Company not found");
+        }
+      }
+
+      const categories = await tx
+        .select()
+        .from(companyCategoriesTable)
+        .leftJoin(categoriesTable, eq(categoriesTable.id, companyCategoriesTable.category_id))
+        .where(eq(companyCategoriesTable.company_id, company.id));
+
+      return {
+        ...company,
+        categories: categories.map((c) => c.categories),
+      };
+    });
   });
 
 export const companyBySlugQuery = (slug: string) =>

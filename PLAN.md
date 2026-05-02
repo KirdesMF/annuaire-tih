@@ -13,10 +13,11 @@ Rebuild app visual system from scratch for v2:
 
 ## 2. Must improvements to track
 - Remove local-only/generated junk from repo/worktree (`.DS_Store`, stale `dist`, caches) and keep `.gitignore` effective.
-- Prevent secret files from shipping in build artifacts: `.dev.vars`, `.env*` must never remain under `dist` after build.
+- Use `.env` as the only local secret file for Cloudflare local development; do not use `.dev.vars` in this project.
+- Prevent secret files from shipping in build artifacts: `.env*` and any accidental `.dev.vars*` must never remain under `dist` after build.
 - Fix lint signal: narrow Biome scan to source/config files, exclude build output/generated/vendor files, then fix real diagnostics.
 - Update README: replace Bun init boilerplate with real TanStack Start/Vite/Cloudflare commands, env setup, build, deploy.
-- Add safety scripts: `check`, typecheck-only, secret-artifact guard, optional clean script.
+- Add safety scripts: `check`, typecheck-only, secret-artifact guard, optional clean script, and verified `cf-typegen` (`wrangler types`) workflow.
 - Audit server-side authorization for all mutations: company create/update/delete/media, user updates, admin role/status actions.
 - Remove unsafe logging: reset-password/auth data, Cloudinary delete logs, debug route logs; keep only intentional server logs.
 - Add tests for validators, slug utilities, auth guards, company/user mutation authorization, analytics queries.
@@ -37,42 +38,41 @@ Rebuild app visual system from scratch for v2:
 - Dynamic sitemap needs real route/data coverage, not hardcoded guesswork.
 
 ## 4. Branching strategy
-Create branches in this order, each one built on last merged phase so conflict stays low:
+PR 1–12 are done. PR 13 and PR 14 are bonus/non-mandatory. Remaining mandatory work now prioritizes security and release hardening.
 
-1. `chore/annuaire-v2` → current working branch for audit + plan only.
-2. `chore/v2-design-tokens` → token inventory, shadcn/Base UI setup plan, TweakCN theme capture, semantic CSS variables in `app/styles/app.css`.
-3. `chore/v2-shadcn-theme` → initialize/configure shadcn with Base UI, apply TweakCN theme, verify global CSS/font/theme plumbing.
-4. `chore/v2-shell-layout` → root layout, header, footer, nav, theme shell, and any token follow-up needed there.
-5. `chore/v2-shadcn-base-ui` → migrate one primitive/component slice at time to shadcn/Base UI, only after shell and tokens stable.
-6. `chore/v2-seo-sitemap` → SEO meta, dynamic sitemap, robots, accessibility baseline, after public routes are stable.
-7. `chore/v2-feature-phase` → a11y tool, preview company page during register/update, profile picture.
-8. `chore/v2-app-ui-refresh` → full app UI refresh aligned with new design: replace images/logo assets and review/update all pages beyond token changes.
-9. `chore/v2-analytics-dashboard` → analytics audit/design first, then later add traffic custom events and web analytics surfaced in dashboard, after full app UI refresh settles.
-10. `chore/v2-vertical-refactor` → domain re-org / colocation pass, only after UI + SEO work settle.
-11. `chore/v2-improvement-audit` → infra/provider decisions and form flow audit at end.
+Create remaining branches in priority order, each one built on last merged phase so conflict stays low:
 
-Rule: do not start next branch before previous phase is merged or at least stabilized. That avoids parallel edits on same shell/components files and keeps conflicts small.
+1. `security/v2-auth-logging-audit` → next mandatory PR (PR 15): server-side authorization audit for mutations/admin actions + unsafe log removal.
+2. `security/v2-better-auth-cloudflare-hardening` → mandatory auth/runtime hardening (PR 16): Better Auth Cloudflare Worker config, secrets, origins, cookies, rate limit, email verification, and Hyperdrive/env usage.
+3. `chore/v2-repo-hardening` → mandatory release hardening (PR 17): secret-artifact guard, README, check scripts, Biome scan scope, generated/local cleanup.
+4. `test/v2-ci-baseline` → mandatory baseline (PR 18): focused tests for security-critical paths + CI for format/lint/typecheck/build/tests.
+5. `chore/v2-dependency-cleanup` → mandatory final cleanup (PR 19): verified dead dependency removal + final build/lint/typecheck.
+6. `feat/v2-analytics-implementation` → bonus PR 13: traffic custom events + web analytics surfaced in dashboard. Skip/defer unless explicitly chosen.
+7. `refactor/v2-vertical-codebase` → bonus PR 14: vertical/domain refactor. Skip/defer unless explicitly chosen.
+8. `chore/v2-improvement-audit` → optional PR 20: provider decisions and future data/form/search direction.
+
+Rule: security and release hardening outrank bonus analytics/refactor work. It is valid to skip PR 13 and PR 14 now, then start PR 15.
 
 ## 5. PR-sized checklist
-- **PR 1**: design/token inventory + shadcn/Base UI migration inventory + TweakCN theme reference only.
-- **PR 2**: shadcn init/config with Base UI + apply TweakCN theme + global CSS/font/theme plumbing.
-- **PR 3**: install/adapt core shadcn components (`button`, `card`, `input`, `label`, `field`, `separator`, `badge`, `alert`, `avatar`, `tooltip`).
-- **PR 4**: shell/layout refresh using shadcn components only (`__root`, header, footer, nav, menu, theme toggle).
-- **PR 5**: shadcn/Base UI migration slice 1: dialog, popover, tooltip, dropdown/menu, avatar, separator.
-- **PR 6**: shadcn/Base UI migration slice 2: select, drawer/sheet, accordion, command, toast/forms.
-- **PR 7**: replace custom markup with shadcn patterns: Card, FieldGroup/Field, Alert, Empty, Badge, Skeleton where applicable.
-- **PR 8**: SEO/meta + dynamic sitemap + robots.
-- **PR 9**: public/auth-page a11y pass + optional a11y tooling; company create/update form a11y deferred to feature/form improvement phase.
-- **PR 10**: feature phase: preview company page, profile picture, a11y tool.
-- **PR 11**: full app UI refresh phase: replace images/logo assets and review/update all pages to match new design, not tokens only.
-- **PR 12**: analytics/dashboard audit + design phase: define events, provider/storage direction, KPI scope, and dashboard slice plan. No analytics implementation yet.
-- **PR 13**: analytics implementation phase: traffic custom events + web analytics surfaced in dashboard.
-- **PR 14**: vertical codebase refactor, domain by domain.
-- **PR 15**: improvement audit: Supabase vs Cloudflare D1, Cloudinary vs Cloudflare R2, register/update form flow, and public search/filter data model (including future region filter).
-- **PR 16**: repo hardening: secret-artifact guard, README update, `.DS_Store`/cache cleanup, check scripts, Biome scan scope.
-- **PR 17**: authorization/logging audit for server functions and admin actions.
-- **PR 18**: test/CI baseline: validators, slug utilities, auth guards, mutation permission checks, build/lint/typecheck in CI.
-- **PR 19**: dependency cleanup + final build/lint/typecheck.
+- **PR 1–12**: done (design system, shadcn/Base UI migration, SEO/sitemap/a11y/features, full UI refresh, analytics audit/design).
+- **PR 13 — bonus analytics implementation**: traffic custom events + web analytics surfaced in dashboard. Optional, not release-blocking.
+- **PR 14 — bonus vertical refactor**: vertical codebase refactor, domain by domain. Optional, not release-blocking.
+- **PR 15 — mandatory security priority**: authorization/logging audit for server functions and admin actions.
+  - verify company create/update/delete/media mutations require session + ownership/admin role server-side
+  - verify user/profile updates cannot target other users unless admin path explicitly allows it
+  - verify admin role/status actions require admin role server-side, not UI-only checks
+  - remove or gate unsafe logs: auth/reset-password data, Cloudinary delete details, debug route logs
+  - add focused tests or test seams for critical permission paths where practical
+- **PR 16 — mandatory Better Auth + Cloudflare hardening**: explicit Better Auth `baseURL`/`secret`/`trustedOrigins`, Cloudflare env/bindings access, Hyperdrive usage, secure cookies, Cloudflare-aware rate limiting, email verification/change-email confirmation, password hash guard, and auth instance/config cleanup.
+- **PR 17 — mandatory Cloudflare/repo hardening**: follow Cloudflare TanStack Start guide for bindings/type generation, switch local secrets to `.env` only, add `.env.example`, remove `.dev.vars` usage, run/document `bun run cf-typegen` (`wrangler types`), prefer typed `cloudflare:workers` `env` for Worker bindings/secrets where practical, add secret-artifact guard, README update, `.DS_Store`/cache cleanup, check scripts, Biome scan scope.
+  - verify `vite.config.ts` has `cloudflare({ viteEnvironment: { name: "ssr" } })`
+  - verify `wrangler.jsonc` has `main: "@tanstack/react-start/server-entry"`, `nodejs_compat`, observability, and declared bindings
+  - decide whether generated Wrangler types are committed; if yes, keep them current in `check`/CI
+  - document production secrets in Cloudflare dashboard/Worker secrets, not source-controlled files
+  - document Workers Builds env setup and `CLOUDFLARE_INCLUDE_PROCESS_ENV=true` only when build-time secrets are needed
+- **PR 18 — mandatory test/CI baseline**: validators, slug utilities, auth guards, mutation permission checks, build/lint/typecheck in CI.
+- **PR 19 — mandatory dependency cleanup**: verified dead dependency removal + final build/lint/typecheck.
+- **PR 20 — optional improvement audit**: Supabase vs Cloudflare D1, Cloudinary vs Cloudflare R2, register/update form flow, public search/filter data model (including future region filter).
 
 ## 6. Files likely involved
 ### Repo hardening / tooling
@@ -80,8 +80,12 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - `README.md`
 - `biome.json`
 - `.gitignore`
+- `.env.example`
+- local `.env` (ignored; not committed)
+- remove local `.dev.vars` usage for this project
 - `vite.config.ts`
 - `wrangler.jsonc`
+- generated Cloudflare types from `bun run cf-typegen` / `wrangler types`
 - future build/check scripts if scripts grow beyond inline package commands
 
 ### Core shell / theme / global style
@@ -249,58 +253,77 @@ Rule: do not start next branch before previous phase is merged or at least stabi
    - stabilize refreshed app UI before analytics work lands
 
 15. **Analytics/dashboard audit phase**
-   - inspect current dashboard and data flow
-   - define tracked event list and privacy-safe payload shape
-   - decide provider/storage direction before implementation
-   - define smallest KPI/dashboard slice
-   - no analytics runtime implementation yet
+   - done before remaining security/release work
+   - keep analytics runtime implementation as bonus only
 
-16. **Analytics/dashboard implementation phase**
-   - surface analytics in dashboard after audit/design settles
-   - add traffic custom events so dashboard can expose web analytics
-   - build analytics on top of refreshed dashboard UI
+16. **Security and authorization audit — next mandatory phase**
+   - inventory all server functions, form handlers, API route handlers, and mutations
+   - verify every server mutation checks session server-side
+   - verify company create/update/delete/media mutations enforce ownership or admin role server-side
+   - verify user/profile updates cannot modify another user unless explicit admin path allows it
+   - verify admin-only actions cannot be called by non-admin users via server function directly
+   - remove or gate debug logs, especially auth/reset-password/cloudinary data
+   - add focused tests or test seams for critical permission paths where practical
 
-17. **Refactor toward vertical codebase**
+17. **Better Auth + Cloudflare Worker hardening — mandatory**
+   - configure Better Auth with explicit `baseURL`, `secret`, and `trustedOrigins`; do not rely on request inference in production
+   - store `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `DATABASE_URL`/Hyperdrive connection, and email provider keys as Cloudflare secrets/bindings, not source-controlled config
+   - prefer typed Cloudflare Worker `env`/bindings (`wrangler types`) over global `process.env` for server-side runtime config where practical
+   - use existing `HYPERDRIVE` binding for Postgres connections or remove binding if intentionally unused; avoid bypassing Hyperdrive accidentally
+   - enable/confirm production secure cookies with `advanced.useSecureCookies: true` unless local/dev path requires override
+   - configure Better Auth IP detection for Cloudflare with `advanced.ipAddress.ipAddressHeaders: ["cf-connecting-ip"]` and IPv6 subnet rate limiting
+   - enable explicit auth rate limiting in production and add stricter rules for sign-in, sign-up, forgot-password, reset-password, and admin-sensitive endpoints where supported
+   - add email verification for sign-up (`requireEmailVerification`) and explicit change-email confirmation before `changeEmail.enabled` remains active
+   - harden custom password verification against malformed stored hashes and buffer length mismatch before `timingSafeEqual`
+   - remove custom password helper if no legacy hash compatibility needs it; Better Auth default already uses scrypt
+   - avoid rebuilding full Better Auth config unnecessarily per request; split static options from per-env/per-db setup and memoize safely only when compatible with Worker isolates
+   - keep `/api/auth/$` route first-party under app domain to avoid Safari third-party cookie issues
+
+18. **Repo hardening and safety cleanup — mandatory**
+   - verify Cloudflare TanStack Start guide alignment: Vite Cloudflare plugin uses `cloudflare({ viteEnvironment: { name: "ssr" } })`, `wrangler.jsonc` uses `main: "@tanstack/react-start/server-entry"`, `nodejs_compat`, observability, and package scripts include `cf-typegen: "wrangler types"`
+   - run `bun run cf-typegen` and commit/update generated Cloudflare types if the project tracks them; document where the generated file lives
+   - follow Cloudflare bindings docs: prefer `cloudflare:workers` `env` for Worker bindings/secrets in server-side code where practical, with generated `wrangler types` for typed bindings
+   - use `.env` as the only local secret file, per Cloudflare local development docs; delete/stop using `.dev.vars` and do not keep both files active
+   - add `.env.example` with fake required keys and no real secrets
+   - update `.gitignore` to ignore `.env*` while allowing `.env.example`, and also ignore `.dev.vars*` to catch accidental files
+   - remove `.DS_Store` and other local/generated junk from worktree
+   - prevent `.env*` and accidental `.dev.vars*` from remaining in `dist` after build
+   - add deploy/build guard that fails if secret files are found in build output
+   - update README with real dev/build/deploy/env docs, including `bun run cf-typegen`, Cloudflare dashboard/secrets for production, Workers Builds env setup if build-time secrets are needed, and `CLOUDFLARE_INCLUDE_PROCESS_ENV=true` only for CI/build-time env access when needed
+   - add `check` script and clean script if useful
+   - tune Biome includes/excludes so lint reports actionable source diagnostics
+
+19. **Test and CI baseline — mandatory**
+   - add focused tests for validators, slug utilities, auth guards, server mutation permissions, analytics query behavior if analytics is implemented
+   - add CI for format/lint/typecheck/build/tests
+   - keep tests behavior-focused and colocated where practical
+
+20. **Verification and dependency cleanup — mandatory**
+   - run typecheck, lint, build
+   - test public routes, auth flows, search, dialogs, mobile nav, theme toggle
+   - confirm sitemap/robots response content
+   - do final dead-code and dead-package sweep
+   - remove dead deps only after verified no production references remain
+
+21. **Analytics/dashboard implementation — bonus**
+   - surface analytics in dashboard only if time remains
+   - add traffic custom events only after security/release hardening are done
+   - keep privacy-safe payload shape from PR 12 audit/design
+
+22. **Refactor toward vertical codebase — bonus**
    - regroup code by domain / ownership, not by technical type
    - co-locate route-specific data, UI, and helpers near routes/domains they serve
    - keep truly generic UI in a reusable design-system area
    - keep shared business logic in a shared area, infrastructure separate
    - move in small batches with import fixes and test coverage after each batch
 
-18. **Improvement audit at end**
+23. **Improvement audit at end — optional**
    - compare Supabase vs Cloudflare D1
    - compare Cloudinary vs Cloudflare R2
    - review register/update form flow and data model
    - review public search improvements, especially structured filters for companies
    - plan future company `region` field from controlled list so public search can filter by area/region
    - decide whether current free-text `service_area` field stays as complementary info or should be replaced/migrated toward structured region data
-   - only decide here after main UI/SEO/feature work settled
-
-19. **Repo hardening and safety cleanup**
-   - remove `.DS_Store` and other local/generated junk from worktree
-   - update `.gitignore` only if new generated/local files appear
-   - prevent `.dev.vars` / `.env*` from remaining in `dist` after build
-   - add deploy guard that fails if secret files are found in build output
-   - update README with real dev/build/deploy/env docs
-   - add `check` script and clean script if useful
-   - tune Biome includes/excludes so lint reports actionable source diagnostics
-
-20. **Security and authorization audit**
-   - verify every server mutation checks session and resource ownership/admin role server-side
-   - verify admin-only actions cannot be called by non-admin users via server function directly
-   - remove or gate debug logs, especially auth/reset-password/cloudinary data
-   - add tests for critical permission paths where possible
-
-21. **Test and CI baseline**
-   - add focused tests for validators, slug utilities, auth guards, server mutation permissions, analytics query behavior
-   - add CI for format/lint/typecheck/build/tests
-   - keep tests behavior-focused and colocated where practical
-
-22. **Verification and cleanup**
-   - run typecheck, lint, build
-   - test public routes, auth flows, search, dialogs, mobile nav, theme toggle
-   - confirm sitemap/robots response content
-   - do final dead-code and dead-package sweep
 
 ## 8. Risks
 - Token rewrite can break visual consistency across many routes fast.
@@ -310,7 +333,7 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - Sitemap can leak private/admin data if query filters are wrong.
 - SEO changes can accidentally worsen UX if semantics or heading order are rushed.
 - Small visual changes in root shell can affect every route, including auth pages.
-- Cloudflare/Vite build can copy local secret files such as `.dev.vars` into `dist`; deploy guard must catch this.
+- Cloudflare/Vite build can copy local secret files into `dist`; `.env*` and any accidental `.dev.vars*` must be guarded.
 - Server functions are callable outside UI flows; missing server-side authorization becomes security bug.
 
 ## 9. Open questions
@@ -321,9 +344,22 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - Do we want OG/Twitter metadata now, or just core SEO tags first?
 - What form should optional accessibility tooling take: tests, lint, or runtime helper?
 - Any pages to exclude from sitemap besides auth/admin/protected routes?
-- Should `.dev.vars` removal be handled by inline package script, dedicated script, or Vite `closeBundle` plugin?
+- Should secret artifact removal be handled by inline package script, dedicated script, or Vite `closeBundle` plugin?
 - Which test runner should become project baseline: Bun test or Vitest?
+- Should generated Wrangler types be committed, and should `check` run `bun run cf-typegen` or only verify existing generated types are current?
 
-## 10. Suggested first change
-Start with **shadcn/Base UI setup check + TweakCN theme capture**.
-That is safest next step: confirm shadcn config/base, apply theme intentionally, then migrate shell/components onto shadcn patterns before touching feature routes.
+## 10. Suggested next change
+Finish **PR 15: security authorization/logging audit**, then continue in this order:
+
+1. **PR 16: Better Auth + Cloudflare Worker hardening**
+   - explicit Better Auth `baseURL`, `secret`, `trustedOrigins`
+   - Cloudflare-aware cookies, IP/rate-limit config, email verification/change-email confirmation
+   - Hyperdrive/env access cleanup and password hash guard
+2. **PR 17: Cloudflare/repo hardening**
+   - switch local secrets to `.env` only and remove `.dev.vars` usage
+   - add `.env.example` and update `.gitignore`
+   - verify TanStack Start Cloudflare guide alignment
+   - run/document `bun run cf-typegen` (`wrangler types`) and generated bindings types
+   - prefer `cloudflare:workers` `env` for Worker bindings/secrets where practical
+   - add secret artifact guard for `dist/**/.env*` and accidental `dist/**/.dev.vars*`
+   - update README scripts/env/build/deploy docs

@@ -77,10 +77,10 @@ export function auth() {
     emailAndPassword: {
       enabled: true,
       password: passwordHelpers,
-      sendResetPassword: async ({ user, url, token }) => {
+      sendResetPassword: async ({ user, url }) => {
         const resend = new Resend(process.env.RESEND_API_KEY);
 
-        const { data, error } = await resend.emails.send({
+        const { error } = await resend.emails.send({
           from: "noreply@annuaire-tih.fr",
           to: user.email,
           subject: "Réinitialisation de mot de passe",
@@ -88,10 +88,8 @@ export function auth() {
         });
 
         if (error) {
-          console.error(error);
+          throw new Error("Failed to send reset password email", { cause: error });
         }
-
-        console.log(data);
       },
     },
     user: {

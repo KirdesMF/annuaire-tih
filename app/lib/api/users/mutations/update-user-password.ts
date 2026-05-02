@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import * as v from "valibot";
 import { auth } from "~/lib/auth/auth.server";
+import { requireCurrentUser } from "~/lib/auth/permissions.server";
 
 const UpdateUserPasswordSchema = v.object({
   password: v.string(),
@@ -17,6 +18,7 @@ export const updateUserPasswordFn = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const { password, newPassword } = data;
+    await requireCurrentUser();
 
     await auth().api.changePassword({
       body: {
