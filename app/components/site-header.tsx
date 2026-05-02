@@ -71,8 +71,14 @@ export function SiteHeader({ user }: { user: AuthUser | undefined }) {
 
         <div className="flex items-center gap-4">
           <RegisterLink user={user} />
-          <LoginButton user={user} />
-          {user ? <MenuUser user={user} /> : <ThemeToggle />}
+          {user ? (
+            <MenuUser user={user} />
+          ) : (
+            <>
+              <LoginButton user={user} />
+              <ThemeToggle />
+            </>
+          )}
         </div>
       </div>
 

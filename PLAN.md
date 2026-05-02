@@ -11,7 +11,21 @@ Rebuild app visual system from scratch for v2:
 - add dynamic sitemap
 - optionally add tooling to push accessibility coverage as far as possible
 
-## 2. Constraints
+## 2. Must improvements to track
+- Remove local-only/generated junk from repo/worktree (`.DS_Store`, stale `dist`, caches) and keep `.gitignore` effective.
+- Prevent secret files from shipping in build artifacts: `.dev.vars`, `.env*` must never remain under `dist` after build.
+- Fix lint signal: narrow Biome scan to source/config files, exclude build output/generated/vendor files, then fix real diagnostics.
+- Update README: replace Bun init boilerplate with real TanStack Start/Vite/Cloudflare commands, env setup, build, deploy.
+- Add safety scripts: `check`, typecheck-only, secret-artifact guard, optional clean script.
+- Audit server-side authorization for all mutations: company create/update/delete/media, user updates, admin role/status actions.
+- Remove unsafe logging: reset-password/auth data, Cloudinary delete logs, debug route logs; keep only intentional server logs.
+- Add tests for validators, slug utilities, auth guards, company/user mutation authorization, analytics queries.
+- Add CI to run format/lint/typecheck/build/tests before merge/deploy.
+- Improve bundle/performance: lazy-load admin/devtools/heavy UI, audit large chunks and route-only dependencies.
+- Refactor toward vertical/domain code organization after UI/SEO stabilization.
+- Audit dependencies and remove dead packages only after verified no production references.
+
+## 3. Constraints
 - App is TanStack Start + Vite + Cloudflare SSR.
 - Root layout lives in `app/routes/__root.tsx`; global styling in `app/styles/app.css`.
 - Current UI uses many shared wrappers in `app/components/ui/*` plus direct `radix-ui` imports in routes/components.
@@ -22,7 +36,7 @@ Rebuild app visual system from scratch for v2:
 - Package removal must happen only after usage audit and replacement verification.
 - Dynamic sitemap needs real route/data coverage, not hardcoded guesswork.
 
-## 3. Branching strategy
+## 4. Branching strategy
 Create branches in this order, each one built on last merged phase so conflict stays low:
 
 1. `chore/annuaire-v2` → current working branch for audit + plan only.
@@ -39,7 +53,7 @@ Create branches in this order, each one built on last merged phase so conflict s
 
 Rule: do not start next branch before previous phase is merged or at least stabilized. That avoids parallel edits on same shell/components files and keeps conflicts small.
 
-## 4. PR-sized checklist
+## 5. PR-sized checklist
 - **PR 1**: design/token inventory + shadcn/Base UI migration inventory + TweakCN theme reference only.
 - **PR 2**: shadcn init/config with Base UI + apply TweakCN theme + global CSS/font/theme plumbing.
 - **PR 3**: install/adapt core shadcn components (`button`, `card`, `input`, `label`, `field`, `separator`, `badge`, `alert`, `avatar`, `tooltip`).
@@ -55,9 +69,21 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - **PR 13**: analytics implementation phase: traffic custom events + web analytics surfaced in dashboard.
 - **PR 14**: vertical codebase refactor, domain by domain.
 - **PR 15**: improvement audit: Supabase vs Cloudflare D1, Cloudinary vs Cloudflare R2, register/update form flow, and public search/filter data model (including future region filter).
-- **PR 16**: dependency cleanup + final build/lint/typecheck.
+- **PR 16**: repo hardening: secret-artifact guard, README update, `.DS_Store`/cache cleanup, check scripts, Biome scan scope.
+- **PR 17**: authorization/logging audit for server functions and admin actions.
+- **PR 18**: test/CI baseline: validators, slug utilities, auth guards, mutation permission checks, build/lint/typecheck in CI.
+- **PR 19**: dependency cleanup + final build/lint/typecheck.
 
-## 5. Files likely involved
+## 6. Files likely involved
+### Repo hardening / tooling
+- `package.json`
+- `README.md`
+- `biome.json`
+- `.gitignore`
+- `vite.config.ts`
+- `wrangler.jsonc`
+- future build/check scripts if scripts grow beyond inline package commands
+
 ### Core shell / theme / global style
 - `app/routes/__root.tsx`
 - `app/styles/app.css`
@@ -127,7 +153,7 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - `public/robots.txt`
 - optional accessibility tool/test helper files
 
-## 6. Step-by-step plan
+## 7. Step-by-step plan
 1. **Inventory current design system**
    - list all current tokens in `app/styles/app.css`
    - map which tokens are used vs dead/legacy
@@ -250,13 +276,33 @@ Rule: do not start next branch before previous phase is merged or at least stabi
    - decide whether current free-text `service_area` field stays as complementary info or should be replaced/migrated toward structured region data
    - only decide here after main UI/SEO/feature work settled
 
-19. **Verification and cleanup**
+19. **Repo hardening and safety cleanup**
+   - remove `.DS_Store` and other local/generated junk from worktree
+   - update `.gitignore` only if new generated/local files appear
+   - prevent `.dev.vars` / `.env*` from remaining in `dist` after build
+   - add deploy guard that fails if secret files are found in build output
+   - update README with real dev/build/deploy/env docs
+   - add `check` script and clean script if useful
+   - tune Biome includes/excludes so lint reports actionable source diagnostics
+
+20. **Security and authorization audit**
+   - verify every server mutation checks session and resource ownership/admin role server-side
+   - verify admin-only actions cannot be called by non-admin users via server function directly
+   - remove or gate debug logs, especially auth/reset-password/cloudinary data
+   - add tests for critical permission paths where possible
+
+21. **Test and CI baseline**
+   - add focused tests for validators, slug utilities, auth guards, server mutation permissions, analytics query behavior
+   - add CI for format/lint/typecheck/build/tests
+   - keep tests behavior-focused and colocated where practical
+
+22. **Verification and cleanup**
    - run typecheck, lint, build
    - test public routes, auth flows, search, dialogs, mobile nav, theme toggle
    - confirm sitemap/robots response content
    - do final dead-code and dead-package sweep
 
-## 7. Risks
+## 8. Risks
 - Token rewrite can break visual consistency across many routes fast.
 - shadcn initialization can overwrite CSS/components if run with wrong preset/apply mode.
 - Base UI migration may change behavior or accessibility semantics of overlays, menus, selects, and drawers.
@@ -264,8 +310,10 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - Sitemap can leak private/admin data if query filters are wrong.
 - SEO changes can accidentally worsen UX if semantics or heading order are rushed.
 - Small visual changes in root shell can affect every route, including auth pages.
+- Cloudflare/Vite build can copy local secret files such as `.dev.vars` into `dist`; deploy guard must catch this.
+- Server functions are callable outside UI flows; missing server-side authorization becomes security bug.
 
-## 8. Open questions
+## 9. Open questions
 - Confirm TweakCN theme `https://tweakcn.com/themes/cmoevuz0m000304l18urs3r7j` is final source of truth.
 - Which shadcn preset/apply mode should be used: overwrite, partial theme/font, merge, or skip component overwrite?
 - Must shadcn/Base UI fully replace every Radix-adjacent pattern, or only direct `radix-ui` imports?
@@ -273,7 +321,9 @@ Rule: do not start next branch before previous phase is merged or at least stabi
 - Do we want OG/Twitter metadata now, or just core SEO tags first?
 - What form should optional accessibility tooling take: tests, lint, or runtime helper?
 - Any pages to exclude from sitemap besides auth/admin/protected routes?
+- Should `.dev.vars` removal be handled by inline package script, dedicated script, or Vite `closeBundle` plugin?
+- Which test runner should become project baseline: Bun test or Vitest?
 
-## 9. Suggested first change
+## 10. Suggested first change
 Start with **shadcn/Base UI setup check + TweakCN theme capture**.
 That is safest next step: confirm shadcn config/base, apply theme intentionally, then migrate shell/components onto shadcn patterns before touching feature routes.

@@ -42,7 +42,7 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Ouvrir le menu utilisateur"
-        className="rounded-full cursor-pointer focus:outline-2 focus:outline-ring focus:outline-offset-2"
+        className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-card text-card-foreground focus:outline-2 focus:outline-offset-2 focus:outline-ring"
       >
         <AvatarUser user={user} />
       </DropdownMenuTrigger>
@@ -129,7 +129,7 @@ function AvatarUser({ user }: { user: AuthUser }) {
 
   if (user.image) {
     return (
-      <Avatar>
+      <Avatar size="lg">
         <AvatarImage src={user.image} alt={user.name} />
         <AvatarFallback>{initials}</AvatarFallback>
       </Avatar>
@@ -137,7 +137,7 @@ function AvatarUser({ user }: { user: AuthUser }) {
   }
 
   return (
-    <Avatar>
+    <Avatar size="lg">
       <AvatarFallback>{initials}</AvatarFallback>
     </Avatar>
   );
