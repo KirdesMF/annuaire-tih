@@ -5,6 +5,7 @@ import * as v from "valibot";
 import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
+import { requireCurrentUser } from "~/lib/auth/permissions.server";
 import { uploadImageToCloudinary } from "~/lib/cloudinary";
 import { CreateCompanySchema } from "~/lib/validator/company.schema";
 import { generateUniqueSlug } from "~/utils/slug";
@@ -25,7 +26,8 @@ export const createCompany = createServerFn({ method: "POST" })
     return v.parse(CreateCompanySchema, decodedFormData);
   })
   .handler(async ({ data }) => {
-    const { logo, gallery, categories, ...rest } = data;
+    const user = await requireCurrentUser();
+    const { logo, gallery, categories, user_id: _formUserId, ...rest } = data;
 
     try {
       const db = getDb();
@@ -33,7 +35,12 @@ export const createCompany = createServerFn({ method: "POST" })
       await db.transaction(async (tx) => {
         const [company] = await tx
           .insert(companiesTable)
-          .values({ ...rest, created_by: data.user_id, slug: generateUniqueSlug(data.name) })
+          .values({
+            ...rest,
+            user_id: user.id,
+            created_by: user.id,
+            slug: generateUniqueSlug(data.name),
+          })
           .returning();
 
         // Insert categories
@@ -84,7 +91,7 @@ export const createCompany = createServerFn({ method: "POST" })
         }
       });
     } catch (error) {
-      console.error(error);
+      throw new Error("Failed to create company", { cause: error });
     }
   });
 

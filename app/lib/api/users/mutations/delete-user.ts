@@ -5,12 +5,18 @@ import { eq } from "drizzle-orm";
 import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 import { auth } from "~/lib/auth/auth.server";
+import { requireCurrentUser } from "~/lib/auth/permissions.server";
 import { deleteCompanyFromCloudinary } from "~/lib/cloudinary";
 
 export const deleteUser = createServerFn({ method: "POST" })
   .inputValidator((data: { userId: string }) => data)
   .handler(async ({ data }) => {
     const request = getRequest();
+    const user = await requireCurrentUser();
+
+    if (data.userId !== user.id) {
+      throw new Error("Accès non autorisé");
+    }
 
     // get all companies of the user
     const companies = await getDb()

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import * as v from "valibot";
 import { auth } from "~/lib/auth/auth.server";
+import { requireCurrentUser } from "~/lib/auth/permissions.server";
 
 const UserInfosSchema = v.object({
   name: v.optional(v.string()),
@@ -16,6 +17,7 @@ export const updateUserInfos = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const request = getRequest();
+    await requireCurrentUser();
 
     await auth().api.updateUser({ headers: request.headers, body: { ...data } });
   });

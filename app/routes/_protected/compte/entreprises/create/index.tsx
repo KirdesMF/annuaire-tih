@@ -250,8 +250,7 @@ function RouteComponent() {
           reset();
           navigate({ to: "/compte/entreprises" });
         },
-        onError: (error) => {
-          console.log(error);
+        onError: () => {
           toast({
             description: "Une erreur est survenue lors de la création de l'entreprise",
             button: { label: "Fermer" },
