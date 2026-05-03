@@ -10,11 +10,14 @@
     "ignoreUnknown": false,
     "includes": [
       "**",
-      "!**/app/routeTree.gen.ts",
-      "!**/.output/**/*",
-      "!**/.vinxi/**/*",
-      "!**/.wrangler/**/*",
-      "!**/node_modules/**/*"
+      "!app/routeTree.gen.ts",
+      "!!dist",
+      "!!.output",
+      "!!.vinxi",
+      "!!.wrangler",
+      "!!node_modules",
+      "!!coverage",
+      "!!build"
     ]
   },
   "formatter": {
