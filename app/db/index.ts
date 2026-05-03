@@ -8,8 +8,6 @@ import * as cguSchema from "./schema/cgu";
 import * as companiesSchema from "./schema/companies";
 import * as companyCategoriesSchema from "./schema/company-categories";
 
-let _client: postgres.Sql | undefined;
-
 type CloudflareEnv = {
   DATABASE_URL?: string;
   HYPERDRIVE?: { connectionString: string };
@@ -32,17 +30,13 @@ export function getDb() {
     throw new Error("DATABASE_URL is not set");
   }
 
-  // Cloudflare bindings are per-request. Do not cache clients in module scope in Workers.
-  const client = postgres(connectionString, { prepare: false });
-  return drizzle({ client, schema });
-}
-
-if (typeof process !== "undefined") {
-  process.on("SIGINT", () => {
-    if (_client) {
-      console.log("🔒 closing database connection");
-      _client.end();
-    }
-    process.exit(0);
+  // Cloudflare bindings are per-request. Keep Postgres.js pool tiny so Worker/Hyperdrive slots do not hang.
+  const client = postgres(connectionString, {
+    prepare: false,
+    fetch_types: false,
+    max: 1,
+    idle_timeout: 2,
+    connect_timeout: 10,
   });
+  return drizzle({ client, schema });
 }

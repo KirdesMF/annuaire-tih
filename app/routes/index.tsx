@@ -7,7 +7,6 @@ import banner from "~/assets/img/banniere.png?url";
 import edmMobile from "~/assets/img/edm-mobile.webp?url";
 import logo from "~/assets/img/Logo vecto_png.png?url";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
-import { companiesQuery } from "~/lib/api/companies/queries/get-companies";
 import { seo } from "~/lib/seo";
 import { slugify } from "~/utils/slug";
 
@@ -15,10 +14,7 @@ export const Route = createFileRoute("/")({
   head: () => seo(),
   component: Home,
   loader: async ({ context }) => {
-    await Promise.all([
-      context.queryClient.ensureQueryData(categoriesQueryOptions),
-      context.queryClient.ensureQueryData(companiesQuery()),
-    ]);
+    await context.queryClient.ensureQueryData(categoriesQueryOptions);
   },
 });
 
