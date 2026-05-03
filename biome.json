@@ -17,7 +17,12 @@
       "!!.wrangler",
       "!!node_modules",
       "!!coverage",
-      "!!build"
+      "!!build",
+      "!!.agents",
+      "!!.sc",
+      "!!.tanstack",
+      "!!.vscode",
+      "!!.zed"
     ]
   },
   "formatter": {
