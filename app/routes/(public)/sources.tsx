@@ -119,11 +119,13 @@ function RouteComponent() {
                   <span>{link.label}</span>
                   <SquareArrowOutUpRight className="size-4 shrink-0" aria-hidden="true" />
                 </a>
-                <div className="mt-6 space-y-4 text-sm leading-snug">
-                  {link.description.split("\n\n").map((paragraph) => (
-                    <p key={paragraph}>{paragraph}</p>
-                  ))}
-                </div>
+                {link.description ? (
+                  <div className="mt-6 space-y-4 text-sm leading-snug">
+                    {link.description.split("\n\n").map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
