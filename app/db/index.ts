@@ -1,5 +1,6 @@
 import { env } from "cloudflare:workers";
 import { drizzle } from "drizzle-orm/postgres-js";
+import { getRequest } from "@tanstack/react-start/server";
 import postgres from "postgres";
 import * as analyticsSchema from "./schema/analytics";
 import * as authSchema from "./schema/auth";
@@ -22,7 +23,10 @@ const schema = {
   ...categoriesSchema,
 };
 
-export function getDb() {
+const clientsByRequest = new WeakMap<Request, postgres.Sql>();
+let localClient: postgres.Sql | undefined;
+
+function getConnectionString() {
   const cloudflareEnv = env as CloudflareEnv;
   const connectionString = cloudflareEnv.HYPERDRIVE?.connectionString ?? cloudflareEnv.DATABASE_URL;
 
@@ -30,13 +34,41 @@ export function getDb() {
     throw new Error("DATABASE_URL is not set");
   }
 
-  // Cloudflare bindings are per-request. Keep Postgres.js pool tiny so Worker/Hyperdrive slots do not hang.
-  const client = postgres(connectionString, {
+  return connectionString;
+}
+
+function createClient(connectionString: string) {
+  return postgres(connectionString, {
     prepare: false,
     fetch_types: false,
     max: 1,
     idle_timeout: 2,
     connect_timeout: 10,
   });
+}
+
+function getCurrentRequest() {
+  try {
+    return getRequest();
+  } catch {
+    return undefined;
+  }
+}
+
+export function getDb() {
+  const connectionString = getConnectionString();
+  const request = getCurrentRequest();
+
+  if (!request) {
+    localClient ??= createClient(connectionString);
+    return drizzle({ client: localClient, schema });
+  }
+
+  let client = clientsByRequest.get(request);
+  if (!client) {
+    client = createClient(connectionString);
+    clientsByRequest.set(request, client);
+  }
+
   return drizzle({ client, schema });
 }
