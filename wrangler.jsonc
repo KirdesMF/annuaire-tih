@@ -3,7 +3,7 @@
   "name": "annuaire-tih-preview",
   "compatibility_flags": ["nodejs_compat"],
   "compatibility_date": "2025-09-24",
-  "main": "@tanstack/react-start/server-entry",
+  "main": "app/server.ts",
   "observability": {
     "enabled": true,
   },

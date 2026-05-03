@@ -13,6 +13,9 @@ export default defineConfig({
     cloudflare({ viteEnvironment: { name: "ssr" } }),
     tanstackStart({
       srcDirectory: "app",
+      server: {
+        entry: "./server",
+      },
     }),
     viteReact(),
   ],
