@@ -3,6 +3,10 @@ type UploadApiResponse = {
   public_id: string;
 };
 
+type CloudinaryErrorResponse = {
+  error?: { message?: string };
+};
+
 type UploadImageToCloudinaryProps =
   | {
       type: "logo" | "gallery";
@@ -90,11 +94,13 @@ export async function uploadImageToCloudinary(props: UploadImageToCloudinaryProp
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Failed to upload image to Cloudinary: ${errorData.error.message}`);
+      const errorData = (await response.json()) as CloudinaryErrorResponse;
+      throw new Error(
+        `Failed to upload image to Cloudinary: ${errorData.error?.message ?? "Unknown error"}`,
+      );
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as UploadApiResponse;
 
     return {
       secure_url: result.secure_url,
@@ -141,11 +147,13 @@ export async function updateImageInCloudinary({
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Failed to update image in Cloudinary: ${errorData.error.message}`);
+      const errorData = (await response.json()) as CloudinaryErrorResponse;
+      throw new Error(
+        `Failed to update image in Cloudinary: ${errorData.error?.message ?? "Unknown error"}`,
+      );
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as UploadApiResponse;
 
     return {
       secure_url: result.secure_url,
@@ -182,7 +190,7 @@ export async function deleteImageFromCloudinary(publicId: string) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = (await response.json()) as CloudinaryErrorResponse;
       throw new Error(
         `Cloudinary API delete image error: ${errorData.error?.message || "Unknown error"}`,
       );
@@ -213,7 +221,7 @@ export async function deleteCompanyFromCloudinary(slug: string) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = (await response.json()) as CloudinaryErrorResponse;
       throw new Error(
         `Cloudinary API get resources error: ${errorData.error?.message || "Unknown error"}`,
       );
@@ -235,7 +243,7 @@ export async function deleteCompanyFromCloudinary(slug: string) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = (await response.json()) as CloudinaryErrorResponse;
         throw new Error(
           `Cloudinary API delete resources error: ${errorData.error?.message || "Unknown error"}`,
         );
@@ -261,7 +269,7 @@ export async function deleteCompanyFromCloudinary(slug: string) {
 
         // if the folder is not found, it's ok
         if (!response.ok && response.status !== 404) {
-          const errorData = await response.json();
+          const errorData = (await response.json()) as CloudinaryErrorResponse;
           throw new Error(
             `Cloudinary API delete folder error: ${errorData.error?.message || "Unknown error"} from ${folderURL}`,
           );

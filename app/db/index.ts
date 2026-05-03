@@ -1,3 +1,4 @@
+import { env } from "cloudflare:workers";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as analyticsSchema from "./schema/analytics";
@@ -9,6 +10,11 @@ import * as companyCategoriesSchema from "./schema/company-categories";
 
 let _client: postgres.Sql | undefined;
 
+type CloudflareEnv = {
+  DATABASE_URL?: string;
+  HYPERDRIVE?: { connectionString: string };
+};
+
 const schema = {
   ...analyticsSchema,
   ...authSchema,
@@ -19,25 +25,16 @@ const schema = {
 };
 
 export function getDb() {
-  if (!process.env.DATABASE_URL) {
+  const cloudflareEnv = env as CloudflareEnv;
+  const connectionString = cloudflareEnv.HYPERDRIVE?.connectionString ?? cloudflareEnv.DATABASE_URL;
+
+  if (!connectionString) {
     throw new Error("DATABASE_URL is not set");
   }
 
-  // for cloudflare workers, we need to create a new client for each request
-  if (process.env.CLOUDFLARE_WORKER) {
-    const client = postgres(process.env.DATABASE_URL, { prepare: false });
-    return drizzle({ client, schema });
-  }
-
-  if (!_client) {
-    _client = postgres(process.env.DATABASE_URL, {
-      prepare: false,
-      max: 10,
-      idle_timeout: 30,
-    });
-  }
-
-  return drizzle({ client: _client, schema });
+  // Cloudflare bindings are per-request. Do not cache clients in module scope in Workers.
+  const client = postgres(connectionString, { prepare: false });
+  return drizzle({ client, schema });
 }
 
 if (typeof process !== "undefined") {
