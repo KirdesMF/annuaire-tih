@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
+import { getRequestHeaders } from "@tanstack/react-start/server";
 import { EyeIcon, EyeOffIcon, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import * as v from "valibot";
@@ -28,9 +29,10 @@ export const loginFn = createServerFn({ method: "POST" })
         email: data.email,
         password: data.password,
       },
+      headers: getRequestHeaders(),
     });
 
-    throw redirect({ to: "/compte/entreprises" });
+    return { status: "success" as const };
   });
 
 export const Route = createFileRoute("/(auth)/sign-in")({
@@ -47,6 +49,8 @@ export const Route = createFileRoute("/(auth)/sign-in")({
 
 function RouteComponent() {
   const { toast } = useToast();
+  const router = useRouter();
+  const navigate = Route.useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const { mutate, isPending } = useMutation({
     mutationFn: useServerFn(loginFn),
@@ -71,6 +75,10 @@ function RouteComponent() {
     mutate(
       { data: result.output },
       {
+        onSuccess: async () => {
+          await router.invalidate();
+          await navigate({ to: "/compte/entreprises" });
+        },
         onError: () => {
           toast({
             status: "error",
