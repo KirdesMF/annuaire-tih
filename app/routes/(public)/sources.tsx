@@ -58,6 +58,10 @@ const USEFUL_LINKS = [
     description:
       "TIH-Learning, un programme d’information – conseil en ligne à la croisée des problématiques du handicap et de l’entrepreneuriat.",
   },
+  {
+    label: "Simulateur de déduction sur votre taxe AGEFIPH (par Next Impact Digital)",
+    url: "https://www.next-impact.digital/avantage-oeth",
+  },
 ];
 
 const DOCUMENTS = [
