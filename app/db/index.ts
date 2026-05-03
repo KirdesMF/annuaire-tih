@@ -9,6 +9,8 @@ import * as cguSchema from "./schema/cgu";
 import * as companiesSchema from "./schema/companies";
 import * as companyCategoriesSchema from "./schema/company-categories";
 
+export type DbConnectionMode = "auto" | "direct" | "hyperdrive";
+
 type CloudflareEnv = {
   DATABASE_URL?: string;
   HYPERDRIVE?: { connectionString: string };
@@ -30,12 +32,17 @@ function getCloudflareEnv() {
   return env as CloudflareEnv;
 }
 
-function getConnectionString() {
+function getConnectionString(mode: DbConnectionMode = "auto") {
   const cloudflareEnv = getCloudflareEnv();
-  const connectionString = cloudflareEnv.HYPERDRIVE?.connectionString ?? cloudflareEnv.DATABASE_URL;
+  const connectionString =
+    mode === "direct"
+      ? cloudflareEnv.DATABASE_URL
+      : mode === "hyperdrive"
+        ? cloudflareEnv.HYPERDRIVE?.connectionString
+        : (cloudflareEnv.HYPERDRIVE?.connectionString ?? cloudflareEnv.DATABASE_URL);
 
   if (!connectionString) {
-    throw new Error("DATABASE_URL is not set");
+    throw new Error(`${mode} database connection string is not set`);
   }
 
   return connectionString;
@@ -59,8 +66,8 @@ function getCurrentRequest() {
   }
 }
 
-export function getDb() {
-  const connectionString = getConnectionString();
+export function getDb(mode: DbConnectionMode = "auto") {
+  const connectionString = getConnectionString(mode);
   const request = getCurrentRequest();
 
   if (!request) {
@@ -71,6 +78,10 @@ export function getDb() {
 
     localClient ??= createClient(connectionString);
     return drizzle({ client: localClient, schema });
+  }
+
+  if (mode !== "auto") {
+    return drizzle({ client: createClient(connectionString), schema });
   }
 
   let client = clientsByRequest.get(request);
