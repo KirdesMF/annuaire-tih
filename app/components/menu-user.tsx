@@ -94,7 +94,6 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
         <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
-          {/* biome-ignore lint/a11y/noLabelWithoutControl: dropdown menu */}
           <DropdownMenuLabel className="text-sm font-light px-2 py-1.5">Thème</DropdownMenuLabel>
 
           <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as Theme)}>

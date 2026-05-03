@@ -21,6 +21,11 @@ export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/
   component: RouteComponent,
 });
 
+function getIssueKey(issue: v.BaseIssue<unknown>) {
+  const path = issue.path?.map((item) => String(item.key)).join(".") ?? "root";
+  return `${path}:${issue.type}:${issue.message}`;
+}
+
 function RouteComponent() {
   const params = Route.useParams();
   const context = Route.useRouteContext();
@@ -116,9 +121,8 @@ function RouteComponent() {
       toast({
         description: (
           <span>
-            {result.issues.map((issue, idx) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              <span key={idx}>{issue.message}</span>
+            {result.issues.map((issue) => (
+              <span key={getIssueKey(issue)}>{issue.message}</span>
             ))}
           </span>
         ),

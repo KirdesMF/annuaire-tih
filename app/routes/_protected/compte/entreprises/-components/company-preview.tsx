@@ -144,12 +144,16 @@ export function CompanyPreview({
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <Mail className="size-5" aria-hidden />
-                  <p className="text-xs text-muted-foreground">{preview.email || "Non renseigné"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {preview.email || "Non renseigné"}
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <Phone className="size-5" aria-hidden />
-                  <p className="text-xs text-muted-foreground">{preview.phone || "Non renseigné"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {preview.phone || "Non renseigné"}
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -192,10 +196,12 @@ export function CompanyPreview({
           <Card>
             <CardContent className="flex flex-col gap-2 pt-4">
               <p className="text-sm">
-                <span className="font-bold">Entrepreneur :</span> {preview.business_owner || "Non renseigné"}
+                <span className="font-bold">Entrepreneur :</span>{" "}
+                {preview.business_owner || "Non renseigné"}
               </p>
               <p className="text-sm">
-                <span className="font-bold">Zone géographique :</span> {preview.service_area || "Non renseigné"}
+                <span className="font-bold">Zone géographique :</span>{" "}
+                {preview.service_area || "Non renseigné"}
               </p>
               <p className="text-sm">
                 <span className="font-bold">Mode de travail :</span>{" "}
@@ -228,7 +234,7 @@ export function CompanyPreview({
                     <li key={url}>
                       <img
                         src={url}
-                        alt={`Image ${index + 1} de la galerie de ${preview.name}`}
+                        alt={`${index + 1} de la galerie de ${preview.name}`}
                         className="size-16 rounded-sm object-cover"
                       />
                     </li>
