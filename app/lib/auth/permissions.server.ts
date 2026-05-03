@@ -1,4 +1,4 @@
-import { getRequest } from "@tanstack/react-start/server";
+import { getRequestHeaders } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
 import { getDb } from "~/db";
 import { isValidRole, type UserRole } from "~/db/schema/auth";
@@ -12,7 +12,7 @@ export function isAdminRole(role?: string | null): role is "admin" | "superadmin
 }
 
 export async function getCurrentUser(): Promise<AuthorizedUser | null> {
-  const session = await auth().api.getSession({ headers: getRequest().headers });
+  const session = await auth().api.getSession({ headers: getRequestHeaders() });
   return session?.user ? (session.user as AuthorizedUser) : null;
 }
 
