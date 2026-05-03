@@ -26,8 +26,12 @@ const schema = {
 const clientsByRequest = new WeakMap<Request, postgres.Sql>();
 let localClient: postgres.Sql | undefined;
 
+function getCloudflareEnv() {
+  return env as CloudflareEnv;
+}
+
 function getConnectionString() {
-  const cloudflareEnv = env as CloudflareEnv;
+  const cloudflareEnv = getCloudflareEnv();
   const connectionString = cloudflareEnv.HYPERDRIVE?.connectionString ?? cloudflareEnv.DATABASE_URL;
 
   if (!connectionString) {
@@ -60,6 +64,11 @@ export function getDb() {
   const request = getCurrentRequest();
 
   if (!request) {
+    if (getCloudflareEnv().HYPERDRIVE) {
+      console.warn("getDb() called outside TanStack request context in Cloudflare runtime");
+      return drizzle({ client: createClient(connectionString), schema });
+    }
+
     localClient ??= createClient(connectionString);
     return drizzle({ client: localClient, schema });
   }

@@ -14,6 +14,8 @@ import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as ApiDbHealthRouteImport } from './routes/api/db-health'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as ProtectedAcceptCguRouteImport } from './routes/_protected/accept-cgu'
 import { Route as publicSourcesRouteImport } from './routes/(public)/sources'
@@ -63,6 +65,16 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const ApiHealthRoute = ApiHealthRouteImport.update({
+  id: '/api/health',
+  path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDbHealthRoute = ApiDbHealthRouteImport.update({
+  id: '/api/db-health',
+  path: '/api/db-health',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
@@ -215,6 +227,8 @@ export interface FileRoutesByFullPath {
   '/sources': typeof publicSourcesRoute
   '/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/api/db-health': typeof ApiDbHealthRoute
+  '/api/health': typeof ApiHealthRoute
   '/admin/': typeof AdminIndexRoute
   '/categories/$slug': typeof publicCategoriesSlugRoute
   '/entreprises/$slug': typeof publicEntreprisesSlugRoute
@@ -244,6 +258,8 @@ export interface FileRoutesByTo {
   '/sources': typeof publicSourcesRoute
   '/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/api/db-health': typeof ApiDbHealthRoute
+  '/api/health': typeof ApiHealthRoute
   '/admin': typeof AdminIndexRoute
   '/categories/$slug': typeof publicCategoriesSlugRoute
   '/entreprises/$slug': typeof publicEntreprisesSlugRoute
@@ -276,6 +292,8 @@ export interface FileRoutesById {
   '/(public)/sources': typeof publicSourcesRoute
   '/_protected/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/api/db-health': typeof ApiDbHealthRoute
+  '/api/health': typeof ApiHealthRoute
   '/admin/': typeof AdminIndexRoute
   '/(public)/categories/$slug': typeof publicCategoriesSlugRoute
   '/(public)/entreprises/$slug': typeof publicEntreprisesSlugRoute
@@ -309,6 +327,8 @@ export interface FileRouteTypes {
     | '/sources'
     | '/accept-cgu'
     | '/admin/dashboard'
+    | '/api/db-health'
+    | '/api/health'
     | '/admin/'
     | '/categories/$slug'
     | '/entreprises/$slug'
@@ -338,6 +358,8 @@ export interface FileRouteTypes {
     | '/sources'
     | '/accept-cgu'
     | '/admin/dashboard'
+    | '/api/db-health'
+    | '/api/health'
     | '/admin'
     | '/categories/$slug'
     | '/entreprises/$slug'
@@ -369,6 +391,8 @@ export interface FileRouteTypes {
     | '/(public)/sources'
     | '/_protected/accept-cgu'
     | '/admin/dashboard'
+    | '/api/db-health'
+    | '/api/health'
     | '/admin/'
     | '/(public)/categories/$slug'
     | '/(public)/entreprises/$slug'
@@ -399,6 +423,8 @@ export interface RootRouteChildren {
   publicFaqRoute: typeof publicFaqRoute
   publicPartnersRoute: typeof publicPartnersRoute
   publicSourcesRoute: typeof publicSourcesRoute
+  ApiDbHealthRoute: typeof ApiDbHealthRoute
+  ApiHealthRoute: typeof ApiHealthRoute
   publicCategoriesSlugRoute: typeof publicCategoriesSlugRoute
   publicEntreprisesSlugRoute: typeof publicEntreprisesSlugRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -440,6 +466,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/api/health': {
+      id: '/api/health'
+      path: '/api/health'
+      fullPath: '/api/health'
+      preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/db-health': {
+      id: '/api/db-health'
+      path: '/api/db-health'
+      fullPath: '/api/db-health'
+      preLoaderRoute: typeof ApiDbHealthRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/dashboard': {
       id: '/admin/dashboard'
@@ -709,6 +749,8 @@ const rootRouteChildren: RootRouteChildren = {
   publicFaqRoute: publicFaqRoute,
   publicPartnersRoute: publicPartnersRoute,
   publicSourcesRoute: publicSourcesRoute,
+  ApiDbHealthRoute: ApiDbHealthRoute,
+  ApiHealthRoute: ApiHealthRoute,
   publicCategoriesSlugRoute: publicCategoriesSlugRoute,
   publicEntreprisesSlugRoute: publicEntreprisesSlugRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
