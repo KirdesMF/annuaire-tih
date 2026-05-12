@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Monitor, Moon, SearchIcon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import logo from "~/assets/img/Logo vecto_png.png?url";
@@ -32,6 +32,7 @@ import { type Theme, useTheme } from "./providers/theme-provider";
 
 export function SiteHeader({ user }: { user: AuthUser | undefined }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
   const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
@@ -55,21 +56,77 @@ export function SiteHeader({ user }: { user: AuthUser | undefined }) {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-secondary text-secondary-foreground">
-      <div className="flex h-20 items-stretch justify-between gap-4 px-4 md:h-24 md:px-10 lg:px-20">
-        <div className="flex items-stretch gap-5">
+    <>
+      {pathname === "/" ? (
+        <div className="flex items-center justify-between bg-success px-4 py-1 text-tiny text-success-foreground md:px-10 lg:px-20">
+          <span>Valorisons les talents, construisons une économie plus inclusive</span>
+          <span className="hidden md:inline">
+            Annuaire dédié aux travailleurs handicapés indépendants
+          </span>
+        </div>
+      ) : null}
+
+      <header className="sticky top-0 z-50 w-full bg-background text-foreground">
+      <div className="flex h-16 items-stretch justify-between gap-2 px-4 md:px-10 lg:px-20">
+        <div className="flex items-stretch gap-3">
           <Link
             to="/"
             className="flex shrink-0 items-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             aria-label="Accueil Annuaire TIH"
           >
-            <img src={logo} alt="Annuaire TIH" className="h-14 w-auto md:h-20" />
+            <img src={logo} alt="Annuaire TIH" className="h-10 w-auto md:h-12" />
           </Link>
           <MainNav />
           <MobileNav />
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger
+              render={
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="size-10 border-0 bg-input text-foreground hover:bg-input/90"
+                />
+              }
+            >
+              <SearchIcon className="size-5" strokeWidth={1.8} />
+              <span className="sr-only">Rechercher une entreprise</span>
+            </DialogTrigger>
+
+            <DialogContent>
+              <DialogTitle className="sr-only">Rechercher une entreprise</DialogTitle>
+              <Command shouldFilter={false} className="py-2">
+                <CommandInput
+                  value={searchTerm}
+                  onValueChange={setSearchTerm}
+                  placeholder="Entrez un nom ou une activité..."
+                />
+
+                <CommandSeparator alwaysRender />
+
+                <CommandList>
+                  {!searchTerm && <CommandEmpty>Entrez au moins 3 caractères...</CommandEmpty>}
+                  {searchTerm && isFetching && <CommandLoading>Loading...</CommandLoading>}
+                  {searchTerm.length >= 3 && !isFetching && (
+                    <CommandEmpty>Aucune entreprise trouvée</CommandEmpty>
+                  )}
+
+                  {companies?.map((company) => (
+                    <CommandItem
+                      key={company.id}
+                      onSelect={() => onNavigate("/entreprises/$slug", company.slug)}
+                    >
+                      {company.name}
+                    </CommandItem>
+                  ))}
+                </CommandList>
+              </Command>
+            </DialogContent>
+          </Dialog>
+
           <RegisterLink user={user} />
           {user ? (
             <MenuUser user={user} />
@@ -81,58 +138,8 @@ export function SiteHeader({ user }: { user: AuthUser | undefined }) {
           )}
         </div>
       </div>
-
-      <div className="flex justify-center bg-muted px-4 py-4 md:py-8">
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger
-            render={
-              <button
-                type="button"
-                aria-label="Ouvrir la recherche"
-                className="flex h-12 w-full max-w-xl items-center gap-4 bg-input px-3 text-start text-lg font-light text-foreground shadow-2xs outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50"
-              />
-            }
-          >
-            <SearchIcon className="size-9 shrink-0 text-foreground" strokeWidth={1.8} />
-            <span>Rechercher un nom ou une activité</span>
-            <kbd className="pointer-events-none ml-auto hidden gap-1 bg-muted px-1.5 py-0.5 font-mono text-xs lg:flex">
-              <span>⌘</span>
-              <span>K</span>
-            </kbd>
-          </DialogTrigger>
-
-          <DialogContent>
-            <DialogTitle className="sr-only">Rechercher une entreprise</DialogTitle>
-            <Command shouldFilter={false} className="py-2">
-              <CommandInput
-                value={searchTerm}
-                onValueChange={setSearchTerm}
-                placeholder="Entrez un nom ou une activité..."
-              />
-
-              <CommandSeparator alwaysRender />
-
-              <CommandList>
-                {!searchTerm && <CommandEmpty>Entrez au moins 3 caractères...</CommandEmpty>}
-                {searchTerm && isFetching && <CommandLoading>Loading...</CommandLoading>}
-                {searchTerm.length >= 3 && !isFetching && (
-                  <CommandEmpty>Aucune entreprise trouvée</CommandEmpty>
-                )}
-
-                {companies?.map((company) => (
-                  <CommandItem
-                    key={company.id}
-                    onSelect={() => onNavigate("/entreprises/$slug", company.slug)}
-                  >
-                    {company.name}
-                  </CommandItem>
-                ))}
-              </CommandList>
-            </Command>
-          </DialogContent>
-        </Dialog>
-      </div>
     </header>
+    </>
   );
 }
 
@@ -140,7 +147,7 @@ function RegisterLink({ user }: { user: AuthUser | undefined }) {
   return (
     <Link
       to={user ? "/compte/entreprises/create" : "/sign-up"}
-      className="hidden h-12 items-center bg-card px-8 text-nowrap text-lg text-card-foreground transition-colors hover:bg-card/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
+      className="hidden h-10 items-center bg-card px-6 text-nowrap text-sm text-card-foreground transition-colors hover:bg-card/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
     >
       Se référencer
     </Link>
@@ -153,7 +160,7 @@ function LoginButton({ user }: { user: AuthUser | undefined }) {
   return (
     <Link
       to="/sign-in"
-      className="hidden h-12 items-center bg-card px-8 text-nowrap text-lg text-card-foreground transition-colors hover:bg-card/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
+      className="hidden h-10 items-center bg-card px-6 text-nowrap text-sm text-card-foreground transition-colors hover:bg-card/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
     >
       Se connecter
     </Link>
@@ -179,11 +186,11 @@ function ThemeToggle() {
             type="button"
             variant="outline"
             size="icon"
-            className="size-12 border-0 bg-card text-card-foreground hover:bg-card/90"
+            className="size-10 border-0 bg-card text-card-foreground hover:bg-card/90"
           />
         }
       >
-        <TriggerIcon data-icon="inline-start" className="size-7" />
+        <TriggerIcon data-icon="inline-start" className="size-5" />
         <span className="sr-only">Modifier le thème</span>
       </DropdownMenuTrigger>
 

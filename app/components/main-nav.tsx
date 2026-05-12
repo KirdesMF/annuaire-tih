@@ -16,7 +16,7 @@ export function MainNav() {
             <Link
               to={link.to}
               activeOptions={{ exact: true }}
-              className="flex items-center px-5 text-nowrap text-sm font-extrabold uppercase tracking-tight transition-colors hover:bg-primary/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[status=active]:bg-primary lg:px-7 lg:text-base"
+              className="flex items-center px-5 text-nowrap text-sm font-extrabold uppercase tracking-tight transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[status=active]:text-primary lg:px-6"
             >
               {link.label}
             </Link>
