@@ -5,8 +5,6 @@ import { getRequestHeaders } from "@tanstack/react-start/server";
 import { EyeIcon, EyeOffIcon, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import * as v from "valibot";
-import banner from "~/assets/img/banniere.png?url";
-import logo from "~/assets/img/Logo vecto_png.png?url";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
@@ -91,22 +89,6 @@ function RouteComponent() {
 
   return (
     <main className="bg-background text-foreground">
-      <section className="pt-16 text-center md:pt-24">
-        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pb-10 md:pb-12">
-          <img src={logo} alt="Annuaire TIH" className="mb-8 h-32 w-auto md:h-44" />
-          <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">Annuaire - TIH</h1>
-          <p className="mt-5 text-2xl font-light md:text-4xl">
-            Votre réseau de prestataires indépendants TIH*.
-          </p>
-        </div>
-
-        <img
-          src={banner}
-          alt="Illustration Annuaire TIH"
-          className="h-40 w-full object-cover object-center md:h-72"
-        />
-      </section>
-
       <section className="px-6 py-20 md:py-24">
         <div className="mx-auto w-full max-w-3xl bg-primary px-10 py-10 text-primary-foreground md:px-12">
           <div className="mb-10 flex flex-col gap-6 text-center">

@@ -1,0 +1,8 @@
+# New design
+
+## Landing page /
+
+- [ ] header
+  - [ ] search bar in header
+- [ ] hero section
+  - [ ] remove graphic banner

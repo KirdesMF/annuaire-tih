@@ -3,9 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FunnelIcon } from "lucide-react";
 import abtraining from "~/assets/img/ab-training.png?url";
-import banner from "~/assets/img/banniere.png?url";
 import edmMobile from "~/assets/img/edm-mobile.webp?url";
-import logo from "~/assets/img/Logo vecto_png.png?url";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { seo } from "~/lib/seo";
 import { slugify } from "~/utils/slug";
@@ -26,22 +24,6 @@ function Home() {
 
   return (
     <main className="bg-background text-foreground">
-      <section className="pt-16 text-center md:pt-24">
-        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pb-10 md:pb-12">
-          <img src={logo} alt="Annuaire TIH" className="mb-8 h-32 w-auto md:h-44" />
-          <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">Annuaire - TIH</h1>
-          <p className="mt-5 text-2xl font-light md:text-4xl">
-            Votre réseau de prestataires indépendants TIH*.
-          </p>
-        </div>
-
-        <img
-          src={banner}
-          alt="Illustration Annuaire TIH"
-          className="h-40 w-full object-cover object-center md:h-72"
-        />
-      </section>
-
       <section className="mx-auto max-w-3xl px-6 py-16">
         <p className="mx-auto max-w-xl text-sm leading-snug">
           Collaborez directement avec des entrepreneurs·ses bénéficiant du statut de *Travailleur

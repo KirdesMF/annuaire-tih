@@ -2,8 +2,6 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { ChevronLeftIcon, ChevronRightIcon, Globe, Mail, Phone } from "lucide-react";
 import { useState } from "react";
-import banner from "~/assets/img/banniere.png?url";
-import logo from "~/assets/img/Logo vecto_png.png?url";
 import { CompanyLogo } from "~/components/company-logo";
 import { CopyButton } from "~/components/copy-button";
 import { CalendlyIcon } from "~/components/icons/calendly";
@@ -82,22 +80,6 @@ function RouteComponent() {
 
   return (
     <main className="bg-background text-foreground">
-      <section className="pt-16 text-center md:pt-24">
-        <div className="mx-auto flex max-w-4xl flex-col items-center px-4 pb-10 md:pb-12">
-          <img src={logo} alt="Annuaire TIH" className="mb-8 h-32 w-auto md:h-44" />
-          <h1 className="text-4xl font-extrabold tracking-tight md:text-5xl">Annuaire - TIH</h1>
-          <p className="mt-5 text-2xl font-light md:text-4xl">
-            Votre réseau de prestataires indépendants TIH*.
-          </p>
-        </div>
-
-        <img
-          src={banner}
-          alt="Illustration Annuaire TIH"
-          className="h-40 w-full object-cover object-center md:h-72"
-        />
-      </section>
-
       <section className="mx-auto max-w-3xl px-6 py-20 md:py-24">
         <div className="grid gap-8">
           <div className="grid items-end gap-8 md:grid-cols-[16rem_1fr]">
