@@ -19,6 +19,7 @@ import { Route as ApiDbHealthRouteImport } from './routes/api/db-health'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as ProtectedAcceptCguRouteImport } from './routes/_protected/accept-cgu'
 import { Route as publicSourcesRouteImport } from './routes/(public)/sources'
+import { Route as publicSearchRouteImport } from './routes/(public)/search'
 import { Route as publicPartnersRouteImport } from './routes/(public)/partners'
 import { Route as publicFaqRouteImport } from './routes/(public)/faq'
 import { Route as publicCguRouteImport } from './routes/(public)/cgu'
@@ -89,6 +90,11 @@ const ProtectedAcceptCguRoute = ProtectedAcceptCguRouteImport.update({
 const publicSourcesRoute = publicSourcesRouteImport.update({
   id: '/(public)/sources',
   path: '/sources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const publicSearchRoute = publicSearchRouteImport.update({
+  id: '/(public)/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const publicPartnersRoute = publicPartnersRouteImport.update({
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/cgu': typeof publicCguRoute
   '/faq': typeof publicFaqRoute
   '/partners': typeof publicPartnersRoute
+  '/search': typeof publicSearchRoute
   '/sources': typeof publicSourcesRoute
   '/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -255,6 +262,7 @@ export interface FileRoutesByTo {
   '/cgu': typeof publicCguRoute
   '/faq': typeof publicFaqRoute
   '/partners': typeof publicPartnersRoute
+  '/search': typeof publicSearchRoute
   '/sources': typeof publicSourcesRoute
   '/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -289,6 +297,7 @@ export interface FileRoutesById {
   '/(public)/cgu': typeof publicCguRoute
   '/(public)/faq': typeof publicFaqRoute
   '/(public)/partners': typeof publicPartnersRoute
+  '/(public)/search': typeof publicSearchRoute
   '/(public)/sources': typeof publicSourcesRoute
   '/_protected/accept-cgu': typeof ProtectedAcceptCguRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/cgu'
     | '/faq'
     | '/partners'
+    | '/search'
     | '/sources'
     | '/accept-cgu'
     | '/admin/dashboard'
@@ -355,6 +365,7 @@ export interface FileRouteTypes {
     | '/cgu'
     | '/faq'
     | '/partners'
+    | '/search'
     | '/sources'
     | '/accept-cgu'
     | '/admin/dashboard'
@@ -388,6 +399,7 @@ export interface FileRouteTypes {
     | '/(public)/cgu'
     | '/(public)/faq'
     | '/(public)/partners'
+    | '/(public)/search'
     | '/(public)/sources'
     | '/_protected/accept-cgu'
     | '/admin/dashboard'
@@ -422,6 +434,7 @@ export interface RootRouteChildren {
   publicCguRoute: typeof publicCguRoute
   publicFaqRoute: typeof publicFaqRoute
   publicPartnersRoute: typeof publicPartnersRoute
+  publicSearchRoute: typeof publicSearchRoute
   publicSourcesRoute: typeof publicSourcesRoute
   ApiDbHealthRoute: typeof ApiDbHealthRoute
   ApiHealthRoute: typeof ApiHealthRoute
@@ -500,6 +513,13 @@ declare module '@tanstack/react-router' {
       path: '/sources'
       fullPath: '/sources'
       preLoaderRoute: typeof publicSourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/search': {
+      id: '/(public)/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof publicSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(public)/partners': {
@@ -748,6 +768,7 @@ const rootRouteChildren: RootRouteChildren = {
   publicCguRoute: publicCguRoute,
   publicFaqRoute: publicFaqRoute,
   publicPartnersRoute: publicPartnersRoute,
+  publicSearchRoute: publicSearchRoute,
   publicSourcesRoute: publicSourcesRoute,
   ApiDbHealthRoute: ApiDbHealthRoute,
   ApiHealthRoute: ApiHealthRoute,
