@@ -11,7 +11,6 @@ import {
 } from "~/components/ui/empty";
 import { companiesByCategoryQuery } from "~/lib/api/companies/queries/get-companies-by-category";
 import { seo } from "~/lib/seo";
-import { slugify } from "~/utils/slug";
 
 const SearchSchema = v.object({
   q: v.optional(v.string(), ""),
