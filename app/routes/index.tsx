@@ -24,11 +24,14 @@ function Home() {
 
   return (
     <main className="bg-background text-foreground">
-      <section className="mx-auto max-w-3xl px-6 py-16">
-        <p className="mx-auto max-w-xl text-sm leading-snug">
-          Collaborez directement avec des entrepreneurs·ses bénéficiant du statut de *Travailleur
-          Indépendant Handicapé (TIH) grâce à cet annuaire spécialisé gratuit et public.
-        </p>
+      <section className="mx-auto max-w-7xl px-4 py-24 md:px-10 lg:px-20">
+        <div className="grid gap-12 md:grid-cols-2">
+          <p className="text-2xl md:text-3xl lg:text-4xl">
+            Collaborez directement avec des entrepreneurs·ses bénéficiant du statut de *Travailleur
+            Indépendant Handicapé (TIH) grâce à cet annuaire spécialisé gratuit et public.
+          </p>
+          <div />
+        </div>
 
         <div className="mt-12 flex flex-col items-center justify-center gap-6 sm:flex-row sm:gap-20">
           <a

@@ -58,16 +58,18 @@ export function SiteHeader({ user }: { user: AuthUser | undefined }) {
   return (
     <>
       {pathname === "/" ? (
-        <div className="flex items-center justify-between bg-success px-4 py-1 text-tiny text-success-foreground md:px-10 lg:px-20">
-          <span>Valorisons les talents, construisons une économie plus inclusive</span>
-          <span className="hidden md:inline">
-            Annuaire dédié aux travailleurs handicapés indépendants
-          </span>
+        <div className="bg-success">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1 text-tiny text-success-foreground md:px-10 lg:px-20">
+            <span>Valorisons les talents, construisons une économie plus inclusive</span>
+            <span className="hidden md:inline">
+              Annuaire dédié aux travailleurs handicapés indépendants
+            </span>
+          </div>
         </div>
       ) : null}
 
       <header className="sticky top-0 z-50 w-full bg-background text-foreground">
-      <div className="flex h-16 items-stretch justify-between gap-2 px-4 md:px-10 lg:px-20">
+      <div className="mx-auto flex h-16 max-w-7xl items-stretch justify-between gap-2 px-4 md:px-10 lg:px-20">
         <div className="flex items-stretch gap-3">
           <Link
             to="/"
