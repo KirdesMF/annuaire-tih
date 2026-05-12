@@ -292,6 +292,15 @@
   margin-inline: auto;
 }
 
+@utility scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @custom-variant dark {
   /* This supports the .dark class */
   &:where([data-theme="dark"] *, [data-theme="dark"]) {

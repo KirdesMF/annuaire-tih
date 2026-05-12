@@ -6,3 +6,9 @@
   - [ ] search bar in header
 - [ ] hero section
   - [ ] remove graphic banner
+  
+  
+  
+## Refactor
+-[ ] better auth
+-[ ] hyperdrive

@@ -30,6 +30,7 @@ import { Route as authResetPasswordRouteImport } from './routes/(auth)/reset-pas
 import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-password'
 import { Route as ProtectedCompteRouteRouteImport } from './routes/_protected/compte/route'
 import { Route as ProtectedCompteIndexRouteImport } from './routes/_protected/compte/index'
+import { Route as publicCategoriesIndexRouteImport } from './routes/(public)/categories/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ProtectedComptePreferencesRouteImport } from './routes/_protected/compte/preferences'
 import { Route as publicEntreprisesSlugRouteImport } from './routes/(public)/entreprises/$slug'
@@ -147,6 +148,11 @@ const ProtectedCompteIndexRoute = ProtectedCompteIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ProtectedCompteRouteRoute,
 } as any)
+const publicCategoriesIndexRoute = publicCategoriesIndexRouteImport.update({
+  id: '/(public)/categories/',
+  path: '/categories/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -241,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/entreprises/$slug': typeof publicEntreprisesSlugRoute
   '/compte/preferences': typeof ProtectedComptePreferencesRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/categories/': typeof publicCategoriesIndexRoute
   '/compte/': typeof ProtectedCompteIndexRoute
   '/compte/entreprises/': typeof ProtectedCompteEntreprisesIndexRoute
   '/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren
@@ -273,6 +280,7 @@ export interface FileRoutesByTo {
   '/entreprises/$slug': typeof publicEntreprisesSlugRoute
   '/compte/preferences': typeof ProtectedComptePreferencesRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/categories': typeof publicCategoriesIndexRoute
   '/compte': typeof ProtectedCompteIndexRoute
   '/compte/entreprises': typeof ProtectedCompteEntreprisesIndexRoute
   '/compte/entreprises/create/preview': typeof ProtectedCompteEntreprisesCreatePreviewRoute
@@ -308,6 +316,7 @@ export interface FileRoutesById {
   '/(public)/entreprises/$slug': typeof publicEntreprisesSlugRoute
   '/_protected/compte/preferences': typeof ProtectedComptePreferencesRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/(public)/categories/': typeof publicCategoriesIndexRoute
   '/_protected/compte/': typeof ProtectedCompteIndexRoute
   '/_protected/compte/entreprises/': typeof ProtectedCompteEntreprisesIndexRoute
   '/_protected/compte/entreprises/$slug/edit': typeof ProtectedCompteEntreprisesSlugEditRouteRouteWithChildren
@@ -344,6 +353,7 @@ export interface FileRouteTypes {
     | '/entreprises/$slug'
     | '/compte/preferences'
     | '/api/auth/$'
+    | '/categories/'
     | '/compte/'
     | '/compte/entreprises/'
     | '/compte/entreprises/$slug/edit'
@@ -376,6 +386,7 @@ export interface FileRouteTypes {
     | '/entreprises/$slug'
     | '/compte/preferences'
     | '/api/auth/$'
+    | '/categories'
     | '/compte'
     | '/compte/entreprises'
     | '/compte/entreprises/create/preview'
@@ -410,6 +421,7 @@ export interface FileRouteTypes {
     | '/(public)/entreprises/$slug'
     | '/_protected/compte/preferences'
     | '/api/auth/$'
+    | '/(public)/categories/'
     | '/_protected/compte/'
     | '/_protected/compte/entreprises/'
     | '/_protected/compte/entreprises/$slug/edit'
@@ -441,6 +453,7 @@ export interface RootRouteChildren {
   publicCategoriesSlugRoute: typeof publicCategoriesSlugRoute
   publicEntreprisesSlugRoute: typeof publicEntreprisesSlugRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  publicCategoriesIndexRoute: typeof publicCategoriesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -591,6 +604,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/compte/'
       preLoaderRoute: typeof ProtectedCompteIndexRouteImport
       parentRoute: typeof ProtectedCompteRouteRoute
+    }
+    '/(public)/categories/': {
+      id: '/(public)/categories/'
+      path: '/categories'
+      fullPath: '/categories/'
+      preLoaderRoute: typeof publicCategoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -775,6 +795,7 @@ const rootRouteChildren: RootRouteChildren = {
   publicCategoriesSlugRoute: publicCategoriesSlugRoute,
   publicEntreprisesSlugRoute: publicEntreprisesSlugRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  publicCategoriesIndexRoute: publicCategoriesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
