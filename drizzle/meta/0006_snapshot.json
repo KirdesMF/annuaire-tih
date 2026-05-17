@@ -93,12 +93,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -174,12 +170,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -189,9 +181,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -277,9 +267,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -380,9 +368,7 @@
         "categories_name_unique": {
           "name": "categories_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
+          "columns": ["name"]
         }
       },
       "policies": {},
@@ -468,12 +454,8 @@
           "name": "user_cgu_acceptance_user_id_user_id_fk",
           "tableFrom": "user_cgu_acceptance",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -481,12 +463,8 @@
           "name": "user_cgu_acceptance_cgu_id_cgu_id_fk",
           "tableFrom": "user_cgu_acceptance",
           "tableTo": "cgu",
-          "columnsFrom": [
-            "cgu_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["cgu_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -494,10 +472,7 @@
       "compositePrimaryKeys": {
         "user_cgu_acceptance_user_id_cgu_id_pk": {
           "name": "user_cgu_acceptance_user_id_cgu_id_pk",
-          "columns": [
-            "user_id",
-            "cgu_id"
-          ]
+          "columns": ["user_id", "cgu_id"]
         }
       },
       "uniqueConstraints": {},
@@ -670,12 +645,8 @@
           "name": "companies_created_by_user_id_fk",
           "tableFrom": "companies",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -683,12 +654,8 @@
           "name": "companies_user_id_user_id_fk",
           "tableFrom": "companies",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -698,9 +665,7 @@
         "companies_slug_unique": {
           "name": "companies_slug_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "slug"
-          ]
+          "columns": ["slug"]
         }
       },
       "policies": {},
@@ -737,12 +702,8 @@
           "name": "company_categories_company_id_companies_id_fk",
           "tableFrom": "company_categories",
           "tableTo": "companies",
-          "columnsFrom": [
-            "company_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["company_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -750,12 +711,8 @@
           "name": "company_categories_category_id_categories_id_fk",
           "tableFrom": "company_categories",
           "tableTo": "categories",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["category_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -763,10 +720,7 @@
       "compositePrimaryKeys": {
         "company_categories_company_id_category_id_pk": {
           "name": "company_categories_company_id_category_id_pk",
-          "columns": [
-            "company_id",
-            "category_id"
-          ]
+          "columns": ["company_id", "category_id"]
         }
       },
       "uniqueConstraints": {},

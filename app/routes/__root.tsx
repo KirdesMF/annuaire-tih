@@ -7,7 +7,6 @@ import {
   HeadContent,
   Link,
   Outlet,
-  ScriptOnce,
   Scripts,
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
@@ -15,7 +14,6 @@ import { getRequestHeaders } from "@tanstack/react-start/server";
 import { ArrowLeftIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
-import { ThemeProvider } from "~/components/providers/theme-provider";
 import { SiteFooter } from "~/components/site-footer";
 import { SiteHeader } from "~/components/site-header";
 import { TooltipProvider } from "~/components/ui/tooltip";
@@ -24,7 +22,7 @@ import { DEFAULT_DESCRIPTION, SITE_NAME } from "~/lib/seo";
 import { getThemeServerFn } from "~/lib/theme";
 import appCSS from "~/styles/app.css?url";
 
-const getSession = createServerFn({ method: "GET" }).handler(async () => {
+const getSession = createServerFn().handler(async () => {
   return auth().api.getSession({ headers: getRequestHeaders() });
 });
 
@@ -87,12 +85,22 @@ export const Route = createRootRouteWithContext<RootRouterContext>()({
   }),
   beforeLoad: async ({ context }) => {
     const session = await context.queryClient.fetchQuery(sessionQueryOptions);
-    return { user: session?.user };
+    return { user: session?.user, theme: await getThemeServerFn() };
   },
-  loader: () => getThemeServerFn(),
-
   component: RootComponent,
-  notFoundComponent: () => (
+  notFoundComponent: NotFoundComponent,
+});
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  );
+}
+
+function NotFoundComponent() {
+  return (
     <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-4xl font-bold">404</h1>
@@ -103,56 +111,22 @@ export const Route = createRootRouteWithContext<RootRouterContext>()({
         </Link>
       </div>
     </main>
-  ),
-});
-
-function RootComponent() {
-  const theme = Route.useLoaderData();
-
-  return (
-    <ThemeProvider theme={theme}>
-      <RootDocument>
-        <Outlet />
-      </RootDocument>
-    </ThemeProvider>
   );
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
-  const { user } = Route.useRouteContext();
+  const { user, theme } = Route.useRouteContext();
 
   return (
-    <html lang="fr">
+    <html lang="fr" className={theme}>
       <head>
-        <ScriptOnce>
-          {`(() => {
-            const match = document.cookie.match(/(?:^|;\\s*)ui-theme=([^;]*)/);
-            const preference = match?.[1] || "system";
-            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-            const themeByPreference = {
-              light: "light",
-              dark: "dark",
-              system: prefersDark ? "dark" : "light",
-            };
-
-            document.documentElement.dataset.theme = themeByPreference[preference] || themeByPreference.system;
-          })();`}
-        </ScriptOnce>
         <HeadContent />
       </head>
 
       <body className="font-sans isolate bg-background text-foreground">
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-sm focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:ring-2 focus:ring-ring"
-        >
-          Aller au contenu principal
-        </a>
         <TooltipProvider>
           <SiteHeader user={user} />
-          <div id="main-content" tabIndex={-1}>
-            {children}
-          </div>
+          {children}
           <SiteFooter />
         </TooltipProvider>
         <Toaster />

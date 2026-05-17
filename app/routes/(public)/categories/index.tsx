@@ -3,8 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Rows3 } from "lucide-react";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { seo } from "~/lib/seo";
-import { slugify } from "~/utils/slug";
 import { categoryIcons } from "~/utils/category-icons";
+import { slugify } from "~/utils/slug";
 
 export const Route = createFileRoute("/(public)/categories/")({
   head: () =>
@@ -42,9 +42,7 @@ function RouteComponent() {
         <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
           Toutes les catégories
         </h1>
-        <p className="mt-2 text-muted-foreground">
-          {categories.length} catégories référencées
-        </p>
+        <p className="mt-2 text-muted-foreground">{categories.length} catégories référencées</p>
 
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((category) => {

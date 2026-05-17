@@ -53,7 +53,9 @@ async function generateSignature(params: Record<string, unknown>, secret: string
     .join("");
 }
 
-export async function uploadImageToCloudinary(props: UploadImageToCloudinaryProps): Promise<UploadApiResponse> {
+export async function uploadImageToCloudinary(
+  props: UploadImageToCloudinaryProps,
+): Promise<UploadApiResponse> {
   const { type, file } = props;
   const options = getCloudinaryOptions();
 
@@ -114,7 +116,10 @@ export async function uploadImageToCloudinary(props: UploadImageToCloudinaryProp
 export async function updateImageInCloudinary({
   file,
   publicId,
-}: { file: File; publicId: string }) {
+}: {
+  file: File;
+  publicId: string;
+}) {
   const options = getCloudinaryOptions();
 
   try {

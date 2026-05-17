@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
-import { drizzle } from "drizzle-orm/postgres-js";
 import { getRequest } from "@tanstack/react-start/server";
+import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as analyticsSchema from "./schema/analytics";
 import * as authSchema from "./schema/auth";

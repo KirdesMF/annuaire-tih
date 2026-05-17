@@ -19,7 +19,7 @@ export const forgotPasswordFn = createServerFn({ method: "POST" })
     return v.parse(ForgotPasswordSchema, formObject);
   })
   .handler(async ({ data }) => {
-    await auth().api.forgetPassword({
+    await auth().api.requestPasswordReset({
       body: { email: data.email, redirectTo: "/reset-password" },
       headers: getRequest().headers,
     });
@@ -34,9 +34,11 @@ export const Route = createFileRoute("/(auth)/forgot-password")({
 
 function RouteComponent() {
   const { toast } = useToast();
-  const { mutate, isPending } = useMutation({ mutationFn: useServerFn(forgotPasswordFn) });
+  const { mutate, isPending } = useMutation({
+    mutationFn: useServerFn(forgotPasswordFn),
+  });
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
@@ -64,7 +66,10 @@ function RouteComponent() {
       <div className="max-w-lg mx-auto px-4 py-12 min-h-svh">
         <h1 className="text-2xl font-bold mb-6 tracking-tighter">Mot de passe oublié</h1>
 
-        <div className="border border-blue-500 bg-blue-100 rounded-sm px-2 py-4 text-blue-500 dark:border-blue-400 dark:bg-blue-900 dark:text-blue-400 mb-6" role="note">
+        <div
+          className="border border-blue-500 bg-blue-100 rounded-sm px-2 py-4 text-blue-500 dark:border-blue-400 dark:bg-blue-900 dark:text-blue-400 mb-6"
+          role="note"
+        >
           <div className="flex gap-2">
             <InfoIcon className="size-4 shrink-0" aria-hidden />
             <div className="flex flex-col gap-2">
@@ -84,7 +89,10 @@ function RouteComponent() {
           <Label className="flex flex-col gap-2" htmlFor="forgot-email">
             Email *
             <div className="relative">
-              <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" aria-hidden />
+              <Mail
+                className="size-4 text-muted-foreground absolute inline-s-2 top-2.5"
+                aria-hidden
+              />
               <Input
                 id="forgot-email"
                 type="email"

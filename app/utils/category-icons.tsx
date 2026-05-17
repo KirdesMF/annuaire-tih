@@ -15,8 +15,8 @@ import {
   Palette,
   ShoppingCart,
   Stethoscope,
-  Truck,
   TrendingUp,
+  Truck,
   Users,
 } from "lucide-react";
 

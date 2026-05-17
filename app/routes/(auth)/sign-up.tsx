@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { Link, createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { APIError } from "better-auth/api";
 import { decode } from "decode-formdata";
@@ -183,7 +183,10 @@ function RouteComponent() {
             <Label className="flex flex-col gap-1" htmlFor="signup-email">
               <span>Email*</span>
               <div className="relative">
-                <Mail className="absolute start-2 top-2.5 size-4 text-muted-foreground" aria-hidden />
+                <Mail
+                  className="absolute start-2 top-2.5 size-4 text-muted-foreground"
+                  aria-hidden
+                />
                 <Input
                   id="signup-email"
                   name="email"
@@ -199,7 +202,10 @@ function RouteComponent() {
             <Label className="flex flex-col gap-1" htmlFor="signup-password">
               <span>Mot de passe*</span>
               <div className="relative">
-                <Lock className="absolute start-2 top-2.5 size-4 text-muted-foreground" aria-hidden />
+                <Lock
+                  className="absolute start-2 top-2.5 size-4 text-muted-foreground"
+                  aria-hidden
+                />
                 <Input
                   id="signup-password"
                   name="password"
@@ -213,7 +219,9 @@ function RouteComponent() {
                 <button
                   type="button"
                   className="absolute end-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  aria-label={showPassword.password ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                  aria-label={
+                    showPassword.password ? "Masquer le mot de passe" : "Afficher le mot de passe"
+                  }
                   aria-pressed={showPassword.password}
                   onClick={() =>
                     setShowPassword({ ...showPassword, password: !showPassword.password })
@@ -231,7 +239,10 @@ function RouteComponent() {
             <Label className="flex flex-col gap-1" htmlFor="confirmPassword">
               <span>Confirmation du mot de passe*</span>
               <div className="relative">
-                <Lock className="absolute start-2 top-2.5 size-4 text-muted-foreground" aria-hidden />
+                <Lock
+                  className="absolute start-2 top-2.5 size-4 text-muted-foreground"
+                  aria-hidden
+                />
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"

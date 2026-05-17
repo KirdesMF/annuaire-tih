@@ -47,4 +47,4 @@ export function seo({
   };
 }
 
-export { DEFAULT_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl, pageTitle };
+export { absoluteUrl, DEFAULT_DESCRIPTION, pageTitle, SITE_NAME, SITE_URL };

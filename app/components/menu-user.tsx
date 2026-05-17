@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, rootRouteId, useRouteContext, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { BriefcaseBusiness, DiamondPlus, LayoutDashboard, LogOut, UserCog } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
@@ -17,11 +17,13 @@ import {
 import { isValidRole } from "~/db/schema/auth";
 import { signOutFn } from "~/lib/api/auth/sign-out";
 import type { AuthUser } from "~/lib/auth/auth.server";
-import { type Theme, useTheme } from "./providers/theme-provider";
+import { setThemeServerFn, type Theme } from "~/lib/theme";
 import { useToast } from "./ui/toast";
 
 export function MenuUser({ user }: { user: AuthUser | undefined }) {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useRouteContext({ from: rootRouteId });
+  const router = useRouter();
+
   const { toast } = useToast();
   const role = user?.role;
   const isAdmin = isValidRole(role) && (role === "admin" || role === "superadmin");
@@ -35,6 +37,10 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
         button: { label: "Fermer" },
       }),
   });
+
+  function toggleTheme(theme: Theme) {
+    setThemeServerFn({ data: theme }).then(() => router.invalidate());
+  }
 
   if (!user) return null;
 
@@ -96,12 +102,10 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
         <DropdownMenuGroup>
           <DropdownMenuLabel className="text-sm font-light px-2 py-1.5">Thème</DropdownMenuLabel>
 
-          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as Theme)}>
+          <DropdownMenuRadioGroup value={theme} onValueChange={toggleTheme}>
             <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
-
             <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
-
-            <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="auto">System</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
 

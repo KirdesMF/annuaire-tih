@@ -19,10 +19,7 @@ export const updateUserAvatar = createServerFn({ method: "POST" })
     const avatar = data.get("avatar");
 
     return v.parse(UpdateUserAvatarSchema, {
-      avatar:
-        avatar instanceof File && avatar.size > 0
-          ? avatar
-          : "",
+      avatar: avatar instanceof File && avatar.size > 0 ? avatar : "",
     });
   })
   .handler(async ({ data }) => {

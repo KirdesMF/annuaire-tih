@@ -1,21 +1,21 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Camera, Loader, Lock, Mail, MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
+import { type ChangeEvent, type SyntheticEvent, useEffect, useState } from "react";
 import { InputFile } from "~/components/input-file";
-import { Separator } from "~/components/ui/separator";
-import { type ChangeEvent, type FormEvent, useEffect, useState } from "react";
-import { type Theme, useTheme } from "~/components/providers/theme-provider";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "~/components/ui/dialog";
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { Separator } from "~/components/ui/separator";
 import { useToast } from "~/components/ui/toast";
 import { deleteUser } from "~/lib/api/users/mutations/delete-user";
 import { updateUserAvatar } from "~/lib/api/users/mutations/update-user-avatar";
 import { updateUserEmailFn } from "~/lib/api/users/mutations/update-user-email";
 import { updateUserInfos } from "~/lib/api/users/mutations/update-user-infos";
 import { updateUserPasswordFn } from "~/lib/api/users/mutations/update-user-password";
+import { setThemeServerFn, type Theme } from "~/lib/theme";
 import { cn } from "~/utils/cn";
 
 export const Route = createFileRoute("/_protected/compte/preferences")({
@@ -23,14 +23,16 @@ export const Route = createFileRoute("/_protected/compte/preferences")({
 });
 
 function RouteComponent() {
+  const router = useRouter();
   const context = Route.useRouteContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenPassword, setIsModalOpenPassword] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(context.user.image ?? undefined);
-  const { setTheme, theme } = useTheme();
   const { toast } = useToast();
 
-  const { mutate, isPending } = useMutation({ mutationFn: useServerFn(deleteUser) });
+  const { mutate, isPending } = useMutation({
+    mutationFn: useServerFn(deleteUser),
+  });
   const { mutate: update, isPending: isUpdatingUserInfos } = useMutation({
     mutationFn: useServerFn(updateUserInfos),
   });
@@ -56,6 +58,10 @@ function RouteComponent() {
     };
   }, [avatarPreview]);
 
+  function toggleTheme(theme: Theme) {
+    setThemeServerFn({ data: theme }).then(() => router.invalidate());
+  }
+
   function onDelete() {
     mutate({ data: { userId: context.user.id } });
   }
@@ -71,7 +77,7 @@ function RouteComponent() {
     setAvatarPreview(URL.createObjectURL(file));
   }
 
-  function onUpdateUserName(event: FormEvent<HTMLFormElement>) {
+  function onUpdateUserName(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
@@ -92,7 +98,7 @@ function RouteComponent() {
     );
   }
 
-  function onUpdateUserPassword(event: FormEvent<HTMLFormElement>) {
+  function onUpdateUserPassword(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
@@ -110,7 +116,7 @@ function RouteComponent() {
     );
   }
 
-  function onUpdateUserEmail(event: FormEvent<HTMLFormElement>) {
+  function onUpdateUserEmail(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
@@ -127,7 +133,7 @@ function RouteComponent() {
     );
   }
 
-  function onUpdateUserAvatar(event: FormEvent<HTMLFormElement>) {
+  function onUpdateUserAvatar(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const avatar = formData.get("avatar");
@@ -198,7 +204,7 @@ function RouteComponent() {
                   onChange={onAvatarChange}
                   previewClassName="object-cover"
                   overlay={
-                    <div className="flex h-full flex-col items-center justify-end bg-gradient-to-t from-black/70 via-black/20 to-transparent p-3 text-white opacity-100 transition-opacity md:opacity-0 md:group-hover/input-file:opacity-100 md:group-focus-within/input-file:opacity-100">
+                    <div className="flex h-full flex-col items-center justify-end bg-linear-to-t from-black/70 via-black/20 to-transparent p-3 text-white opacity-100 transition-opacity md:opacity-0 md:group-hover/input-file:opacity-100 md:group-focus-within/input-file:opacity-100">
                       <div className="inline-flex items-center gap-2 rounded-full bg-black/45 px-3 py-1.5 text-[11px] font-medium backdrop-blur-sm">
                         <Camera className="size-3.5" />
                         <span>Changer photo</span>
@@ -217,7 +223,11 @@ function RouteComponent() {
                 className="bg-primary text-primary-foreground px-4 py-2 rounded-sm text-xs"
                 disabled={isUpdatingAvatar}
               >
-                {isUpdatingAvatar ? <Loader className="size-4 animate-spin" /> : "Modifier mon avatar"}
+                {isUpdatingAvatar ? (
+                  <Loader className="size-4 animate-spin" />
+                ) : (
+                  "Modifier mon avatar"
+                )}
               </button>
             </div>
           </form>
@@ -265,7 +275,7 @@ function RouteComponent() {
               <Label>
                 <span className="sr-only">Email</span>
                 <div className="relative">
-                  <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                  <Mail className="size-4 text-muted-foreground absolute inset-s-2 top-2.5" />
                   <Input
                     name="email"
                     defaultValue={context.user.email}
@@ -303,7 +313,7 @@ function RouteComponent() {
             <Label>
               <span className="sr-only">Mot de passe</span>
               <div className="relative">
-                <Lock className="size-4 text-muted-foreground absolute start-2 top-2.5" />
+                <Lock className="size-4 text-muted-foreground absolute inset-s-2 top-2.5" />
                 <Input
                   type="password"
                   name="password"
@@ -392,36 +402,34 @@ function RouteComponent() {
               Vous pouvez modifier le thème du site en selectionnant une option ci-dessous.
             </p>
 
-            <RadioGroup
-              value={theme}
-              onValueChange={(value) => setTheme(value as Theme)}
-              className="flex gap-2"
-            >
+            <RadioGroup value={context.theme} onValueChange={toggleTheme} className="flex gap-2">
               <RadioGroupItem
                 value="light"
                 className={cn(
                   "bg-secondary text-secondary-foreground px-3 py-2 rounded-sm text-xs cursor-pointer flex items-center gap-2",
-                  theme === "light" && "bg-primary text-primary-foreground",
+                  context.theme === "light" && "bg-primary text-primary-foreground",
                 )}
               >
                 <SunIcon className="size-4" />
                 Light
               </RadioGroupItem>
+
               <RadioGroupItem
                 value="dark"
                 className={cn(
                   "bg-secondary text-secondary-foreground px-3 py-2 rounded-sm text-xs cursor-pointer flex items-center gap-2",
-                  theme === "dark" && "bg-primary text-primary-foreground",
+                  context.theme === "dark" && "bg-primary text-primary-foreground",
                 )}
               >
                 <MoonIcon className="size-4" />
                 Dark
               </RadioGroupItem>
+
               <RadioGroupItem
-                value="system"
+                value="auto"
                 className={cn(
                   "bg-secondary text-secondary-foreground px-3 py-2 rounded-sm text-xs cursor-pointer flex items-center gap-2",
-                  theme === "system" && "bg-primary text-primary-foreground",
+                  context.theme === "auto" && "bg-primary text-primary-foreground",
                 )}
               >
                 <MonitorIcon className="size-4" />
@@ -492,4 +500,3 @@ function RouteComponent() {
     </div>
   );
 }
-

@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { Plus } from "lucide-react";
 import { Separator } from "~/components/ui/separator";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";

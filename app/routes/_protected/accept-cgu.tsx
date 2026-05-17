@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { Link, createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { createServerFn, useServerFn } from "@tanstack/react-start";
 import { Loader } from "lucide-react";
 import { getDb } from "~/db";
@@ -15,13 +15,13 @@ const acceptCGUFn = createServerFn({ method: "POST" }).handler(async () => {
   const db = getDb();
 
   await db.transaction(async (tx) => {
-        const activeCGU = await tx.query.cguTable.findFirst({
-          where: (cgu, { eq }) => eq(cgu.isActive, true),
-        });
+    const activeCGU = await tx.query.cguTable.findFirst({
+      where: (cgu, { eq }) => eq(cgu.isActive, true),
+    });
 
-        if (!activeCGU) {
-          throw new Error("No active CGU found");
-        }
+    if (!activeCGU) {
+      throw new Error("No active CGU found");
+    }
 
     await tx.insert(userCguAcceptanceTable).values({
       userId: user.id,

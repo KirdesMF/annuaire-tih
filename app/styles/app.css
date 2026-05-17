@@ -1,12 +1,15 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
 
-@font-face {
-  font-family: "Luciole";
-  src: url("../assets/font/Luciole-Regular.ttf") format("truetype");
-  font-display: swap;
+@custom-variant dark {
+  &:is(.dark *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:is(.auto *) {
+      @slot;
+    }
+  }
 }
 
 :root {
@@ -72,7 +75,7 @@
   --success-foreground: oklch(1 0 0);
 }
 
-[data-theme="dark"] {
+.dark {
   --background: oklch(0.2529 0.0415 279.0076);
   --foreground: oklch(0.9842 0.0034 247.8575);
   --card: oklch(0.312 0.0503 278.3787);
@@ -105,10 +108,6 @@
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(0.3548 0.0524 277.5527);
   --sidebar-ring: oklch(0.6255 0.1741 149.0136);
-  --font-sans: "Inter var", "Inter", system-ui, -apple-system, sans-serif;
-  --font-serif: "Charter", "Bitstream Charter", serif;
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
-  --radius: 0.375rem;
   --shadow-x: 0px;
   --shadow-y: 0px;
   --shadow-blur: 0px;
@@ -131,6 +130,65 @@
   --info-foreground: oklch(0.16 0.035 235);
   --success: oklch(0.74 0.12 145);
   --success-foreground: oklch(0.15 0.035 145);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:is(.auto) {
+    --background: oklch(0.2529 0.0415 279.0076);
+    --foreground: oklch(0.9842 0.0034 247.8575);
+    --card: oklch(0.312 0.0503 278.3787);
+    --card-foreground: oklch(0.9842 0.0034 247.8575);
+    --popover: oklch(0.2824 0.0461 277.7841);
+    --popover-foreground: oklch(0.9842 0.0034 247.8575);
+    --primary: oklch(0.6255 0.1741 149.0136);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.3548 0.0524 277.5527);
+    --secondary-foreground: oklch(0.9842 0.0034 247.8575);
+    --muted: oklch(0.2824 0.0461 277.7841);
+    --muted-foreground: oklch(0.7322 0.0382 275.1551);
+    --accent: oklch(0.3548 0.0524 277.5527);
+    --accent-foreground: oklch(1 0 0);
+    --destructive: oklch(0.7122 0.1748 18.4427);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.3548 0.0524 277.5527);
+    --input: oklch(0.2087 0.0377 278.026);
+    --ring: oklch(0.6255 0.1741 149.0136);
+    --chart-1: oklch(0.6255 0.1741 149.0136);
+    --chart-2: oklch(0.7246 0.1244 256.4227);
+    --chart-3: oklch(0.7112 0.1348 153.8141);
+    --chart-4: oklch(0.8095 0.1613 77.1958);
+    --chart-5: oklch(0.7122 0.1748 18.4427);
+    --sidebar: oklch(0.2824 0.0461 277.7841);
+    --sidebar-foreground: oklch(0.9842 0.0034 247.8575);
+    --sidebar-primary: oklch(0.6255 0.1741 149.0136);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.3548 0.0524 277.5527);
+    --sidebar-accent-foreground: oklch(1 0 0);
+    --sidebar-border: oklch(0.3548 0.0524 277.5527);
+    --sidebar-ring: oklch(0.6255 0.1741 149.0136);
+    --shadow-x: 0px;
+    --shadow-y: 0px;
+    --shadow-blur: 0px;
+    --shadow-spread: 0px;
+    --shadow-opacity: 0;
+    --shadow-color: 0 0 0;
+    --shadow-2xs: 0px 0px 0px 0px hsl(0 0 0 / 0);
+    --shadow-xs: 0px 0px 0px 0px hsl(0 0 0 / 0);
+    --shadow-sm: 0px 0px 0px 0px hsl(0 0 0 / 0), 0px 1px 2px -1px hsl(0 0 0 / 0);
+    --shadow: 0px 0px 0px 0px hsl(0 0 0 / 0), 0px 1px 2px -1px hsl(0 0 0 / 0);
+    --shadow-md: 0px 0px 0px 0px hsl(0 0 0 / 0), 0px 2px 4px -1px hsl(0 0 0 / 0);
+    --shadow-lg: 0px 0px 0px 0px hsl(0 0 0 / 0), 0px 4px 6px -1px hsl(0 0 0 / 0);
+    --shadow-xl: 0px 0px 0px 0px hsl(0 0 0 / 0), 0px 8px 10px -1px hsl(0 0 0 / 0);
+    --shadow-2xl: 0px 0px 0px 0px hsl(0 0 0 / 0);
+    --error: var(--destructive);
+    --error-foreground: var(--destructive-foreground);
+    --warning: oklch(0.76 0.14 85);
+    --warning-foreground: oklch(0.18 0.02 85);
+    --info: oklch(0.76 0.095 235);
+    --info-foreground: oklch(0.16 0.035 235);
+    --success: oklch(0.74 0.12 145);
+    --success-foreground: oklch(0.15 0.035 145);
+  }
 }
 
 @theme inline {
@@ -162,10 +220,13 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-sans: Segoe UI, system-ui, sans-serif;
-  --font-mono: monospace;
-  --font-serif: Georgia, serif;
-  --font-luciole: "Luciole", sans-serif;
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+  --font-heading: var(--font-sans);
+  --text-tiny: 0.625rem;
+  --letter-spacing: var(--letter-spacing);
+
   --radius-sm: calc(var(--radius) + 2px);
   --radius-md: calc(var(--radius) + 4px);
   --radius-lg: calc(var(--radius) + 8px);
@@ -179,8 +240,6 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
-  --font-heading: var(--font-sans);
-  --text-tiny: 0.625rem;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -205,7 +264,6 @@
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
   --tracking-normal: var(--tracking-normal);
   --spacing: var(--spacing);
-  --letter-spacing: var(--letter-spacing);
   --shadow-offset-y: var(--shadow-offset-y);
   --shadow-offset-x: var(--shadow-offset-x);
   --shadow-spread: var(--shadow-spread);
@@ -224,12 +282,6 @@
 
   &::-webkit-scrollbar {
     display: none;
-  }
-}
-
-@custom-variant dark {
-  &:where([data-theme="dark"] *, [data-theme="dark"]) {
-    @slot;
   }
 }
 

@@ -10,10 +10,13 @@ export function CompanyLogo({
   url,
   name,
   size = "sm",
-}: { url?: string; name: string; size?: keyof typeof SIZES }) {
+}: {
+  url?: string;
+  name: string;
+  size?: keyof typeof SIZES;
+}) {
   if (!url) return null;
   return (
     <img src={url} alt={name} className={cn("rounded-sm object-contain size-full", SIZES[size])} />
   );
 }
-

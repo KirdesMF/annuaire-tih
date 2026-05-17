@@ -1,11 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie } from "@tanstack/react-start/server";
-import { DEFAULT_THEME, isTheme, THEME_COOKIE_NAME } from "~/lib/theme.shared";
+import { getCookie, setCookie } from "@tanstack/react-start/server";
+import * as v from "valibot";
 
-export const getThemeServerFn = createServerFn({ method: "GET" }).handler(() => {
-  const theme = getCookie(THEME_COOKIE_NAME);
+const COOKIE_NAME = "app-theme";
 
-  if (!isTheme(theme)) return DEFAULT_THEME;
+const THEME_VALUES = ["light", "dark", "auto"] as const;
+const ThemeSchema = v.picklist(THEME_VALUES);
+export type Theme = v.InferOutput<typeof ThemeSchema>;
+const DEFAULT_THEME = "auto" satisfies Theme;
 
-  return theme;
-});
+const FallbackThemeSchema = v.fallback(ThemeSchema, DEFAULT_THEME);
+
+function getThemeFromCookie(): Theme {
+  return v.parse(FallbackThemeSchema, getCookie(COOKIE_NAME));
+}
+
+export const getThemeServerFn = createServerFn().handler(() => getThemeFromCookie());
+
+export const setThemeServerFn = createServerFn()
+  .inputValidator(ThemeSchema)
+  .handler(({ data }) => setCookie(COOKIE_NAME, data));

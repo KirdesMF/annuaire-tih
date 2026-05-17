@@ -1,13 +1,7 @@
 // app/routes/index.tsx
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import {
-  ArrowRight,
-  ChevronLeft,
-  ChevronRight,
-  Rows3,
-  SearchIcon,
-} from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Rows3, SearchIcon } from "lucide-react";
 import { useState } from "react";
 import abtraining from "~/assets/img/ab-training.png?url";
 import edmMobile from "~/assets/img/edm-mobile.webp?url";
@@ -61,9 +55,9 @@ function Home() {
         <div className="grid gap-12 md:grid-cols-2">
           <div>
             <p className="text-2xl md:text-3xl lg:text-4xl">
-              Collaborez directement avec des entrepreneurs·ses bénéficiant du
-              statut de *Travailleur Indépendant Handicapé (TIH) grâce à cet
-              annuaire spécialisé gratuit et public.
+              Collaborez directement avec des entrepreneurs·ses bénéficiant du statut de
+              *Travailleur Indépendant Handicapé (TIH) grâce à cet annuaire spécialisé gratuit et
+              public.
             </p>
           </div>
 
@@ -78,7 +72,7 @@ function Home() {
             <div className="flex flex-col gap-2">
               <Label htmlFor="search">Mot-clé</Label>
               <div className="relative">
-                <SearchIcon className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <SearchIcon className="absolute inset-s-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="search"
                   type="text"
@@ -123,14 +117,9 @@ function Home() {
         </form>
       </section>
 
-      <section
-        id="categories"
-        className="mx-auto max-w-7xl px-4 pb-32 pt-16 md:px-10 lg:px-20"
-      >
+      <section id="categories" className="mx-auto max-w-7xl px-4 pb-32 pt-16 md:px-10 lg:px-20">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-extrabold tracking-tight">
-            Rechercher par catégorie
-          </h2>
+          <h2 className="text-2xl font-extrabold tracking-tight">Rechercher par catégorie</h2>
 
           <div className="flex items-center gap-2">
             <button
@@ -167,10 +156,7 @@ function Home() {
           </div>
         </div>
 
-        <div
-          id="categories-scroll"
-          className="scrollbar-none flex gap-4 overflow-x-auto"
-        >
+        <div id="categories-scroll" className="scrollbar-none flex gap-4 overflow-x-auto">
           {categories.slice(0, 6).map((category) => {
             const Icon = categoryIcons[category.name] ?? Rows3;
 
@@ -185,9 +171,7 @@ function Home() {
                 <div className="flex size-12 items-center justify-center rounded-xs bg-primary/10 text-primary">
                   <Icon className="size-6" />
                 </div>
-                <span className="text-center text-sm font-medium">
-                  {category.name}
-                </span>
+                <span className="text-center text-sm font-medium">{category.name}</span>
               </Link>
             );
           })}
@@ -197,9 +181,7 @@ function Home() {
             className="flex h-36 w-44 shrink-0 flex-col items-center justify-center gap-2 rounded-xs border border-dashed border-border bg-card/50 p-5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             <Rows3 className="size-6" />
-            <span className="text-center text-sm font-medium">
-              Voir toutes les catégories
-            </span>
+            <span className="text-center text-sm font-medium">Voir toutes les catégories</span>
           </Link>
         </div>
       </section>
@@ -208,11 +190,7 @@ function Home() {
         <h2 className="text-2xl font-light">Sponsors</h2>
 
         <div className="mx-auto mt-10 flex max-w-3xl flex-col items-center justify-center gap-20 sm:flex-row">
-          <a
-            href="https://www.en-dautres-mots.fr"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
+          <a href="https://www.en-dautres-mots.fr" target="_blank" rel="noreferrer noopener">
             <img
               src={edmMobile}
               alt="En d'autres mots, accompagnement administratif"
@@ -220,16 +198,8 @@ function Home() {
             />
           </a>
 
-          <a
-            href="https://www.abtraining.fr"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            <img
-              src={abtraining}
-              alt="AB Training"
-              className="h-80 w-72 bg-card object-contain"
-            />
+          <a href="https://www.abtraining.fr" target="_blank" rel="noreferrer noopener">
+            <img src={abtraining} alt="AB Training" className="h-80 w-72 bg-card object-contain" />
           </a>
         </div>
       </section>

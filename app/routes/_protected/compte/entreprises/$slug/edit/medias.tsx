@@ -86,7 +86,11 @@ function RouteComponent() {
     companyId,
     publicId,
     index,
-  }: { companyId: string; publicId: string; index: number }) {
+  }: {
+    companyId: string;
+    publicId: string;
+    index: number;
+  }) {
     setDeletingMedia(publicId);
     deleteMedia(
       { data: { companyId, publicId, type: "gallery", index } },

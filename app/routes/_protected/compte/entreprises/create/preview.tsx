@@ -1,10 +1,10 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CompanyPreview } from "~/routes/_protected/compte/entreprises/-components/company-preview";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
+import { CompanyPreview } from "~/routes/_protected/compte/entreprises/-components/company-preview";
 import { useAddPreviewStore } from "~/stores/preview.store";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/create/preview")({

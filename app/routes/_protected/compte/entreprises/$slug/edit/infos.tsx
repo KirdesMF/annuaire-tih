@@ -1,15 +1,15 @@
 import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Command } from "cmdk";
 import { decode } from "decode-formdata";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { Separator } from "~/components/ui/separator";
 import { useRef, useState } from "react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Separator } from "~/components/ui/separator";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";

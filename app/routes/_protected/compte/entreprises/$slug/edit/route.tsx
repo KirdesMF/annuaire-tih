@@ -1,4 +1,4 @@
-import { Link, Outlet, createFileRoute, linkOptions, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, linkOptions, Outlet, redirect } from "@tanstack/react-router";
 import * as v from "valibot";
 
 const searchParamsSchema = v.object({

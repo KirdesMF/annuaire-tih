@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getDb } from "~/db";
 import { isValidRole, type UserRole } from "~/db/schema/auth";
 import { companiesTable } from "~/db/schema/companies";
-import { auth, type AuthUser } from "~/lib/auth/auth.server";
+import { type AuthUser, auth } from "~/lib/auth/auth.server";
 
 export type AuthorizedUser = AuthUser & { id: string; role?: UserRole };
 

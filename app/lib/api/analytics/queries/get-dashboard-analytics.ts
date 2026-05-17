@@ -14,7 +14,9 @@ export const getDashboardAnalytics = createServerFn({ method: "GET" }).handler(a
     .orderBy(desc(analyticsEventsTable.createdAt));
 
   const uniqueVisitors = new Set(
-    events.map((event) => event.visitorId).filter((visitorId): visitorId is string => Boolean(visitorId)),
+    events
+      .map((event) => event.visitorId)
+      .filter((visitorId): visitorId is string => Boolean(visitorId)),
   ).size;
 
   const companyViews = events.filter((event) => event.name === "company_viewed").length;

@@ -1,14 +1,25 @@
-import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
-import { Link, createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowUpRight, Building2, Check, Clock3, LoaderIcon, Search, Shield, Trash2, Users, X } from "lucide-react";
+import {
+  ArrowUpRight,
+  Building2,
+  Check,
+  Clock3,
+  LoaderIcon,
+  Search,
+  Shield,
+  Trash2,
+  Users,
+  X,
+} from "lucide-react";
 import { useDeferredValue, useRef } from "react";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { Input } from "~/components/ui/input";
 import { useToast } from "~/components/ui/toast";
-import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "~/components/ui/empty";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 import { isValidRole, type UserRole } from "~/db/schema/auth";
-import { isValidCompanyStatus, type Company, type CompanyStatus } from "~/db/schema/companies";
+import { type Company, type CompanyStatus, isValidCompanyStatus } from "~/db/schema/companies";
 import { updateUserRoleFn } from "~/lib/api/admin/mutations/update-user-role";
 import { deleteCompany } from "~/lib/api/companies/mutations/delete-company";
 import { updateCompanyStatus } from "~/lib/api/companies/mutations/update-company-status";
@@ -22,9 +33,7 @@ export const Route = createFileRoute("/admin/dashboard")({
     companyStatus: isCompanyStatusFilter(search.companyStatus)
       ? search.companyStatus
       : defaultDashboardSearch.companyStatus,
-    userRole: isUserRoleFilter(search.userRole)
-      ? search.userRole
-      : defaultDashboardSearch.userRole,
+    userRole: isUserRoleFilter(search.userRole) ? search.userRole : defaultDashboardSearch.userRole,
   }),
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
@@ -79,18 +88,15 @@ function RouteComponent() {
   const { data: allUsers = [] } = useSuspenseQuery(usersQuery);
   const deferredQuery = useDeferredValue(search.q);
 
-  const {
-    mutate: updateCompany,
-    isPending: isUpdatingCompany,
-  } = useMutation({ mutationFn: useServerFn(updateCompanyStatus) });
-  const {
-    mutate: removeCompany,
-    isPending: isDeletingCompany,
-  } = useMutation({ mutationFn: useServerFn(deleteCompany) });
-  const {
-    mutate: updateUserRole,
-    isPending: isUpdatingUserRole,
-  } = useMutation({ mutationFn: useServerFn(updateUserRoleFn) });
+  const { mutate: updateCompany, isPending: isUpdatingCompany } = useMutation({
+    mutationFn: useServerFn(updateCompanyStatus),
+  });
+  const { mutate: removeCompany, isPending: isDeletingCompany } = useMutation({
+    mutationFn: useServerFn(deleteCompany),
+  });
+  const { mutate: updateUserRole, isPending: isUpdatingUserRole } = useMutation({
+    mutationFn: useServerFn(updateUserRoleFn),
+  });
 
   const currentUser = useRef("");
   const currentCompany = useRef("");
@@ -140,9 +146,7 @@ function RouteComponent() {
   const pendingCompanies = filteredCompanies.filter((company) => company.status === "pending");
   const activeCompanies = companies.filter((company) => company.status === "active");
   const rejectedCompanies = companies.filter((company) => company.status === "rejected");
-  const adminUsers = allUsers.filter(
-    (user) => user.role === "admin" || user.role === "superadmin",
-  );
+  const adminUsers = allUsers.filter((user) => user.role === "admin" || user.role === "superadmin");
   const referencedUsers = allUsers.filter((user) => (companiesByUserId.get(user.id) ?? 0) > 0);
   const approvalRate = companies.length
     ? Math.round((activeCompanies.length / companies.length) * 100)
@@ -219,8 +223,8 @@ function RouteComponent() {
                     Dashboard de supervision
                   </h1>
                   <p className="max-w-3xl text-sm leading-6 text-black/62 dark:text-white/62">
-                    Suivez l'activite des comptes, priorisez les entreprises a moderer et pilotez
-                    la qualite du repertoire depuis une seule vue.
+                    Suivez l'activite des comptes, priorisez les entreprises a moderer et pilotez la
+                    qualite du repertoire depuis une seule vue.
                   </p>
                 </div>
               </div>
@@ -293,199 +297,301 @@ function RouteComponent() {
           {search.view !== "users" ? (
             <div className="grid gap-6 xl:grid-cols-[1.2fr_1.8fr]">
               <section className="rounded-sm border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-black">
-              <SectionHeader
-                eyebrow="Priorite"
-                title="Moderation immediate"
-                subtitle="Les entreprises en attente remontent ici en premier pour accelerer le tri."
-              />
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                <FilterChip
-                  active={search.companyStatus === "all"}
-                  onClick={() => updateSearch({ companyStatus: "all" })}
-                  label={`Tous (${companies.length})`}
+                <SectionHeader
+                  eyebrow="Priorite"
+                  title="Moderation immediate"
+                  subtitle="Les entreprises en attente remontent ici en premier pour accelerer le tri."
                 />
-                <FilterChip
-                  active={search.companyStatus === "pending"}
-                  onClick={() => updateSearch({ companyStatus: "pending" })}
-                  label={`En attente (${companies.filter((company) => company.status === "pending").length})`}
-                />
-                <FilterChip
-                  active={search.companyStatus === "active"}
-                  onClick={() => updateSearch({ companyStatus: "active" })}
-                  label={`Actives (${activeCompanies.length})`}
-                />
-                <FilterChip
-                  active={search.companyStatus === "rejected"}
-                  onClick={() => updateSearch({ companyStatus: "rejected" })}
-                  label={`Rejetees (${rejectedCompanies.length})`}
-                />
-              </div>
 
-              <div className="mt-5 grid gap-3">
-                {pendingCompanies.length ? (
-                  pendingCompanies.slice(0, 6).map((company) => {
-                    const owner = usersById.get(company.user_id);
-                    const isWorking =
-                      (isUpdatingCompany || isDeletingCompany) &&
-                      currentCompany.current === company.id;
-
-                    return (
-                      <article
-                        key={company.id}
-                        className="rounded-sm border border-black/10 bg-black/[0.02] p-4 dark:border-white/10 dark:bg-white/[0.03]"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="grid gap-2">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <h2 className="text-sm font-semibold tracking-tight">
-                                <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
-                                  {company.name}
-                                </Link>
-                              </h2>
-                              <StatusPill status={company.status} />
-                            </div>
-
-                            <div className="grid gap-1 text-xs text-black/55 dark:text-white/55">
-                              <p>SIRET: {company.siret}</p>
-                              <p>
-                                Proprietaire: {owner?.name || "Inconnu"}
-                                {owner?.email ? ` • ${owner.email}` : ""}
-                              </p>
-                              <p>Soumise le {formatDate(company.created_at)}</p>
-                            </div>
-                          </div>
-
-                          {isWorking ? (
-                            <LoaderIcon className="mt-0.5 size-4 animate-spin text-black/50 dark:text-white/50" />
-                          ) : null}
-                        </div>
-
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          <IconActionButton
-                            label="Approuver"
-                            onClick={() => onAction(company.id, "active")}
-                            disabled={isWorking}
-                            tone="solid"
-                            icon={<Check className="size-3.5" />}
-                          />
-                          <IconActionButton
-                            label="Rejeter"
-                            onClick={() => onAction(company.id, "rejected")}
-                            disabled={isWorking}
-                            icon={<X className="size-3.5" />}
-                          />
-                          <IconActionButton
-                            label="Supprimer"
-                            onClick={() => onDeleteCompany(company.id, company.slug)}
-                            disabled={isWorking}
-                            tone="danger"
-                            icon={<Trash2 className="size-3.5" />}
-                          />
-                        </div>
-                      </article>
-                    );
-                  })
-                ) : (
-                  <EmptyState
-                    title="Aucune entreprise a moderer"
-                    description="Les nouvelles soumissions ou les resultats de recherche apparaissent ici."
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <FilterChip
+                    active={search.companyStatus === "all"}
+                    onClick={() => updateSearch({ companyStatus: "all" })}
+                    label={`Tous (${companies.length})`}
                   />
-                )}
-              </div>
-              </section>
-
-              <section className="rounded-sm border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-black">
-              <SectionHeader
-                eyebrow="Annuaire"
-                title="Entreprises"
-                subtitle="Vue detaillee des fiches, avec recherche unifiee et commandes de moderation."
-              />
-
-              <div className="mt-5 overflow-hidden rounded-sm border border-black/10 dark:border-white/10">
-                <div className="grid grid-cols-[minmax(0,2fr)_120px_150px_180px] gap-3 border-b border-black/10 bg-black/[0.03] px-4 py-3 text-[11px] uppercase tracking-[0.16em] text-black/50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
-                  <span>Entreprise</span>
-                  <span>Statut</span>
-                  <span>Responsable</span>
-                  <span>Actions</span>
+                  <FilterChip
+                    active={search.companyStatus === "pending"}
+                    onClick={() => updateSearch({ companyStatus: "pending" })}
+                    label={`En attente (${companies.filter((company) => company.status === "pending").length})`}
+                  />
+                  <FilterChip
+                    active={search.companyStatus === "active"}
+                    onClick={() => updateSearch({ companyStatus: "active" })}
+                    label={`Actives (${activeCompanies.length})`}
+                  />
+                  <FilterChip
+                    active={search.companyStatus === "rejected"}
+                    onClick={() => updateSearch({ companyStatus: "rejected" })}
+                    label={`Rejetees (${rejectedCompanies.length})`}
+                  />
                 </div>
 
-                <div className="divide-y divide-black/10 dark:divide-white/10">
-                  {filteredCompanies.length ? (
-                    filteredCompanies.map((company) => {
+                <div className="mt-5 grid gap-3">
+                  {pendingCompanies.length ? (
+                    pendingCompanies.slice(0, 6).map((company) => {
                       const owner = usersById.get(company.user_id);
                       const isWorking =
                         (isUpdatingCompany || isDeletingCompany) &&
                         currentCompany.current === company.id;
 
                       return (
-                        <div
+                        <article
                           key={company.id}
-                          className="grid grid-cols-1 gap-4 px-4 py-4 md:grid-cols-[minmax(0,2fr)_120px_150px_180px] md:items-center"
+                          className="rounded-sm border border-black/10 bg-black/[0.02] p-4 dark:border-white/10 dark:bg-white/[0.03]"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="grid gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <h2 className="text-sm font-semibold tracking-tight">
+                                  <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
+                                    {company.name}
+                                  </Link>
+                                </h2>
+                                <StatusPill status={company.status} />
+                              </div>
+
+                              <div className="grid gap-1 text-xs text-black/55 dark:text-white/55">
+                                <p>SIRET: {company.siret}</p>
+                                <p>
+                                  Proprietaire: {owner?.name || "Inconnu"}
+                                  {owner?.email ? ` • ${owner.email}` : ""}
+                                </p>
+                                <p>Soumise le {formatDate(company.created_at)}</p>
+                              </div>
+                            </div>
+
+                            {isWorking ? (
+                              <LoaderIcon className="mt-0.5 size-4 animate-spin text-black/50 dark:text-white/50" />
+                            ) : null}
+                          </div>
+
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <IconActionButton
+                              label="Approuver"
+                              onClick={() => onAction(company.id, "active")}
+                              disabled={isWorking}
+                              tone="solid"
+                              icon={<Check className="size-3.5" />}
+                            />
+                            <IconActionButton
+                              label="Rejeter"
+                              onClick={() => onAction(company.id, "rejected")}
+                              disabled={isWorking}
+                              icon={<X className="size-3.5" />}
+                            />
+                            <IconActionButton
+                              label="Supprimer"
+                              onClick={() => onDeleteCompany(company.id, company.slug)}
+                              disabled={isWorking}
+                              tone="danger"
+                              icon={<Trash2 className="size-3.5" />}
+                            />
+                          </div>
+                        </article>
+                      );
+                    })
+                  ) : (
+                    <EmptyState
+                      title="Aucune entreprise a moderer"
+                      description="Les nouvelles soumissions ou les resultats de recherche apparaissent ici."
+                    />
+                  )}
+                </div>
+              </section>
+
+              <section className="rounded-sm border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-black">
+                <SectionHeader
+                  eyebrow="Annuaire"
+                  title="Entreprises"
+                  subtitle="Vue detaillee des fiches, avec recherche unifiee et commandes de moderation."
+                />
+
+                <div className="mt-5 overflow-hidden rounded-sm border border-black/10 dark:border-white/10">
+                  <div className="grid grid-cols-[minmax(0,2fr)_120px_150px_180px] gap-3 border-b border-black/10 bg-black/[0.03] px-4 py-3 text-[11px] uppercase tracking-[0.16em] text-black/50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
+                    <span>Entreprise</span>
+                    <span>Statut</span>
+                    <span>Responsable</span>
+                    <span>Actions</span>
+                  </div>
+
+                  <div className="divide-y divide-black/10 dark:divide-white/10">
+                    {filteredCompanies.length ? (
+                      filteredCompanies.map((company) => {
+                        const owner = usersById.get(company.user_id);
+                        const isWorking =
+                          (isUpdatingCompany || isDeletingCompany) &&
+                          currentCompany.current === company.id;
+
+                        return (
+                          <div
+                            key={company.id}
+                            className="grid grid-cols-1 gap-4 px-4 py-4 md:grid-cols-[minmax(0,2fr)_120px_150px_180px] md:items-center"
+                          >
+                            <div className="grid gap-1">
+                              <div className="flex items-center gap-2">
+                                <Link
+                                  to="/entreprises/$slug"
+                                  params={{ slug: company.slug }}
+                                  className="text-sm font-medium tracking-tight underline-offset-4 hover:underline"
+                                >
+                                  {company.name}
+                                </Link>
+                              </div>
+                              <div className="text-xs text-black/55 dark:text-white/55">
+                                <span>{company.slug}</span>
+                                <span> • </span>
+                                <span>{company.siret}</span>
+                                <span> • </span>
+                                <span>{formatDate(company.created_at)}</span>
+                              </div>
+                            </div>
+
+                            <div>
+                              <StatusPill status={company.status} />
+                            </div>
+
+                            <div className="grid gap-0.5 text-xs text-black/62 dark:text-white/62">
+                              <span>{owner?.name || "Inconnu"}</span>
+                              <span>{owner?.email || company.email || "Aucun email"}</span>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2 md:justify-end">
+                              {isWorking ? (
+                                <span className="inline-flex h-8 items-center rounded-sm border border-black/10 px-3 text-xs dark:border-white/10">
+                                  <LoaderIcon className="size-3.5 animate-spin" />
+                                </span>
+                              ) : (
+                                <>
+                                  {company.status !== "active" ? (
+                                    <IconActionButton
+                                      label="Approuver"
+                                      onClick={() => onAction(company.id, "active")}
+                                      tone="solid"
+                                      icon={<Check className="size-3.5" />}
+                                    />
+                                  ) : null}
+                                  {company.status !== "pending" ? (
+                                    <ActionButton
+                                      label="En attente"
+                                      onClick={() => onAction(company.id, "pending")}
+                                    />
+                                  ) : null}
+                                  {company.status !== "rejected" ? (
+                                    <IconActionButton
+                                      label="Rejeter"
+                                      onClick={() => onAction(company.id, "rejected")}
+                                      icon={<X className="size-3.5" />}
+                                    />
+                                  ) : null}
+                                  <IconActionButton
+                                    label="Supprimer"
+                                    onClick={() => onDeleteCompany(company.id, company.slug)}
+                                    tone="danger"
+                                    icon={<Trash2 className="size-3.5" />}
+                                  />
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="p-6">
+                        <EmptyState
+                          title="Aucun resultat cote entreprises"
+                          description="Ajustez la recherche ou les filtres de statut pour retrouver une fiche."
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
+            </div>
+          ) : null}
+
+          {search.view !== "companies" ? (
+            <section className="rounded-sm border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-black">
+              <SectionHeader
+                eyebrow="Comptes"
+                title="Utilisateurs"
+                subtitle="Recherche par nom ou email, avec bascule rapide des roles d'administration."
+              />
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <FilterChip
+                  active={search.userRole === "all"}
+                  onClick={() => updateSearch({ userRole: "all" })}
+                  label={`Tous (${allUsers.length})`}
+                />
+                <FilterChip
+                  active={search.userRole === "admin"}
+                  onClick={() => updateSearch({ userRole: "admin" })}
+                  label={`Admins (${allUsers.filter((user) => user.role === "admin").length})`}
+                />
+                <FilterChip
+                  active={search.userRole === "superadmin"}
+                  onClick={() => updateSearch({ userRole: "superadmin" })}
+                  label={`Superadmins (${allUsers.filter((user) => user.role === "superadmin").length})`}
+                />
+                <FilterChip
+                  active={search.userRole === "user"}
+                  onClick={() => updateSearch({ userRole: "user" })}
+                  label={`Users (${allUsers.filter((user) => user.role === "user").length})`}
+                />
+              </div>
+
+              <div className="mt-5 overflow-hidden rounded-sm border border-black/10 dark:border-white/10">
+                <div className="grid grid-cols-[minmax(0,2fr)_110px_140px_170px] gap-3 border-b border-black/10 bg-black/[0.03] px-4 py-3 text-[11px] uppercase tracking-[0.16em] text-black/50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
+                  <span>Utilisateur</span>
+                  <span>Role</span>
+                  <span>Entreprises</span>
+                  <span>Action</span>
+                </div>
+
+                <div className="divide-y divide-black/10 dark:divide-white/10">
+                  {filteredUsers.length ? (
+                    filteredUsers.map((user) => {
+                      const companyCount = companiesByUserId.get(user.id) ?? 0;
+                      const isWorking = isUpdatingUserRole && currentUser.current === user.id;
+
+                      return (
+                        <div
+                          key={user.id}
+                          className="grid grid-cols-1 gap-4 px-4 py-4 md:grid-cols-[minmax(0,2fr)_110px_140px_170px] md:items-center"
                         >
                           <div className="grid gap-1">
-                            <div className="flex items-center gap-2">
-                              <Link
-                                to="/entreprises/$slug"
-                                params={{ slug: company.slug }}
-                                className="text-sm font-medium tracking-tight underline-offset-4 hover:underline"
-                              >
-                                {company.name}
-                              </Link>
-                            </div>
-                            <div className="text-xs text-black/55 dark:text-white/55">
-                              <span>{company.slug}</span>
-                              <span> • </span>
-                              <span>{company.siret}</span>
-                              <span> • </span>
-                              <span>{formatDate(company.created_at)}</span>
-                            </div>
+                            <p className="text-sm font-medium tracking-tight">{user.name}</p>
+                            <p className="text-xs text-black/55 dark:text-white/55">{user.email}</p>
                           </div>
 
                           <div>
-                            <StatusPill status={company.status} />
+                            <RolePill role={user.role} />
                           </div>
 
-                          <div className="grid gap-0.5 text-xs text-black/62 dark:text-white/62">
-                            <span>{owner?.name || "Inconnu"}</span>
-                            <span>{owner?.email || company.email || "Aucun email"}</span>
+                          <div className="text-xs text-black/62 dark:text-white/62">
+                            {companyCount} {companyCount > 1 ? "entreprises" : "entreprise"}
                           </div>
 
-                          <div className="flex flex-wrap gap-2 md:justify-end">
+                          <div className="flex justify-start md:justify-end">
                             {isWorking ? (
                               <span className="inline-flex h-8 items-center rounded-sm border border-black/10 px-3 text-xs dark:border-white/10">
                                 <LoaderIcon className="size-3.5 animate-spin" />
                               </span>
+                            ) : user.role === "user" ? (
+                              <ActionButton
+                                label="Promouvoir admin"
+                                onClick={() => onUpdateUserRole(user.id, "admin")}
+                                tone="solid"
+                              />
+                            ) : user.role === "admin" ? (
+                              <ActionButton
+                                label="Retirer admin"
+                                onClick={() => onUpdateUserRole(user.id, "user")}
+                              />
                             ) : (
-                              <>
-                                {company.status !== "active" ? (
-                                  <IconActionButton
-                                    label="Approuver"
-                                    onClick={() => onAction(company.id, "active")}
-                                    tone="solid"
-                                    icon={<Check className="size-3.5" />}
-                                  />
-                                ) : null}
-                                {company.status !== "pending" ? (
-                                  <ActionButton
-                                    label="En attente"
-                                    onClick={() => onAction(company.id, "pending")}
-                                  />
-                                ) : null}
-                                {company.status !== "rejected" ? (
-                                  <IconActionButton
-                                    label="Rejeter"
-                                    onClick={() => onAction(company.id, "rejected")}
-                                    icon={<X className="size-3.5" />}
-                                  />
-                                ) : null}
-                                <IconActionButton
-                                  label="Supprimer"
-                                  onClick={() => onDeleteCompany(company.id, company.slug)}
-                                  tone="danger"
-                                  icon={<Trash2 className="size-3.5" />}
-                                />
-                              </>
+                              <span className="inline-flex h-8 items-center rounded-sm border border-black/10 px-3 text-xs text-black/45 dark:border-white/10 dark:text-white/45">
+                                Role fixe
+                              </span>
                             )}
                           </div>
                         </div>
@@ -494,115 +600,13 @@ function RouteComponent() {
                   ) : (
                     <div className="p-6">
                       <EmptyState
-                        title="Aucun resultat cote entreprises"
-                        description="Ajustez la recherche ou les filtres de statut pour retrouver une fiche."
+                        title="Aucun resultat cote utilisateurs"
+                        description="Essayez un autre nom, email ou filtre de role."
                       />
                     </div>
                   )}
                 </div>
               </div>
-              </section>
-            </div>
-          ) : null}
-
-          {search.view !== "companies" ? (
-            <section className="rounded-sm border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-black">
-            <SectionHeader
-              eyebrow="Comptes"
-              title="Utilisateurs"
-              subtitle="Recherche par nom ou email, avec bascule rapide des roles d'administration."
-            />
-
-            <div className="mt-4 flex flex-wrap gap-2">
-              <FilterChip
-                active={search.userRole === "all"}
-                onClick={() => updateSearch({ userRole: "all" })}
-                label={`Tous (${allUsers.length})`}
-              />
-              <FilterChip
-                active={search.userRole === "admin"}
-                onClick={() => updateSearch({ userRole: "admin" })}
-                label={`Admins (${allUsers.filter((user) => user.role === "admin").length})`}
-              />
-              <FilterChip
-                active={search.userRole === "superadmin"}
-                onClick={() => updateSearch({ userRole: "superadmin" })}
-                label={`Superadmins (${allUsers.filter((user) => user.role === "superadmin").length})`}
-              />
-              <FilterChip
-                active={search.userRole === "user"}
-                onClick={() => updateSearch({ userRole: "user" })}
-                label={`Users (${allUsers.filter((user) => user.role === "user").length})`}
-              />
-            </div>
-
-            <div className="mt-5 overflow-hidden rounded-sm border border-black/10 dark:border-white/10">
-              <div className="grid grid-cols-[minmax(0,2fr)_110px_140px_170px] gap-3 border-b border-black/10 bg-black/[0.03] px-4 py-3 text-[11px] uppercase tracking-[0.16em] text-black/50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
-                <span>Utilisateur</span>
-                <span>Role</span>
-                <span>Entreprises</span>
-                <span>Action</span>
-              </div>
-
-              <div className="divide-y divide-black/10 dark:divide-white/10">
-                {filteredUsers.length ? (
-                  filteredUsers.map((user) => {
-                    const companyCount = companiesByUserId.get(user.id) ?? 0;
-                    const isWorking = isUpdatingUserRole && currentUser.current === user.id;
-
-                    return (
-                      <div
-                        key={user.id}
-                        className="grid grid-cols-1 gap-4 px-4 py-4 md:grid-cols-[minmax(0,2fr)_110px_140px_170px] md:items-center"
-                      >
-                        <div className="grid gap-1">
-                          <p className="text-sm font-medium tracking-tight">{user.name}</p>
-                          <p className="text-xs text-black/55 dark:text-white/55">{user.email}</p>
-                        </div>
-
-                        <div>
-                          <RolePill role={user.role} />
-                        </div>
-
-                        <div className="text-xs text-black/62 dark:text-white/62">
-                          {companyCount} {companyCount > 1 ? "entreprises" : "entreprise"}
-                        </div>
-
-                        <div className="flex justify-start md:justify-end">
-                          {isWorking ? (
-                            <span className="inline-flex h-8 items-center rounded-sm border border-black/10 px-3 text-xs dark:border-white/10">
-                              <LoaderIcon className="size-3.5 animate-spin" />
-                            </span>
-                          ) : user.role === "user" ? (
-                            <ActionButton
-                              label="Promouvoir admin"
-                              onClick={() => onUpdateUserRole(user.id, "admin")}
-                              tone="solid"
-                            />
-                          ) : user.role === "admin" ? (
-                            <ActionButton
-                              label="Retirer admin"
-                              onClick={() => onUpdateUserRole(user.id, "user")}
-                            />
-                          ) : (
-                            <span className="inline-flex h-8 items-center rounded-sm border border-black/10 px-3 text-xs text-black/45 dark:border-white/10 dark:text-white/45">
-                              Role fixe
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="p-6">
-                    <EmptyState
-                      title="Aucun resultat cote utilisateurs"
-                      description="Essayez un autre nom, email ou filtre de role."
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
             </section>
           ) : null}
         </div>
@@ -616,7 +620,12 @@ function MetricCard({
   label,
   value,
   hint,
-}: { icon: React.ReactNode; label: string; value: number | string; hint: string }) {
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number | string;
+  hint: string;
+}) {
   return (
     <div className="bg-white p-4 dark:bg-black">
       <div className="mb-6 inline-flex size-8 items-center justify-center rounded-sm border border-black/10 text-black/70 dark:border-white/10 dark:text-white/70">
@@ -637,7 +646,11 @@ function SectionHeader({
   eyebrow,
   title,
   subtitle,
-}: { eyebrow: string; title: string; subtitle: string }) {
+}: {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+}) {
   return (
     <div className="grid gap-2">
       <p className="text-[11px] uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
@@ -655,7 +668,11 @@ function ToggleChip({
   active,
   onClick,
   label,
-}: { active: boolean; onClick: () => void; label: string }) {
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
   return (
     <button
       type="button"
@@ -676,7 +693,11 @@ function FilterChip({
   active,
   onClick,
   label,
-}: { active: boolean; onClick: () => void; label: string }) {
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
   return (
     <button
       type="button"
@@ -831,7 +852,9 @@ function EmptyState({ title, description }: { title: string; description: string
     <Empty className="rounded-sm border border-dashed border-black/10 bg-black/[0.02] p-5 text-left dark:border-white/10 dark:bg-white/[0.03]">
       <EmptyHeader className="items-start gap-1">
         <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription className="text-black/58 dark:text-white/58">{description}</EmptyDescription>
+        <EmptyDescription className="text-black/58 dark:text-white/58">
+          {description}
+        </EmptyDescription>
       </EmptyHeader>
     </Empty>
   );

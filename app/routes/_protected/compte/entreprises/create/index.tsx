@@ -4,13 +4,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { Command } from "cmdk";
 import { decode } from "decode-formdata";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { Separator } from "~/components/ui/separator";
 import { useRef, useState } from "react";
 import * as v from "valibot";
 import { InputFile } from "~/components/input-file";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Separator } from "~/components/ui/separator";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
@@ -111,9 +111,7 @@ function RouteComponent() {
     }
 
     if (Array.isArray(data.gallery)) {
-      data.gallery = data.gallery.filter(
-        (file) => !(file instanceof File && file.size === 0),
-      );
+      data.gallery = data.gallery.filter((file) => !(file instanceof File && file.size === 0));
     }
 
     return data;
@@ -175,11 +173,7 @@ function RouteComponent() {
       toast({
         status: "error",
         title: "Prévisualisation impossible",
-        description: (
-          <div className="grid gap-1 whitespace-pre-line">
-            {errorMessage}
-          </div>
-        ),
+        description: <div className="grid gap-1 whitespace-pre-line">{errorMessage}</div>,
         button: {
           label: "Copier",
           onClick: () => void copyErrorMessage(errorMessage),

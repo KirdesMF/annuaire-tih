@@ -10,6 +10,8 @@
     "preview": "vite preview",
     "lint": "biome lint",
     "format": "biome format --write",
+    "check": "biome check --write",
+    "typecheck": "tsc --noEmit",
     "deploy": "bun run build && wrangler deploy",
     "cf-typegen": "wrangler types"
   },

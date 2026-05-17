@@ -1,4 +1,4 @@
-import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { isValidRole } from "~/db/schema/auth";
 
 export const Route = createFileRoute("/admin")({

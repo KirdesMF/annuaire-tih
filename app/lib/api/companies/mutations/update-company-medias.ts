@@ -1,7 +1,6 @@
-import { eq } from "drizzle-orm";
-
 import { createServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
+import { eq } from "drizzle-orm";
 import * as v from "valibot";
 import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
@@ -179,7 +178,10 @@ export const updateCompanyGallery = createServerFn({ method: "POST" })
       gallery.map(async (image, index) => {
         if (!image.size) return;
 
-        if (gallery_public_id?.[index] && company.gallery[index]?.publicId !== gallery_public_id[index]) {
+        if (
+          gallery_public_id?.[index] &&
+          company.gallery[index]?.publicId !== gallery_public_id[index]
+        ) {
           throw new Error("Accès non autorisé");
         }
 

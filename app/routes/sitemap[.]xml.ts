@@ -53,14 +53,13 @@ export const Route = createFileRoute("/sitemap.xml")({
   },
 });
 
-function renderSitemap(
-  urls: Array<{ loc: string; lastmod?: Date | string; priority?: string }>,
-) {
+function renderSitemap(urls: Array<{ loc: string; lastmod?: Date | string; priority?: string }>) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
     .map(
-      (url) => `  <url>\n    <loc>${escapeXml(url.loc)}</loc>${
-        url.lastmod ? `\n    <lastmod>${formatDate(url.lastmod)}</lastmod>` : ""
-      }${url.priority ? `\n    <priority>${url.priority}</priority>` : ""}\n  </url>`,
+      (url) =>
+        `  <url>\n    <loc>${escapeXml(url.loc)}</loc>${
+          url.lastmod ? `\n    <lastmod>${formatDate(url.lastmod)}</lastmod>` : ""
+        }${url.priority ? `\n    <priority>${url.priority}</priority>` : ""}\n  </url>`,
     )
     .join("\n")}\n</urlset>`;
 }

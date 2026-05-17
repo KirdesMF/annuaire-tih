@@ -83,9 +83,7 @@ function RouteComponent() {
 }
 
 function SearchResults({ categoryId }: { categoryId: string }) {
-  const { data } = useSuspenseQuery(
-    companiesByCategoryQuery({ categoryId, status: "active" }),
-  );
+  const { data } = useSuspenseQuery(companiesByCategoryQuery({ categoryId, status: "active" }));
 
   if (data.companies.length === 0) {
     return (

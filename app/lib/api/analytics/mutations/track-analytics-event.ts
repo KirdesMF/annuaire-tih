@@ -19,15 +19,17 @@ export const trackAnalyticsEvent = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => v.parse(TrackAnalyticsEventSchema, data))
   .handler(async ({ data }) => {
     try {
-      await getDb().insert(analyticsEventsTable).values({
-        name: data.name,
-        path: data.path,
-        companySlug: data.companySlug,
-        categorySlug: data.categorySlug,
-        source: data.source,
-        visitorId: data.visitorId,
-        metadata: data.metadata ?? null,
-      });
+      await getDb()
+        .insert(analyticsEventsTable)
+        .values({
+          name: data.name,
+          path: data.path,
+          companySlug: data.companySlug,
+          categorySlug: data.categorySlug,
+          source: data.source,
+          visitorId: data.visitorId,
+          metadata: data.metadata ?? null,
+        });
     } catch {
       // Analytics failures must not break user-facing flows.
     }

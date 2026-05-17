@@ -9,7 +9,14 @@ import { TiktokIcon } from "~/components/icons/tiktok";
 import { TwitterIcon } from "~/components/icons/twitter";
 import { YoutubeIcon } from "~/components/icons/youtube";
 import { Input } from "~/components/ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { useToast } from "~/components/ui/toast";
 import type { Company } from "~/db/schema/companies";
 
