@@ -10,5 +10,6 @@
   
   
 ## Refactor
--[ ] better auth
--[ ] hyperdrive
+- [ ] better auth
+- [ ] hyperdrive
+- [ ] improve handling dark mode

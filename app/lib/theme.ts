@@ -1,17 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getCookie, setCookie } from "@tanstack/react-start/server";
-import * as v from "valibot";
-import type { Theme } from "~/components/providers/theme-provider";
-
-const COOKIE_NAME = "ui-theme";
-const ThemeSchema = v.picklist(["light", "dark", "system"]);
+import { getCookie } from "@tanstack/react-start/server";
+import { DEFAULT_THEME, isTheme, THEME_COOKIE_NAME } from "~/lib/theme.shared";
 
 export const getThemeServerFn = createServerFn({ method: "GET" }).handler(() => {
-  return (getCookie(COOKIE_NAME) ?? "system") as Theme;
-});
+  const theme = getCookie(THEME_COOKIE_NAME);
 
-export const setThemeServerFn = createServerFn({ method: "POST" })
-  .inputValidator(ThemeSchema)
-  .handler(({ data }) => {
-    setCookie(COOKIE_NAME, data);
-  });
+  if (!isTheme(theme)) return DEFAULT_THEME;
+
+  return theme;
+});

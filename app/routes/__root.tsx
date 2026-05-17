@@ -3,21 +3,22 @@
 import { type QueryClient, queryOptions } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
+  createRootRouteWithContext,
   HeadContent,
   Link,
   Outlet,
+  ScriptOnce,
   Scripts,
-  createRootRouteWithContext,
 } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { ArrowLeftIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
-import { ThemeProvider, useTheme } from "~/components/providers/theme-provider";
-import { TooltipProvider } from "~/components/ui/tooltip";
+import { ThemeProvider } from "~/components/providers/theme-provider";
 import { SiteFooter } from "~/components/site-footer";
 import { SiteHeader } from "~/components/site-header";
+import { TooltipProvider } from "~/components/ui/tooltip";
 import { auth } from "~/lib/auth/auth.server";
 import { DEFAULT_DESCRIPTION, SITE_NAME } from "~/lib/seo";
 import { getThemeServerFn } from "~/lib/theme";
@@ -51,16 +52,36 @@ export const Route = createRootRouteWithContext<RootRouterContext>()({
     links: [
       { rel: "stylesheet", href: appCSS },
       { rel: "manifest", href: "/site.webmanifest" },
-      { rel: "icon", href: "/img/android-chrome-192x192.png", type: "image/png", sizes: "192x192" },
-      { rel: "icon", href: "/img/android-chrome-512x512.png", type: "image/png", sizes: "512x512" },
+      {
+        rel: "icon",
+        href: "/img/android-chrome-192x192.png",
+        type: "image/png",
+        sizes: "192x192",
+      },
+      {
+        rel: "icon",
+        href: "/img/android-chrome-512x512.png",
+        type: "image/png",
+        sizes: "512x512",
+      },
       {
         rel: "apple-touch-icon",
         href: "/img/apple-touch-icon.png",
         type: "image/png",
         sizes: "180x180",
       },
-      { rel: "icon", href: "/img/favicon-16x16.png", type: "image/png", sizes: "16x16" },
-      { rel: "icon", href: "/img/favicon-32x32.png", type: "image/png", sizes: "32x32" },
+      {
+        rel: "icon",
+        href: "/img/favicon-16x16.png",
+        type: "image/png",
+        sizes: "16x16",
+      },
+      {
+        rel: "icon",
+        href: "/img/favicon-32x32.png",
+        type: "image/png",
+        sizes: "32x32",
+      },
       { rel: "icon", href: "/img/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -99,11 +120,24 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const { user } = Route.useRouteContext();
-  const { theme } = useTheme();
 
   return (
-    <html lang="fr" data-theme={theme}>
+    <html lang="fr">
       <head>
+        <ScriptOnce>
+          {`(() => {
+            const match = document.cookie.match(/(?:^|;\\s*)ui-theme=([^;]*)/);
+            const preference = match?.[1] || "system";
+            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            const themeByPreference = {
+              light: "light",
+              dark: "dark",
+              system: prefersDark ? "dark" : "light",
+            };
+
+            document.documentElement.dataset.theme = themeByPreference[preference] || themeByPreference.system;
+          })();`}
+        </ScriptOnce>
         <HeadContent />
       </head>
 
