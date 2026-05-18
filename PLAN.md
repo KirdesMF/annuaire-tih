@@ -10,7 +10,72 @@ Clean Better Auth setup for TanStack Start on Cloudflare Workers while keeping r
 - Do not add `superadmin` to Better Auth admin roles yet.
 - Do not replace current DB schema unless part of planned migration.
 
-## 1. Keep request-scoped auth setup
+## 1. Dev database environment
+
+Use a remote Supabase dev project, not local Supabase/OrbStack, as the default development database. This better matches production: Cloudflare Workers, Hyperdrive, Supabase pooler, SSL, preview deploys, and OAuth callback behavior.
+
+Actions:
+
+- Create a separate Supabase project for development.
+- Create a separate Cloudflare Hyperdrive config for the dev Supabase database.
+- Add Wrangler environments:
+  - `dev` uses dev Hyperdrive.
+  - `production` uses production Hyperdrive.
+- During setup, use temporary local secret files only if required by Wrangler/local tooling, and keep them ignored by Git.
+- Never store production DB credentials in `.dev.vars` or local env files.
+- Make local Drizzle migrations use the dev database by default.
+- Adopt Infisical after dev/prod environments, Hyperdrive, Cloudinary folders, and migrations are settled.
+- Once adopted, use Infisical for local/dev/prod secret injection and remove long-lived local secret files.
+- Keep production migrations manual/CI-only with explicit approval.
+- Add dev seed script for safe fake data.
+- Do not use local Supabase/OrbStack as the default. Keep it optional only for destructive migration experiments or disposable integration tests.
+
+Validation:
+
+- `bunx wrangler hyperdrive list` shows distinct dev and production configs.
+- `bun dev` uses dev DB through temporary ignored local secrets first, then Infisical once adopted.
+- `bunx wrangler deploy --env dev` uses dev DB.
+- Production deploy uses production DB only.
+
+## 2. Media environments
+
+Use the current personal Cloudinary account during setup, but isolate app assets by folder namespace. Later, move Annuaire TIH to its own Cloudinary account. Once the dedicated account exists, folders should be environment-only (`dev/` and `prod/`) because the account itself will represent the app boundary.
+
+Temporary folder structure in current personal Cloudinary account:
+
+```txt
+annuaire-tih/
+  dev/
+    users/
+    companies/
+  prod/
+    users/
+    companies/
+```
+
+Target folder structure in future Annuaire TIH Cloudinary account:
+
+```txt
+dev/
+  users/
+  companies/
+prod/
+  users/
+  companies/
+```
+
+Actions:
+
+- Add `CLOUDINARY_FOLDER` secret per environment.
+- Temporary dev uses `CLOUDINARY_FOLDER=annuaire-tih/dev`.
+- Temporary production uses `CLOUDINARY_FOLDER=annuaire-tih/prod`.
+- Future dedicated Cloudinary account should use `CLOUDINARY_FOLDER=dev` and `CLOUDINARY_FOLDER=prod`.
+- Update upload helpers to prefix all user/company uploads with `CLOUDINARY_FOLDER`.
+- Ensure delete operations use the full `publicId` returned by Cloudinary.
+- Plan one-time migration for existing production images into the chosen production folder before enforcing the new namespace.
+- Do not move to Cloudflare R2 yet; revisit only if Cloudinary limits/costs become a problem.
+
+## 3. Keep request-scoped auth setup
 
 Current `auth()` factory is needed because Cloudflare Workers can throw request-bound I/O errors when clients created in one request are reused by another.
 
@@ -21,7 +86,7 @@ Actions:
 - Keep Hyperdrive as preferred connection in `auto` mode.
 - Avoid module-level `betterAuth(...)` singleton.
 
-## 2. Split auth server file
+## 4. Split auth server file
 
 `app/lib/auth/auth.server.ts` currently owns too much.
 
@@ -33,37 +98,84 @@ Proposed files:
 - `app/lib/auth/emails.server.ts` — reset/welcome email helpers.
 - `app/lib/auth/permissions.server.ts` — app authorization helpers.
 
-## 3. Better Auth permissions
+## 5. Better Auth permissions
 
 Build explicit permission model before adding `superadmin`.
 
 Actions:
 
 - Keep `admin({ adminRoles: ["admin"] })` for now.
-- Define app permissions by domain/action.
+- Use Better Auth admin plugin access control (`ac` + `roles`) for app-level RBAC.
+- Define roles statically in auth config. Do not create arbitrary app roles from user input.
+- Define app permissions by resource/action.
 - Map Better Auth roles to permissions.
 - Replace scattered role checks with permission checks.
 - Add `superadmin` only after permission model is defined.
+- Re-run Better Auth schema generation / Drizzle migration check after changing plugins or plugin schema.
 
-Example domains:
+Implementation shape:
+
+```ts
+import { createAccessControl } from "better-auth/plugins/access";
+import { admin } from "better-auth/plugins/admin";
+
+const ac = createAccessControl({
+  company: ["create", "read-own", "update-own", "delete-own", "read-any", "update-any", "delete-any"],
+  adminDashboard: ["view"],
+  user: ["read-any", "update-any", "set-role", "delete-any"],
+} as const);
+
+const userRole = ac.newRole({
+  company: ["create", "read-own", "update-own", "delete-own"],
+  adminDashboard: [],
+  user: [],
+});
+
+const adminRole = ac.newRole({
+  company: ["create", "read-own", "update-own", "delete-own", "read-any", "update-any", "delete-any"],
+  adminDashboard: ["view"],
+  user: ["read-any", "update-any", "set-role", "delete-any"],
+});
+
+admin({
+  adminRoles: ["admin"],
+  defaultRole: "user",
+  ac,
+  roles: {
+    user: userRole,
+    admin: adminRole,
+  },
+});
+```
+
+Example permissions:
 
 - `company:create`
-- `company:update:any`
-- `company:update:own`
-- `user:update:any`
-- `user:delete:any`
-- `admin:dashboard:view`
+- `company:read-own`
+- `company:update-own`
+- `company:delete-own`
+- `company:read-any`
+- `company:update-any`
+- `company:delete-any`
+- `user:set-role`
+- `adminDashboard:view`
 
-## 4. Role model cleanup
+## 6. Role model cleanup
 
 Actions:
 
 - Keep DB default role as `user`.
+- Keep Better Auth `admin` plugin `defaultRole: "user"` aligned with DB default.
 - Keep public signup from accepting role input.
 - Centralize role constants and permission mapping.
-- Validate role changes server-side.
+- Validate role changes server-side with a schema/union, not raw strings.
+- Prevent privilege mistakes:
+  - no self-demotion unless another admin exists
+  - no removing the last admin
+  - no assigning roles outside configured Better Auth `roles`
+- Prefer Better Auth `auth().api.setRole` for admin role changes.
 
-## 5. Signup flow fixes
+## 7. Signup flow fixes
 
 Actions:
 
@@ -72,7 +184,7 @@ Actions:
 - Avoid returning silent `{ status: "error" }` without client handling.
 - Ensure duplicate email shows friendly message.
 
-## 6. Signup + CGU consistency
+## 8. Signup + CGU consistency
 
 Current flow creates user, then inserts CGU acceptance. If CGU insert fails, user remains half-created.
 
@@ -85,7 +197,7 @@ Actions:
   - if CGU insert fails, delete created user or mark onboarding incomplete
 - Add tests or manual checks for failure paths.
 
-## 7. Email handling
+## 9. Email handling
 
 Actions:
 
@@ -96,7 +208,7 @@ Actions:
 - Add Better Auth `onExistingUserSignUp` callback to notify the account owner when someone tries to create a new account with an existing email address.
 - Keep duplicate signup UI response generic enough to avoid account enumeration.
 
-## 8. Password hashing
+## 10. Password hashing
 
 Current custom `scryptSync` works but blocks event loop.
 
@@ -107,7 +219,7 @@ Actions:
 - If required, replace `scryptSync` with async `scrypt`.
 - Keep malformed hash checks returning `false`.
 
-## 9. Forgot/reset password hardening
+## 11. Forgot/reset password hardening
 
 Actions:
 
@@ -116,7 +228,7 @@ Actions:
 - Return generic forgot-password success message.
 - Avoid exposing raw Better Auth/provider errors to users.
 
-## 10. Session enrichment performance
+## 12. Session enrichment performance
 
 Current custom session reads role, active CGU, and acceptance on each session read.
 
@@ -127,7 +239,7 @@ Actions:
 - Keep session payload minimal.
 - Avoid expensive session reads in root route when not needed.
 
-## 11. Social sign-in
+## 13. Social sign-in
 
 Add OAuth providers after core email/password flow is stable.
 
