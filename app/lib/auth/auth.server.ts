@@ -1,4 +1,3 @@
-import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, customSession } from "better-auth/plugins";
@@ -7,26 +6,8 @@ import { getDb } from "~/db";
 import type { UserRole } from "~/db/schema/auth";
 import { account, session, user, verification } from "~/db/schema/auth";
 import { sendEmail } from "~/lib/email.server";
-
-const passwordHelpers = {
-  hash: async (password: string) => {
-    const salt = randomBytes(16).toString("hex");
-    const hash = scryptSync(password, salt, 64).toString("hex");
-    return `${salt}:${hash}`;
-  },
-  verify: async ({ hash, password }: { hash: string; password: string }) => {
-    const [salt, key] = hash.split(":");
-
-    if (!salt || !key) return false;
-
-    const hashedBuffer = scryptSync(password, salt, 64);
-    const keyBuffer = Buffer.from(key, "hex");
-
-    if (hashedBuffer.length !== keyBuffer.length) return false;
-
-    return timingSafeEqual(hashedBuffer, keyBuffer);
-  },
-};
+import { passwordHelpers } from "./password.server";
+import { createCustomSession } from "./session.server";
 
 export function auth() {
   const db = getDb();
@@ -44,40 +25,7 @@ export function auth() {
     },
     plugins: [
       admin({ adminRoles: ["admin"] as const }),
-      customSession(async ({ user: currentUser, session }) => {
-        const user = await db.query.user.findFirst({
-          where: (user, { eq }) => eq(user.id, currentUser.id),
-          columns: {
-            role: true,
-          },
-        });
-
-        const activeCGU = await db.query.cguTable.findFirst({
-          where: (cgu, { eq }) => eq(cgu.isActive, true),
-        });
-
-        if (!activeCGU) {
-          return {
-            session,
-            user: { ...currentUser, cgu: false, role: user?.role },
-          };
-        }
-
-        const userCGU = await db.query.userCguAcceptanceTable.findFirst({
-          where: (userCguAcceptance, { eq, and }) =>
-            and(
-              eq(userCguAcceptance.userId, currentUser.id),
-              eq(userCguAcceptance.cguId, activeCGU.id),
-            ),
-        });
-
-        const hasAcceptedCGU = !!userCGU;
-
-        return {
-          session,
-          user: { ...currentUser, cgu: hasAcceptedCGU, role: user?.role },
-        };
-      }),
+      customSession(createCustomSession({ db })),
       tanstackStartCookies(),
     ] as const,
     emailAndPassword: {

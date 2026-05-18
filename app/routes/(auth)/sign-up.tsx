@@ -36,7 +36,10 @@ const SignupSchema = v.pipe(
       v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères"),
       v.maxLength(100, "Le mot de passe doit contenir au plus 100 caractères"),
     ),
-    confirmPassword: v.pipe(v.string(), v.minLength(1, "Veuillez confirmer votre mot de passe")),
+    confirmPassword: v.pipe(
+      v.string(),
+      v.minLength(1, "Veuillez confirmer votre mot de passe"),
+    ),
     cgu: v.boolean("Veuillez accepter les conditions générales d'utilisation"),
   }),
   v.forward(
@@ -122,9 +125,9 @@ function RouteComponent() {
     confirmPassword: false,
   });
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: React.SubmitEvent) {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
+    const formData = new FormData(e.target);
     const decoded = decode(formData, { booleans: ["cgu"] });
 
     const result = v.safeParse(SignupSchema, decoded, { abortEarly: true });
@@ -180,7 +183,7 @@ function RouteComponent() {
               <span>Email*</span>
               <div className="relative">
                 <Mail
-                  className="absolute start-2 top-2.5 size-4 text-muted-foreground"
+                  className="absolute inset-s-2 top-2.5 size-4 text-muted-foreground"
                   aria-hidden
                 />
                 <Input
@@ -199,7 +202,7 @@ function RouteComponent() {
               <span>Mot de passe*</span>
               <div className="relative">
                 <Lock
-                  className="absolute start-2 top-2.5 size-4 text-muted-foreground"
+                  className="absolute inset-s-2 top-2.5 size-4 text-muted-foreground"
                   aria-hidden
                 />
                 <Input
@@ -214,13 +217,18 @@ function RouteComponent() {
                 />
                 <button
                   type="button"
-                  className="absolute end-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="absolute inset-e-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label={
-                    showPassword.password ? "Masquer le mot de passe" : "Afficher le mot de passe"
+                    showPassword.password
+                      ? "Masquer le mot de passe"
+                      : "Afficher le mot de passe"
                   }
                   aria-pressed={showPassword.password}
                   onClick={() =>
-                    setShowPassword({ ...showPassword, password: !showPassword.password })
+                    setShowPassword({
+                      ...showPassword,
+                      password: !showPassword.password,
+                    })
                   }
                 >
                   {showPassword.password ? (
@@ -236,7 +244,7 @@ function RouteComponent() {
               <span>Confirmation du mot de passe*</span>
               <div className="relative">
                 <Lock
-                  className="absolute start-2 top-2.5 size-4 text-muted-foreground"
+                  className="absolute inset-s-2 top-2.5 size-4 text-muted-foreground"
                   aria-hidden
                 />
                 <Input
@@ -251,7 +259,7 @@ function RouteComponent() {
                 />
                 <button
                   type="button"
-                  className="absolute end-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="absolute inset-e-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label={
                     showPassword.confirmPassword
                       ? "Masquer la confirmation du mot de passe"
@@ -275,7 +283,13 @@ function RouteComponent() {
             </Label>
 
             <Label className="flex gap-2 items-center" htmlFor="cgu">
-              <input id="cgu" name="cgu" type="checkbox" required className="accent-primary" />
+              <input
+                id="cgu"
+                name="cgu"
+                type="checkbox"
+                required
+                className="accent-primary"
+              />
               <span className="text-xs">
                 Je reconnais avoir pris connaissance et j'accepte les{" "}
                 <Link to="/cgu" className="text-blue-500 underline">
