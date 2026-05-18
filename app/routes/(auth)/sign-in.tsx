@@ -6,7 +6,9 @@ import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
+import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 import { authClient } from "~/lib/auth/auth.client";
+import { sessionQueryOptions } from "~/lib/auth/session-query";
 
 const LoginSchema = v.object({
   email: v.pipe(
@@ -33,6 +35,7 @@ function RouteComponent() {
   const { toast } = useToast();
   const router = useRouter();
   const navigate = Route.useNavigate();
+  const { queryClient } = Route.useRouteContext();
   const [showPassword, setShowPassword] = useState(false);
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: v.InferOutput<typeof LoginSchema>) => {
@@ -45,7 +48,18 @@ function RouteComponent() {
         throw new Error(result.error.message || "Email ou mot de passe incorrect");
       }
 
-      return result.data;
+      await queryClient.invalidateQueries({ queryKey: sessionQueryOptions.queryKey });
+      const session = await queryClient.fetchQuery(sessionQueryOptions);
+
+      if (session?.user.id) {
+        await queryClient.ensureQueryData(userCompaniesQuery(session.user.id));
+      }
+
+      await router.invalidate();
+
+      return {
+        redirectTo: session?.user.cgu ? "/compte/entreprises" : "/accept-cgu",
+      };
     },
   });
 
@@ -66,9 +80,8 @@ function RouteComponent() {
     }
 
     mutate(result.output, {
-      onSuccess: async () => {
-        await router.invalidate();
-        await navigate({ to: "/compte/entreprises" });
+      onSuccess: async ({ redirectTo }) => {
+        await navigate({ to: redirectTo });
       },
       onError: () => {
         toast({
