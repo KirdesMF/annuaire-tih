@@ -5,7 +5,6 @@ import { APIError } from "better-auth/api";
 import { decode } from "decode-formdata";
 import { EyeIcon, EyeOffIcon, Lock, Mail } from "lucide-react";
 import { useState } from "react";
-import { Resend } from "resend";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -13,6 +12,7 @@ import { useToast } from "~/components/ui/toast";
 import { getDb } from "~/db";
 import { userCguAcceptanceTable } from "~/db/schema/cgu";
 import { auth } from "~/lib/auth/auth.server";
+import { sendEmail } from "~/lib/email.server";
 
 const SignupSchema = v.pipe(
   v.object({
@@ -85,10 +85,7 @@ export const signupFn = createServerFn({ method: "POST" })
       throw error;
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
-    await resend.emails.send({
-      from: "noreply@annuaire-tih.fr",
+    await sendEmail({
       to: data.email,
       subject: "Bienvenue sur l'annuaire Tih",
       react: (

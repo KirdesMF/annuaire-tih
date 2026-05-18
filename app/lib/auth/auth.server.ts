@@ -3,10 +3,10 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, customSession } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
-import { Resend } from "resend";
 import { getDb } from "~/db";
 import type { UserRole } from "~/db/schema/auth";
 import { account, session, user, verification } from "~/db/schema/auth";
+import { sendEmail } from "~/lib/email.server";
 
 const passwordHelpers = {
   hash: async (password: string) => {
@@ -84,20 +84,11 @@ export function auth() {
       enabled: true,
       password: passwordHelpers,
       sendResetPassword: async ({ user, url }) => {
-        const resend = new Resend(process.env.RESEND_API_KEY);
-
-        const { error } = await resend.emails.send({
-          from: "noreply@annuaire-tih.fr",
+        await sendEmail({
           to: user.email,
           subject: "Réinitialisation de mot de passe",
           text: `Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ${url}`,
         });
-
-        if (error) {
-          throw new Error("Failed to send reset password email", {
-            cause: error,
-          });
-        }
       },
     },
     user: {
