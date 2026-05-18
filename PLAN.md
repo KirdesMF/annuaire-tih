@@ -210,7 +210,10 @@ Actions:
 
 Actions:
 
-- Pass request headers to `auth().api.signUpEmail`.
+- Follow Better Auth recommendation: use `authClient` for browser auth flows instead of server actions wrapping `auth().api`.
+- Move sign-in, sign-up, forgot-password, reset-password, and sign-out UI flows to `authClient` where possible.
+- Keep server-side `auth().api` for admin/system operations such as role changes and session reads.
+- Keep CGU acceptance server-side, but call it after successful client signup or rely on `/accept-cgu` guard if it fails.
 - Handle Better Auth signup errors in client UI.
 - Avoid returning silent `{ status: "error" }` without client handling.
 - Ensure duplicate email shows friendly message.

@@ -1,18 +1,25 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { APIError } from "better-auth/api";
+import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
-import { EyeIcon, EyeOffIcon, Lock, Mail } from "lucide-react";
+import { CheckIcon, EyeIcon, EyeOffIcon, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
-import { getDb } from "~/db";
-import { userCguAcceptanceTable } from "~/db/schema/cgu";
-import { auth } from "~/lib/auth/auth.server";
-import { sendEmail } from "~/lib/email.server";
+import { acceptCurrentCguFn } from "~/lib/api/cgu/accept-cgu";
+import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
+import { authClient } from "~/lib/auth/auth.client";
+import { sessionQueryOptions } from "~/lib/auth/session-query";
+
+const SIGNUP_STEPS = [
+  { id: "account", label: "Création du compte..." },
+  { id: "cgu", label: "Validation des CGU..." },
+  { id: "workspace", label: "Préparation de votre espace..." },
+] as const;
+
+type SignupStep = (typeof SIGNUP_STEPS)[number]["id"];
 
 const SignupSchema = v.pipe(
   v.object({
@@ -49,56 +56,6 @@ const SignupSchema = v.pipe(
   ),
 );
 
-export const signupFn = createServerFn({ method: "POST" })
-  .inputValidator(SignupSchema)
-  .handler(async ({ data }) => {
-    try {
-      const res = await auth().api.signUpEmail({
-        body: {
-          email: data.email,
-          password: data.password,
-          name: `${data.firstName} ${data.lastName}`,
-        },
-      });
-
-      const db = getDb();
-
-      // update user cgu acceptance
-      const activeCGU = await db.query.cguTable.findFirst({
-        where: (cgu, { eq }) => eq(cgu.isActive, true),
-      });
-
-      if (!activeCGU) {
-        throw new Error("No active CGU found");
-      }
-
-      await db.insert(userCguAcceptanceTable).values({
-        userId: res.user.id,
-        cguId: activeCGU.id,
-        acceptedAt: new Date(),
-      });
-    } catch (error) {
-      if (error instanceof APIError) {
-        return { status: "error", message: error.message };
-      }
-
-      throw error;
-    }
-
-    await sendEmail({
-      to: data.email,
-      subject: "Bienvenue sur l'annuaire Tih",
-      react: (
-        <div>
-          <h1>Bienvenue sur l'annuaire Tih</h1>
-          <p>Votre compte a été créé avec succès</p>
-        </div>
-      ),
-    });
-
-    throw redirect({ to: "/compte/entreprises" });
-  });
-
 export const Route = createFileRoute("/(auth)/sign-up")({
   head: () => ({
     meta: [{ title: "Créer un compte" }],
@@ -113,8 +70,44 @@ export const Route = createFileRoute("/(auth)/sign-up")({
 
 function RouteComponent() {
   const { toast } = useToast();
+  const navigate = Route.useNavigate();
+  const router = useRouter();
+  const { queryClient } = Route.useRouteContext();
+  const acceptCurrentCgu = useServerFn(acceptCurrentCguFn);
+  const [signupStep, setSignupStep] = useState<SignupStep | null>(null);
   const { mutate, isPending } = useMutation({
-    mutationFn: useServerFn(signupFn),
+    mutationFn: async (data: v.InferOutput<typeof SignupSchema>) => {
+      setSignupStep("account");
+      const result = await authClient.signUp.email({
+        email: data.email,
+        password: data.password,
+        name: `${data.firstName} ${data.lastName}`,
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message || "Impossible de créer le compte");
+      }
+
+      setSignupStep("cgu");
+
+      try {
+        await acceptCurrentCgu();
+      } catch {
+        return { redirectTo: "/accept-cgu" as const };
+      }
+
+      setSignupStep("workspace");
+      await queryClient.invalidateQueries({ queryKey: sessionQueryOptions.queryKey });
+      const session = await queryClient.fetchQuery(sessionQueryOptions);
+
+      if (session?.user.id) {
+        await queryClient.ensureQueryData(userCompaniesQuery(session.user.id));
+      }
+
+      await router.invalidate();
+
+      return { redirectTo: "/compte/entreprises" as const };
+    },
   });
 
   const [showPassword, setShowPassword] = useState({
@@ -137,7 +130,19 @@ function RouteComponent() {
       return;
     }
 
-    mutate({ data: result.output });
+    mutate(result.output, {
+      onSuccess: async ({ redirectTo }) => {
+        await navigate({ to: redirectTo });
+      },
+      onError: (error) => {
+        setSignupStep(null);
+        toast({
+          status: "error",
+          description: error.message || "Impossible de créer le compte",
+          button: { label: "Fermer" },
+        });
+      },
+    });
   }
 
   return (
@@ -289,15 +294,51 @@ function RouteComponent() {
             </Label>
           </div>
 
-          <button
-            type="submit"
-            className="transition-colors px-2 py-3 rounded-sm font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1"
-            disabled={isPending}
-          >
-            {isPending ? "Création en cours..." : "S'inscrire"}
-          </button>
+          <div className="grid gap-3">
+            <button
+              type="submit"
+              className="transition-colors px-2 py-3 rounded-sm font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1"
+              disabled={isPending}
+            >
+              {isPending ? "Création de votre espace..." : "S'inscrire"}
+            </button>
+
+            {isPending ? <SignupProgress activeStep={signupStep} /> : null}
+          </div>
         </form>
       </div>
     </main>
+  );
+}
+
+function SignupProgress({ activeStep }: { activeStep: SignupStep | null }) {
+  const activeIndex = SIGNUP_STEPS.findIndex((step) => step.id === activeStep);
+
+  return (
+    <ul className="grid gap-2 text-xs text-muted-foreground" aria-live="polite">
+      {SIGNUP_STEPS.map((step, index) => {
+        const isDone = activeIndex > index;
+        const isActive = activeIndex === index;
+
+        return (
+          <li key={step.id} className="flex items-center gap-2">
+            <span
+              className={[
+                "grid size-4 place-items-center rounded-full border transition-colors",
+                isDone
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : isActive
+                    ? "border-primary text-primary"
+                    : "border-muted-foreground/40 text-transparent",
+              ].join(" ")}
+              aria-hidden="true"
+            >
+              <CheckIcon className="size-3" />
+            </span>
+            <span className={isActive ? "text-foreground" : undefined}>{step.label}</span>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

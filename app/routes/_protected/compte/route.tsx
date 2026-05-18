@@ -7,6 +7,7 @@ import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 export const Route = createFileRoute("/_protected/compte")({
   component: RouteComponent,
   loader: async ({ context }) => {
+    if (!context.user?.id) return;
     await context.queryClient.ensureQueryData(userCompaniesQuery(context.user.id));
   },
 });

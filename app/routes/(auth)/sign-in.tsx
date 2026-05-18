@@ -1,14 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
-import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
 import { EyeIcon, EyeOffIcon, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
-import { auth } from "~/lib/auth/auth.server";
+import { authClient } from "~/lib/auth/auth.client";
 
 const LoginSchema = v.object({
   email: v.pipe(
@@ -18,20 +16,6 @@ const LoginSchema = v.object({
   ),
   password: v.pipe(v.string(), v.nonEmpty("Veuillez entrer un mot de passe")),
 });
-
-export const loginFn = createServerFn({ method: "POST" })
-  .inputValidator(LoginSchema)
-  .handler(async ({ data }) => {
-    await auth().api.signInEmail({
-      body: {
-        email: data.email,
-        password: data.password,
-      },
-      headers: getRequestHeaders(),
-    });
-
-    return { status: "success" as const };
-  });
 
 export const Route = createFileRoute("/(auth)/sign-in")({
   head: () => ({
@@ -51,7 +35,18 @@ function RouteComponent() {
   const navigate = Route.useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const { mutate, isPending } = useMutation({
-    mutationFn: useServerFn(loginFn),
+    mutationFn: async (data: v.InferOutput<typeof LoginSchema>) => {
+      const result = await authClient.signIn.email({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message || "Email ou mot de passe incorrect");
+      }
+
+      return result.data;
+    },
   });
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -70,21 +65,18 @@ function RouteComponent() {
       return;
     }
 
-    mutate(
-      { data: result.output },
-      {
-        onSuccess: async () => {
-          await router.invalidate();
-          await navigate({ to: "/compte/entreprises" });
-        },
-        onError: () => {
-          toast({
-            status: "error",
-            description: "Email ou mot de passe incorrect",
-          });
-        },
+    mutate(result.output, {
+      onSuccess: async () => {
+        await router.invalidate();
+        await navigate({ to: "/compte/entreprises" });
       },
-    );
+      onError: () => {
+        toast({
+          status: "error",
+          description: "Email ou mot de passe incorrect",
+        });
+      },
+    });
   }
 
   return (
