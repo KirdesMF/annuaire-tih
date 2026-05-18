@@ -72,9 +72,7 @@ function RouteComponent() {
   return (
     <main>
       <div className="max-w-lg mx-auto px-4 py-12 min-h-svh">
-        <h1 className="text-2xl font-bold mb-6 tracking-tighter">
-          Réinitialiser le mot de passe
-        </h1>
+        <h1 className="text-2xl font-bold mb-6 tracking-tighter">Réinitialiser le mot de passe</h1>
         <form className="flex flex-col gap-6" onSubmit={onSubmit}>
           <input type="hidden" name="token" value={searchParams.token} />
           <Label className="flex flex-col gap-2" htmlFor="newPassword">
@@ -97,11 +95,7 @@ function RouteComponent() {
               <button
                 type="button"
                 className="absolute inset-e-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={
-                  showPassword
-                    ? "Masquer le mot de passe"
-                    : "Afficher le mot de passe"
-                }
+                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                 aria-pressed={showPassword}
                 onClick={() => setShowPassword(!showPassword)}
               >

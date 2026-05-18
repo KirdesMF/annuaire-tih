@@ -6,6 +6,7 @@ import { getDb } from "~/db";
 import type { UserRole } from "~/db/schema/auth";
 import { account, session, user, verification } from "~/db/schema/auth";
 import { sendEmail } from "~/lib/email.server";
+import { authAc, authRoles } from "./access-control.server";
 import { passwordHelpers } from "./password.server";
 import { createCustomSession } from "./session.server";
 
@@ -24,7 +25,12 @@ export function auth() {
       },
     },
     plugins: [
-      admin({ adminRoles: ["admin"] as const }),
+      admin({
+        adminRoles: ["admin"] as const,
+        defaultRole: "user",
+        ac: authAc,
+        roles: authRoles,
+      }),
       customSession(createCustomSession({ db })),
       tanstackStartCookies(),
     ] as const,

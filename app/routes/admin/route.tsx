@@ -6,7 +6,7 @@ export const Route = createFileRoute("/admin")({
     if (!context.user) throw redirect({ to: "/sign-in" });
     const role = context.user.role;
 
-    if (!isValidRole(role) || (role !== "admin" && role !== "superadmin")) {
+    if (!isValidRole(role) || role !== "admin") {
       throw redirect({ to: "/sign-in" });
     }
   },

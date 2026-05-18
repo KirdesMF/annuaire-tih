@@ -36,10 +36,7 @@ const SignupSchema = v.pipe(
       v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères"),
       v.maxLength(100, "Le mot de passe doit contenir au plus 100 caractères"),
     ),
-    confirmPassword: v.pipe(
-      v.string(),
-      v.minLength(1, "Veuillez confirmer votre mot de passe"),
-    ),
+    confirmPassword: v.pipe(v.string(), v.minLength(1, "Veuillez confirmer votre mot de passe")),
     cgu: v.boolean("Veuillez accepter les conditions générales d'utilisation"),
   }),
   v.forward(
@@ -219,9 +216,7 @@ function RouteComponent() {
                   type="button"
                   className="absolute inset-e-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label={
-                    showPassword.password
-                      ? "Masquer le mot de passe"
-                      : "Afficher le mot de passe"
+                    showPassword.password ? "Masquer le mot de passe" : "Afficher le mot de passe"
                   }
                   aria-pressed={showPassword.password}
                   onClick={() =>
@@ -283,13 +278,7 @@ function RouteComponent() {
             </Label>
 
             <Label className="flex gap-2 items-center" htmlFor="cgu">
-              <input
-                id="cgu"
-                name="cgu"
-                type="checkbox"
-                required
-                className="accent-primary"
-              />
+              <input id="cgu" name="cgu" type="checkbox" required className="accent-primary" />
               <span className="text-xs">
                 Je reconnais avoir pris connaissance et j'accepte les{" "}
                 <Link to="/cgu" className="text-blue-500 underline">

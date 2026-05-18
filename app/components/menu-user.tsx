@@ -26,7 +26,7 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
 
   const { toast } = useToast();
   const role = user?.role;
-  const isAdmin = isValidRole(role) && (role === "admin" || role === "superadmin");
+  const isAdmin = isValidRole(role) && role === "admin";
 
   const { mutate: signOut } = useMutation({
     mutationFn: useServerFn(signOutFn),
