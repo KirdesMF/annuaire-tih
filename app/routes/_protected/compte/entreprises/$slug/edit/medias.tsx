@@ -10,13 +10,13 @@ import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
 import { deleteCompanyMedia } from "~/lib/api/companies/mutations/delete-company-media";
 import { updateCompanyMedia } from "~/lib/api/companies/mutations/update-company-medias";
-import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { manageCompanyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import { UpdateCompanyMediaSchema } from "~/lib/validator/company.schema";
 import { useAddPreviewStore } from "~/stores/preview.store";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/medias")({
   loader: async ({ context, params }) => {
-    await context.queryClient.ensureQueryData(companyBySlugQuery(params.slug));
+    await context.queryClient.ensureQueryData(manageCompanyBySlugQuery(params.slug));
   },
   component: RouteComponent,
 });
@@ -31,7 +31,7 @@ function RouteComponent() {
   const context = Route.useRouteContext();
   const navigate = Route.useNavigate();
 
-  const { data: company } = useSuspenseQuery(companyBySlugQuery(params.slug));
+  const { data: company } = useSuspenseQuery(manageCompanyBySlugQuery(params.slug));
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompanyMedia) });
   const { mutate: deleteMedia, isPending: isDeletingMedia } = useMutation({
     mutationFn: useServerFn(deleteCompanyMedia),

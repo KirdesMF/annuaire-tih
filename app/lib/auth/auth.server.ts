@@ -16,15 +16,21 @@ const passwordHelpers = {
   },
   verify: async ({ hash, password }: { hash: string; password: string }) => {
     const [salt, key] = hash.split(":");
+
+    if (!salt || !key) return false;
+
     const hashedBuffer = scryptSync(password, salt, 64);
     const keyBuffer = Buffer.from(key, "hex");
+
+    if (hashedBuffer.length !== keyBuffer.length) return false;
+
     return timingSafeEqual(hashedBuffer, keyBuffer);
   },
 };
 
-// @todo: use relational queries instead of raw queries
 export function auth() {
   const db = getDb();
+
   return betterAuth({
     database: drizzleAdapter(db, {
       provider: "pg",
@@ -37,7 +43,7 @@ export function auth() {
       },
     },
     plugins: [
-      admin({ adminRoles: ["admin"] }),
+      admin({ adminRoles: ["admin"] as const }),
       customSession(async ({ user: currentUser, session }) => {
         const user = await db.query.user.findFirst({
           where: (user, { eq }) => eq(user.id, currentUser.id),
@@ -73,7 +79,7 @@ export function auth() {
         };
       }),
       tanstackStartCookies(),
-    ],
+    ] as const,
     emailAndPassword: {
       enabled: true,
       password: passwordHelpers,
@@ -104,6 +110,8 @@ export function auth() {
       additionalFields: {
         role: {
           type: "string",
+          required: false,
+          defaultValue: "user",
         },
       },
     },

@@ -58,7 +58,6 @@ export const signupFn = createServerFn({ method: "POST" })
           email: data.email,
           password: data.password,
           name: `${data.firstName} ${data.lastName}`,
-          role: "user",
         },
       });
 

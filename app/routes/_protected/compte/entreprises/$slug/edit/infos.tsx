@@ -13,7 +13,7 @@ import { Separator } from "~/components/ui/separator";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
-import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { manageCompanyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import { UpdateCompanyInfosSchema } from "~/lib/validator/company.schema";
 import { useUpdatePreviewStore } from "~/stores/preview.store";
 import { cn } from "~/utils/cn";
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/
   loader: async ({ context, params }) => {
     // seed the cache
     await Promise.all([
-      context.queryClient.ensureQueryData(companyBySlugQuery(params.slug)),
+      context.queryClient.ensureQueryData(manageCompanyBySlugQuery(params.slug)),
       context.queryClient.ensureQueryData(categoriesQueryOptions),
     ]);
   },
@@ -42,7 +42,7 @@ function RouteComponent() {
   const formRef = useRef<HTMLFormElement>(null);
   const { setPreview } = useUpdatePreviewStore();
   const [categories, company] = useSuspenseQueries({
-    queries: [categoriesQueryOptions, companyBySlugQuery(params.slug)],
+    queries: [categoriesQueryOptions, manageCompanyBySlugQuery(params.slug)],
   });
 
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompanyInfos) });
