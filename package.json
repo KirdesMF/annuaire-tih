@@ -4,8 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun --env-file=.env.local vite dev",
-    "build": "vite build && tsc --noEmit",
+    "dev": "WRANGLER_ENV=dev bun --env-file=.dev.vars vite dev",
+    "build": "bun run build:dev",
     "start": "vite preview",
     "preview": "vite preview",
     "lint": "biome lint",
@@ -17,10 +17,10 @@
     "build:prod": "WRANGLER_ENV=production vite build && tsc --noEmit",
     "deploy:dev": "bun run build:dev && wrangler deploy --env dev",
     "deploy:prod": "bun run build:prod && wrangler deploy --env production",
-    "cf-typegen": "wrangler types --config wrangler.jsonc",
-    "db:generate": "bun --env-file=.env.local drizzle-kit generate",
-    "db:migrate:dev": "bun --env-file=.env.local drizzle-kit migrate",
-    "db:seed:dev": "bun --env-file=.env.local app/db/seeds/dev.ts"
+    "cf-typegen": "wrangler types --env dev --config wrangler.jsonc",
+    "db:generate": "bun --env-file=.dev.vars drizzle-kit generate",
+    "db:migrate:dev": "bun --env-file=.dev.vars drizzle-kit migrate",
+    "db:seed:dev": "bun --env-file=.dev.vars app/db/seeds/dev.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.12",
