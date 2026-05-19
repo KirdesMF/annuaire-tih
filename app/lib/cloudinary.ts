@@ -24,16 +24,30 @@ function getCloudinaryOptions() {
   const name = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const folder = process.env.CLOUDINARY_FOLDER;
 
   if (!name || !apiKey || !apiSecret) {
     throw new Error("Cloudinary credentials are not set");
+  }
+
+  if (!folder) {
+    throw new Error("Cloudinary folder is not set");
   }
 
   return {
     name,
     api_key: apiKey,
     api_secret: apiSecret,
+    folder: normalizeFolder(folder),
   };
+}
+
+function normalizeFolder(folder: string): string {
+  return folder.replace(/^\/+|\/+$/g, "");
+}
+
+function joinCloudinaryPath(...parts: Array<string>): string {
+  return parts.map(normalizeFolder).filter(Boolean).join("/");
 }
 
 // generate signature for cloudinary upload
@@ -63,10 +77,10 @@ export async function uploadImageToCloudinary(
     type === "avatar" ? `${props.userId}-${Date.now()}` : `${props.companyId}-${Date.now()}`;
   const path =
     type === "avatar"
-      ? `users/${props.userId}/avatar`
+      ? joinCloudinaryPath(options.folder, "users", props.userId, "avatar")
       : type === "logo"
-        ? `companies/${props.companySlug}/logo`
-        : `companies/${props.companySlug}/gallery`;
+        ? joinCloudinaryPath(options.folder, "companies", props.companySlug, "logo")
+        : joinCloudinaryPath(options.folder, "companies", props.companySlug, "gallery");
 
   try {
     const formData = new FormData();
@@ -213,7 +227,7 @@ export async function deleteCompanyFromCloudinary(slug: string) {
   const options = getCloudinaryOptions();
 
   try {
-    const path = `companies/${slug}`;
+    const path = joinCloudinaryPath(options.folder, "companies", slug);
 
     // list all resources in path
     const url = new URL(`https://api.cloudinary.com/v1_1/${options.name}/resources/image/upload`);
@@ -258,7 +272,7 @@ export async function deleteCompanyFromCloudinary(slug: string) {
     }
 
     // delete the folder
-    const folders = [`${path}/logo`, `${path}/gallery`, path];
+    const folders = [joinCloudinaryPath(path, "logo"), joinCloudinaryPath(path, "gallery"), path];
     await Promise.all(
       folders.map(async (folder) => {
         const folderURL = new URL(

@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link, rootRouteId, useRouteContext, useRouter } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { BriefcaseBusiness, DiamondPlus, LayoutDashboard, LogOut, UserCog } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
@@ -15,27 +15,52 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { isValidRole } from "~/db/schema/auth";
-import { signOutFn } from "~/lib/api/auth/sign-out";
 import type { AuthUser } from "~/lib/auth/auth.server";
+import { sessionQueryOptions } from "~/lib/auth/session-query";
 import { setThemeServerFn, type Theme } from "~/lib/theme";
 import { useToast } from "./ui/toast";
 
+const signOutClient = createClientOnlyFn(async () => {
+  const { authClient } = await import("~/lib/auth/auth.client");
+  return authClient.signOut();
+});
+
 export function MenuUser({ user }: { user: AuthUser | undefined }) {
-  const { theme } = useRouteContext({ from: rootRouteId });
+  const { theme, queryClient } = useRouteContext({ from: rootRouteId });
   const router = useRouter();
 
   const { toast } = useToast();
   const role = user?.role;
-  const isAdmin = isValidRole(role) && (role === "admin" || role === "superadmin");
+  const isAdmin = isValidRole(role) && role === "admin";
 
   const { mutate: signOut } = useMutation({
-    mutationFn: useServerFn(signOutFn),
-    onSuccess: () =>
+    mutationFn: async () => {
+      const result = await signOutClient();
+
+      if (result.error) {
+        throw new Error(result.error.message || "Impossible de se déconnecter");
+      }
+
+      queryClient.setQueryData(sessionQueryOptions.queryKey, null);
+
+      return result.data;
+    },
+    onSuccess: async () => {
       toast({
         status: "success",
         description: "Vous avez été déconnecté avec succès",
         button: { label: "Fermer" },
-      }),
+      });
+      await router.navigate({ to: "/" });
+      await router.invalidate();
+    },
+    onError: (error) => {
+      toast({
+        status: "error",
+        description: error.message || "Impossible de se déconnecter",
+        button: { label: "Fermer" },
+      });
+    },
   });
 
   function toggleTheme(theme: Theme) {
@@ -112,7 +137,7 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
         <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => signOut(undefined)}>
+          <DropdownMenuItem onClick={() => signOut()}>
             <LogOut data-icon="inline-start" />
             <span>Se déconnecter</span>
           </DropdownMenuItem>

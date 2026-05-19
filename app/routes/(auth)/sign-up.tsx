@@ -1,18 +1,29 @@
 import { useMutation } from "@tanstack/react-query";
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { APIError } from "better-auth/api";
+import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
+import { createClientOnlyFn, useServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
-import { EyeIcon, EyeOffIcon, Lock, Mail } from "lucide-react";
+import { CheckIcon, EyeIcon, EyeOffIcon, Lock, Mail } from "lucide-react";
 import { useState } from "react";
-import { Resend } from "resend";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
-import { getDb } from "~/db";
-import { userCguAcceptanceTable } from "~/db/schema/cgu";
-import { auth } from "~/lib/auth/auth.server";
+import { acceptCurrentCguFn } from "~/lib/api/cgu/accept-cgu";
+import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
+import {
+  PASSWORD_LENGTH_MESSAGE,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+} from "~/lib/auth/password-policy";
+import { sessionQueryOptions } from "~/lib/auth/session-query";
+
+const SIGNUP_STEPS = [
+  { id: "account", label: "Création du compte..." },
+  { id: "cgu", label: "Validation des CGU..." },
+  { id: "workspace", label: "Préparation de votre espace..." },
+] as const;
+
+type SignupStep = (typeof SIGNUP_STEPS)[number]["id"];
 
 const SignupSchema = v.pipe(
   v.object({
@@ -33,8 +44,8 @@ const SignupSchema = v.pipe(
     ),
     password: v.pipe(
       v.string(),
-      v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères"),
-      v.maxLength(100, "Le mot de passe doit contenir au plus 100 caractères"),
+      v.minLength(PASSWORD_MIN_LENGTH, PASSWORD_LENGTH_MESSAGE),
+      v.maxLength(PASSWORD_MAX_LENGTH, PASSWORD_LENGTH_MESSAGE),
     ),
     confirmPassword: v.pipe(v.string(), v.minLength(1, "Veuillez confirmer votre mot de passe")),
     cgu: v.boolean("Veuillez accepter les conditions générales d'utilisation"),
@@ -49,59 +60,12 @@ const SignupSchema = v.pipe(
   ),
 );
 
-export const signupFn = createServerFn({ method: "POST" })
-  .inputValidator(SignupSchema)
-  .handler(async ({ data }) => {
-    try {
-      const res = await auth().api.signUpEmail({
-        body: {
-          email: data.email,
-          password: data.password,
-          name: `${data.firstName} ${data.lastName}`,
-          role: "user",
-        },
-      });
-
-      const db = getDb();
-
-      // update user cgu acceptance
-      const activeCGU = await db.query.cguTable.findFirst({
-        where: (cgu, { eq }) => eq(cgu.isActive, true),
-      });
-
-      if (!activeCGU) {
-        throw new Error("No active CGU found");
-      }
-
-      await db.insert(userCguAcceptanceTable).values({
-        userId: res.user.id,
-        cguId: activeCGU.id,
-        acceptedAt: new Date(),
-      });
-    } catch (error) {
-      if (error instanceof APIError) {
-        return { status: "error", message: error.message };
-      }
-
-      throw error;
-    }
-
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
-    await resend.emails.send({
-      from: "noreply@annuaire-tih.fr",
-      to: data.email,
-      subject: "Bienvenue sur l'annuaire Tih",
-      react: (
-        <div>
-          <h1>Bienvenue sur l'annuaire Tih</h1>
-          <p>Votre compte a été créé avec succès</p>
-        </div>
-      ),
-    });
-
-    throw redirect({ to: "/compte/entreprises" });
-  });
+const signUpEmailClient = createClientOnlyFn(
+  async (data: { email: string; password: string; name: string }) => {
+    const { authClient } = await import("~/lib/auth/auth.client");
+    return authClient.signUp.email(data);
+  },
+);
 
 export const Route = createFileRoute("/(auth)/sign-up")({
   head: () => ({
@@ -117,8 +81,44 @@ export const Route = createFileRoute("/(auth)/sign-up")({
 
 function RouteComponent() {
   const { toast } = useToast();
+  const navigate = Route.useNavigate();
+  const router = useRouter();
+  const { queryClient } = Route.useRouteContext();
+  const acceptCurrentCgu = useServerFn(acceptCurrentCguFn);
+  const [signupStep, setSignupStep] = useState<SignupStep | null>(null);
   const { mutate, isPending } = useMutation({
-    mutationFn: useServerFn(signupFn),
+    mutationFn: async (data: v.InferOutput<typeof SignupSchema>) => {
+      setSignupStep("account");
+      const result = await signUpEmailClient({
+        email: data.email,
+        password: data.password,
+        name: `${data.firstName} ${data.lastName}`,
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message || "Impossible de créer le compte");
+      }
+
+      setSignupStep("cgu");
+
+      try {
+        await acceptCurrentCgu();
+      } catch {
+        return { redirectTo: "/accept-cgu" as const };
+      }
+
+      setSignupStep("workspace");
+      await queryClient.invalidateQueries({ queryKey: sessionQueryOptions.queryKey });
+      const session = await queryClient.fetchQuery(sessionQueryOptions);
+
+      if (session?.user.id) {
+        await queryClient.ensureQueryData(userCompaniesQuery(session.user.id));
+      }
+
+      await router.invalidate();
+
+      return { redirectTo: "/compte/entreprises" as const };
+    },
   });
 
   const [showPassword, setShowPassword] = useState({
@@ -126,9 +126,9 @@ function RouteComponent() {
     confirmPassword: false,
   });
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: React.SubmitEvent) {
     e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
+    const formData = new FormData(e.target);
     const decoded = decode(formData, { booleans: ["cgu"] });
 
     const result = v.safeParse(SignupSchema, decoded, { abortEarly: true });
@@ -141,7 +141,20 @@ function RouteComponent() {
       return;
     }
 
-    mutate({ data: result.output });
+    mutate(result.output, {
+      onSuccess: async ({ redirectTo }) => {
+        await navigate({ to: redirectTo });
+      },
+      onError: () => {
+        setSignupStep(null);
+        toast({
+          status: "error",
+          description:
+            "Impossible de créer le compte. Si cette adresse est déjà utilisée, connectez-vous ou réinitialisez votre mot de passe.",
+          button: { label: "Fermer" },
+        });
+      },
+    });
   }
 
   return (
@@ -184,7 +197,7 @@ function RouteComponent() {
               <span>Email*</span>
               <div className="relative">
                 <Mail
-                  className="absolute start-2 top-2.5 size-4 text-muted-foreground"
+                  className="absolute inset-s-2 top-2.5 size-4 text-muted-foreground"
                   aria-hidden
                 />
                 <Input
@@ -203,7 +216,7 @@ function RouteComponent() {
               <span>Mot de passe*</span>
               <div className="relative">
                 <Lock
-                  className="absolute start-2 top-2.5 size-4 text-muted-foreground"
+                  className="absolute inset-s-2 top-2.5 size-4 text-muted-foreground"
                   aria-hidden
                 />
                 <Input
@@ -212,19 +225,23 @@ function RouteComponent() {
                   type={showPassword.password ? "text" : "password"}
                   autoComplete="new-password"
                   required
-                  minLength={8}
+                  minLength={PASSWORD_MIN_LENGTH}
+                  maxLength={PASSWORD_MAX_LENGTH}
                   placeholder="••••••••••••••••"
                   className="ps-8"
                 />
                 <button
                   type="button"
-                  className="absolute end-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="absolute inset-e-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label={
                     showPassword.password ? "Masquer le mot de passe" : "Afficher le mot de passe"
                   }
                   aria-pressed={showPassword.password}
                   onClick={() =>
-                    setShowPassword({ ...showPassword, password: !showPassword.password })
+                    setShowPassword({
+                      ...showPassword,
+                      password: !showPassword.password,
+                    })
                   }
                 >
                   {showPassword.password ? (
@@ -240,7 +257,7 @@ function RouteComponent() {
               <span>Confirmation du mot de passe*</span>
               <div className="relative">
                 <Lock
-                  className="absolute start-2 top-2.5 size-4 text-muted-foreground"
+                  className="absolute inset-s-2 top-2.5 size-4 text-muted-foreground"
                   aria-hidden
                 />
                 <Input
@@ -249,13 +266,14 @@ function RouteComponent() {
                   type={showPassword.confirmPassword ? "text" : "password"}
                   autoComplete="new-password"
                   required
-                  minLength={8}
+                  minLength={PASSWORD_MIN_LENGTH}
+                  maxLength={PASSWORD_MAX_LENGTH}
                   placeholder="••••••••••••••••"
                   className="ps-8"
                 />
                 <button
                   type="button"
-                  className="absolute end-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="absolute inset-e-2 top-2.5 rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label={
                     showPassword.confirmPassword
                       ? "Masquer la confirmation du mot de passe"
@@ -290,15 +308,51 @@ function RouteComponent() {
             </Label>
           </div>
 
-          <button
-            type="submit"
-            className="transition-colors px-2 py-3 rounded-sm font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1"
-            disabled={isPending}
-          >
-            {isPending ? "Création en cours..." : "S'inscrire"}
-          </button>
+          <div className="grid gap-3">
+            <button
+              type="submit"
+              className="transition-colors px-2 py-3 rounded-sm font-medium text-sm bg-primary text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-1"
+              disabled={isPending}
+            >
+              {isPending ? "Création de votre espace..." : "S'inscrire"}
+            </button>
+
+            {isPending ? <SignupProgress activeStep={signupStep} /> : null}
+          </div>
         </form>
       </div>
     </main>
+  );
+}
+
+function SignupProgress({ activeStep }: { activeStep: SignupStep | null }) {
+  const activeIndex = SIGNUP_STEPS.findIndex((step) => step.id === activeStep);
+
+  return (
+    <ul className="grid gap-2 text-xs text-muted-foreground" aria-live="polite">
+      {SIGNUP_STEPS.map((step, index) => {
+        const isDone = activeIndex > index;
+        const isActive = activeIndex === index;
+
+        return (
+          <li key={step.id} className="flex items-center gap-2">
+            <span
+              className={[
+                "grid size-4 place-items-center rounded-full border transition-colors",
+                isDone
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : isActive
+                    ? "border-primary text-primary"
+                    : "border-muted-foreground/40 text-transparent",
+              ].join(" ")}
+              aria-hidden="true"
+            >
+              <CheckIcon className="size-3" />
+            </span>
+            <span className={isActive ? "text-foreground" : undefined}>{step.label}</span>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

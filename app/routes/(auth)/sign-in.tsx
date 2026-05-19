@@ -1,14 +1,15 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
-import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { EyeIcon, EyeOffIcon, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
-import { auth } from "~/lib/auth/auth.server";
+import { getCurrentCguAcceptanceFn } from "~/lib/api/cgu/queries/get-current-cgu-acceptance";
+import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
+import { sessionQueryOptions } from "~/lib/auth/session-query";
 
 const LoginSchema = v.object({
   email: v.pipe(
@@ -19,19 +20,10 @@ const LoginSchema = v.object({
   password: v.pipe(v.string(), v.nonEmpty("Veuillez entrer un mot de passe")),
 });
 
-export const loginFn = createServerFn({ method: "POST" })
-  .inputValidator(LoginSchema)
-  .handler(async ({ data }) => {
-    await auth().api.signInEmail({
-      body: {
-        email: data.email,
-        password: data.password,
-      },
-      headers: getRequestHeaders(),
-    });
-
-    return { status: "success" as const };
-  });
+const signInEmailClient = createClientOnlyFn(async (data: v.InferOutput<typeof LoginSchema>) => {
+  const { authClient } = await import("~/lib/auth/auth.client");
+  return authClient.signIn.email(data);
+});
 
 export const Route = createFileRoute("/(auth)/sign-in")({
   head: () => ({
@@ -49,9 +41,33 @@ function RouteComponent() {
   const { toast } = useToast();
   const router = useRouter();
   const navigate = Route.useNavigate();
+  const { queryClient } = Route.useRouteContext();
   const [showPassword, setShowPassword] = useState(false);
   const { mutate, isPending } = useMutation({
-    mutationFn: useServerFn(loginFn),
+    mutationFn: async (data: v.InferOutput<typeof LoginSchema>) => {
+      const result = await signInEmailClient({
+        email: data.email,
+        password: data.password,
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message || "Email ou mot de passe incorrect");
+      }
+
+      await queryClient.invalidateQueries({ queryKey: sessionQueryOptions.queryKey });
+      const session = await queryClient.fetchQuery(sessionQueryOptions);
+
+      if (session?.user.id) {
+        await queryClient.ensureQueryData(userCompaniesQuery(session.user.id));
+      }
+
+      const hasAcceptedCgu = session?.user.id ? await getCurrentCguAcceptanceFn() : false;
+      await router.invalidate();
+
+      return {
+        redirectTo: hasAcceptedCgu ? "/compte/entreprises" : "/accept-cgu",
+      };
+    },
   });
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -70,21 +86,17 @@ function RouteComponent() {
       return;
     }
 
-    mutate(
-      { data: result.output },
-      {
-        onSuccess: async () => {
-          await router.invalidate();
-          await navigate({ to: "/compte/entreprises" });
-        },
-        onError: () => {
-          toast({
-            status: "error",
-            description: "Email ou mot de passe incorrect",
-          });
-        },
+    mutate(result.output, {
+      onSuccess: async ({ redirectTo }) => {
+        await navigate({ to: redirectTo });
       },
-    );
+      onError: () => {
+        toast({
+          status: "error",
+          description: "Email ou mot de passe incorrect",
+        });
+      },
+    });
   }
 
   return (

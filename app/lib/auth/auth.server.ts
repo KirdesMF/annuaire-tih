@@ -1,30 +1,19 @@
-import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, customSession } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
-import { Resend } from "resend";
 import { getDb } from "~/db";
 import type { UserRole } from "~/db/schema/auth";
 import { account, session, user, verification } from "~/db/schema/auth";
+import { sendEmail } from "~/lib/email.server";
+import { authAc, authRoles } from "./access-control.server";
+import { passwordHelpers } from "./password.server";
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "./password-policy";
+import { createCustomSession } from "./session.server";
 
-const passwordHelpers = {
-  hash: async (password: string) => {
-    const salt = randomBytes(16).toString("hex");
-    const hash = scryptSync(password, salt, 64).toString("hex");
-    return `${salt}:${hash}`;
-  },
-  verify: async ({ hash, password }: { hash: string; password: string }) => {
-    const [salt, key] = hash.split(":");
-    const hashedBuffer = scryptSync(password, salt, 64);
-    const keyBuffer = Buffer.from(key, "hex");
-    return timingSafeEqual(hashedBuffer, keyBuffer);
-  },
-};
-
-// @todo: use relational queries instead of raw queries
 export function auth() {
   const db = getDb();
+
   return betterAuth({
     database: drizzleAdapter(db, {
       provider: "pg",
@@ -37,61 +26,41 @@ export function auth() {
       },
     },
     plugins: [
-      admin({ adminRoles: ["admin"] }),
-      customSession(async ({ user: currentUser, session }) => {
-        const user = await db.query.user.findFirst({
-          where: (user, { eq }) => eq(user.id, currentUser.id),
-          columns: {
-            role: true,
-          },
-        });
-
-        const activeCGU = await db.query.cguTable.findFirst({
-          where: (cgu, { eq }) => eq(cgu.isActive, true),
-        });
-
-        if (!activeCGU) {
-          return {
-            session,
-            user: { ...currentUser, cgu: false, role: user?.role },
-          };
-        }
-
-        const userCGU = await db.query.userCguAcceptanceTable.findFirst({
-          where: (userCguAcceptance, { eq, and }) =>
-            and(
-              eq(userCguAcceptance.userId, currentUser.id),
-              eq(userCguAcceptance.cguId, activeCGU.id),
-            ),
-        });
-
-        const hasAcceptedCGU = !!userCGU;
-
-        return {
-          session,
-          user: { ...currentUser, cgu: hasAcceptedCGU, role: user?.role },
-        };
+      admin({
+        adminRoles: ["admin"] as const,
+        defaultRole: "user",
+        ac: authAc,
+        roles: authRoles,
       }),
+      customSession(createCustomSession({ db })),
       tanstackStartCookies(),
-    ],
+    ] as const,
     emailAndPassword: {
       enabled: true,
+      minPasswordLength: PASSWORD_MIN_LENGTH,
+      maxPasswordLength: PASSWORD_MAX_LENGTH,
+      revokeSessionsOnPasswordReset: true,
       password: passwordHelpers,
+      onExistingUserSignUp: async ({ user }) => {
+        await sendEmail({
+          to: user.email,
+          subject: "Tentative de création de compte",
+          text: [
+            "Bonjour,",
+            "",
+            "Une tentative de création de compte a été effectuée avec cette adresse email sur Annuaire TIH.",
+            "",
+            "Si c'était vous, connectez-vous à votre compte ou réinitialisez votre mot de passe.",
+            "Si ce n'était pas vous, aucune action n'est requise.",
+          ].join("\n"),
+        });
+      },
       sendResetPassword: async ({ user, url }) => {
-        const resend = new Resend(process.env.RESEND_API_KEY);
-
-        const { error } = await resend.emails.send({
-          from: "noreply@annuaire-tih.fr",
+        await sendEmail({
           to: user.email,
           subject: "Réinitialisation de mot de passe",
           text: `Cliquez sur le lien suivant pour réinitialiser votre mot de passe : ${url}`,
         });
-
-        if (error) {
-          throw new Error("Failed to send reset password email", {
-            cause: error,
-          });
-        }
       },
     },
     user: {
@@ -104,6 +73,8 @@ export function auth() {
       additionalFields: {
         role: {
           type: "string",
+          required: false,
+          defaultValue: "user",
         },
       },
     },

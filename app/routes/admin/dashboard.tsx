@@ -38,7 +38,7 @@ export const Route = createFileRoute("/admin/dashboard")({
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
     const role = context.user?.role;
-    const isAdmin = isValidRole(role) && (role === "admin" || role === "superadmin");
+    const isAdmin = isValidRole(role) && role === "admin";
 
     if (!context.user || !isAdmin) {
       throw redirect({ to: "/" });
@@ -146,7 +146,7 @@ function RouteComponent() {
   const pendingCompanies = filteredCompanies.filter((company) => company.status === "pending");
   const activeCompanies = companies.filter((company) => company.status === "active");
   const rejectedCompanies = companies.filter((company) => company.status === "rejected");
-  const adminUsers = allUsers.filter((user) => user.role === "admin" || user.role === "superadmin");
+  const adminUsers = allUsers.filter((user) => user.role === "admin");
   const referencedUsers = allUsers.filter((user) => (companiesByUserId.get(user.id) ?? 0) > 0);
   const approvalRate = companies.length
     ? Math.round((activeCompanies.length / companies.length) * 100)
@@ -199,10 +199,18 @@ function RouteComponent() {
       {
         onSuccess: () => {
           toast({
+            status: "success",
             description: "Rôle de l'utilisateur mis à jour",
             button: { label: "Fermer" },
           });
           context.queryClient.invalidateQueries({ queryKey: ["users"] });
+        },
+        onError: (error) => {
+          toast({
+            status: "error",
+            description: error.message || "Impossible de mettre à jour le rôle de l'utilisateur",
+            button: { label: "Fermer" },
+          });
         },
       },
     );
@@ -529,11 +537,6 @@ function RouteComponent() {
                   label={`Admins (${allUsers.filter((user) => user.role === "admin").length})`}
                 />
                 <FilterChip
-                  active={search.userRole === "superadmin"}
-                  onClick={() => updateSearch({ userRole: "superadmin" })}
-                  label={`Superadmins (${allUsers.filter((user) => user.role === "superadmin").length})`}
-                />
-                <FilterChip
                   active={search.userRole === "user"}
                   onClick={() => updateSearch({ userRole: "user" })}
                   label={`Users (${allUsers.filter((user) => user.role === "user").length})`}
@@ -743,7 +746,7 @@ function StatusPill({ status }: { status: CompanyStatus }) {
 }
 
 function RolePill({ role }: { role: string }) {
-  const isElevated = role === "admin" || role === "superadmin";
+  const isElevated = role === "admin";
 
   return (
     <span

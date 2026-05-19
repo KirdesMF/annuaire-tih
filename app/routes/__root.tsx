@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 // app/routes/__root.tsx
-import { type QueryClient, queryOptions } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
   createRootRouteWithContext,
@@ -9,27 +9,16 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
 import { ArrowLeftIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
 import { SiteFooter } from "~/components/site-footer";
 import { SiteHeader } from "~/components/site-header";
 import { TooltipProvider } from "~/components/ui/tooltip";
-import { auth } from "~/lib/auth/auth.server";
+import { sessionQueryOptions } from "~/lib/auth/session-query";
 import { DEFAULT_DESCRIPTION, SITE_NAME } from "~/lib/seo";
 import { getThemeServerFn } from "~/lib/theme";
 import appCSS from "~/styles/app.css?url";
-
-const getSession = createServerFn().handler(async () => {
-  return auth().api.getSession({ headers: getRequestHeaders() });
-});
-
-const sessionQueryOptions = queryOptions({
-  queryKey: ["user", "session"],
-  queryFn: ({ signal }) => getSession({ signal }),
-});
 
 export type RootRouterContext = { queryClient: QueryClient };
 

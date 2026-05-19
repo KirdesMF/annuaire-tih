@@ -7,8 +7,8 @@ import { type AuthUser, auth } from "~/lib/auth/auth.server";
 
 export type AuthorizedUser = AuthUser & { id: string; role?: UserRole };
 
-export function isAdminRole(role?: string | null): role is "admin" | "superadmin" {
-  return isValidRole(role) && (role === "admin" || role === "superadmin");
+export function isAdminRole(role?: string | null): role is "admin" {
+  return isValidRole(role) && role === "admin";
 }
 
 export async function getCurrentUser(): Promise<AuthorizedUser | null> {

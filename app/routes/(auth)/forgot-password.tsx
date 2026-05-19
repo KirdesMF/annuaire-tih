@@ -1,29 +1,22 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { createServerFn, useServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { InfoIcon, Loader, Mail } from "lucide-react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
-import { auth } from "~/lib/auth/auth.server";
 
 const ForgotPasswordSchema = v.object({
   email: v.pipe(v.string(), v.email("Veuillez entrer une adresse email valide")),
 });
 
-export const forgotPasswordFn = createServerFn({ method: "POST" })
-  .inputValidator((data: FormData) => {
-    const formObject = Object.fromEntries(data.entries());
-    return v.parse(ForgotPasswordSchema, formObject);
-  })
-  .handler(async ({ data }) => {
-    await auth().api.requestPasswordReset({
-      body: { email: data.email, redirectTo: "/reset-password" },
-      headers: getRequest().headers,
-    });
-  });
+const requestPasswordResetClient = createClientOnlyFn(
+  async (data: { email: string; redirectTo: string }) => {
+    const { authClient } = await import("~/lib/auth/auth.client");
+    return authClient.requestPasswordReset(data);
+  },
+);
 
 export const Route = createFileRoute("/(auth)/forgot-password")({
   head: () => ({
@@ -35,30 +28,50 @@ export const Route = createFileRoute("/(auth)/forgot-password")({
 function RouteComponent() {
   const { toast } = useToast();
   const { mutate, isPending } = useMutation({
-    mutationFn: useServerFn(forgotPasswordFn),
+    mutationFn: async (data: v.InferOutput<typeof ForgotPasswordSchema>) => {
+      const result = await requestPasswordResetClient({
+        email: data.email,
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (result.error) {
+        return null;
+      }
+
+      return result.data;
+    },
   });
 
   function onSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
+    const result = v.safeParse(ForgotPasswordSchema, Object.fromEntries(formData.entries()));
 
-    mutate(
-      { data: formData },
-      {
-        onSuccess: () => {
-          toast({
-            description: "Un email vous a été envoyé pour réinitialiser votre mot de passe",
-            button: { label: "Fermer" },
-          });
-        },
-        onError: (error) => {
-          toast({
-            description: error.message,
-            button: { label: "Fermer" },
-          });
-        },
+    if (!result.success) {
+      toast({
+        status: "error",
+        description: result.issues[0].message,
+        button: { label: "Fermer" },
+      });
+      return;
+    }
+
+    mutate(result.output, {
+      onSuccess: () => {
+        toast({
+          description:
+            "Si un compte existe pour cette adresse, un email de réinitialisation sera envoyé.",
+          button: { label: "Fermer" },
+        });
       },
-    );
+      onError: () => {
+        toast({
+          description:
+            "Si un compte existe pour cette adresse, un email de réinitialisation sera envoyé.",
+          button: { label: "Fermer" },
+        });
+      },
+    });
   }
 
   return (

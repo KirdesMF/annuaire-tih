@@ -1,15 +1,93 @@
-# @annuaire-tih
+# Annuaire TIH
 
-To install dependencies:
+TanStack Start app deployed on Cloudflare Workers with Better Auth, Drizzle, Supabase Postgres, and Hyperdrive.
+
+## Requirements
+
+- Bun
+- Wrangler auth configured
+- Access to Cloudflare Hyperdrive configs
+- Access to dev secrets provider once Infisical is configured
+
+Install dependencies:
 
 ```bash
 bun install
 ```
 
-To run:
+## Development
+
+Default local app command:
 
 ```bash
-bun run index.ts
+bun run dev
 ```
 
-This project was created using `bun init` in bun v1.2.4. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+Do not use production database for local development. Development should use remote Supabase dev database through dev secrets / generated local runtime vars.
+
+## Database environments
+
+This project uses separate remote Supabase databases:
+
+- dev: `annuaire-tih-dev`
+- production: `annuaire-tih`
+
+Cloudflare Hyperdrive bindings are split by Wrangler config:
+
+- `wrangler.dev.jsonc` → dev Hyperdrive
+- `wrangler.production.jsonc` → production Hyperdrive
+- `wrangler.jsonc` → preview/default config
+
+Do not keep production DB credentials in local env files.
+
+## Build
+
+```bash
+bun run build:dev
+bun run build:preview
+bun run build:prod
+```
+
+`vite.config.ts` reads `WRANGLER_CONFIG` so Cloudflare's generated Worker config uses the correct Hyperdrive binding.
+
+## Deploy
+
+Deploy dev Worker:
+
+```bash
+bun run deploy:dev
+```
+
+Deploy preview/default Worker:
+
+```bash
+bun run deploy:preview
+```
+
+Deploy production Worker:
+
+```bash
+bun run deploy:prod
+```
+
+Default deploy points to production:
+
+```bash
+bun run deploy
+```
+
+## Validation
+
+Run before finishing code changes:
+
+```bash
+bun run typecheck
+bun run check
+```
+
+## Notes
+
+- Better Auth uses request-scoped `auth()` because Cloudflare Workers can reject I/O objects reused across requests.
+- Hyperdrive handles DB connection routing/pooling, but does not make request-bound I/O globally reusable.
+- Keep `tanstackStartCookies()` last in Better Auth plugins.
+- Re-run Better Auth schema generation / Drizzle migration checks after changing Better Auth plugins or schema.

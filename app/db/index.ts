@@ -11,9 +11,11 @@ import * as companyCategoriesSchema from "./schema/company-categories";
 
 export type DbConnectionMode = "auto" | "direct" | "hyperdrive";
 
+type HyperdriveBinding = { connectionString: string };
+
 type CloudflareEnv = {
   DATABASE_URL?: string;
-  HYPERDRIVE?: { connectionString: string };
+  HYPERDRIVE?: HyperdriveBinding;
 };
 
 const schema = {
@@ -25,21 +27,24 @@ const schema = {
   ...categoriesSchema,
 };
 
-const clientsByRequest = new WeakMap<Request, postgres.Sql>();
-let localClient: postgres.Sql | undefined;
+type Db = ReturnType<typeof createDb>;
 
-function getCloudflareEnv() {
+const dbByRequest = new WeakMap<Request, Db>();
+let localDb: Db | undefined;
+
+function getCloudflareEnv(): CloudflareEnv {
   return env as CloudflareEnv;
 }
 
-function getConnectionString(mode: DbConnectionMode = "auto") {
+function getConnectionString(mode: DbConnectionMode = "auto"): string {
   const cloudflareEnv = getCloudflareEnv();
-  const connectionString =
-    mode === "direct"
-      ? cloudflareEnv.DATABASE_URL
-      : mode === "hyperdrive"
-        ? cloudflareEnv.HYPERDRIVE?.connectionString
-        : (cloudflareEnv.DATABASE_URL ?? cloudflareEnv.HYPERDRIVE?.connectionString);
+  const connectionStringByMode: Record<DbConnectionMode, string | undefined> = {
+    auto: cloudflareEnv.HYPERDRIVE?.connectionString ?? cloudflareEnv.DATABASE_URL,
+    direct: cloudflareEnv.DATABASE_URL,
+    hyperdrive: cloudflareEnv.HYPERDRIVE?.connectionString,
+  };
+
+  const connectionString = connectionStringByMode[mode];
 
   if (!connectionString) {
     throw new Error(`${mode} database connection string is not set`);
@@ -48,17 +53,19 @@ function getConnectionString(mode: DbConnectionMode = "auto") {
   return connectionString;
 }
 
-function createClient(connectionString: string) {
-  return postgres(connectionString, {
+function createDb(connectionString: string) {
+  const client = postgres(connectionString, {
     prepare: false,
     fetch_types: false,
     max: 1,
     idle_timeout: 2,
     connect_timeout: 10,
   });
+
+  return drizzle({ client, schema });
 }
 
-function getCurrentRequest() {
+function getCurrentRequest(): Request | undefined {
   try {
     return getRequest();
   } catch {
@@ -66,29 +73,25 @@ function getCurrentRequest() {
   }
 }
 
-export function getDb(mode: DbConnectionMode = "auto") {
+export function getDb(mode: DbConnectionMode = "auto"): Db {
   const connectionString = getConnectionString(mode);
   const request = getCurrentRequest();
 
   if (!request) {
-    if (getCloudflareEnv().HYPERDRIVE) {
-      console.warn("getDb() called outside TanStack request context in Cloudflare runtime");
-      return drizzle({ client: createClient(connectionString), schema });
-    }
-
-    localClient ??= createClient(connectionString);
-    return drizzle({ client: localClient, schema });
+    localDb ??= createDb(connectionString);
+    return localDb;
   }
 
   if (mode !== "auto") {
-    return drizzle({ client: createClient(connectionString), schema });
+    return createDb(connectionString);
   }
 
-  let client = clientsByRequest.get(request);
-  if (!client) {
-    client = createClient(connectionString);
-    clientsByRequest.set(request, client);
-  }
+  const cachedDb = dbByRequest.get(request);
 
-  return drizzle({ client, schema });
+  if (cachedDb) return cachedDb;
+
+  const db = createDb(connectionString);
+  dbByRequest.set(request, db);
+
+  return db;
 }
