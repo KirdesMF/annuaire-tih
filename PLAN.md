@@ -303,7 +303,7 @@ Done after initial authClient migration:
 
 ## 9. Signup + CGU consistency
 
-Status: partially done. `user_cgu_acceptance` is used as source of truth and signup calls server-side CGU acceptance after account creation. Legacy `user.cgu` migration/drop and compensation strategy remain.
+Status: mostly done for dev. `user_cgu_acceptance` is used as source of truth and signup calls server-side CGU acceptance after account creation. Dev migration `0011_drop_legacy_user_cgu` backfills legacy accepted users into `user_cgu_acceptance` when possible and drops `user.cgu`. Production migration must be run later after merge/approval.
 
 Current flow creates user, then inserts CGU acceptance. If CGU insert fails, user remains half-created.
 
@@ -311,7 +311,8 @@ Actions:
 
 - Keep `user_cgu_acceptance` as the only source of truth for CGU acceptance.
 - Treat `user.cgu` as deprecated legacy DB column; it is stale and not updated by current code.
-- Add migration to drop deprecated `user.cgu` column after verifying no production code depends on it.
+- Dev migration added: `drizzle/0011_drop_legacy_user_cgu.sql`.
+- Run the same migration against production only after merge to main and explicit approval.
 - Keep computed `user.cgu` only in Better Auth custom session payload/UI context.
 - Wrap related DB writes where possible.
 - If Better Auth user creation cannot share transaction, add compensation:
