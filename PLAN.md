@@ -4,6 +4,62 @@
 
 Clean Better Auth setup for TanStack Start on Cloudflare Workers while keeping request-scoped I/O safe.
 
+## New agent handoff
+
+Current checkpoint:
+
+- Core email/password Better Auth client migration is done and committed.
+- Password reset/signup password policy hardening is done and committed.
+- Server function resource protection exists and is documented.
+- `auth()` must stay request-scoped. Do not convert to a module-level Better Auth singleton; Cloudflare request-bound I/O can fail if DB/Hyperdrive clients are reused across requests.
+- Browser auth flows should use `authClient`; server-side `auth().api` remains appropriate for session reads and admin/system operations.
+- Client-only Better Auth imports must respect TanStack Start import protection. Do not statically import `*.client.*` files from components that are part of the SSR graph. Use `createClientOnlyFn`, a client-only boundary, or move code to a true client-only module.
+- Server functions must protect resources themselves. Route guards are UX only.
+
+Important files:
+
+- `app/lib/auth/auth.server.ts` — Better Auth config.
+- `app/lib/auth/auth.client.ts` — Better Auth React client. Client-only import boundary.
+- `app/lib/auth/session-query.ts` — shared root/session query.
+- `app/lib/auth/session.server.ts` — custom session enrichment including role/CGU.
+- `app/lib/auth/permissions.server.ts` — server function auth/authorization helpers.
+- `app/lib/auth/password-policy.ts` — shared password min/max constants.
+- `app/lib/api/cgu/accept-cgu.ts` — current-session CGU acceptance server fn.
+- `app/routes/(auth)/sign-up.tsx` — signup + CGU + session refresh/prefetch flow.
+- `app/routes/(auth)/sign-in.tsx` — signin + session refresh/prefetch flow.
+- `app/components/menu-user.tsx` — signout uses `createClientOnlyFn` to avoid client import in SSR graph.
+
+Next recommended work, in priority order:
+
+1. Commit any remaining plan-only edits after this handoff update.
+2. Decide whether to tackle `11. Password hashing` next:
+   - current `scryptSync` blocks the event loop;
+   - confirm whether custom hashes are needed for existing users;
+   - if yes, replace with async `scrypt`; if no, migrate to Better Auth default hashing only after checking compatibility.
+3. Do protected route pending/loading-state pass (`14`) when ready:
+   - account layout skeleton for `/_protected/compte`;
+   - skeletons for heavy protected children;
+   - avoid footer-only empty shells.
+4. Before production, handle ownership/migration items:
+   - Annuaire TIH-owned Cloudflare/Supabase/Resend/Cloudinary/domain;
+   - Infisical adoption;
+   - maintenance mode.
+5. Later auth features:
+   - email verification;
+   - social sign-in;
+   - legacy `user.cgu` drop migration.
+
+Known local state:
+
+- `TODO.md` may contain a user/local unstaged change. Do not overwrite unless asked.
+
+Validation commands:
+
+- `bun run typecheck`
+- `bun run check`
+- manual auth smoke tests after auth/navigation changes.
+
+
 ## Non-goals
 
 - Do not globalize `auth()` while DB/Hyperdrive clients are request-bound.
