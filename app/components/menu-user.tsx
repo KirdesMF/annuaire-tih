@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link, rootRouteId, useRouteContext, useRouter } from "@tanstack/react-router";
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { BriefcaseBusiness, DiamondPlus, LayoutDashboard, LogOut, UserCog } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
@@ -14,11 +15,15 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { isValidRole } from "~/db/schema/auth";
-import { authClient } from "~/lib/auth/auth.client";
 import type { AuthUser } from "~/lib/auth/auth.server";
 import { sessionQueryOptions } from "~/lib/auth/session-query";
 import { setThemeServerFn, type Theme } from "~/lib/theme";
 import { useToast } from "./ui/toast";
+
+const signOutClient = createClientOnlyFn(async () => {
+  const { authClient } = await import("~/lib/auth/auth.client");
+  return authClient.signOut();
+});
 
 export function MenuUser({ user }: { user: AuthUser | undefined }) {
   const { theme, queryClient } = useRouteContext({ from: rootRouteId });
@@ -30,7 +35,7 @@ export function MenuUser({ user }: { user: AuthUser | undefined }) {
 
   const { mutate: signOut } = useMutation({
     mutationFn: async () => {
-      const result = await authClient.signOut();
+      const result = await signOutClient();
 
       if (result.error) {
         throw new Error(result.error.message || "Impossible de se déconnecter");

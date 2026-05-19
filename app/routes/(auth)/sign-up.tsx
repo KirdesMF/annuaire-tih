@@ -134,11 +134,12 @@ function RouteComponent() {
       onSuccess: async ({ redirectTo }) => {
         await navigate({ to: redirectTo });
       },
-      onError: (error) => {
+      onError: () => {
         setSignupStep(null);
         toast({
           status: "error",
-          description: error.message || "Impossible de créer le compte",
+          description:
+            "Impossible de créer le compte. Si cette adresse est déjà utilisée, connectez-vous ou réinitialisez votre mot de passe.",
           button: { label: "Fermer" },
         });
       },

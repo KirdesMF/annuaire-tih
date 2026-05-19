@@ -12,6 +12,8 @@ Clean Better Auth setup for TanStack Start on Cloudflare Workers while keeping r
 
 ## 1. Dev database environment
 
+Status: partially done. Dev/prod Wrangler configs, Hyperdrive wiring, env docs, dev seed, Cloudinary folder support, and email env mode are in place. Production ownership/migration and Infisical adoption remain.
+
 Use a remote Supabase dev project, not local Supabase/OrbStack, as the default development database. This better matches production: Cloudflare Workers, Hyperdrive, Supabase pooler, SSL, preview deploys, and OAuth callback behavior.
 
 Production Supabase and Cloudflare infrastructure should be owned by Annuaire TIH, not a personal account. Personal Supabase/Cloudflare resources can be used temporarily during setup only.
@@ -51,6 +53,8 @@ Validation:
 
 ## 2. Media environments
 
+Status: partially done. `CLOUDINARY_FOLDER` support is implemented and local/dev upload flows were validated. Dedicated Annuaire TIH Cloudinary account and any asset migration remain.
+
 Use the current personal Cloudinary account during setup, but isolate app assets by folder namespace. Later, move Annuaire TIH to its own Cloudinary account. Once the dedicated account exists, folders should be environment-only (`dev/` and `prod/`) because the account itself will represent the app boundary.
 
 Temporary folder structure in current personal Cloudinary account:
@@ -89,6 +93,8 @@ Actions:
 
 ## 3. Maintenance mode
 
+Status: not started.
+
 Add maintenance handling before production launch.
 
 App-level maintenance mode:
@@ -108,6 +114,8 @@ Cloudflare-level emergency fallback:
 
 ## 4. Keep request-scoped auth setup
 
+Status: done. Keep this constraint active for future refactors.
+
 Current `auth()` factory is needed because Cloudflare Workers can throw request-bound I/O errors when clients created in one request are reused by another.
 
 Actions:
@@ -118,6 +126,8 @@ Actions:
 - Avoid module-level `betterAuth(...)` singleton.
 
 ## 5. Split auth server file
+
+Status: done. Auth config, password helpers, session enrichment, permissions/access control were split. Email helper currently lives in `app/lib/email.server.ts`; optional future move to `app/lib/auth/emails.server.ts` remains.
 
 `app/lib/auth/auth.server.ts` currently owns too much.
 
@@ -130,6 +140,8 @@ Proposed files:
 - `app/lib/auth/permissions.server.ts` — app authorization helpers.
 
 ## 6. Better Auth permissions
+
+Status: mostly done. Better Auth access control and app permission helpers are implemented. Continue replacing scattered role checks when touched. `superadmin` remains intentionally deferred.
 
 Build explicit permission model before adding `superadmin`.
 
@@ -193,6 +205,8 @@ Example permissions:
 
 ## 7. Role model cleanup
 
+Status: done for current roles. `admin`/`user` are centralized, role updates use schema validation and guard self-demotion/last-admin cases. No `superadmin` for now.
+
 Actions:
 
 - Keep DB default role as `user`.
@@ -208,17 +222,32 @@ Actions:
 
 ## 8. Signup flow fixes
 
-Actions:
+Status: done for core email/password authClient migration.
 
-- Follow Better Auth recommendation: use `authClient` for browser auth flows instead of server actions wrapping `auth().api`.
-- Move sign-in, sign-up, forgot-password, reset-password, and sign-out UI flows to `authClient` where possible.
+Done:
+
+- Sign-up uses `authClient.signUp.email`.
+- Sign-in uses `authClient.signIn.email`.
+- Forgot password uses `authClient.requestPasswordReset`.
+- Reset password uses `authClient.resetPassword`.
+- Sign-out uses `authClient.signOut`.
+- Shared session query lives in `app/lib/auth/session-query.ts`.
+- CGU acceptance is handled server-side through `acceptCurrentCguFn` after client signup.
+- Signup and sign-in keep pending state active until session refresh/prefetch/router invalidation is complete.
+- Removed unused server sign-out function.
+
+Remaining actions:
+
 - Keep server-side `auth().api` for admin/system operations such as role changes and session reads.
-- Keep CGU acceptance server-side, but call it after successful client signup or rely on `/accept-cgu` guard if it fails.
-- Handle Better Auth signup errors in client UI.
-- Avoid returning silent `{ status: "error" }` without client handling.
-- Ensure duplicate email shows friendly message.
+- Continue reviewing navigation/pending UX in the protected route loading-state pass.
+
+Done after initial authClient migration:
+
+- Duplicate signup errors now show a generic, friendly message that avoids confirming whether an email address already exists.
 
 ## 9. Signup + CGU consistency
+
+Status: partially done. `user_cgu_acceptance` is used as source of truth and signup calls server-side CGU acceptance after account creation. Legacy `user.cgu` migration/drop and compensation strategy remain.
 
 Current flow creates user, then inserts CGU acceptance. If CGU insert fails, user remains half-created.
 
@@ -236,6 +265,8 @@ Actions:
 - Add tests or manual checks for failure paths.
 
 ## 10. Email handling
+
+Status: partially done. Shared email helper and dev-safe email envs are in place. Production Resend ownership/domain, email verification, duplicate signup notification, and fuller error logging remain.
 
 Use the current personal Resend account only during setup. Before production launch, move email sending to an Annuaire TIH-owned Resend account/domain.
 
@@ -266,6 +297,8 @@ Actions:
 
 ## 11. Password hashing
 
+Status: not started.
+
 Current custom `scryptSync` works but blocks event loop.
 
 Actions:
@@ -277,6 +310,8 @@ Actions:
 
 ## 12. Forgot/reset password hardening
 
+Status: partially done. Forgot/reset flows use `authClient`; password policy/error hardening remains.
+
 Actions:
 
 - Enforce reset password length server-side.
@@ -284,7 +319,64 @@ Actions:
 - Return generic forgot-password success message.
 - Avoid exposing raw Better Auth/provider errors to users.
 
-## 13. Session enrichment performance
+## 13. Server function resource protection
+
+Status: mostly done.
+
+Server functions must protect resources even when their route is already protected. Route guards are UX/navigation protection only; server functions are RPC endpoints and can be called directly.
+
+Current protection helpers live in `app/lib/auth/permissions.server.ts`:
+
+- `getCurrentUser()` — reads current session user or returns null.
+- `requireCurrentUser()` — requires an authenticated user.
+- `requireAdminUser()` — requires admin role.
+- `requireCompanyManager(companyId)` — requires company owner or admin.
+- `assertSelfOrAdmin(targetUserId, user)` — protects user-scoped resources.
+
+Current coverage:
+
+- Company creation uses `requireCurrentUser()` and derives `user_id`/`created_by` from the session user.
+- Company update/delete/media mutations use `requireCompanyManager()`.
+- Admin queries/mutations use `requireAdminUser()`.
+- User profile/user company functions use `requireCurrentUser()` and/or `assertSelfOrAdmin()`.
+- CGU acceptance uses `requireCurrentUser()`.
+
+Intentional public server functions:
+
+- Public company/category/search queries.
+- Analytics tracking.
+- Theme cookie helpers.
+- Session query.
+
+Remaining actions:
+
+- Audit every new server function against one of: public by design, `requireCurrentUser`, `requireAdminUser`, `requireCompanyManager`, or `assertSelfOrAdmin`.
+- Standardize unauthorized error messages later.
+
+Done after adding this section:
+
+- `updateUserAvatar` now uses `requireCurrentUser()` instead of direct session read.
+
+## 14. Protected route pending/loading states
+
+Status: planned. Deferred until navigation/pending-state review.
+
+Add explicit pending UI for protected and account routes after authClient migration review.
+
+Actions:
+
+- Add an account layout skeleton for `/_protected/compte` so navigation never shows a footer-only empty shell.
+- Add pending components for heavy protected children as needed:
+  - `/compte/entreprises`
+  - company edit routes
+  - admin dashboard
+- Review navigation and pending behavior globally after auth flows stabilize.
+- Keep button pending states active until auth/session refresh and route prefetch work are complete.
+- Prefer route-level skeletons over blank `null` returns.
+
+## 15. Session enrichment performance
+
+Status: not started.
 
 Current custom session reads role, active CGU, and acceptance on each session read.
 
@@ -295,7 +387,9 @@ Actions:
 - Keep session payload minimal.
 - Avoid expensive session reads in root route when not needed.
 
-## 14. Social sign-in
+## 16. Social sign-in
+
+Status: not started.
 
 Add OAuth providers after core email/password flow is stable.
 

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import * as v from "valibot";
 import { auth } from "~/lib/auth/auth.server";
+import { requireCurrentUser } from "~/lib/auth/permissions.server";
 import { uploadImageToCloudinary } from "~/lib/cloudinary";
 
 const AvatarSchema = v.pipe(
@@ -24,16 +25,12 @@ export const updateUserAvatar = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const request = getRequest();
-    const session = await auth().api.getSession({ headers: request.headers });
-
-    if (!session?.user) {
-      throw new Error("Utilisateur non authentifié");
-    }
+    const user = await requireCurrentUser();
 
     const result = await uploadImageToCloudinary({
       type: "avatar",
       file: data.avatar,
-      userId: session.user.id,
+      userId: user.id,
     });
 
     await auth().api.updateUser({
