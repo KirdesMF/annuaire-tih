@@ -32,11 +32,10 @@ This project uses separate remote Supabase databases:
 - dev: `annuaire-tih-dev`
 - production: `annuaire-tih`
 
-Cloudflare Hyperdrive bindings are split by Wrangler config:
+Cloudflare Hyperdrive bindings are defined in one `wrangler.jsonc`:
 
-- `wrangler.dev.jsonc` → dev Hyperdrive
-- `wrangler.production.jsonc` → production Hyperdrive
-- `wrangler.jsonc` → preview/default config
+- default / `WRANGLER_ENV=dev` → dev Worker and dev Hyperdrive
+- `WRANGLER_ENV=production` → production Worker and production Hyperdrive
 
 Do not keep production DB credentials in local env files.
 
@@ -44,11 +43,10 @@ Do not keep production DB credentials in local env files.
 
 ```bash
 bun run build:dev
-bun run build:preview
 bun run build:prod
 ```
 
-`vite.config.ts` reads `WRANGLER_CONFIG` so Cloudflare's generated Worker config uses the correct Hyperdrive binding.
+`vite.config.ts` reads `WRANGLER_ENV` so Cloudflare's generated Worker config uses the correct Worker name and Hyperdrive binding.
 
 ## Deploy
 
@@ -56,12 +54,6 @@ Deploy dev Worker:
 
 ```bash
 bun run deploy:dev
-```
-
-Deploy preview/default Worker:
-
-```bash
-bun run deploy:preview
 ```
 
 Deploy production Worker:
