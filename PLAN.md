@@ -103,6 +103,7 @@ Actions:
 Validation:
 
 - `bunx wrangler hyperdrive list` shows distinct dev and production configs.
+- Hyperdrive configs must use Supabase Direct connection strings, not Supabase pooler strings. Cloudflare Hyperdrive performs pooling itself.
 - `bun dev` uses dev DB through temporary ignored local secrets first, then Infisical once adopted.
 - `bunx wrangler deploy --env dev` uses dev DB.
 - Production deploy uses production DB only.
