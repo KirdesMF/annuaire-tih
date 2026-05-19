@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { createClientOnlyFn, useServerFn } from "@tanstack/react-start";
 import { decode } from "decode-formdata";
 import { CheckIcon, EyeIcon, EyeOffIcon, Lock, Mail } from "lucide-react";
 import { useState } from "react";
@@ -10,7 +10,6 @@ import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
 import { acceptCurrentCguFn } from "~/lib/api/cgu/accept-cgu";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
-import { authClient } from "~/lib/auth/auth.client";
 import {
   PASSWORD_LENGTH_MESSAGE,
   PASSWORD_MAX_LENGTH,
@@ -61,6 +60,13 @@ const SignupSchema = v.pipe(
   ),
 );
 
+const signUpEmailClient = createClientOnlyFn(
+  async (data: { email: string; password: string; name: string }) => {
+    const { authClient } = await import("~/lib/auth/auth.client");
+    return authClient.signUp.email(data);
+  },
+);
+
 export const Route = createFileRoute("/(auth)/sign-up")({
   head: () => ({
     meta: [{ title: "Créer un compte" }],
@@ -83,7 +89,7 @@ function RouteComponent() {
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: v.InferOutput<typeof SignupSchema>) => {
       setSignupStep("account");
-      const result = await authClient.signUp.email({
+      const result = await signUpEmailClient({
         email: data.email,
         password: data.password,
         name: `${data.firstName} ${data.lastName}`,

@@ -41,6 +41,20 @@ export function auth() {
       maxPasswordLength: PASSWORD_MAX_LENGTH,
       revokeSessionsOnPasswordReset: true,
       password: passwordHelpers,
+      onExistingUserSignUp: async ({ user }) => {
+        await sendEmail({
+          to: user.email,
+          subject: "Tentative de création de compte",
+          text: [
+            "Bonjour,",
+            "",
+            "Une tentative de création de compte a été effectuée avec cette adresse email sur Annuaire TIH.",
+            "",
+            "Si c'était vous, connectez-vous à votre compte ou réinitialisez votre mot de passe.",
+            "Si ce n'était pas vous, aucune action n'est requise.",
+          ].join("\n"),
+        });
+      },
       sendResetPassword: async ({ user, url }) => {
         await sendEmail({
           to: user.email,

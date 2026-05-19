@@ -1,12 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { EyeIcon, EyeOffIcon, Loader, Lock } from "lucide-react";
 import { useState } from "react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
-import { authClient } from "~/lib/auth/auth.client";
 import {
   PASSWORD_LENGTH_MESSAGE,
   PASSWORD_MAX_LENGTH,
@@ -26,6 +26,13 @@ const ResetPasswordSchema = v.object({
   ),
 });
 
+const resetPasswordClient = createClientOnlyFn(
+  async (data: { token: string; newPassword: string }) => {
+    const { authClient } = await import("~/lib/auth/auth.client");
+    return authClient.resetPassword(data);
+  },
+);
+
 export const Route = createFileRoute("/(auth)/reset-password")({
   head: () => ({
     meta: [{ title: "Réinitialiser votre mot de passe" }],
@@ -40,7 +47,7 @@ function RouteComponent() {
   const navigate = Route.useNavigate();
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: v.InferOutput<typeof ResetPasswordSchema>) => {
-      const result = await authClient.resetPassword({
+      const result = await resetPasswordClient({
         token: data.token,
         newPassword: data.newPassword,
       });

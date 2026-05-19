@@ -1,13 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { EyeIcon, EyeOffIcon, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
+import { getCurrentCguAcceptanceFn } from "~/lib/api/cgu/queries/get-current-cgu-acceptance";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
-import { authClient } from "~/lib/auth/auth.client";
 import { sessionQueryOptions } from "~/lib/auth/session-query";
 
 const LoginSchema = v.object({
@@ -17,6 +18,11 @@ const LoginSchema = v.object({
     v.email("Veuillez entrer un email valide"),
   ),
   password: v.pipe(v.string(), v.nonEmpty("Veuillez entrer un mot de passe")),
+});
+
+const signInEmailClient = createClientOnlyFn(async (data: v.InferOutput<typeof LoginSchema>) => {
+  const { authClient } = await import("~/lib/auth/auth.client");
+  return authClient.signIn.email(data);
 });
 
 export const Route = createFileRoute("/(auth)/sign-in")({
@@ -39,7 +45,7 @@ function RouteComponent() {
   const [showPassword, setShowPassword] = useState(false);
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: v.InferOutput<typeof LoginSchema>) => {
-      const result = await authClient.signIn.email({
+      const result = await signInEmailClient({
         email: data.email,
         password: data.password,
       });
@@ -55,10 +61,11 @@ function RouteComponent() {
         await queryClient.ensureQueryData(userCompaniesQuery(session.user.id));
       }
 
+      const hasAcceptedCgu = session?.user.id ? await getCurrentCguAcceptanceFn() : false;
       await router.invalidate();
 
       return {
-        redirectTo: session?.user.cgu ? "/compte/entreprises" : "/accept-cgu",
+        redirectTo: hasAcceptedCgu ? "/compte/entreprises" : "/accept-cgu",
       };
     },
   });

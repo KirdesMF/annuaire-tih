@@ -1,15 +1,22 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { InfoIcon, Loader, Mail } from "lucide-react";
 import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
-import { authClient } from "~/lib/auth/auth.client";
 
 const ForgotPasswordSchema = v.object({
   email: v.pipe(v.string(), v.email("Veuillez entrer une adresse email valide")),
 });
+
+const requestPasswordResetClient = createClientOnlyFn(
+  async (data: { email: string; redirectTo: string }) => {
+    const { authClient } = await import("~/lib/auth/auth.client");
+    return authClient.requestPasswordReset(data);
+  },
+);
 
 export const Route = createFileRoute("/(auth)/forgot-password")({
   head: () => ({
@@ -22,7 +29,7 @@ function RouteComponent() {
   const { toast } = useToast();
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: v.InferOutput<typeof ForgotPasswordSchema>) => {
-      const result = await authClient.requestPasswordReset({
+      const result = await requestPasswordResetClient({
         email: data.email,
         redirectTo: `${window.location.origin}/reset-password`,
       });

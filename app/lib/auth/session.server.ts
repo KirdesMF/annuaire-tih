@@ -1,5 +1,7 @@
 import type { getDb } from "~/db";
 
+export type CustomSessionUser = { id: string; role?: string };
+
 type Db = ReturnType<typeof getDb>;
 
 type CreateCustomSessionOptions = {
@@ -16,35 +18,9 @@ export function createCustomSession({ db }: CreateCustomSessionOptions) {
   }) {
     const user = await db.query.user.findFirst({
       where: (user, { eq }) => eq(user.id, currentUser.id),
-      columns: {
-        role: true,
-      },
+      columns: { role: true },
     });
 
-    const activeCGU = await db.query.cguTable.findFirst({
-      where: (cgu, { eq }) => eq(cgu.isActive, true),
-    });
-
-    if (!activeCGU) {
-      return {
-        session,
-        user: { ...currentUser, cgu: false, role: user?.role },
-      };
-    }
-
-    const userCGU = await db.query.userCguAcceptanceTable.findFirst({
-      where: (userCguAcceptance, { eq, and }) =>
-        and(
-          eq(userCguAcceptance.userId, currentUser.id),
-          eq(userCguAcceptance.cguId, activeCGU.id),
-        ),
-    });
-
-    const hasAcceptedCGU = !!userCGU;
-
-    return {
-      session,
-      user: { ...currentUser, cgu: hasAcceptedCGU, role: user?.role },
-    };
+    return { session, user: { ...currentUser, role: user?.role } };
   };
 }

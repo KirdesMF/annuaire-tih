@@ -149,9 +149,9 @@ Actions:
 
 ## 3. Maintenance mode
 
-Status: not started.
+Status: optional / deferred.
 
-Add maintenance handling before production launch.
+Add maintenance handling later if needed before production launch.
 
 App-level maintenance mode:
 
@@ -349,8 +349,12 @@ Actions:
 - Welcome email should not block successful signup.
 - Log Resend errors with context.
 - Reset password email can fail loudly, but message to user should stay generic.
-- Add Better Auth `onExistingUserSignUp` callback to notify the account owner when someone tries to create a new account with an existing email address.
 - Keep duplicate signup UI response generic enough to avoid account enumeration.
+
+Done after password hardening:
+
+- Added Better Auth `onExistingUserSignUp` callback to notify the account owner when someone tries to create a new account with an existing email address.
+- Important Better Auth behavior: this callback only runs when `requireEmailVerification: true` or `autoSignIn: false`. Current signup keeps auto sign-in and does not require verification yet, so the callback is configured for the future email-verification rollout but is not expected to fire in the current flow.
 
 ## 11. Password hashing
 
@@ -446,16 +450,23 @@ Actions:
 
 ## 15. Session enrichment performance
 
-Status: not started.
+Status: mostly done.
 
-Current custom session reads role, active CGU, and acceptance on each session read.
+Custom session no longer performs CGU DB reads on every root session load. CGU acceptance is now checked only where protected route logic needs it. Role remains in custom session for header/admin UI compatibility.
 
-Actions:
+Done:
 
-- Cache active CGU ID where safe.
-- Consider checking CGU only on protected routes that need it.
+- Simplified `createCustomSession()` to remove active CGU and CGU acceptance queries from root session loads.
+- Kept role enrichment in custom session for header/admin UI compatibility.
+- Added `getCurrentCguAcceptanceFn` for protected-route CGU checks.
+- `_protected` route checks CGU acceptance before allowing protected children.
+- Sign-in redirect target uses dedicated CGU check instead of root session enrichment.
+
+Remaining actions:
+
+- Consider moving admin/header role checks to dedicated permission queries later if root session should become fully DB-read-free.
+- Consider caching active CGU ID later if protected-route CGU checks become hot.
 - Keep session payload minimal.
-- Avoid expensive session reads in root route when not needed.
 
 ## 16. Social sign-in
 
