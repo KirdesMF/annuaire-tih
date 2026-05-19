@@ -1,11 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
-import type { User } from "better-auth";
+import {
+  Link,
+  rootRouteId,
+  useLocation,
+  useNavigate,
+  useRouteContext,
+  useRouter,
+} from "@tanstack/react-router";
 import { Monitor, Moon, SearchIcon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import logo from "~/assets/img/Logo vecto_png.png?url";
 import { MainNav } from "~/components/main-nav";
 import { MenuUser } from "~/components/menu-user";
 import { MobileNav } from "~/components/mobile-nav";
+import { Button } from "~/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -26,10 +34,12 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { useDebounce } from "~/hooks/use-debounce";
 import { companiesByTermQuery } from "~/lib/api/companies/queries/get-companies-by-term";
-import { type Theme, useTheme } from "./providers/theme-provider";
+import type { AuthUser } from "~/lib/auth/auth.server";
+import { setThemeServerFn, type Theme } from "~/lib/theme";
 
-export function SiteHeader({ user }: { user: User | undefined }) {
+export function SiteHeader({ user }: { user: AuthUser | undefined }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 1000);
   const { data: companies, isFetching } = useQuery(companiesByTermQuery(debouncedSearchTerm));
@@ -40,108 +50,114 @@ export function SiteHeader({ user }: { user: User | undefined }) {
     navigate({ to: path, params: { slug } });
   }
 
-  useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "k" && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault();
-        setIsDialogOpen((prev) => !prev);
-      }
-    }
-
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, []);
-
   return (
-    <header className="px-4 md:px-8 py-3 border-b-[0.5px] border-border backdrop-blur-sm sticky top-0 z-50 w-full h-16 flex items-center">
-      <div className="flex items-center gap-2 justify-between flex-1">
-        <MainNav />
-        <MobileNav />
-
-        <div className="flex-1 md:flex-none flex items-center gap-3">
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <button
-                type="button"
-                className="flex w-full md:w-auto items-center gap-2 text-xs text-nowrap font-light px-2.5 h-8 rounded-sm ring-1 ring-input/50 shadow-2xs focus:outline-primary focus:outline-2"
-              >
-                <SearchIcon className="size-4 text-muted-foreground" />
-                <span className="hidden lg:block">Rechercher un nom ou une activité...</span>
-                <span className="block lg:hidden">Rechercher...</span>
-                <kbd className="text-xs px-1.5 py-0.5 rounded-sm bg-muted pointer-events-none hidden lg:flex gap-1 font-mono">
-                  <span>⌘</span>
-                  <span>K</span>
-                </kbd>
-              </button>
-            </DialogTrigger>
-
-            <DialogContent>
-              <DialogTitle className="sr-only">Rechercher une entreprise</DialogTitle>
-              <Command shouldFilter={false} className="py-2">
-                <CommandInput
-                  value={searchTerm}
-                  onValueChange={setSearchTerm}
-                  placeholder="Entrez un nom ou une activité..."
-                />
-
-                <CommandSeparator alwaysRender />
-
-                <CommandList>
-                  {!searchTerm && <CommandEmpty>Entrez au moins 3 caractères...</CommandEmpty>}
-                  {searchTerm && isFetching && <CommandLoading>Loading...</CommandLoading>}
-                  {searchTerm.length >= 3 && !isFetching && (
-                    <CommandEmpty>Aucune entreprise trouvée</CommandEmpty>
-                  )}
-
-                  {companies?.map((company) => (
-                    <CommandItem
-                      key={company.id}
-                      onSelect={() => onNavigate("/entreprises/$slug", company.slug)}
-                    >
-                      {company.name}
-                    </CommandItem>
-                  ))}
-                </CommandList>
-              </Command>
-            </DialogContent>
-          </Dialog>
-
-          {/* <a
-            href="https://linkedin.com/groups/13011531"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-blue-700 transition-colors"
-          >
-            <LinkedinIcon className="size-5" />
-          </a> */}
-
-          <RegisterLink user={user} />
-          <LoginButton user={user} />
-          {user ? <MenuUser user={user} /> : <ThemeToggle />}
+    <>
+      {pathname === "/" ? (
+        <div className="bg-success">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-1 text-tiny text-success-foreground md:px-10 lg:px-20">
+            <span>Valorisons les talents, construisons une économie plus inclusive</span>
+            <span className="hidden md:inline">
+              Annuaire dédié aux travailleurs handicapés indépendants
+            </span>
+          </div>
         </div>
-      </div>
-    </header>
+      ) : null}
+
+      <header className="sticky top-0 z-50 w-full bg-background text-foreground">
+        <div className="mx-auto flex h-16 max-w-7xl items-stretch justify-between gap-2 px-4 md:px-10 lg:px-20">
+          <div className="flex items-stretch gap-3">
+            <Link
+              to="/"
+              className="flex shrink-0 items-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              aria-label="Accueil Annuaire TIH"
+            >
+              <img src={logo} alt="Annuaire TIH" className="h-10 w-auto md:h-12" />
+            </Link>
+            <MainNav />
+            <MobileNav />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger
+                render={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    className="size-10 border-0 bg-input text-foreground hover:bg-input/90"
+                  />
+                }
+              >
+                <SearchIcon className="size-5" strokeWidth={1.8} />
+                <span className="sr-only">Rechercher une entreprise</span>
+              </DialogTrigger>
+
+              <DialogContent>
+                <DialogTitle className="sr-only">Rechercher une entreprise</DialogTitle>
+                <Command shouldFilter={false} className="py-2">
+                  <CommandInput
+                    value={searchTerm}
+                    onValueChange={setSearchTerm}
+                    placeholder="Entrez un nom ou une activité..."
+                  />
+
+                  <CommandSeparator alwaysRender />
+
+                  <CommandList>
+                    {!searchTerm && <CommandEmpty>Entrez au moins 3 caractères...</CommandEmpty>}
+                    {searchTerm && isFetching && <CommandLoading>Loading...</CommandLoading>}
+                    {searchTerm.length >= 3 && !isFetching && (
+                      <CommandEmpty>Aucune entreprise trouvée</CommandEmpty>
+                    )}
+
+                    {companies?.map((company) => (
+                      <CommandItem
+                        key={company.id}
+                        onSelect={() => onNavigate("/entreprises/$slug", company.slug)}
+                      >
+                        {company.name}
+                      </CommandItem>
+                    ))}
+                  </CommandList>
+                </Command>
+              </DialogContent>
+            </Dialog>
+
+            <RegisterLink user={user} />
+            {user ? (
+              <MenuUser user={user} />
+            ) : (
+              <>
+                <LoginButton user={user} />
+                <ThemeToggle />
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+    </>
   );
 }
 
-function RegisterLink({ user }: { user: User | undefined }) {
+function RegisterLink({ user }: { user: AuthUser | undefined }) {
   return (
     <Link
       to={user ? "/compte/entreprises/create" : "/sign-up"}
-      className="text-xs px-2 py-1 h-8 items-center rounded-sm ring-1 ring-border text-nowrap hidden md:inline-flex focus:outline-primary focus:outline-2"
+      className="hidden h-10 items-center bg-card px-6 text-nowrap text-sm text-card-foreground transition-colors hover:bg-card/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
     >
       Se référencer
     </Link>
   );
 }
 
-function LoginButton({ user }: { user: User | undefined }) {
+function LoginButton({ user }: { user: AuthUser | undefined }) {
   if (user) return null;
 
   return (
     <Link
       to="/sign-in"
-      className="text-xs px-2 py-1 h-8 hidden md:inline-flex items-center rounded-sm text-nowrap bg-primary text-primary-foreground focus:outline-primary focus:outline-1"
+      className="hidden h-10 items-center bg-card px-6 text-nowrap text-sm text-card-foreground transition-colors hover:bg-card/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:inline-flex"
     >
       Se connecter
     </Link>
@@ -151,28 +167,37 @@ function LoginButton({ user }: { user: User | undefined }) {
 const TRIGGER_THEME_ICON = {
   light: Sun,
   dark: Moon,
-  system: Monitor,
+  auto: Monitor,
 } as const;
 
 function ThemeToggle() {
-  const { setTheme, theme } = useTheme();
+  const { theme } = useRouteContext({ from: rootRouteId });
+  const router = useRouter();
 
   const TriggerIcon = TRIGGER_THEME_ICON[theme];
 
+  function toggleTheme(theme: Theme) {
+    setThemeServerFn({ data: theme }).then(() => router.invalidate());
+  }
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="text-xs px-2 py-1 h-8 inline-flex items-center rounded-sm border border-border text-nowrap cursor-pointer"
-        >
-          <TriggerIcon className="size-4" />
-          <span className="sr-only">Modifier le thème</span>
-        </button>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="size-10 border-0 bg-card text-card-foreground hover:bg-card/90"
+            aria-label="Modifier le thème"
+          />
+        }
+      >
+        <TriggerIcon data-icon="inline-start" className="size-5" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent sideOffset={5} align="end" className="min-w-32">
-        <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as Theme)}>
+        <DropdownMenuRadioGroup value={theme} onValueChange={toggleTheme}>
           <DropdownMenuRadioItem value="light" className="flex items-center gap-2 px-2 group">
             <div className="flex items-center gap-2">
               <Sun size={16} className="group-aria-checked:text-primary" />
@@ -191,7 +216,7 @@ function ThemeToggle() {
 
           <DropdownMenuSeparator className="h-px bg-border my-1" />
 
-          <DropdownMenuRadioItem value="system" className="flex items-center gap-2 px-2 group">
+          <DropdownMenuRadioItem value="auto" className="flex items-center gap-2 px-2 group">
             <div className="flex items-center gap-2">
               <Monitor size={16} className="group-aria-checked:text-primary" />
               System

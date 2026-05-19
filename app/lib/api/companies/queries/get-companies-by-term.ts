@@ -5,7 +5,7 @@ import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 
 export const getCompaniesByTerm = createServerFn({ method: "GET" })
-  .validator((term: string) => term)
+  .inputValidator((term: string) => term)
   .handler(async ({ data: term }) => {
     const searchWords = term
       .split(/\s+/)

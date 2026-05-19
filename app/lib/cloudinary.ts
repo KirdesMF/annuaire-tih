@@ -3,18 +3,52 @@ type UploadApiResponse = {
   public_id: string;
 };
 
-type UploadImageToCloudinaryProps = {
-  type: "logo" | "gallery";
-  file: File;
-  companyId: string;
-  companySlug: string;
+type CloudinaryErrorResponse = {
+  error?: { message?: string };
 };
 
-const options = {
-  name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-};
+type UploadImageToCloudinaryProps =
+  | {
+      type: "logo" | "gallery";
+      file: File;
+      companyId: string;
+      companySlug: string;
+    }
+  | {
+      type: "avatar";
+      file: File;
+      userId: string;
+    };
+
+function getCloudinaryOptions() {
+  const name = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  const folder = process.env.CLOUDINARY_FOLDER;
+
+  if (!name || !apiKey || !apiSecret) {
+    throw new Error("Cloudinary credentials are not set");
+  }
+
+  if (!folder) {
+    throw new Error("Cloudinary folder is not set");
+  }
+
+  return {
+    name,
+    api_key: apiKey,
+    api_secret: apiSecret,
+    folder: normalizeFolder(folder),
+  };
+}
+
+function normalizeFolder(folder: string): string {
+  return folder.replace(/^\/+|\/+$/g, "");
+}
+
+function joinCloudinaryPath(...parts: Array<string>): string {
+  return parts.map(normalizeFolder).filter(Boolean).join("/");
+}
 
 // generate signature for cloudinary upload
 async function generateSignature(params: Record<string, unknown>, secret: string) {
@@ -33,19 +67,20 @@ async function generateSignature(params: Record<string, unknown>, secret: string
     .join("");
 }
 
-export async function uploadImageToCloudinary({
-  type,
-  file,
-  companyId,
-  companySlug,
-}: UploadImageToCloudinaryProps): Promise<UploadApiResponse> {
-  if (!options.name || !options.api_key || !options.api_secret) {
-    throw new Error("Cloudinary credentials are not set");
-  }
+export async function uploadImageToCloudinary(
+  props: UploadImageToCloudinaryProps,
+): Promise<UploadApiResponse> {
+  const { type, file } = props;
+  const options = getCloudinaryOptions();
 
-  const publicId = `${companyId}-${Date.now()}`;
+  const publicId =
+    type === "avatar" ? `${props.userId}-${Date.now()}` : `${props.companyId}-${Date.now()}`;
   const path =
-    type === "logo" ? `companies/${companySlug}/logo` : `companies/${companySlug}/gallery`;
+    type === "avatar"
+      ? joinCloudinaryPath(options.folder, "users", props.userId, "avatar")
+      : type === "logo"
+        ? joinCloudinaryPath(options.folder, "companies", props.companySlug, "logo")
+        : joinCloudinaryPath(options.folder, "companies", props.companySlug, "gallery");
 
   try {
     const formData = new FormData();
@@ -75,18 +110,19 @@ export async function uploadImageToCloudinary({
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Failed to upload image to Cloudinary: ${errorData.error.message}`);
+      const errorData = (await response.json()) as CloudinaryErrorResponse;
+      throw new Error(
+        `Failed to upload image to Cloudinary: ${errorData.error?.message ?? "Unknown error"}`,
+      );
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as UploadApiResponse;
 
     return {
       secure_url: result.secure_url,
       public_id: result.public_id,
     };
   } catch (error) {
-    console.error(error);
     throw new Error("Failed to upload image to Cloudinary", { cause: error });
   }
 }
@@ -94,10 +130,11 @@ export async function uploadImageToCloudinary({
 export async function updateImageInCloudinary({
   file,
   publicId,
-}: { file: File; publicId: string }) {
-  if (!options.name || !options.api_key || !options.api_secret) {
-    throw new Error("Cloudinary credentials are not set");
-  }
+}: {
+  file: File;
+  publicId: string;
+}) {
+  const options = getCloudinaryOptions();
 
   try {
     const formData = new FormData();
@@ -129,26 +166,25 @@ export async function updateImageInCloudinary({
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`Failed to update image in Cloudinary: ${errorData.error.message}`);
+      const errorData = (await response.json()) as CloudinaryErrorResponse;
+      throw new Error(
+        `Failed to update image in Cloudinary: ${errorData.error?.message ?? "Unknown error"}`,
+      );
     }
 
-    const result = await response.json();
+    const result = (await response.json()) as UploadApiResponse;
 
     return {
       secure_url: result.secure_url,
       public_id: result.public_id,
     };
   } catch (error) {
-    console.error(error);
     throw new Error("Failed to update image in Cloudinary", { cause: error });
   }
 }
 
 export async function deleteImageFromCloudinary(publicId: string) {
-  if (!options.name || !options.api_key || !options.api_secret) {
-    throw new Error("Cloudinary credentials are not set");
-  }
+  const options = getCloudinaryOptions();
 
   try {
     const timestamp = Math.floor(Date.now() / 1000);
@@ -173,7 +209,7 @@ export async function deleteImageFromCloudinary(publicId: string) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = (await response.json()) as CloudinaryErrorResponse;
       throw new Error(
         `Cloudinary API delete image error: ${errorData.error?.message || "Unknown error"}`,
       );
@@ -183,18 +219,15 @@ export async function deleteImageFromCloudinary(publicId: string) {
       success: true,
     };
   } catch (error) {
-    console.error(error);
     throw new Error("Failed to delete image from Cloudinary", { cause: error });
   }
 }
 
 export async function deleteCompanyFromCloudinary(slug: string) {
-  if (!options.name || !options.api_key || !options.api_secret) {
-    throw new Error("Cloudinary credentials are not set");
-  }
+  const options = getCloudinaryOptions();
 
   try {
-    const path = `companies/${slug}`;
+    const path = joinCloudinaryPath(options.folder, "companies", slug);
 
     // list all resources in path
     const url = new URL(`https://api.cloudinary.com/v1_1/${options.name}/resources/image/upload`);
@@ -207,7 +240,7 @@ export async function deleteCompanyFromCloudinary(slug: string) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = (await response.json()) as CloudinaryErrorResponse;
       throw new Error(
         `Cloudinary API get resources error: ${errorData.error?.message || "Unknown error"}`,
       );
@@ -229,18 +262,17 @@ export async function deleteCompanyFromCloudinary(slug: string) {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = (await response.json()) as CloudinaryErrorResponse;
         throw new Error(
           `Cloudinary API delete resources error: ${errorData.error?.message || "Unknown error"}`,
         );
       }
 
-      const result = await response.json();
-      console.log("Deleted resources:", result);
+      await response.json();
     }
 
     // delete the folder
-    const folders = [`${path}/logo`, `${path}/gallery`, path];
+    const folders = [joinCloudinaryPath(path, "logo"), joinCloudinaryPath(path, "gallery"), path];
     await Promise.all(
       folders.map(async (folder) => {
         const folderURL = new URL(
@@ -254,11 +286,9 @@ export async function deleteCompanyFromCloudinary(slug: string) {
           },
         });
 
-        console.log("Deleted folder:", folder);
-
         // if the folder is not found, it's ok
         if (!response.ok && response.status !== 404) {
-          const errorData = await response.json();
+          const errorData = (await response.json()) as CloudinaryErrorResponse;
           throw new Error(
             `Cloudinary API delete folder error: ${errorData.error?.message || "Unknown error"} from ${folderURL}`,
           );
@@ -266,7 +296,6 @@ export async function deleteCompanyFromCloudinary(slug: string) {
       }),
     );
   } catch (error) {
-    console.error("Failed to delete images from Cloudinary", { cause: error });
     throw new Error("Failed to delete images from Cloudinary", { cause: error });
   }
 }

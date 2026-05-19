@@ -1,10 +1,19 @@
-import { cn } from "~/utils/cn";
+import type { ComponentProps } from "react";
 
-type Props = React.ComponentPropsWithRef<"label">;
+import { cn } from "~/lib/utils";
 
-export function Label({ className, ...props }: Props) {
+function Label({ className, ...props }: ComponentProps<"label">) {
   return (
-    // biome-ignore lint/a11y/noLabelWithoutControl: <explanation>
-    <label className={cn("text-sm font-light", className)} {...props} />
+    // biome-ignore lint/a11y/noLabelWithoutControl:  "shadcn component"
+    <label
+      data-slot="label"
+      className={cn(
+        "flex items-center gap-2 text-sm leading-none font-medium select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
+        className,
+      )}
+      {...props}
+    />
   );
 }
+
+export { Label };

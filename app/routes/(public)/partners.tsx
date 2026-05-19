@@ -1,9 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Separator } from "radix-ui";
 import findajob from "~/assets/img/FINDAJOB.jpg?url";
-import logoTIHM from "~/assets/img/Logo_TIHM.svg?url";
+import { seo } from "~/lib/seo";
 
 export const Route = createFileRoute("/(public)/partners")({
+  head: () =>
+    seo({
+      title: "Partenaires",
+      description:
+        "Partenaires et remerciements de l'Annuaire TIH, projet dédié à la visibilité des entrepreneur·euses en situation de handicap.",
+      path: "/partners",
+    }),
   component: RouteComponent,
 });
 
@@ -22,91 +28,61 @@ const PERSONS = [
 
 function RouteComponent() {
   return (
-    <main className="px-4 py-6">
-      <div className="py-20 max-w-4xl mx-auto">
+    <main className="bg-background text-foreground">
+      <div className="mx-auto max-w-3xl px-6 py-20 md:py-24">
         <h1 className="sr-only">Partenaires et remerciements</h1>
+
         <section>
-          <div className="flex flex-col gap-2 mb-4">
-            <h2 className="text-4xl font-bold tracking-tighter">Remerciements</h2>
-            <p className="text-muted-foreground text-md font-light leading-relaxed">
-              Nous souhaitons remercier les partenaires qui ont soutenu{" "}
-              <span className="font-bold">l'annuaire-tih.fr</span> en participant au financement
-              collaboratif.
-            </p>
-          </div>
-          <div className="flex flex-col gap-4 items-center p-4 w-fit ">
-            <ul className="list-disc list-inside">
-              {PERSONS.map((person) => (
-                <li key={person}>{person}</li>
-              ))}
-            </ul>
-          </div>
+          <h2 className="mb-16 text-center text-2xl font-extrabold uppercase tracking-tight">
+            Remerciements
+          </h2>
+          <p className="text-sm leading-snug">
+            Nous souhaitons remercier les partenaires qui ont soutenu{" "}
+            <span className="font-bold">l'annuaire-tih.fr</span> en participant au financement
+            collaboratif.
+          </p>
+
+          <ul className="mt-8 text-sm leading-snug">
+            {PERSONS.map((person) => (
+              <li key={person}>{person}</li>
+            ))}
+          </ul>
         </section>
-        <Separator.Root className="my-16 h-px w-1/3 mx-auto bg-border" />
-        <section>
-          <div className="flex flex-col gap-8 mb-8">
-            <div className="flex flex-col gap-2">
-              <h2 className="text-4xl font-bold tracking-tighter">Partenariats</h2>
-            </div>
 
-            <div className="flex flex-col gap-12">
-              <div className="flex flex-col gap-4">
-                <p className="text-muted-foreground text-md font-light leading-relaxed">
-                  L'association{" "}
-                  <span className="font-bold">"Les Rencontres Handicap Sport & Emploi"</span>{" "}
-                  promeut l'annuaire-tih.fr lors des évènements{" "}
-                  <span className="font-bold">FindaJob</span> et{" "}
-                  <span className="font-bold">Le Relais-Universel</span> !
-                </p>
+        <section className="mt-24">
+          <h2 className="mb-16 text-center text-2xl font-extrabold uppercase tracking-tight">
+            Partenaires
+          </h2>
+          <p className="text-sm leading-snug">
+            L’association{" "}
+            <span className="font-bold">« Les Rencontres Handicap Sport & Emploi »</span> promeut
+            l’annuaire-tih.fr lors des évènements <span className="font-bold">FindaJob</span> et{" "}
+            <span className="font-bold">Le Relais-Universel</span> !
+          </p>
 
-                <div className="border border-border rounded-sm w-full max-w-md">
-                  <img
-                    src={findajob}
-                    alt="FindaJob"
-                    className="w-full h-full object-cover rounded-sm dark:brightness-85"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <p className="text-muted-foreground text-md font-light leading-relaxed">
-                  En tant que partenaire de ce projet, nous sommes heureux de vous faire découvrir
-                  le portail{" "}
-                  <a
-                    href="https://www.tihm.urssaf.fr/"
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="font-bold underline underline-offset-2"
-                  >
-                    TIHm
-                  </a>{" "}
-                  dédié aux Travailleurs Indépendants en situation de Handicap (TIH)!
-                </p>
-
-                <div className="border border-border rounded-sm w-full max-w-sm bg-white p-4">
-                  <a href="https://www.tihm.urssaf.fr/" target="_blank" rel="noreferrer noopener">
-                    <img
-                      src={logoTIHM}
-                      alt="TIHm, le messager des TIH"
-                      className="w-full h-auto object-contain rounded-sm"
-                    />
-                  </a>
-                </div>
-              </div>
-            </div>
+          <div className="mt-10 w-full max-w-md bg-card p-4">
+            <img src={findajob} alt="FindaJob" className="h-auto w-full object-contain" />
           </div>
         </section>
 
-        <Separator.Root className="my-16 h-px w-1/3 mx-auto bg-border" />
-
-        <section>
-          <div className="flex flex-col gap-2 mb-8">
-            <h2 className="text-4xl font-bold tracking-tighter">Illustrations</h2>
-            <p className="text-muted-foreground text-md font-light leading-relaxed">
+        <section className="mt-24">
+          <h2 className="mb-16 text-center text-2xl font-extrabold uppercase tracking-tight">
+            Graphisme et illustration
+          </h2>
+          <div className="space-y-6 text-sm leading-snug">
+            <p>
               Toutes les illustrations ont été réalisées bénévolement par{" "}
               <a href="mailto:zelia.grvl@gmail.com" className="underline underline-offset-2">
                 Zelia GOURVILLE
               </a>
+              .
+            </p>
+            <p>
+              La refonte graphique du site a été réalisée bénévolement par{" "}
+              <a href="mailto:tracy.salame@gmail.com" className="underline underline-offset-2">
+                Tracy SALAME
+              </a>
+              .
             </p>
           </div>
         </section>

@@ -1,17 +1,22 @@
 import { redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { getWebRequest } from "@tanstack/react-start/server";
+import { getRequest } from "@tanstack/react-start/server";
 import { eq } from "drizzle-orm";
 import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 import { auth } from "~/lib/auth/auth.server";
+import { requireCurrentUser } from "~/lib/auth/permissions.server";
 import { deleteCompanyFromCloudinary } from "~/lib/cloudinary";
 
 export const deleteUser = createServerFn({ method: "POST" })
-  .validator((data: { userId: string }) => data)
+  .inputValidator((data: { userId: string }) => data)
   .handler(async ({ data }) => {
-    const request = getWebRequest();
-    if (!request) throw new Error("Request not found");
+    const request = getRequest();
+    const user = await requireCurrentUser();
+
+    if (data.userId !== user.id) {
+      throw new Error("Accès non autorisé");
+    }
 
     // get all companies of the user
     const companies = await getDb()

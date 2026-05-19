@@ -1,46 +1,80 @@
 import { useMutation } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
-import type { User } from "better-auth";
+import { Link, rootRouteId, useRouteContext, useRouter } from "@tanstack/react-router";
+import { createClientOnlyFn } from "@tanstack/react-start";
 import { BriefcaseBusiness, DiamondPlus, LayoutDashboard, LogOut, UserCog } from "lucide-react";
-import { Avatar } from "radix-ui";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuItemIndicator,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { useAdminRole } from "~/hooks/use-admin-role";
-import { signOutFn } from "~/lib/api/auth/sign-out";
-import { type Theme, useTheme } from "./providers/theme-provider";
+import { isValidRole } from "~/db/schema/auth";
+import type { AuthUser } from "~/lib/auth/auth.server";
+import { sessionQueryOptions } from "~/lib/auth/session-query";
+import { setThemeServerFn, type Theme } from "~/lib/theme";
 import { useToast } from "./ui/toast";
 
-export function MenuUser({ user }: { user: User | undefined }) {
-  const { isAdmin } = useAdminRole();
-  const { theme, setTheme } = useTheme();
+const signOutClient = createClientOnlyFn(async () => {
+  const { authClient } = await import("~/lib/auth/auth.client");
+  return authClient.signOut();
+});
+
+export function MenuUser({ user }: { user: AuthUser | undefined }) {
+  const { theme, queryClient } = useRouteContext({ from: rootRouteId });
+  const router = useRouter();
+
   const { toast } = useToast();
+  const role = user?.role;
+  const isAdmin = isValidRole(role) && role === "admin";
 
   const { mutate: signOut } = useMutation({
-    mutationFn: useServerFn(signOutFn),
-    onSuccess: () =>
+    mutationFn: async () => {
+      const result = await signOutClient();
+
+      if (result.error) {
+        throw new Error(result.error.message || "Impossible de se déconnecter");
+      }
+
+      queryClient.setQueryData(sessionQueryOptions.queryKey, null);
+
+      return result.data;
+    },
+    onSuccess: async () => {
       toast({
         status: "success",
         description: "Vous avez été déconnecté avec succès",
         button: { label: "Fermer" },
-      }),
+      });
+      await router.navigate({ to: "/" });
+      await router.invalidate();
+    },
+    onError: (error) => {
+      toast({
+        status: "error",
+        description: error.message || "Impossible de se déconnecter",
+        button: { label: "Fermer" },
+      });
+    },
   });
+
+  function toggleTheme(theme: Theme) {
+    setThemeServerFn({ data: theme }).then(() => router.invalidate());
+  }
 
   if (!user) return null;
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full cursor-pointer focus:outline-primary focus:outline-2">
+      <DropdownMenuTrigger
+        aria-label="Ouvrir le menu utilisateur"
+        className="flex size-12 cursor-pointer items-center justify-center rounded-full bg-card text-card-foreground focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+      >
         <AvatarUser user={user} />
       </DropdownMenuTrigger>
 
@@ -53,33 +87,37 @@ export function MenuUser({ user }: { user: User | undefined }) {
         <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link to="/compte/entreprises/create">
-              <DiamondPlus className="size-4" />
-              <span className="text-xs">Référencer</span>
-            </Link>
+          <DropdownMenuItem render={<Link to="/compte/entreprises/create" />}>
+            <DiamondPlus data-icon="inline-start" />
+            <span className="text-xs">Référencer</span>
           </DropdownMenuItem>
 
-          <DropdownMenuItem asChild>
-            <Link to="/compte/entreprises">
-              <BriefcaseBusiness className="size-4" />
-              <span className="text-xs">Mes entreprises</span>
-            </Link>
+          <DropdownMenuItem render={<Link to="/compte/entreprises" />}>
+            <BriefcaseBusiness data-icon="inline-start" />
+            <span className="text-xs">Mes entreprises</span>
           </DropdownMenuItem>
 
-          <DropdownMenuItem asChild>
-            <Link to="/compte/preferences">
-              <UserCog className="size-4" />
-              <span className="text-xs">Mon compte</span>
-            </Link>
+          <DropdownMenuItem render={<Link to="/compte/preferences" />}>
+            <UserCog data-icon="inline-start" />
+            <span className="text-xs">Mon compte</span>
           </DropdownMenuItem>
 
           {isAdmin ? (
-            <DropdownMenuItem asChild>
-              <Link to="/admin/dashboard">
-                <LayoutDashboard className="size-4" />
-                <span className="text-xs">Admin dashboard</span>
-              </Link>
+            <DropdownMenuItem
+              render={
+                <Link
+                  to="/admin/dashboard"
+                  search={{
+                    view: "all",
+                    q: "",
+                    companyStatus: "all",
+                    userRole: "all",
+                  }}
+                />
+              }
+            >
+              <LayoutDashboard data-icon="inline-start" />
+              <span className="text-xs">Admin dashboard</span>
             </DropdownMenuItem>
           ) : null}
         </DropdownMenuGroup>
@@ -87,41 +125,21 @@ export function MenuUser({ user }: { user: User | undefined }) {
         <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
-          {/* biome-ignore lint/a11y/noLabelWithoutControl: dropdown menu */}
           <DropdownMenuLabel className="text-sm font-light px-2 py-1.5">Thème</DropdownMenuLabel>
 
-          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as Theme)}>
-            <DropdownMenuRadioItem value="light" className="relative ps-8 ">
-              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
-                <span className="size-2 rounded-full flex bg-accent-foreground" />
-              </DropdownMenuItemIndicator>
-              Light
-            </DropdownMenuRadioItem>
-
-            <DropdownMenuRadioItem value="dark" className="relative ps-8">
-              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
-                <span className="size-2 rounded-full flex bg-accent-foreground" />
-              </DropdownMenuItemIndicator>
-              Dark
-            </DropdownMenuRadioItem>
-
-            <DropdownMenuRadioItem value="system" className="relative ps-8">
-              <DropdownMenuItemIndicator className="absolute start-2 top-1/2 -translate-y-1/2">
-                <span className="size-2 rounded-full flex bg-accent-foreground" />
-              </DropdownMenuItemIndicator>
-              System
-            </DropdownMenuRadioItem>
+          <DropdownMenuRadioGroup value={theme} onValueChange={toggleTheme}>
+            <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="auto">System</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
 
         <DropdownMenuSeparator className="h-px bg-border my-1 -mx-1" />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <button type="button" onClick={() => signOut(undefined)}>
-              <LogOut className="size-4" />
-              <span>Se déconnecter</span>
-            </button>
+          <DropdownMenuItem onClick={() => signOut()}>
+            <LogOut data-icon="inline-start" />
+            <span>Se déconnecter</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
@@ -129,7 +147,7 @@ export function MenuUser({ user }: { user: User | undefined }) {
   );
 }
 
-function AvatarUser({ user }: { user: User }) {
+function AvatarUser({ user }: { user: AuthUser }) {
   const initials = user.name
     ?.split(" ")
     .map((name) => name[0])
@@ -139,18 +157,16 @@ function AvatarUser({ user }: { user: User }) {
 
   if (user.image) {
     return (
-      <Avatar.Root className="size-8 rounded-full">
-        <Avatar.Image src={user.image} alt={user.name} className="size-full rounded-full" />
-        <Avatar.Fallback className="size-full leading-1">{initials}</Avatar.Fallback>
-      </Avatar.Root>
+      <Avatar size="lg">
+        <AvatarImage src={user.image} alt={user.name} />
+        <AvatarFallback>{initials}</AvatarFallback>
+      </Avatar>
     );
   }
 
   return (
-    <Avatar.Root className="size-8 rounded-full bg-secondary flex">
-      <Avatar.Fallback className="size-full leading-1 text-xs grid place-items-center text-secondary-foreground">
-        {initials}
-      </Avatar.Fallback>
-    </Avatar.Root>
+    <Avatar size="lg">
+      <AvatarFallback>{initials}</AvatarFallback>
+    </Avatar>
   );
 }

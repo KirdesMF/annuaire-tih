@@ -9,7 +9,14 @@ import { TiktokIcon } from "~/components/icons/tiktok";
 import { TwitterIcon } from "~/components/icons/twitter";
 import { YoutubeIcon } from "~/components/icons/youtube";
 import { Input } from "~/components/ui/input";
-import { Select, SelectItem } from "~/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { useToast } from "~/components/ui/toast";
 import type { Company } from "~/db/schema/companies";
 
@@ -126,14 +133,19 @@ export function SocialMedias({ company }: { company?: Company }) {
           <Select
             value={selectedNetwork}
             onValueChange={(value) => setSelectedNetwork(value as SocialMediaName)}
-            placeholder="Sélectionner un réseau"
-            className="w-full md:max-w-[180px]"
           >
-            {SOCIAL_MEDIAS.map((socialMedia) => (
-              <SelectItem key={socialMedia.name} value={socialMedia.name}>
-                <span className="first-letter:capitalize">{socialMedia.name}</span>
-              </SelectItem>
-            ))}
+            <SelectTrigger className="w-full md:max-w-[180px]">
+              <SelectValue placeholder="Sélectionner un réseau" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {SOCIAL_MEDIAS.map((socialMedia) => (
+                  <SelectItem key={socialMedia.name} value={socialMedia.name}>
+                    <span className="first-letter:capitalize">{socialMedia.name}</span>
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
           </Select>
 
           <div className="flex items-center gap-2 flex-1 relative">

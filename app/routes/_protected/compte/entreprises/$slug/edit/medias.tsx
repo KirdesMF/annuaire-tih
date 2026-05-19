@@ -10,23 +10,28 @@ import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
 import { deleteCompanyMedia } from "~/lib/api/companies/mutations/delete-company-media";
 import { updateCompanyMedia } from "~/lib/api/companies/mutations/update-company-medias";
-import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { manageCompanyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
 import { UpdateCompanyMediaSchema } from "~/lib/validator/company.schema";
 import { useAddPreviewStore } from "~/stores/preview.store";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/medias")({
   loader: async ({ context, params }) => {
-    await context.queryClient.ensureQueryData(companyBySlugQuery(params.slug));
+    await context.queryClient.ensureQueryData(manageCompanyBySlugQuery(params.slug));
   },
   component: RouteComponent,
 });
+
+function getIssueKey(issue: v.BaseIssue<unknown>) {
+  const path = issue.path?.map((item) => String(item.key)).join(".") ?? "root";
+  return `${path}:${issue.type}:${issue.message}`;
+}
 
 function RouteComponent() {
   const params = Route.useParams();
   const context = Route.useRouteContext();
   const navigate = Route.useNavigate();
 
-  const { data: company } = useSuspenseQuery(companyBySlugQuery(params.slug));
+  const { data: company } = useSuspenseQuery(manageCompanyBySlugQuery(params.slug));
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompanyMedia) });
   const { mutate: deleteMedia, isPending: isDeletingMedia } = useMutation({
     mutationFn: useServerFn(deleteCompanyMedia),
@@ -81,7 +86,11 @@ function RouteComponent() {
     companyId,
     publicId,
     index,
-  }: { companyId: string; publicId: string; index: number }) {
+  }: {
+    companyId: string;
+    publicId: string;
+    index: number;
+  }) {
     setDeletingMedia(publicId);
     deleteMedia(
       { data: { companyId, publicId, type: "gallery", index } },
@@ -116,9 +125,8 @@ function RouteComponent() {
       toast({
         description: (
           <span>
-            {result.issues.map((issue, idx) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              <span key={idx}>{issue.message}</span>
+            {result.issues.map((issue) => (
+              <span key={getIssueKey(issue)}>{issue.message}</span>
             ))}
           </span>
         ),

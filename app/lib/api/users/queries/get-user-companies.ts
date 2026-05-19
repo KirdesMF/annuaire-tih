@@ -5,10 +5,14 @@ import { getDb } from "~/db";
 import { categoriesTable } from "~/db/schema/categories";
 import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
+import { assertSelfOrAdmin, requireCurrentUser } from "~/lib/auth/permissions.server";
 
 export const getUserCompanies = createServerFn({ method: "GET" })
-  .validator((userId: string) => userId)
+  .inputValidator((userId: string) => userId)
   .handler(async ({ data }) => {
+    const user = await requireCurrentUser();
+    assertSelfOrAdmin(data, user);
+
     const db = getDb();
 
     return await db.transaction(async (tx) => {

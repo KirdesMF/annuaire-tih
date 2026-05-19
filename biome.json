@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.12/schema.json",
 
   "vcs": {
     "enabled": false,
@@ -8,13 +8,21 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": [
-      "app/routeTree.gen.ts",
-      ".output/*",
-      ".vinxi/*",
-      ".wrangler/*",
-      "node_modules/*",
-      "app/styles/*"
+    "includes": [
+      "**",
+      "!app/routeTree.gen.ts",
+      "!!dist",
+      "!!.output",
+      "!!.vinxi",
+      "!!.wrangler",
+      "!!node_modules",
+      "!!coverage",
+      "!!build",
+      "!!.agents",
+      "!!.sc",
+      "!!.tanstack",
+      "!!.vscode",
+      "!!.zed"
     ]
   },
   "formatter": {
@@ -22,26 +30,19 @@
     "indentStyle": "space",
     "lineWidth": 100
   },
-  "organizeImports": {
-    "enabled": true
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
       "correctness": {
         "noUnusedImports": "warn"
-      },
-      "a11y": {
-        "noLabelWithoutControl": {
-          "level": "error",
-          "options": {
-            "inputComponents": ["Input", "InputFile"],
-            "labelComponents": ["Label", "DropdownMenuLabel"],
-            "labelAttributes": ["label"]
-          }
-        }
       }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "javascript": {

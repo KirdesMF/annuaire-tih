@@ -1,4 +1,5 @@
-import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { getCurrentCguAcceptanceFn } from "~/lib/api/cgu/queries/get-current-cgu-acceptance";
 
 export const Route = createFileRoute("/_protected")({
   component: ProtectedLayout,
@@ -7,11 +8,13 @@ export const Route = createFileRoute("/_protected")({
       throw redirect({ to: "/sign-in" });
     }
 
-    if (!context.user.cgu && location.pathname !== "/accept-cgu") {
+    const hasAcceptedCgu = await getCurrentCguAcceptanceFn();
+
+    if (!hasAcceptedCgu && location.pathname !== "/accept-cgu") {
       throw redirect({ to: "/accept-cgu" });
     }
 
-    return { user: context.user };
+    return { user: { ...context.user, cgu: hasAcceptedCgu } };
   },
 });
 

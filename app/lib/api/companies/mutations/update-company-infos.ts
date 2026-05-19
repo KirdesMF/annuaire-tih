@@ -5,10 +5,11 @@ import * as v from "valibot";
 import { getDb } from "~/db";
 import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
+import { requireCompanyManager } from "~/lib/auth/permissions.server";
 import { UpdateCompanyInfosSchema } from "~/lib/validator/company.schema";
 
 export const updateCompanyInfos = createServerFn({ method: "POST" })
-  .validator((data: FormData) => {
+  .inputValidator((data: FormData) => {
     const decodedFormData = decode(data, {
       arrays: ["categories"],
       booleans: ["rqth"],
@@ -17,6 +18,7 @@ export const updateCompanyInfos = createServerFn({ method: "POST" })
   })
   .handler(async ({ data }) => {
     const { categories, companyId, ...companyData } = data;
+    await requireCompanyManager(companyId);
 
     try {
       await getDb().transaction(async (tx) => {
@@ -36,7 +38,6 @@ export const updateCompanyInfos = createServerFn({ method: "POST" })
         }
       });
     } catch (error) {
-      console.error("Failed to update company info:", error);
-      throw new Error("Failed to update company information");
+      throw new Error("Failed to update company information", { cause: error });
     }
   });

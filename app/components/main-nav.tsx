@@ -1,27 +1,22 @@
 import { Link, linkOptions } from "@tanstack/react-router";
-import annuaire from "~/assets/img/annuaire.webp?url";
 
 const LINKS = linkOptions([
-  { label: "Qui sommes-nous ?", to: "/about" },
-  { label: "Partenaires ", to: "/partners" },
+  { label: "À propos", to: "/about" },
+  { label: "Partenaires", to: "/partners" },
   { label: "Sources", to: "/sources" },
   { label: "FAQ", to: "/faq" },
 ]);
 
 export function MainNav() {
   return (
-    <nav className="hidden md:flex">
-      <ul className="flex items-center gap-1">
-        <li className="shrink-0">
-          <Link to="/" className="flex items-center justify-center">
-            <img src={annuaire} alt="Annuaire TIH" className="w-10 shrink-0" />
-          </Link>
-        </li>
+    <nav className="hidden md:flex" aria-label="Navigation principale">
+      <ul className="flex items-stretch gap-0 self-stretch">
         {LINKS.map((link) => (
-          <li key={link.to}>
+          <li key={link.to} className="flex">
             <Link
               to={link.to}
-              className="text-sm font-light text-nowrap focus:outline-primary focus:outline-2 px-1.5 py-1 rounded-xs data-[status=active]:text-primary data-[status=active]:font-bold"
+              activeOptions={{ exact: true }}
+              className="flex items-center px-5 text-nowrap text-sm font-extrabold uppercase tracking-tight transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[status=active]:text-primary lg:px-6"
             >
               {link.label}
             </Link>

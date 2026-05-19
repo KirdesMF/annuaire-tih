@@ -1,16 +1,21 @@
 import { useMutation, useSuspenseQueries } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { Command } from "cmdk";
+import { decode } from "decode-formdata";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
-import { Popover, Separator } from "radix-ui";
 import { useRef, useState } from "react";
+import * as v from "valibot";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Separator } from "~/components/ui/separator";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { updateCompanyInfos } from "~/lib/api/companies/mutations/update-company-infos";
-import { companyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { manageCompanyBySlugQuery } from "~/lib/api/companies/queries/get-company-by-slug";
+import { UpdateCompanyInfosSchema } from "~/lib/validator/company.schema";
+import { useUpdatePreviewStore } from "~/stores/preview.store";
 import { cn } from "~/utils/cn";
 import { SocialMedias } from "../../-components/social-medias";
 
@@ -18,7 +23,7 @@ export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/
   loader: async ({ context, params }) => {
     // seed the cache
     await Promise.all([
-      context.queryClient.ensureQueryData(companyBySlugQuery(params.slug)),
+      context.queryClient.ensureQueryData(manageCompanyBySlugQuery(params.slug)),
       context.queryClient.ensureQueryData(categoriesQueryOptions),
     ]);
   },
@@ -31,11 +36,13 @@ function RouteComponent() {
   const context = Route.useRouteContext();
   const params = Route.useParams();
   const navigate = Route.useNavigate();
+  const search = Route.useSearch();
   const { toast } = useToast();
 
   const formRef = useRef<HTMLFormElement>(null);
+  const { setPreview } = useUpdatePreviewStore();
   const [categories, company] = useSuspenseQueries({
-    queries: [categoriesQueryOptions, companyBySlugQuery(params.slug)],
+    queries: [categoriesQueryOptions, manageCompanyBySlugQuery(params.slug)],
   });
 
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(updateCompanyInfos) });
@@ -73,6 +80,81 @@ function RouteComponent() {
     setDescriptionLength(e.target.value.length);
   }
 
+  function formatValidationIssues(
+    issues: Array<{ path?: Array<{ key?: unknown }>; message: string }>,
+  ) {
+    return issues
+      .map((issue) => {
+        const field = issue.path?.[0]?.key;
+
+        if (field === "categories") {
+          return `Catégories: ${issue.message}`;
+        }
+
+        if (field === "description") {
+          return `Description: ${issue.message}`;
+        }
+
+        return issue.message;
+      })
+      .join("\n");
+  }
+
+  async function copyErrorMessage(message: string) {
+    try {
+      await navigator.clipboard.writeText(message);
+      toast({
+        status: "success",
+        description: "Message d'erreur copié",
+        button: { label: "Fermer" },
+      });
+    } catch {
+      toast({
+        status: "error",
+        description: "Impossible de copier le message d'erreur",
+        button: { label: "Fermer" },
+      });
+    }
+  }
+
+  function onPreview() {
+    const formData = new FormData(formRef.current as HTMLFormElement);
+    const decodedFormData = decode(formData, {
+      arrays: ["categories"],
+      booleans: ["rqth"],
+    });
+
+    const result = v.safeParse(UpdateCompanyInfosSchema, decodedFormData, {
+      abortPipeEarly: true,
+    });
+
+    if (!result.success) {
+      const errorMessage = formatValidationIssues(result.issues);
+
+      return toast({
+        status: "error",
+        title: "Prévisualisation impossible",
+        description: <span className="whitespace-pre-line">{errorMessage}</span>,
+        button: {
+          label: "Copier",
+          onClick: () => void copyErrorMessage(errorMessage),
+        },
+      });
+    }
+
+    setPreview({
+      ...result.output,
+      logoUrl: company.data?.logo?.secureUrl,
+      galleryUrls: company.data?.gallery?.map((image) => image.secureUrl) ?? [],
+    });
+
+    navigate({
+      to: "/compte/entreprises/$slug/edit/preview",
+      params: { slug: params.slug },
+      search,
+    });
+  }
+
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
@@ -92,8 +174,13 @@ function RouteComponent() {
         },
         onError: (error) => {
           toast({
+            status: "error",
+            title: "Mise à jour impossible",
             description: error.message,
-            button: { label: "Fermer" },
+            button: {
+              label: "Copier",
+              onClick: () => void copyErrorMessage(error.message),
+            },
           });
         },
       },
@@ -131,41 +218,36 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Catégories * (max. 3)</span>
-            <Popover.Root>
-              <Popover.Trigger className="h-9 cursor-pointer border rounded-sm border-input px-2 py-1 text-xs flex items-center justify-between gap-2 shadow-2xs">
-                <span className="rounded-sm text-xs flex items-center gap-2 text-muted-foreground">
+            <Popover>
+              <PopoverTrigger className="flex h-9 w-full cursor-pointer items-center justify-between gap-2 rounded-sm border border-input px-2 py-1 text-xs shadow-2xs">
+                <span className="flex items-center gap-2 rounded-sm text-xs text-muted-foreground">
                   Ajouter une catégorie
                 </span>
                 <ChevronDown className="size-4 text-muted-foreground" />
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Content
-                  className="bg-popover w-(--radix-popper-anchor-width)"
-                  sideOffset={5}
-                >
-                  <Command className="border rounded-sm border-input">
-                    <Command.Input
-                      placeholder="Rechercher une catégorie"
-                      className="w-full h-9 px-2 outline-none placeholder:text-sm placeholder:font-light"
-                    />
-                    <Command.Separator className="h-px bg-border" />
-                    <Command.List className="max-h-60 overflow-y-auto">
-                      {categories.data?.map((category) => (
-                        <Command.Item
-                          key={category.id}
-                          value={category.name}
-                          disabled={selectedCategories.has(category.id)}
-                          className="cursor-pointer py-1.5 px-2 aria-selected:bg-muted text-sm font-light aria-disabled:opacity-20"
-                          onSelect={() => onSelectCategory(category.id)}
-                        >
-                          {category.name}
-                        </Command.Item>
-                      ))}
-                    </Command.List>
-                  </Command>
-                </Popover.Content>
-              </Popover.Portal>
-            </Popover.Root>
+              </PopoverTrigger>
+              <PopoverContent className="w-(--anchor-width) bg-popover" sideOffset={5}>
+                <Command className="rounded-sm border border-input">
+                  <Command.Input
+                    placeholder="Rechercher une catégorie"
+                    className="h-9 w-full px-2 outline-none placeholder:text-sm placeholder:font-light"
+                  />
+                  <Command.Separator className="h-px bg-border" />
+                  <Command.List className="max-h-60 overflow-y-auto">
+                    {categories.data?.map((category) => (
+                      <Command.Item
+                        key={category.id}
+                        value={category.name}
+                        disabled={selectedCategories.has(category.id)}
+                        className="cursor-pointer px-2 py-1.5 text-sm font-light aria-selected:bg-muted aria-disabled:opacity-20"
+                        onSelect={() => onSelectCategory(category.id)}
+                      >
+                        {category.name}
+                      </Command.Item>
+                    ))}
+                  </Command.List>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </Label>
 
           {selectedCategories.size ? (
@@ -199,7 +281,7 @@ function RouteComponent() {
               <span className="text-xs font-medium">Description</span>
               <textarea
                 name="description"
-                className="border rounded-sm p-2 border-input placeholder:text-xs focus-visible:outline-primary"
+                className="w-full border rounded-sm p-2 border-input placeholder:text-xs focus-visible:outline-primary"
                 rows={6}
                 placeholder="Entrer une description de mon entreprise..."
                 onChange={onDescriptionChange}
@@ -216,7 +298,7 @@ function RouteComponent() {
             </span>
           </div>
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Entrepreneur</span>
@@ -240,7 +322,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Perimètre d'intervention</span>
-            <div className="relative">
+            <div className="relative w-full">
               <MapPinned className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="text"
@@ -254,7 +336,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Email</span>
-            <div className="relative">
+            <div className="relative w-full">
               <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="email"
@@ -268,7 +350,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Numéro de téléphone</span>
-            <div className="relative">
+            <div className="relative w-full">
               <Phone className="size-4 text-muted-foregound absolute start-2 top-2.5" />
               <Input
                 type="tel"
@@ -282,7 +364,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Site web</span>
-            <div className="relative">
+            <div className="relative w-full">
               <Globe className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="text"
@@ -294,7 +376,7 @@ function RouteComponent() {
             </div>
           </Label>
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <div className="grid gap-8">
             <fieldset className="flex gap-4">
@@ -366,13 +448,40 @@ function RouteComponent() {
             </fieldset>
           </div>
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
+
+          <div className="flex items-center justify-between gap-3 rounded-sm border border-border bg-card px-4 py-3">
+            <div className="grid gap-1">
+              <p className="text-sm font-medium">Images entreprise</p>
+              <p className="text-xs text-muted-foreground">
+                Logo et galerie se modifient dans onglet média.
+              </p>
+            </div>
+
+            <Link
+              to="/compte/entreprises/$slug/edit/medias"
+              params={{ slug: params.slug }}
+              search={search}
+              className="rounded-sm border border-border bg-muted px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-muted/80"
+            >
+              Gérer les images
+            </Link>
+          </div>
+
+          <Separator className="h-px bg-border my-4" />
 
           <SocialMedias company={company.data} />
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <div className="flex gap-2 justify-end">
+            <button
+              type="button"
+              className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs hover:bg-secondary/90"
+              onClick={onPreview}
+            >
+              Prévisualiser
+            </button>
             <button
               type="submit"
               className="bg-primary text-primary-foreground px-3 py-2 rounded-sm font-light text-xs"

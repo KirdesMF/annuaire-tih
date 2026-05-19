@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { Separator } from "radix-ui";
 import img from "~/assets/img/FINDAJOB.jpg?url";
 import logoTIHM from "~/assets/img/logoTIHM.png?url";
+import { Separator } from "~/components/ui/separator";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border bg-accent text-accent-foreground mt-auto">
-      <div className="max-w-5xl mx-auto px-8 py-12">
-        <div className="flex justify-between gap-4">
+    <footer className="mt-auto border-t border-border bg-background text-foreground">
+      <div className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-10 md:px-8 md:py-12">
+        <div className="flex flex-col justify-between gap-8 md:flex-row">
           <ul className="flex flex-col gap-2 text-xs list-disc list-inside">
             <li>
               Besoin d'aide ? Des questions ?{" "}
@@ -44,7 +44,7 @@ export function SiteFooter() {
           </ul>
 
           <div className="flex flex-col gap-6 text-xs">
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <p className="text-xs font-light">Partenaires:</p>
               <div className="w-24">
                 <img src={img} alt="logo" className="size-full object-contain" />
@@ -57,7 +57,7 @@ export function SiteFooter() {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               <p className="text-xs font-light">Illustrations:</p>
               <a href="mailto:zelia.grvl@gmail.com" className="underline underline-offset-2">
                 Zélia GOURVILLE
@@ -66,7 +66,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <Separator.Root className="my-8 h-px bg-border" />
+        <Separator />
 
         <p className="text-xs font-light">
           Si vous n'arrivez pas à accéder à un contenu ou à un service, et pour être orienté vers

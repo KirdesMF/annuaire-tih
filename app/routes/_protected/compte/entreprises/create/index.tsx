@@ -4,12 +4,13 @@ import { useServerFn } from "@tanstack/react-start";
 import { Command } from "cmdk";
 import { decode } from "decode-formdata";
 import { ChevronDown, Globe, Loader, Mail, MapPinned, Phone, X } from "lucide-react";
-import { Popover, Separator } from "radix-ui";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as v from "valibot";
 import { InputFile } from "~/components/input-file";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Separator } from "~/components/ui/separator";
 import { useToast } from "~/components/ui/toast";
 import { categoriesQueryOptions } from "~/lib/api/categories/queries/get-categories";
 import { createCompany } from "~/lib/api/companies/mutations/create-company";
@@ -41,7 +42,7 @@ function RouteComponent() {
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
   const { mutate, isPending } = useMutation({ mutationFn: useServerFn(createCompany) });
 
-  const { preview, setPreview, revokeAll } = useAddPreviewStore();
+  const { preview, setPreview, revokeAll, reset } = useAddPreviewStore();
   const { toast } = useToast();
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -98,34 +99,103 @@ function RouteComponent() {
     }
   }
 
+  function sanitizeDecodedCompanyData(decodedFormData: unknown) {
+    if (!decodedFormData || typeof decodedFormData !== "object") {
+      return decodedFormData;
+    }
+
+    const data = { ...decodedFormData } as Record<string, unknown>;
+
+    if (data.logo instanceof File && data.logo.size === 0) {
+      data.logo = undefined;
+    }
+
+    if (Array.isArray(data.gallery)) {
+      data.gallery = data.gallery.filter((file) => !(file instanceof File && file.size === 0));
+    }
+
+    return data;
+  }
+
+  function formatValidationIssues(
+    issues: Array<{ path?: Array<{ key?: unknown }>; message: string }>,
+  ) {
+    return issues
+      .map((issue) => {
+        const field = issue.path?.[0]?.key;
+
+        if (field === "logo") {
+          return `Logo: ${issue.message}`;
+        }
+
+        if (field === "gallery") {
+          return `Galerie: ${issue.message}`;
+        }
+
+        return issue.message;
+      })
+      .join("\n");
+  }
+
+  async function copyErrorMessage(message: string) {
+    try {
+      await navigator.clipboard.writeText(message);
+      toast({
+        status: "success",
+        description: "Message d'erreur copié",
+        button: { label: "Fermer" },
+      });
+    } catch {
+      toast({
+        status: "error",
+        description: "Impossible de copier le message d'erreur",
+        button: { label: "Fermer" },
+      });
+    }
+  }
+
   function onPreview() {
     const formData = new FormData(formRef.current as HTMLFormElement);
 
-    // decode the form data
-    const decodedFormData = decode(formData, {
-      files: ["logo", "gallery"],
-      arrays: ["categories", "gallery"],
-      booleans: ["rqth"],
-    });
+    const decodedFormData = sanitizeDecodedCompanyData(
+      decode(formData, {
+        files: ["logo", "gallery"],
+        arrays: ["categories", "gallery"],
+        booleans: ["rqth"],
+      }),
+    );
 
     const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortPipeEarly: true });
 
     if (!result.success) {
+      const errorMessage = formatValidationIssues(result.issues);
+
       toast({
-        description: (
-          <div>
-            {result.issues.map((issue, idx) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              <p key={idx}>{issue.message}</p>
-            ))}
-          </div>
-        ),
-        button: { label: "Fermer" },
+        status: "error",
+        title: "Prévisualisation impossible",
+        description: <div className="grid gap-1 whitespace-pre-line">{errorMessage}</div>,
+        button: {
+          label: "Copier",
+          onClick: () => void copyErrorMessage(errorMessage),
+        },
       });
       return;
     }
 
-    setPreview({ ...preview, ...result.output });
+    setPreview({
+      ...preview,
+      ...result.output,
+      logo: result.output.logo ?? preview.logo,
+      logoUrl: result.output.logo ? preview.logoUrl : preview.logoUrl,
+      gallery:
+        result.output.gallery && result.output.gallery.length > 0
+          ? result.output.gallery
+          : preview.gallery,
+      galleryUrls:
+        result.output.gallery && result.output.gallery.length > 0
+          ? preview.galleryUrls
+          : preview.galleryUrls,
+    });
     navigate({ to: "/compte/entreprises/create/preview" });
   }
 
@@ -133,25 +203,27 @@ function RouteComponent() {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
 
-    const decodedFormData = decode(formData, {
-      files: ["logo", "gallery.$"],
-      arrays: ["categories", "gallery"],
-      booleans: ["rqth"],
-    });
+    const decodedFormData = sanitizeDecodedCompanyData(
+      decode(formData, {
+        files: ["logo", "gallery.$"],
+        arrays: ["categories", "gallery"],
+        booleans: ["rqth"],
+      }),
+    );
 
     const result = v.safeParse(CreateCompanySchema, decodedFormData, { abortEarly: true });
 
     if (!result.success) {
+      const errorMessage = formatValidationIssues(result.issues);
+
       return toast({
-        description: (
-          <span>
-            {result.issues.map((issue, idx) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              <span key={idx}>{issue.message}</span>
-            ))}
-          </span>
-        ),
-        button: { label: "Fermer" },
+        status: "error",
+        title: "Création impossible",
+        description: <span className="whitespace-pre-line">{errorMessage}</span>,
+        button: {
+          label: "Copier",
+          onClick: () => void copyErrorMessage(errorMessage),
+        },
       });
     }
 
@@ -169,10 +241,10 @@ function RouteComponent() {
             description: "Entreprise créée avec succès",
             button: { label: "Fermer" },
           });
+          reset();
           navigate({ to: "/compte/entreprises" });
         },
-        onError: (error) => {
-          console.log(error);
+        onError: () => {
           toast({
             description: "Une erreur est survenue lors de la création de l'entreprise",
             button: { label: "Fermer" },
@@ -181,10 +253,6 @@ function RouteComponent() {
       },
     );
   }
-
-  useEffect(() => {
-    return () => revokeAll();
-  }, [revokeAll]);
 
   return (
     <div className="container px-4 py-6">
@@ -216,41 +284,36 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Catégories * (max. 3)</span>
-            <Popover.Root>
-              <Popover.Trigger className="h-10 cursor-pointer ring-1 ring-input/50 rounded-sm px-2 py-1 text-xs flex items-center justify-between gap-2 shadow-2xs">
-                <span className="rounded-sm text-xs flex items-center gap-2 text-muted-foreground">
+            <Popover>
+              <PopoverTrigger className="flex h-10 w-full cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-1 text-xs shadow-2xs ring-1 ring-input/50">
+                <span className="flex items-center gap-2 rounded-sm text-xs text-muted-foreground">
                   Ajouter une catégorie
                 </span>
                 <ChevronDown className="size-4 text-muted-foreground" />
-              </Popover.Trigger>
-              <Popover.Portal>
-                <Popover.Content
-                  className="bg-popover w-(--radix-popper-anchor-width)"
-                  sideOffset={5}
-                >
-                  <Command className="border border-input rounded-sm">
-                    <Command.Input
-                      placeholder="Rechercher une catégorie"
-                      className="w-full h-10 px-2 outline-none placeholder:text-sm placeholder:font-light"
-                    />
-                    <Command.Separator className="h-px bg-border" />
-                    <Command.List className="max-h-60 overflow-y-auto">
-                      {categories.map((category) => (
-                        <Command.Item
-                          key={category.id}
-                          value={category.name}
-                          disabled={selectedCategories.has(category.id)}
-                          className="cursor-pointer py-1.5 px-2 aria-selected:bg-secondary aria-selected:text-secondary-foreground text-sm font-light aria-disabled:opacity-20"
-                          onSelect={() => onSelectCategory(category.id)}
-                        >
-                          {category.name}
-                        </Command.Item>
-                      ))}
-                    </Command.List>
-                  </Command>
-                </Popover.Content>
-              </Popover.Portal>
-            </Popover.Root>
+              </PopoverTrigger>
+              <PopoverContent className="w-(--anchor-width) bg-popover" sideOffset={5}>
+                <Command className="rounded-sm border border-input">
+                  <Command.Input
+                    placeholder="Rechercher une catégorie"
+                    className="h-10 w-full px-2 outline-none placeholder:text-sm placeholder:font-light"
+                  />
+                  <Command.Separator className="h-px bg-border" />
+                  <Command.List className="max-h-60 overflow-y-auto">
+                    {categories.map((category) => (
+                      <Command.Item
+                        key={category.id}
+                        value={category.name}
+                        disabled={selectedCategories.has(category.id)}
+                        className="cursor-pointer px-2 py-1.5 text-sm font-light aria-selected:bg-secondary aria-selected:text-secondary-foreground aria-disabled:opacity-20"
+                        onSelect={() => onSelectCategory(category.id)}
+                      >
+                        {category.name}
+                      </Command.Item>
+                    ))}
+                  </Command.List>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </Label>
 
           {selectedCategories.size ? (
@@ -285,7 +348,7 @@ function RouteComponent() {
               <span className="text-xs font-medium">Description</span>
               <textarea
                 name="description"
-                className="ring-1 ring-input/50 shadow-2xs rounded-sm p-2 placeholder:text-xs focus-visible:outline-primary"
+                className="w-full ring-1 ring-input/50 shadow-2xs rounded-sm p-2 placeholder:text-xs focus-visible:outline-primary"
                 rows={6}
                 placeholder="Entrer une description de l'entreprise..."
                 onChange={onDescriptionChange}
@@ -302,7 +365,7 @@ function RouteComponent() {
             </span>
           </div>
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Entrepreneur</span>
@@ -326,7 +389,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Perimètre d'intervention</span>
-            <div className="relative">
+            <div className="relative w-full">
               <MapPinned className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="text"
@@ -340,7 +403,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Email</span>
-            <div className="relative">
+            <div className="relative w-full">
               <Mail className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="email"
@@ -354,7 +417,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Numéro de téléphone</span>
-            <div className="relative">
+            <div className="relative w-full">
               <Phone className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="tel"
@@ -368,7 +431,7 @@ function RouteComponent() {
 
           <Label className="flex flex-col gap-1">
             <span className="text-xs font-medium">Site web</span>
-            <div className="relative">
+            <div className="relative w-full">
               <Globe className="size-4 text-muted-foreground absolute start-2 top-2.5" />
               <Input
                 type="text"
@@ -380,7 +443,7 @@ function RouteComponent() {
             </div>
           </Label>
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <div className="grid gap-8">
             <fieldset className="flex gap-4">
@@ -452,11 +515,11 @@ function RouteComponent() {
             </fieldset>
           </div>
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <SocialMedias />
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <fieldset className="border rounded-sm border-border p-4">
             <legend className="text-sm font-medium px-2">Images</legend>
@@ -497,16 +560,16 @@ function RouteComponent() {
             </div>
           </fieldset>
 
-          <Separator.Root className="h-px bg-border my-4" />
+          <Separator className="h-px bg-border my-4" />
 
           <div className="flex gap-2 justify-end">
-            {/* <button
+            <button
               type="button"
               className="bg-secondary text-secondary-foreground px-3 py-2 rounded-sm font-light text-xs disabled:opacity-50 cursor-pointer hover:bg-secondary/90 transition-colors"
               onClick={onPreview}
             >
               Prévisualiser
-            </button> */}
+            </button>
 
             <button
               type="submit"

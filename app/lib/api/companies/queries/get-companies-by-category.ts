@@ -5,6 +5,7 @@ import * as v from "valibot";
 import { getDb } from "~/db";
 import { COMPANY_STATUSES, companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
+import { requireAdminUser } from "~/lib/auth/permissions.server";
 
 const GetCompaniesByCategorySchema = v.object({
   categoryId: v.string(),
@@ -14,8 +15,12 @@ const GetCompaniesByCategorySchema = v.object({
 type GetCompaniesByCategoryData = v.InferOutput<typeof GetCompaniesByCategorySchema>;
 
 export const getCompaniesByCategory = createServerFn({ method: "GET" })
-  .validator((data: unknown) => v.parse(GetCompaniesByCategorySchema, data))
+  .inputValidator((data: unknown) => v.parse(GetCompaniesByCategorySchema, data))
   .handler(async ({ data: { categoryId, status = "active" } }) => {
+    if (status !== "active") {
+      await requireAdminUser();
+    }
+
     const query = await getDb()
       .select()
       .from(companiesTable)

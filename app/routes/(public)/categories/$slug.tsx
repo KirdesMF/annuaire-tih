@@ -1,7 +1,14 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
-import { ArrowLeftIcon } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { SearchXIcon } from "lucide-react";
 import * as v from "valibot";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "~/components/ui/empty";
 import { companiesByCategoryQuery } from "~/lib/api/companies/queries/get-companies-by-category";
 
 const SearchSchema = v.object({
@@ -14,7 +21,8 @@ export const Route = createFileRoute("/(public)/categories/$slug")({
   loaderDeps: ({ search }) => ({
     categoryId: search.id,
   }),
-  loader: async ({ context, deps: { categoryId } }) => {
+  loader: async ({ context, deps }) => {
+    const { categoryId } = deps;
     await context.queryClient.ensureQueryData(
       companiesByCategoryQuery({ categoryId, status: "active" }),
     );
@@ -24,47 +32,44 @@ export const Route = createFileRoute("/(public)/categories/$slug")({
 
 function RouteComponent() {
   const { id, name } = Route.useSearch();
-  const router = useRouter();
   const { data } = useSuspenseQuery(companiesByCategoryQuery({ categoryId: id, status: "active" }));
 
   return (
-    <main className="min-h-svh">
-      <div className="max-w-5xl mx-auto px-4 py-16 grid gap-6">
-        <header className="space-y-2">
-          <button
-            type="button"
-            onClick={() => router.history.back()}
-            className="text-sm text-muted-foreground flex items-center gap-1 cursor-pointer hover:text-primary transition-colors duration-300"
-          >
-            <ArrowLeftIcon className="size-4" />
-            <span>Back</span>
-          </button>
-          <h1 className="text-2xl font-bold first-letter:capitalize">{name}</h1>
-        </header>
+    <main className="bg-background text-foreground">
+      <section className="mx-auto max-w-3xl px-6 py-20 md:py-24">
+        <h1 className="mb-16 text-center text-2xl font-extrabold uppercase tracking-tight">
+          {name}
+        </h1>
 
         {data.companies.length === 0 ? (
-          <div>Aucune entreprise trouvée</div>
+          <Empty>
+            <EmptyMedia variant="icon">
+              <SearchXIcon />
+            </EmptyMedia>
+            <EmptyHeader>
+              <EmptyTitle>Aucune entreprise trouvée</EmptyTitle>
+              <EmptyDescription>
+                Aucune entreprise active ne correspond encore à cette catégorie.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
         ) : (
-          <ul className="grid gap-2">
+          <ul className="space-y-2">
             {data.companies.map((company) => (
-              <li
-                key={company.id}
-                className="flex items-center justify-between gap-2 border border-border bg-card text-card-foreground rounded-md p-4 shadow-xs"
-              >
-                <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
-                  {company.name}
+              <li key={company.id}>
+                <Link
+                  to="/entreprises/$slug"
+                  params={{ slug: company.slug }}
+                  className="flex min-h-14 items-center justify-between gap-4 bg-secondary px-4 py-3 text-sm text-secondary-foreground transition-colors hover:bg-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  <span>{company.name}</span>
+                  {company.subdomain && <span className="text-xs">{company.subdomain}</span>}
                 </Link>
-
-                {company.subdomain && (
-                  <p className="text-xs text-muted-foreground border-muted border rounded-md px-2 py-1">
-                    {company.subdomain}
-                  </p>
-                )}
               </li>
             ))}
           </ul>
         )}
-      </div>
+      </section>
     </main>
   );
 }

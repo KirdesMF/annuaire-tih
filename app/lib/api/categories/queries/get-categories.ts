@@ -6,14 +6,9 @@ import { categoriesTable } from "~/db/schema/categories";
 export const getCategories = createServerFn({
   method: "GET",
 }).handler(async () => {
-  try {
-    const db = getDb();
-    const categories = await db.select().from(categoriesTable);
-    return categories;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  const db = getDb();
+  const categories = await db.select().from(categoriesTable);
+  return categories;
 });
 
 export const categoriesQueryOptions = queryOptions({

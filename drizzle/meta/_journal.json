@@ -71,6 +71,20 @@
       "when": 1746480481872,
       "tag": "0009_exotic_forge",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1777248550849,
+      "tag": "0010_analytics_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1779182313688,
+      "tag": "0011_drop_legacy_user_cgu",
+      "breakpoints": true
     }
   ]
 }
