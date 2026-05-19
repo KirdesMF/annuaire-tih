@@ -353,16 +353,21 @@ Actions:
 
 ## 11. Password hashing
 
-Status: not started.
+Status: done for compatibility-preserving async migration.
 
-Current custom `scryptSync` works but blocks event loop.
+Current custom password hash format is kept for existing users: `salt:hash`.
 
-Actions:
+Done:
 
-- Confirm whether custom hash is required for migrated users.
-- If not required, use Better Auth default password hashing.
-- If required, replace `scryptSync` with async `scrypt`.
-- Keep malformed hash checks returning `false`.
+- Replaced blocking `scryptSync` with promisified async `scrypt`.
+- Kept existing hash format to avoid forcing password resets.
+- Kept malformed hash checks returning `false`.
+
+Remaining actions:
+
+- Manual smoke test existing user sign-in.
+- Manual smoke test new user signup.
+- Manual smoke test password reset.
 
 ## 12. Forgot/reset password hardening
 
