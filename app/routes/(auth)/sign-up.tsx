@@ -11,6 +11,11 @@ import { useToast } from "~/components/ui/toast";
 import { acceptCurrentCguFn } from "~/lib/api/cgu/accept-cgu";
 import { userCompaniesQuery } from "~/lib/api/users/queries/get-user-companies";
 import { authClient } from "~/lib/auth/auth.client";
+import {
+  PASSWORD_LENGTH_MESSAGE,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+} from "~/lib/auth/password-policy";
 import { sessionQueryOptions } from "~/lib/auth/session-query";
 
 const SIGNUP_STEPS = [
@@ -40,8 +45,8 @@ const SignupSchema = v.pipe(
     ),
     password: v.pipe(
       v.string(),
-      v.minLength(8, "Le mot de passe doit contenir au moins 8 caractères"),
-      v.maxLength(100, "Le mot de passe doit contenir au plus 100 caractères"),
+      v.minLength(PASSWORD_MIN_LENGTH, PASSWORD_LENGTH_MESSAGE),
+      v.maxLength(PASSWORD_MAX_LENGTH, PASSWORD_LENGTH_MESSAGE),
     ),
     confirmPassword: v.pipe(v.string(), v.minLength(1, "Veuillez confirmer votre mot de passe")),
     cgu: v.boolean("Veuillez accepter les conditions générales d'utilisation"),
@@ -214,7 +219,8 @@ function RouteComponent() {
                   type={showPassword.password ? "text" : "password"}
                   autoComplete="new-password"
                   required
-                  minLength={8}
+                  minLength={PASSWORD_MIN_LENGTH}
+                  maxLength={PASSWORD_MAX_LENGTH}
                   placeholder="••••••••••••••••"
                   className="ps-8"
                 />
@@ -254,7 +260,8 @@ function RouteComponent() {
                   type={showPassword.confirmPassword ? "text" : "password"}
                   autoComplete="new-password"
                   required
-                  minLength={8}
+                  minLength={PASSWORD_MIN_LENGTH}
+                  maxLength={PASSWORD_MAX_LENGTH}
                   placeholder="••••••••••••••••"
                   className="ps-8"
                 />

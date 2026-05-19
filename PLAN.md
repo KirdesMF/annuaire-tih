@@ -310,14 +310,22 @@ Actions:
 
 ## 12. Forgot/reset password hardening
 
-Status: partially done. Forgot/reset flows use `authClient`; password policy/error hardening remains.
+Status: mostly done.
 
-Actions:
+Done:
 
-- Enforce reset password length server-side.
-- Add max password length server-side.
-- Return generic forgot-password success message.
-- Avoid exposing raw Better Auth/provider errors to users.
+- Forgot/reset flows use `authClient`.
+- Shared password policy constants live in `app/lib/auth/password-policy.ts`.
+- Better Auth email/password config enforces min/max password length.
+- Password reset revokes existing sessions.
+- Reset password form validates min/max length client-side.
+- Forgot password always returns a generic success-style message to avoid account enumeration.
+- Reset password no longer exposes raw Better Auth/provider errors to users.
+
+Remaining actions:
+
+- Consider stronger password policy before production if needed.
+- Log reset/email provider errors with context without showing details to users.
 
 ## 13. Server function resource protection
 

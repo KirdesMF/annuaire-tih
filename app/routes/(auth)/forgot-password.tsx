@@ -28,7 +28,7 @@ function RouteComponent() {
       });
 
       if (result.error) {
-        throw new Error(result.error.message || "Impossible d'envoyer l'email");
+        return null;
       }
 
       return result.data;
@@ -52,13 +52,15 @@ function RouteComponent() {
     mutate(result.output, {
       onSuccess: () => {
         toast({
-          description: "Un email vous a été envoyé pour réinitialiser votre mot de passe",
+          description:
+            "Si un compte existe pour cette adresse, un email de réinitialisation sera envoyé.",
           button: { label: "Fermer" },
         });
       },
-      onError: (error) => {
+      onError: () => {
         toast({
-          description: error.message,
+          description:
+            "Si un compte existe pour cette adresse, un email de réinitialisation sera envoyé.",
           button: { label: "Fermer" },
         });
       },

@@ -7,6 +7,11 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useToast } from "~/components/ui/toast";
 import { authClient } from "~/lib/auth/auth.client";
+import {
+  PASSWORD_LENGTH_MESSAGE,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+} from "~/lib/auth/password-policy";
 
 const SearchParamsSchema = v.object({
   token: v.string(),
@@ -14,7 +19,11 @@ const SearchParamsSchema = v.object({
 
 const ResetPasswordSchema = v.object({
   token: v.string(),
-  newPassword: v.string(),
+  newPassword: v.pipe(
+    v.string(),
+    v.minLength(PASSWORD_MIN_LENGTH, PASSWORD_LENGTH_MESSAGE),
+    v.maxLength(PASSWORD_MAX_LENGTH, PASSWORD_LENGTH_MESSAGE),
+  ),
 });
 
 export const Route = createFileRoute("/(auth)/reset-password")({
@@ -37,7 +46,7 @@ function RouteComponent() {
       });
 
       if (result.error) {
-        throw new Error(result.error.message || "Impossible de réinitialiser le mot de passe");
+        throw new Error("Impossible de réinitialiser le mot de passe");
       }
 
       return result.data;
@@ -91,7 +100,8 @@ function RouteComponent() {
                 name="newPassword"
                 autoComplete="new-password"
                 required
-                minLength={8}
+                minLength={PASSWORD_MIN_LENGTH}
+                maxLength={PASSWORD_MAX_LENGTH}
                 placeholder="••••••••••••••••"
                 className="ps-8"
               />
