@@ -7,9 +7,6 @@
   "observability": {
     "enabled": true
   },
-  "vars": {
-    "DB_CONNECTION_MODE": "direct"
-  },
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",

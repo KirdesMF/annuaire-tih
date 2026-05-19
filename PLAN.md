@@ -104,7 +104,6 @@ Validation:
 
 - `bunx wrangler hyperdrive list` shows distinct dev and production configs.
 - `bun dev` uses dev DB through temporary ignored local secrets first, then Infisical once adopted.
-- Dev Cloudflare deploy currently sets `DB_CONNECTION_MODE=direct` to bypass intermittent Hyperdrive `CONNECTION_CLOSED`/timeout errors. Revisit Hyperdrive before production. DB clients are cached per request and connection mode to avoid creating multiple direct clients during one request.
 - `bunx wrangler deploy --env dev` uses dev DB.
 - Production deploy uses production DB only.
 

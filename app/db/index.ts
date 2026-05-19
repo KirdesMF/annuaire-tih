@@ -11,12 +11,9 @@ import * as companyCategoriesSchema from "./schema/company-categories";
 
 export type DbConnectionMode = "auto" | "direct" | "hyperdrive";
 
-type HyperdriveBinding = { connectionString: string };
-
 type CloudflareEnv = {
   DATABASE_URL?: string;
-  DB_CONNECTION_MODE?: DbConnectionMode;
-  HYPERDRIVE?: HyperdriveBinding;
+  HYPERDRIVE?: { connectionString: string };
 };
 
 const schema = {
@@ -28,33 +25,21 @@ const schema = {
   ...categoriesSchema,
 };
 
-type Db = ReturnType<typeof createDb>;
+const clientsByRequest = new WeakMap<Request, postgres.Sql>();
+let localClient: postgres.Sql | undefined;
 
-const dbByRequest = new WeakMap<Request, Map<DbConnectionMode, Db>>();
-const localDbByMode = new Map<DbConnectionMode, Db>();
-
-function getCloudflareEnv(): CloudflareEnv {
+function getCloudflareEnv() {
   return env as CloudflareEnv;
 }
 
-function isDbConnectionMode(value: string | undefined): value is DbConnectionMode {
-  return value === "auto" || value === "direct" || value === "hyperdrive";
-}
-
-function getDefaultConnectionMode(): DbConnectionMode {
-  const mode = getCloudflareEnv().DB_CONNECTION_MODE;
-  return isDbConnectionMode(mode) ? mode : "auto";
-}
-
-function getConnectionString(mode: DbConnectionMode): string {
+function getConnectionString(mode: DbConnectionMode = "auto") {
   const cloudflareEnv = getCloudflareEnv();
-  const connectionStringByMode: Record<DbConnectionMode, string | undefined> = {
-    auto: cloudflareEnv.HYPERDRIVE?.connectionString ?? cloudflareEnv.DATABASE_URL,
-    direct: cloudflareEnv.DATABASE_URL,
-    hyperdrive: cloudflareEnv.HYPERDRIVE?.connectionString,
-  };
-
-  const connectionString = connectionStringByMode[mode];
+  const connectionString =
+    mode === "direct"
+      ? cloudflareEnv.DATABASE_URL
+      : mode === "hyperdrive"
+        ? cloudflareEnv.HYPERDRIVE?.connectionString
+        : (cloudflareEnv.DATABASE_URL ?? cloudflareEnv.HYPERDRIVE?.connectionString);
 
   if (!connectionString) {
     throw new Error(`${mode} database connection string is not set`);
@@ -63,19 +48,17 @@ function getConnectionString(mode: DbConnectionMode): string {
   return connectionString;
 }
 
-function createDb(connectionString: string) {
-  const client = postgres(connectionString, {
+function createClient(connectionString: string) {
+  return postgres(connectionString, {
     prepare: false,
     fetch_types: false,
     max: 1,
     idle_timeout: 2,
     connect_timeout: 10,
   });
-
-  return drizzle({ client, schema });
 }
 
-function getCurrentRequest(): Request | undefined {
+function getCurrentRequest() {
   try {
     return getRequest();
   } catch {
@@ -83,27 +66,29 @@ function getCurrentRequest(): Request | undefined {
   }
 }
 
-export function getDb(mode: DbConnectionMode = getDefaultConnectionMode()): Db {
+export function getDb(mode: DbConnectionMode = "auto") {
   const connectionString = getConnectionString(mode);
   const request = getCurrentRequest();
 
   if (!request) {
-    const cachedDb = localDbByMode.get(mode);
-    if (cachedDb) return cachedDb;
+    if (getCloudflareEnv().HYPERDRIVE) {
+      console.warn("getDb() called outside TanStack request context in Cloudflare runtime");
+      return drizzle({ client: createClient(connectionString), schema });
+    }
 
-    const db = createDb(connectionString);
-    localDbByMode.set(mode, db);
-    return db;
+    localClient ??= createClient(connectionString);
+    return drizzle({ client: localClient, schema });
   }
 
-  const dbByMode = dbByRequest.get(request) ?? new Map<DbConnectionMode, Db>();
-  const cachedDb = dbByMode.get(mode);
+  if (mode !== "auto") {
+    return drizzle({ client: createClient(connectionString), schema });
+  }
 
-  if (cachedDb) return cachedDb;
+  let client = clientsByRequest.get(request);
+  if (!client) {
+    client = createClient(connectionString);
+    clientsByRequest.set(request, client);
+  }
 
-  const db = createDb(connectionString);
-  dbByMode.set(mode, db);
-  dbByRequest.set(request, dbByMode);
-
-  return db;
+  return drizzle({ client, schema });
 }
