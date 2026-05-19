@@ -68,7 +68,7 @@ Validation commands:
 
 ## 1. Dev database environment
 
-Status: partially done. Dev/prod Wrangler configs, Hyperdrive wiring, env docs, dev seed, Cloudinary folder support, and email env mode are in place. Production ownership/migration and Infisical adoption remain.
+Status: partially done. Dev/prod Wrangler configs, env docs, dev seed, Cloudinary folder support, and email env mode are in place. Hyperdrive direct-origin config exists but app currently keeps direct DB first for stability. Production ownership/migration and Infisical adoption remain.
 
 Use a remote Supabase dev project, not local Supabase/OrbStack, as the default development database. This better matches production: Cloudflare Workers, Hyperdrive, Supabase pooler, SSL, preview deploys, and OAuth callback behavior.
 
@@ -95,6 +95,15 @@ Actions:
 - Never store production DB credentials in `.dev.vars` or local env files.
 - Make local Drizzle migrations use the dev database by default.
 - Adopt Infisical after dev/prod environments, Hyperdrive, Cloudinary folders, and migrations are settled.
+- After auth/features stabilize, revisit DB connection handling as dedicated cleanup:
+  - remove ad-hoc/historical connection behavior
+  - define one stable strategy for local, deployed dev, and production
+  - validate Hyperdrive with Supabase Direct connection only, never Supabase pooler
+  - decide whether `postgres` or `pg` is the right driver for Hyperdrive
+  - test `prepare` settings explicitly for Hyperdrive
+  - add stress/health checks that catch intermittent `CONNECTION_CLOSED` and timeout issues
+  - keep local migrations/seeds simple with direct `DATABASE_URL`
+  - avoid hacks or environment-specific surprises.
 - Once adopted, use Infisical for local/dev/prod secret injection and remove long-lived local secret files.
 - Keep production migrations manual/CI-only with explicit approval.
 - Add dev seed script for safe fake data.
