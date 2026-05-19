@@ -1,19 +1,21 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "annuaire-tih-dev",
   "compatibility_flags": ["nodejs_compat"],
   "compatibility_date": "2025-09-24",
   "main": "app/server.ts",
   "observability": {
     "enabled": true
   },
-  "hyperdrive": [
-    {
-      "binding": "HYPERDRIVE",
-      "id": "7e2870d7d80047fdbf42bfc362bbfe0b"
-    }
-  ],
   "env": {
+    "dev": {
+      "name": "annuaire-tih-dev",
+      "hyperdrive": [
+        {
+          "binding": "HYPERDRIVE",
+          "id": "7e2870d7d80047fdbf42bfc362bbfe0b"
+        }
+      ]
+    },
     "production": {
       "name": "annuaire-tih",
       "hyperdrive": [

@@ -34,7 +34,7 @@ This project uses separate remote Supabase databases:
 
 Cloudflare Hyperdrive bindings are defined in one `wrangler.jsonc`:
 
-- default / `WRANGLER_ENV=dev` → dev Worker and dev Hyperdrive
+- `WRANGLER_ENV=dev` → dev Worker and dev Hyperdrive
 - `WRANGLER_ENV=production` → production Worker and production Hyperdrive
 
 Do not keep production DB credentials in local env files.

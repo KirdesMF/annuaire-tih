@@ -12,6 +12,10 @@ type WranglerConfigWithEnvs = WorkerConfig & {
 const wranglerEnv = process.env.WRANGLER_ENV;
 const wranglerConfig = JSON.parse(readFileSync("wrangler.jsonc", "utf8")) as WranglerConfigWithEnvs;
 
+if (!wranglerEnv) {
+  throw new Error("WRANGLER_ENV must be set to dev or production");
+}
+
 export default defineConfig({
   resolve: {
     tsconfigPaths: true,
@@ -21,10 +25,6 @@ export default defineConfig({
     cloudflare({
       configPath: "wrangler.jsonc",
       config: () => {
-        if (!wranglerEnv || wranglerEnv === "dev") {
-          return;
-        }
-
         const envConfig = wranglerConfig.env?.[wranglerEnv];
 
         if (!envConfig) {
