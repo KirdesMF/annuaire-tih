@@ -15,6 +15,7 @@ type HyperdriveBinding = { connectionString: string };
 
 type CloudflareEnv = {
   DATABASE_URL?: string;
+  DB_CONNECTION_MODE?: DbConnectionMode;
   HYPERDRIVE?: HyperdriveBinding;
 };
 
@@ -36,7 +37,16 @@ function getCloudflareEnv(): CloudflareEnv {
   return env as CloudflareEnv;
 }
 
-function getConnectionString(mode: DbConnectionMode = "auto"): string {
+function isDbConnectionMode(value: string | undefined): value is DbConnectionMode {
+  return value === "auto" || value === "direct" || value === "hyperdrive";
+}
+
+function getDefaultConnectionMode(): DbConnectionMode {
+  const mode = getCloudflareEnv().DB_CONNECTION_MODE;
+  return isDbConnectionMode(mode) ? mode : "auto";
+}
+
+function getConnectionString(mode: DbConnectionMode): string {
   const cloudflareEnv = getCloudflareEnv();
   const connectionStringByMode: Record<DbConnectionMode, string | undefined> = {
     auto: cloudflareEnv.HYPERDRIVE?.connectionString ?? cloudflareEnv.DATABASE_URL,
@@ -73,7 +83,7 @@ function getCurrentRequest(): Request | undefined {
   }
 }
 
-export function getDb(mode: DbConnectionMode = "auto"): Db {
+export function getDb(mode: DbConnectionMode = getDefaultConnectionMode()): Db {
   const connectionString = getConnectionString(mode);
   const request = getCurrentRequest();
 
