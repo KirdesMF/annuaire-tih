@@ -35,9 +35,7 @@ export default defineConfig({
       },
       viteEnvironment: { name: "ssr" },
     }),
-    tanstackStart({
-      srcDirectory: "app",
-    }),
+    tanstackStart({ srcDirectory: "app" }),
     viteReact(),
   ],
 });

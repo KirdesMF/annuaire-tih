@@ -46,7 +46,7 @@ bun run build:dev
 bun run build:prod
 ```
 
-`vite.config.ts` reads `WRANGLER_ENV` so Cloudflare's generated Worker config uses the correct Worker name and Hyperdrive binding.
+`vite.config.ts` reads `WRANGLER_ENV` so the Vite build uses the correct Worker name and Hyperdrive binding. Deploy with Wrangler's native `--env` flag.
 
 ## Deploy
 
