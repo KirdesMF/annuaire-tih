@@ -104,6 +104,7 @@ Validation:
 
 - `bunx wrangler hyperdrive list` shows distinct dev and production configs.
 - Hyperdrive configs must use Supabase Direct connection strings, not Supabase pooler strings. Cloudflare Hyperdrive performs pooling itself.
+- Dev Hyperdrive direct-origin config was unstable during auth/app loads. Current app auto mode keeps `DATABASE_URL` first for stability while Hyperdrive remains available for explicit `/api/db-health?mode=hyperdrive` testing.
 - `bun dev` uses dev DB through temporary ignored local secrets first, then Infisical once adopted.
 - `bunx wrangler deploy --env dev` uses dev DB.
 - Production deploy uses production DB only.

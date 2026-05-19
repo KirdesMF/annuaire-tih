@@ -39,7 +39,7 @@ function getConnectionString(mode: DbConnectionMode = "auto") {
       ? cloudflareEnv.DATABASE_URL
       : mode === "hyperdrive"
         ? cloudflareEnv.HYPERDRIVE?.connectionString
-        : (cloudflareEnv.HYPERDRIVE?.connectionString ?? cloudflareEnv.DATABASE_URL);
+        : (cloudflareEnv.DATABASE_URL ?? cloudflareEnv.HYPERDRIVE?.connectionString);
 
   if (!connectionString) {
     throw new Error(`${mode} database connection string is not set`);
