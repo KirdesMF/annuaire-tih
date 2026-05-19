@@ -30,8 +30,8 @@ const schema = {
 
 type Db = ReturnType<typeof createDb>;
 
-const dbByRequest = new WeakMap<Request, Db>();
-let localDb: Db | undefined;
+const dbByRequest = new WeakMap<Request, Map<DbConnectionMode, Db>>();
+const localDbByMode = new Map<DbConnectionMode, Db>();
 
 function getCloudflareEnv(): CloudflareEnv {
   return env as CloudflareEnv;
@@ -88,20 +88,22 @@ export function getDb(mode: DbConnectionMode = getDefaultConnectionMode()): Db {
   const request = getCurrentRequest();
 
   if (!request) {
-    localDb ??= createDb(connectionString);
-    return localDb;
+    const cachedDb = localDbByMode.get(mode);
+    if (cachedDb) return cachedDb;
+
+    const db = createDb(connectionString);
+    localDbByMode.set(mode, db);
+    return db;
   }
 
-  if (mode !== "auto") {
-    return createDb(connectionString);
-  }
-
-  const cachedDb = dbByRequest.get(request);
+  const dbByMode = dbByRequest.get(request) ?? new Map<DbConnectionMode, Db>();
+  const cachedDb = dbByMode.get(mode);
 
   if (cachedDb) return cachedDb;
 
   const db = createDb(connectionString);
-  dbByRequest.set(request, db);
+  dbByMode.set(mode, db);
+  dbByRequest.set(request, dbByMode);
 
   return db;
 }
