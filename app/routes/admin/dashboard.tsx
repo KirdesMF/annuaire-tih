@@ -217,20 +217,20 @@ function RouteComponent() {
   }
 
   return (
-    <main className="min-h-[calc(100svh-4rem)] bg-white text-black dark:bg-black dark:text-white">
+    <main className="min-h-[calc(100svh-4rem)] bg-background text-foreground">
       <div className="container px-4 py-8 md:px-8 md:py-10">
         <div className="grid gap-6">
-          <section className="sticky top-20 z-20 rounded-sm border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-black">
+          <section className="sticky top-20 z-20 rounded-sm border border-border bg-card p-5">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <div className="grid gap-2">
-                <p className="text-[11px] uppercase tracking-[0.24em] text-black/45 dark:text-white/45">
+                <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
                   Administration
                 </p>
                 <div className="grid gap-2">
-                  <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+                  <h1 className="text-3xl font-semibold tracking-tight md:text-4xl text-foreground">
                     Dashboard de supervision
                   </h1>
-                  <p className="max-w-3xl text-sm leading-6 text-black/62 dark:text-white/62">
+                  <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
                     Suivez l'activite des comptes, priorisez les entreprises a moderer et pilotez la
                     qualite du repertoire depuis une seule vue.
                   </p>
@@ -239,12 +239,12 @@ function RouteComponent() {
 
               <div className="grid w-full gap-2 lg:max-w-xl">
                 <div className="relative">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-black/35 dark:text-white/35" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     value={search.q}
                     onChange={(event) => updateSearch({ q: event.target.value }, true)}
                     placeholder="Rechercher un utilisateur, un email, un nom d'entreprise, un slug, un SIRET..."
-                    className="h-11 rounded-sm border border-black/10 bg-white pl-9 text-sm shadow-none ring-0 placeholder:text-sm focus-visible:outline-black dark:border-white/10 dark:bg-black dark:focus-visible:outline-white"
+                    className="h-11 rounded-sm border border-border bg-card pl-9 text-sm shadow-none ring-0 placeholder:text-sm focus-visible:outline-ring"
                   />
                 </div>
 
@@ -269,7 +269,7 @@ function RouteComponent() {
             </div>
           </section>
 
-          <section className="grid gap-px overflow-hidden rounded-sm border border-black/10 bg-black/10 md:grid-cols-2 xl:grid-cols-5 dark:border-white/10 dark:bg-white/10">
+          <section className="grid gap-px overflow-hidden rounded-sm border border-border bg-border/30 md:grid-cols-2 xl:grid-cols-5">
             <MetricCard
               icon={<Building2 className="size-4" />}
               label="Entreprises"
@@ -304,7 +304,7 @@ function RouteComponent() {
 
           {search.view !== "users" ? (
             <div className="grid gap-6 xl:grid-cols-[1.2fr_1.8fr]">
-              <section className="rounded-sm border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-black">
+              <section className="rounded-sm border border-border bg-card p-5">
                 <SectionHeader
                   eyebrow="Priorite"
                   title="Moderation immediate"
@@ -345,7 +345,7 @@ function RouteComponent() {
                       return (
                         <article
                           key={company.id}
-                          className="rounded-sm border border-black/10 bg-black/[0.02] p-4 dark:border-white/10 dark:bg-white/[0.03]"
+                          className="rounded-sm border border-border bg-card p-4"
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div className="grid gap-2">
@@ -358,7 +358,7 @@ function RouteComponent() {
                                 <StatusPill status={company.status} />
                               </div>
 
-                              <div className="grid gap-1 text-xs text-black/55 dark:text-white/55">
+                              <div className="grid gap-1 text-xs text-muted-foreground">
                                 <p>SIRET: {company.siret}</p>
                                 <p>
                                   Proprietaire: {owner?.name || "Inconnu"}
@@ -369,7 +369,7 @@ function RouteComponent() {
                             </div>
 
                             {isWorking ? (
-                              <LoaderIcon className="mt-0.5 size-4 animate-spin text-black/50 dark:text-white/50" />
+                              <LoaderIcon className="mt-0.5 size-4 animate-spin text-muted-foreground" />
                             ) : null}
                           </div>
 
@@ -407,22 +407,22 @@ function RouteComponent() {
                 </div>
               </section>
 
-              <section className="rounded-sm border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-black">
+              <section className="rounded-sm border border-border bg-card p-5">
                 <SectionHeader
                   eyebrow="Annuaire"
                   title="Entreprises"
                   subtitle="Vue detaillee des fiches, avec recherche unifiee et commandes de moderation."
                 />
 
-                <div className="mt-5 overflow-hidden rounded-sm border border-black/10 dark:border-white/10">
-                  <div className="grid grid-cols-[minmax(0,2fr)_120px_150px_180px] gap-3 border-b border-black/10 bg-black/[0.03] px-4 py-3 text-[11px] uppercase tracking-[0.16em] text-black/50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
+                <div className="mt-5 overflow-hidden rounded-sm border border-border">
+                  <div className="grid grid-cols-[minmax(0,2fr)_120px_150px_180px] gap-3 border-b border-border bg-muted px-4 py-3 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
                     <span>Entreprise</span>
                     <span>Statut</span>
                     <span>Responsable</span>
                     <span>Actions</span>
                   </div>
 
-                  <div className="divide-y divide-black/10 dark:divide-white/10">
+                  <div className="divide-y divide-border">
                     {filteredCompanies.length ? (
                       filteredCompanies.map((company) => {
                         const owner = usersById.get(company.user_id);
@@ -445,7 +445,7 @@ function RouteComponent() {
                                   {company.name}
                                 </Link>
                               </div>
-                              <div className="text-xs text-black/55 dark:text-white/55">
+                              <div className="text-xs text-muted-foreground">
                                 <span>{company.slug}</span>
                                 <span> • </span>
                                 <span>{company.siret}</span>
@@ -458,14 +458,14 @@ function RouteComponent() {
                               <StatusPill status={company.status} />
                             </div>
 
-                            <div className="grid gap-0.5 text-xs text-black/62 dark:text-white/62">
+                            <div className="grid gap-0.5 text-xs text-muted-foreground">
                               <span>{owner?.name || "Inconnu"}</span>
                               <span>{owner?.email || company.email || "Aucun email"}</span>
                             </div>
 
                             <div className="flex flex-wrap gap-2 md:justify-end">
                               {isWorking ? (
-                                <span className="inline-flex h-8 items-center rounded-sm border border-black/10 px-3 text-xs dark:border-white/10">
+                                <span className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs">
                                   <LoaderIcon className="size-3.5 animate-spin" />
                                 </span>
                               ) : (
@@ -518,7 +518,7 @@ function RouteComponent() {
           ) : null}
 
           {search.view !== "companies" ? (
-            <section className="rounded-sm border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-black">
+            <section className="rounded-sm border border-border bg-card p-5">
               <SectionHeader
                 eyebrow="Comptes"
                 title="Utilisateurs"
@@ -543,15 +543,15 @@ function RouteComponent() {
                 />
               </div>
 
-              <div className="mt-5 overflow-hidden rounded-sm border border-black/10 dark:border-white/10">
-                <div className="grid grid-cols-[minmax(0,2fr)_110px_140px_170px] gap-3 border-b border-black/10 bg-black/[0.03] px-4 py-3 text-[11px] uppercase tracking-[0.16em] text-black/50 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/50">
+              <div className="mt-5 overflow-hidden rounded-sm border border-border">
+                <div className="grid grid-cols-[minmax(0,2fr)_110px_140px_170px] gap-3 border-b border-border bg-muted px-4 py-3 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
                   <span>Utilisateur</span>
                   <span>Role</span>
                   <span>Entreprises</span>
                   <span>Action</span>
                 </div>
 
-                <div className="divide-y divide-black/10 dark:divide-white/10">
+                <div className="divide-y divide-border">
                   {filteredUsers.length ? (
                     filteredUsers.map((user) => {
                       const companyCount = companiesByUserId.get(user.id) ?? 0;
@@ -564,20 +564,20 @@ function RouteComponent() {
                         >
                           <div className="grid gap-1">
                             <p className="text-sm font-medium tracking-tight">{user.name}</p>
-                            <p className="text-xs text-black/55 dark:text-white/55">{user.email}</p>
+                            <p className="text-xs text-muted-foreground">{user.email}</p>
                           </div>
 
                           <div>
                             <RolePill role={user.role} />
                           </div>
 
-                          <div className="text-xs text-black/62 dark:text-white/62">
+                          <div className="text-xs text-muted-foreground">
                             {companyCount} {companyCount > 1 ? "entreprises" : "entreprise"}
                           </div>
 
                           <div className="flex justify-start md:justify-end">
                             {isWorking ? (
-                              <span className="inline-flex h-8 items-center rounded-sm border border-black/10 px-3 text-xs dark:border-white/10">
+                              <span className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs">
                                 <LoaderIcon className="size-3.5 animate-spin" />
                               </span>
                             ) : user.role === "user" ? (
@@ -592,7 +592,7 @@ function RouteComponent() {
                                 onClick={() => onUpdateUserRole(user.id, "user")}
                               />
                             ) : (
-                              <span className="inline-flex h-8 items-center rounded-sm border border-black/10 px-3 text-xs text-black/45 dark:border-white/10 dark:text-white/45">
+                              <span className="inline-flex h-8 items-center rounded-sm border border-border px-3 text-xs text-muted-foreground">
                                 Role fixe
                               </span>
                             )}
@@ -630,16 +630,14 @@ function MetricCard({
   hint: string;
 }) {
   return (
-    <div className="bg-white p-4 dark:bg-black">
-      <div className="mb-6 inline-flex size-8 items-center justify-center rounded-sm border border-black/10 text-black/70 dark:border-white/10 dark:text-white/70">
+    <div className="bg-card p-4">
+      <div className="mb-6 inline-flex size-8 items-center justify-center rounded-sm border border-border text-muted-foreground">
         {icon}
       </div>
       <div className="grid gap-1">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
-          {label}
-        </p>
+        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
         <p className="text-3xl font-semibold tracking-tight">{value}</p>
-        <p className="text-xs leading-5 text-black/58 dark:text-white/58">{hint}</p>
+        <p className="text-xs leading-5 text-muted-foreground">{hint}</p>
       </div>
     </div>
   );
@@ -656,12 +654,10 @@ function SectionHeader({
 }) {
   return (
     <div className="grid gap-2">
-      <p className="text-[11px] uppercase tracking-[0.18em] text-black/45 dark:text-white/45">
-        {eyebrow}
-      </p>
+      <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{eyebrow}</p>
       <div className="grid gap-1">
         <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
-        <p className="text-sm leading-6 text-black/62 dark:text-white/62">{subtitle}</p>
+        <p className="text-sm leading-6 text-muted-foreground">{subtitle}</p>
       </div>
     </div>
   );
@@ -683,8 +679,8 @@ function ToggleChip({
       className={[
         "inline-flex h-8 items-center rounded-sm border px-3 text-xs transition-colors",
         active
-          ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-          : "border-black/10 bg-white text-black/70 hover:border-black/25 dark:border-white/10 dark:bg-black dark:text-white/70 dark:hover:border-white/25",
+          ? "border-foreground bg-foreground text-background"
+          : "border-border bg-card text-muted-foreground hover:border-foreground/25",
       ].join(" ")}
     >
       {label}
@@ -708,8 +704,8 @@ function FilterChip({
       className={[
         "inline-flex h-8 items-center rounded-sm border px-3 text-xs transition-colors",
         active
-          ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-          : "border-black/10 bg-transparent text-black/65 hover:border-black/20 dark:border-white/10 dark:text-white/65 dark:hover:border-white/20",
+          ? "border-foreground bg-foreground text-background"
+          : "border-border bg-transparent text-muted-foreground hover:border-foreground/20",
       ].join(" ")}
     >
       {label}
@@ -725,12 +721,9 @@ function StatusPill({ status }: { status: CompanyStatus }) {
   } as const;
 
   const styles = {
-    pending:
-      "border-black/12 bg-black text-white dark:border-white/12 dark:bg-white dark:text-black",
-    active:
-      "border-black/10 bg-black/[0.05] text-black dark:border-white/10 dark:bg-white/[0.08] dark:text-white",
-    rejected:
-      "border-black/10 bg-transparent text-black/60 dark:border-white/10 dark:text-white/60",
+    pending: "border-border bg-foreground text-background",
+    active: "border-border bg-muted text-foreground",
+    rejected: "border-border bg-transparent text-muted-foreground",
   } as const;
 
   return (
@@ -753,8 +746,8 @@ function RolePill({ role }: { role: string }) {
       className={[
         "inline-flex h-6 items-center rounded-sm border px-2.5 text-[11px] uppercase tracking-[0.16em]",
         isElevated
-          ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
-          : "border-black/10 text-black/65 dark:border-white/10 dark:text-white/65",
+          ? "border-foreground bg-foreground text-background"
+          : "border-border text-muted-foreground",
       ].join(" ")}
     >
       {role}
@@ -776,12 +769,10 @@ function ActionButton({
   icon?: React.ReactNode;
 }) {
   const tones = {
-    solid:
-      "border-black bg-black text-white hover:bg-black/85 dark:border-white dark:bg-white dark:text-black dark:hover:bg-white/85",
-    ghost:
-      "border-black/10 bg-transparent text-black hover:border-black/25 dark:border-white/10 dark:text-white dark:hover:border-white/25",
+    solid: "border-border bg-foreground text-background hover:bg-foreground/85",
+    ghost: "border-border bg-transparent text-foreground hover:border-foreground/25",
     danger:
-      "border-black/10 bg-transparent text-black/60 hover:border-black/25 hover:text-black dark:border-white/10 dark:text-white/60 dark:hover:border-white/25 dark:hover:text-white",
+      "border-border bg-transparent text-muted-foreground hover:border-foreground/25 hover:text-foreground",
   } as const;
 
   return (
@@ -814,12 +805,10 @@ function IconActionButton({
   icon: React.ReactNode;
 }) {
   const tones = {
-    solid:
-      "border-black bg-black text-white hover:bg-black/85 dark:border-white dark:bg-white dark:text-black dark:hover:bg-white/85",
-    ghost:
-      "border-black/10 bg-transparent text-black hover:border-black/25 dark:border-white/10 dark:text-white dark:hover:border-white/25",
+    solid: "border-border bg-foreground text-background hover:bg-foreground/85",
+    ghost: "border-border bg-transparent text-foreground hover:border-foreground/25",
     danger:
-      "border-black/10 bg-transparent text-black/60 hover:border-black/25 hover:text-black dark:border-white/10 dark:text-white/60 dark:hover:border-white/25 dark:hover:text-white",
+      "border-border bg-transparent text-muted-foreground hover:border-foreground/25 hover:text-foreground",
   } as const;
 
   return (
@@ -842,7 +831,7 @@ function IconActionButton({
       </TooltipTrigger>
       <TooltipContent
         side="top"
-        className="rounded-sm border border-black/10 bg-white px-2 py-1 text-[11px] text-black shadow-none dark:border-white/10 dark:bg-black dark:text-white"
+        className="rounded-sm border border-border bg-card px-2 py-1 text-[11px] text-foreground shadow-none"
       >
         {label}
       </TooltipContent>
@@ -852,12 +841,10 @@ function IconActionButton({
 
 function EmptyState({ title, description }: { title: string; description: string }) {
   return (
-    <Empty className="rounded-sm border border-dashed border-black/10 bg-black/[0.02] p-5 text-left dark:border-white/10 dark:bg-white/[0.03]">
+    <Empty className="rounded-sm border border-dashed border-border bg-card/50 p-5 text-left">
       <EmptyHeader className="items-start gap-1">
         <EmptyTitle>{title}</EmptyTitle>
-        <EmptyDescription className="text-black/58 dark:text-white/58">
-          {description}
-        </EmptyDescription>
+        <EmptyDescription className="text-muted-foreground">{description}</EmptyDescription>
       </EmptyHeader>
     </Empty>
   );
