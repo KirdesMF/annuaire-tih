@@ -47,19 +47,20 @@ function RouteComponent() {
         ) : (
           <ul className="grid gap-2">
             {data.companies.map((company) => (
-              <li
-                key={company.id}
-                className="flex items-center justify-between gap-2 border border-border bg-card text-card-foreground rounded-md p-4 shadow-xs"
-              >
-                <Link to="/entreprises/$slug" params={{ slug: company.slug }}>
-                  {company.name}
-                </Link>
+              <li key={company.id}>
+                <Link
+                  to="/entreprises/$slug"
+                  params={{ slug: company.slug }}
+                  className="flex items-center justify-between gap-2 border border-border bg-card text-card-foreground rounded-md p-4 shadow-xs focus-visible:outline-2 focus-visible:outline-primary"
+                >
+                  <span>{company.name}</span>
 
-                {company.subdomain && (
-                  <p className="text-xs text-muted-foreground border-muted border rounded-md px-2 py-1">
-                    {company.subdomain}
-                  </p>
-                )}
+                  {company.subdomain && (
+                    <span className="text-xs text-muted-foreground border-muted border rounded-md px-2 py-1">
+                      {company.subdomain}
+                    </span>
+                  )}
+                </Link>
               </li>
             ))}
           </ul>
