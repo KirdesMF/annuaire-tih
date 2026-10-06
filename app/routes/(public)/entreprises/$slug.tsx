@@ -124,7 +124,7 @@ function RouteComponent() {
 
             {data.rqth ? (
               <p className="text-sm text-nowrap">
-                <span className="font-bold">RQTH:</span> Oui
+                <span className="font-bold">BOETH:</span> Oui
               </p>
             ) : null}
 

@@ -34,12 +34,13 @@ function RouteComponent() {
                 Les auto-entrepreneurs·ses et autres travailleurs·ses non salarié·e·s (gérant·e·s de
                 EIRL, EURL, SARL, SAS, SASU, professions libérales, artisan·e·s, commerçant·e·s)
                 bénéficient automatiquement du statut de TIH lorsqu'ils sont reconnus comme
-                Travailleurs Handicapés (Personne bénéficiant d'une RQTH).
+                Travailleurs Handicapés (Personne bénéficiaire de l'obligation d'emploi des travailleurs
+                handicapés — BOETH).
               </p>
 
               <p className="text-muted-foreground text-md font-light leading-relaxed text-pretty">
-                La demande d'une Reconnaissance de la Qualité de Travailleur·se Handicapé·e (RQTH)
-                se fait auprès de votre MDPH (maison départementale des personnes handicapées).
+                La demande de Reconnaissance de la Qualité de Travailleur·se Handicapé·e (RQTH)
+                peut être faite auprès de votre MDPH (maison départementale des personnes handicapées).
               </p>
             </Accordion.Content>
           </Accordion.Item>

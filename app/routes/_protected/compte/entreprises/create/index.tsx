@@ -428,7 +428,7 @@ function RouteComponent() {
             </fieldset>
 
             <fieldset className="flex gap-2">
-              <legend className="text-xs font-medium mb-2">RQTH</legend>
+              <legend className="text-xs font-medium mb-2">BOETH</legend>
               <Label className="flex items-center gap-1">
                 <input
                   type="radio"

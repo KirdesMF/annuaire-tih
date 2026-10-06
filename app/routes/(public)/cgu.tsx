@@ -94,8 +94,8 @@ function RouteComponent() {
 
         <Paragraph className="font-bold">
           Chaque entrepreneur·se référencé·e déclare sur honneur être en situation de handicap et
-          être en mesure de fournir un justificatif de reconnaissance de son handicap auprès de ses
-          entreprises clientes lorsqu'il·elle coche "OUI" à la question "RQTH à jour" lors de la
+          être en mesure de fournir un justificatif de la reconnaissance administrative de son handicap
+          auprès de ses entreprises clientes lorsqu'il·elle coche "OUI" à la question "BOETH" lors de la
           création de sa/ses fiche(s) entreprise.
         </Paragraph>
 

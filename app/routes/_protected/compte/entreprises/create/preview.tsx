@@ -209,7 +209,7 @@ function RouteComponent() {
             {WORK_MODES[preview.work_mode ?? "not_specified"]}
           </p>
           <p className="text-sm text-gray-500">
-            <span className="font-bold">RQTH:</span> {preview.rqth ? "Oui" : "Non"}
+            <span className="font-bold">BOETH:</span> {preview.rqth ? "Oui" : "Non"}
           </p>
           <p className="text-sm text-gray-500">
             <span className="font-bold">Sous domaine:</span> {preview.subdomain || "Non renseigné"}
