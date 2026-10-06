@@ -4,21 +4,14 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import {
   BookUser,
   FunnelIcon,
-  GlobeIcon,
-  HandshakeIcon,
-  MailIcon,
   MoveRightIcon,
-  PhoneIcon,
   ScanSearchIcon,
   SearchIcon,
   SquareArrowOutUpRight,
 } from "lucide-react";
 import { Separator } from "radix-ui";
 import { useState } from "react";
-import abtraining from "~/assets/img/ab-training.png?url";
 import banner from "~/assets/img/banner.webp?url";
-import edmDesktop from "~/assets/img/edm-desktop.webp?url";
-import edmMobile from "~/assets/img/edm-mobile.webp?url";
 import malette from "~/assets/img/malette.webp?url";
 
 import { LinkedinIcon } from "~/components/icons/linkedin";
@@ -105,17 +98,6 @@ function Home() {
       </section>
 
       <section className="max-w-7xl mx-auto py-20 relative" id="search">
-        <div className="absolute top-20 start-0 hidden xl:grid w-2/9">
-          <a
-            href="https://www.en-dautres-mots.fr"
-            target="_blank"
-            rel="noreferrer noopener"
-            className="w-full"
-          >
-            <img src={edmDesktop} alt="" className="w-full object-cover" />
-          </a>
-        </div>
-
         <div className="flex flex-col gap-8 items-center max-w-3xl mx-auto">
           <div className="flex flex-col gap-4 items-center">
             <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
@@ -217,20 +199,6 @@ function Home() {
 
       <HomeSeparator />
 
-      <section className="py-20 max-w-3xl mx-auto xl:hidden ">
-        <div className="flex flex-col gap-4 items-center">
-          <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
-            <HandshakeIcon className="size-4" />
-            <span>Sponsors</span>
-          </div>
-          <a href="https://www.en-dautres-mots.fr" target="_blank" rel="noreferrer noopener">
-            <img src={edmMobile} alt="" className="size-full object-fit" />
-          </a>
-        </div>
-      </section>
-
-      <HomeSeparator />
-
       <section className="max-w-7xl mx-auto py-20 relative">
         <div className="grid gap-4 max-w-3xl mx-auto">
           <article className="ring-1 ring-border rounded-sm p-4 shadow grid gap-4 bg-card text-card-foreground w-full">
@@ -313,70 +281,6 @@ function Home() {
         </div>
       </section>
 
-      <HomeSeparator />
-
-      <section className="max-w-3xl mx-auto py-20">
-        <div className="flex flex-col gap-6 items-center">
-          <div className="text-xs text-secondary-foreground bg-secondary w-fit px-4 py-2 rounded-full flex items-center gap-2 shadow-sm ring-1 ring-border">
-            <HandshakeIcon className="size-4" />
-            <span>Sponsors</span>
-          </div>
-
-          <div className="flex flex-col gap-8">
-            <div className="border border-border rounded-sm text-black bg-[#66C9F9] shadow-sm font-luciole">
-              <div className="flex gap-4">
-                <div className="p-6 w-full sm:w-1/2 bg-white grid place-items-center rounded-s-sm">
-                  <a href="https://www.abtraining.fr" target="_blank" rel="noreferrer noopener">
-                    <img src={abtraining} alt="AB Training" className="aspect-auto w-full" />
-                  </a>
-                </div>
-                <div className="hidden sm:grid gap-5 px-4 py-6 flex-1">
-                  <div className="text-center">
-                    <p className="text-lg font-bold tracking-tighter">Notre force:</p>
-                    <p className="text-sm">cadrer, expliquer, traduire, motiver.</p>
-                  </div>
-                  <div className="text-center text-sm font-light">
-                    <p className="tracking-tighter">Accompagnement Conseil et Formation</p>
-                    <p>Administratif et Financier</p>
-                  </div>
-                  <div className="flex flex-col gap-1 text-center">
-                    <p className="text-sm font-bold">Nous joindre:</p>
-                    <div className="flex items-center justify-center gap-2">
-                      <a
-                        href="mailto:contact@abtraining.fr"
-                        className="text-xs flex items-center gap-1"
-                      >
-                        <MailIcon className="size-3" />
-                        contact@abtraining.fr
-                      </a>
-                      <Separator.Root orientation="vertical" className="h-4 w-px bg-black" />
-                      <a
-                        href="tel:+33683231449"
-                        className="text-xs flex items-center gap-1 text-nowrap"
-                      >
-                        <PhoneIcon className="size-3" />
-                        +33 6 83 23 14 49
-                      </a>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-1 ">
-                    <p className="text-sm font-bold text-center">Site web:</p>
-                    <a
-                      href="https://www.abtraining.fr"
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="text-xs flex items-center gap-1 justify-center"
-                    >
-                      <GlobeIcon className="size-3" />
-                      www.abtraining.fr
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
