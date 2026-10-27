@@ -2,6 +2,7 @@ import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin, customSession } from "better-auth/plugins";
+import { adminAc, defaultRoles } from "better-auth/plugins/admin/access";
 import { reactStartCookies } from "better-auth/react-start";
 import { Resend } from "resend";
 import { getDb } from "~/db";
@@ -36,7 +37,10 @@ export function auth() {
       },
     },
     plugins: [
-      admin({ adminRoles: ["admin", "superadmin"] }),
+      admin({
+        adminRoles: ["admin", "superadmin"],
+        roles: { ...defaultRoles, superadmin: adminAc },
+      }),
       customSession(async ({ user: currentUser, session }) => {
         const user = await db.query.user.findFirst({
           where: (user, { eq }) => eq(user.id, currentUser.id),
@@ -108,5 +112,3 @@ export function auth() {
     },
   });
 }
-
-export type AuthSession = Awaited<ReturnType<typeof auth>>["$Infer"]["Session"];

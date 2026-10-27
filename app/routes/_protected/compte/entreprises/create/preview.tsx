@@ -91,7 +91,7 @@ function RouteComponent() {
 
     if (preview.gallery) {
       for (const image of preview.gallery) {
-        formData.append("gallery", image);
+        if (image) formData.append("gallery", image);
       }
     }
 

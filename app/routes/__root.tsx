@@ -16,15 +16,14 @@ import { Toaster } from "sonner";
 import { ThemeProvider, useTheme } from "~/components/providers/theme-provider";
 import { SiteFooter } from "~/components/site-footer";
 import { SiteHeader } from "~/components/site-header";
-import { type AuthSession, auth } from "~/lib/auth/auth.server";
+import { auth } from "~/lib/auth/auth.server";
 import { getThemeServerFn } from "~/lib/theme";
 import appCSS from "~/styles/app.css?url";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
   const request = getWebRequest();
   if (!request) return null;
-  const session = await auth().api.getSession({ headers: request.headers });
-  return session as unknown as AuthSession;
+  return auth().api.getSession({ headers: request.headers });
 });
 
 const sessionQueryOptions = queryOptions({

@@ -21,10 +21,10 @@ import type { Entries } from "~/utils/types";
 
 export const Route = createFileRoute("/_protected/compte/entreprises/$slug/edit/preview")({
   component: RouteComponent,
-  beforeLoad: ({ params }) => {
+  beforeLoad: ({ params, search }) => {
     const preview = useUpdatePreviewStore.getState().preview;
     if (!preview) {
-      throw redirect({ to: "/compte/entreprises/$slug/edit/infos", params });
+      throw redirect({ to: "/compte/entreprises/$slug/edit/infos", params, search });
     }
     return { preview };
   },
@@ -55,6 +55,7 @@ function RouteComponent() {
   const { toast } = useToast();
   const { preview, queryClient } = Route.useRouteContext();
   const params = Route.useParams();
+  const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const { data: categories } = useSuspenseQuery(categoriesQueryOptions);
 
@@ -89,7 +90,7 @@ function RouteComponent() {
 
     if (preview.gallery) {
       for (const image of preview.gallery) {
-        formData.append("gallery", image);
+        if (image) formData.append("gallery", image);
       }
     }
 
@@ -116,6 +117,7 @@ function RouteComponent() {
       <Link
         to="/compte/entreprises/$slug/edit/infos"
         params={{ slug: params.slug }}
+        search={search}
         className="text-sm text-gray-500"
       >
         Retour
