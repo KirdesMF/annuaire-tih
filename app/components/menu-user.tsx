@@ -139,15 +139,15 @@ function AvatarUser({ user }: { user: User }) {
 
   if (user.image) {
     return (
-      <Avatar.Root className="size-8 rounded-full">
-        <Avatar.Image src={user.image} alt={user.name} className="size-full rounded-full" />
+      <Avatar.Root className="flex size-8 shrink-0 overflow-hidden rounded-full">
+        <Avatar.Image src={user.image} alt={user.name} className="size-full rounded-full object-cover" />
         <Avatar.Fallback className="size-full leading-1">{initials}</Avatar.Fallback>
       </Avatar.Root>
     );
   }
 
   return (
-    <Avatar.Root className="size-8 rounded-full bg-secondary flex">
+    <Avatar.Root className="size-8 shrink-0 overflow-hidden rounded-full bg-secondary flex">
       <Avatar.Fallback className="size-full leading-1 text-xs grid place-items-center text-secondary-foreground">
         {initials}
       </Avatar.Fallback>
