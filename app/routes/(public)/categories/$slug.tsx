@@ -3,14 +3,10 @@ import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
 import { ArrowLeftIcon } from "lucide-react";
 import * as v from "valibot";
 import { companiesByCategoryQuery } from "~/lib/api/companies/queries/get-companies-by-category";
-
-const SearchSchema = v.object({
-  id: v.string(),
-  name: v.string(),
-});
+import { CategorySearchSchema } from "~/lib/validator/category.schema";
 
 export const Route = createFileRoute("/(public)/categories/$slug")({
-  validateSearch: (search) => v.parse(SearchSchema, search),
+  validateSearch: (search) => v.parse(CategorySearchSchema, search),
   loaderDeps: ({ search }) => ({
     categoryId: search.id,
   }),

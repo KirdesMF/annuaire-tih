@@ -1,27 +1,35 @@
 import { queryOptions } from "@tanstack/react-query";
 import { createServerFn } from "@tanstack/react-start";
+import { setResponseStatus } from "@tanstack/react-start/server";
 import { and, eq } from "drizzle-orm";
 import * as v from "valibot";
 import { getDb } from "~/db";
-import { COMPANY_STATUSES, companiesTable } from "~/db/schema/companies";
+import { companiesTable } from "~/db/schema/companies";
 import { companyCategoriesTable } from "~/db/schema/company-categories";
 
-const GetCompaniesByCategorySchema = v.object({
-  categoryId: v.string(),
-  status: v.picklist(COMPANY_STATUSES),
-});
+import { PublicCategoryCompaniesSchema } from "~/lib/validator/category.schema";
 
-type GetCompaniesByCategoryData = v.InferOutput<typeof GetCompaniesByCategorySchema>;
+type GetCompaniesByCategoryData = v.InferOutput<typeof PublicCategoryCompaniesSchema>;
 
 export const getCompaniesByCategory = createServerFn({ method: "GET" })
-  .validator((data: unknown) => v.parse(GetCompaniesByCategorySchema, data))
-  .handler(async ({ data: { categoryId, status = "active" } }) => {
+  .validator((data: unknown) => {
+    const result = v.safeParse(PublicCategoryCompaniesSchema, data);
+    if (!result.success) {
+      setResponseStatus(400);
+      throw new Error("Requête de catégorie invalide");
+    }
+    return result.output;
+  })
+  .handler(async ({ data: { categoryId } }) => {
     const query = await getDb()
       .select()
       .from(companiesTable)
       .innerJoin(companyCategoriesTable, eq(companiesTable.id, companyCategoriesTable.company_id))
       .where(
-        and(eq(companyCategoriesTable.category_id, categoryId), eq(companiesTable.status, status)),
+        and(
+          eq(companyCategoriesTable.category_id, categoryId),
+          eq(companiesTable.status, "active"),
+        ),
       )
       .orderBy(companiesTable.name);
 
